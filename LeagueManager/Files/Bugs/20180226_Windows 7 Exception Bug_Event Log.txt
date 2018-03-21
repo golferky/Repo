@@ -1,0 +1,49 @@
+Log Name:      Application
+Source:        Application Error
+Date:          2/26/2018 8:01:21 AM
+Event ID:      1000
+Task Category: (100)
+Level:         Error
+Keywords:      Classic
+User:          N/A
+Computer:      Gary-PC
+Description:
+Faulting application name: LeagueManager.exe, version: 1.0.0.0, time stamp: 0x5a94050e
+Faulting module name: comctl32.dll, version: 5.82.7601.18837, time stamp: 0x553a885f
+Exception code: 0xc0000005
+Fault offset: 0x00000000000403d3
+Faulting process id: 0x558
+Faulting application start time: 0x01d3af01deac96e9
+Faulting application path: A:\LeagueManager\Files\LeagueManager.exe
+Faulting module path: C:\Windows\WinSxS\amd64_microsoft.windows.common-controls_6595b64144ccf1df_5.82.7601.18837_none_a4d981ff711297b6\comctl32.dll
+Report Id: 23d52e39-1af5-11e8-b329-0800273a02f1
+Event Xml:
+<Event xmlns="http://schemas.microsoft.com/win/2004/08/events/event">
+  <System>
+    <Provider Name="Application Error" />
+    <EventID Qualifiers="0">1000</EventID>
+    <Level>2</Level>
+    <Task>100</Task>
+    <Keywords>0x80000000000000</Keywords>
+    <TimeCreated SystemTime="2018-02-26T13:01:21.000000000Z" />
+    <EventRecordID>160314</EventRecordID>
+    <Channel>Application</Channel>
+    <Computer>Gary-PC</Computer>
+    <Security />
+  </System>
+  <EventData>
+    <Data>LeagueManager.exe</Data>
+    <Data>1.0.0.0</Data>
+    <Data>5a94050e</Data>
+    <Data>comctl32.dll</Data>
+    <Data>5.82.7601.18837</Data>
+    <Data>553a885f</Data>
+    <Data>c0000005</Data>
+    <Data>00000000000403d3</Data>
+    <Data>558</Data>
+    <Data>01d3af01deac96e9</Data>
+    <Data>A:\LeagueManager\Files\LeagueManager.exe</Data>
+    <Data>C:\Windows\WinSxS\amd64_microsoft.windows.common-controls_6595b64144ccf1df_5.82.7601.18837_none_a4d981ff711297b6\comctl32.dll</Data>
+    <Data>23d52e39-1af5-11e8-b329-0800273a02f1</Data>
+  </EventData>
+</Event>

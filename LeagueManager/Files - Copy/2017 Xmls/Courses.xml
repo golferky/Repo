@@ -1,0 +1,234 @@
+<?xml version="1.0" standalone="yes"?>
+<dsLeague xmlns="http://tempuri.org/dsLeague.xsd">
+  <xs:schema id="dsLeague" targetNamespace="http://tempuri.org/dsLeague.xsd" xmlns:mstns="http://tempuri.org/dsLeague.xsd" xmlns="http://tempuri.org/dsLeague.xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" xmlns:msprop="urn:schemas-microsoft-com:xml-msprop" attributeFormDefault="qualified" elementFormDefault="qualified">
+    <xs:element name="dsLeague" msdata:IsDataSet="true" msdata:MainDataTable="http_x003A__x002F__x002F_tempuri.org_x002F_dsLeague.xsd_x003A_dtCourses" msdata:UseCurrentLocale="true">
+      <xs:complexType>
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+          <xs:element name="dtCourses">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="Name" type="xs:string" />
+                <xs:element name="Date" msprop:Generator_ColumnVarNameInTable="columnDate" msprop:Generator_ColumnPropNameInTable="DateColumn" msprop:Generator_UserColumnName="Date" type="xs:dateTime" minOccurs="0" />
+                <xs:element name="Hole1" msdata:Caption="1" type="xs:short" minOccurs="0" />
+                <xs:element name="Hole2" msdata:Caption="2" type="xs:short" minOccurs="0" />
+                <xs:element name="Hole3" msdata:Caption="3" type="xs:short" minOccurs="0" />
+                <xs:element name="Hole4" msdata:Caption="4" type="xs:short" minOccurs="0" />
+                <xs:element name="Hole5" msdata:Caption="5" type="xs:short" minOccurs="0" />
+                <xs:element name="Hole6" msdata:Caption="6" type="xs:short" minOccurs="0" />
+                <xs:element name="Hole7" msdata:Caption="7" type="xs:short" minOccurs="0" />
+                <xs:element name="Hole8" msdata:Caption="8" type="xs:short" minOccurs="0" />
+                <xs:element name="Hole9" msdata:Caption="9" type="xs:short" minOccurs="0" />
+                <xs:element name="In" msprop:Generator_ColumnVarNameInTable="columnIn" msprop:Generator_ColumnPropNameInTable="InColumn" msprop:Generator_UserColumnName="In" type="xs:short" minOccurs="0" />
+                <xs:element name="Hole10" msdata:Caption="10" type="xs:short" minOccurs="0" />
+                <xs:element name="Hole11" msdata:Caption="11" type="xs:short" minOccurs="0" />
+                <xs:element name="Hole12" msdata:Caption="12" type="xs:short" minOccurs="0" />
+                <xs:element name="Hole13" msdata:Caption="13" type="xs:short" minOccurs="0" />
+                <xs:element name="Hole14" msdata:Caption="14" type="xs:short" minOccurs="0" />
+                <xs:element name="Hole15" msdata:Caption="15" type="xs:short" minOccurs="0" />
+                <xs:element name="Hole16" msdata:Caption="16" type="xs:short" minOccurs="0" />
+                <xs:element name="Hole17" msdata:Caption="17" type="xs:short" minOccurs="0" />
+                <xs:element name="Hole18" msdata:Caption="18" type="xs:short" minOccurs="0" />
+                <xs:element name="Out" type="xs:short" minOccurs="0" />
+                <xs:element name="Total" type="xs:string" minOccurs="0" />
+                <xs:element name="H1" type="xs:string" minOccurs="0" />
+                <xs:element name="H2" type="xs:string" minOccurs="0" />
+                <xs:element name="H3" type="xs:string" minOccurs="0" />
+                <xs:element name="H4" type="xs:string" minOccurs="0" />
+                <xs:element name="H5" type="xs:string" minOccurs="0" />
+                <xs:element name="H6" type="xs:string" minOccurs="0" />
+                <xs:element name="H7" type="xs:string" minOccurs="0" />
+                <xs:element name="H8" type="xs:string" minOccurs="0" />
+                <xs:element name="H9" type="xs:string" minOccurs="0" />
+                <xs:element name="H10" type="xs:string" minOccurs="0" />
+                <xs:element name="H11" type="xs:string" minOccurs="0" />
+                <xs:element name="H12" type="xs:string" minOccurs="0" />
+                <xs:element name="H13" type="xs:string" minOccurs="0" />
+                <xs:element name="H14" type="xs:string" minOccurs="0" />
+                <xs:element name="H15" type="xs:string" minOccurs="0" />
+                <xs:element name="H16" type="xs:string" minOccurs="0" />
+                <xs:element name="H17" type="xs:string" minOccurs="0" />
+                <xs:element name="H18" type="xs:string" minOccurs="0" />
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+        </xs:choice>
+      </xs:complexType>
+      <xs:unique name="Constraint1" msdata:PrimaryKey="true">
+        <xs:selector xpath=".//mstns:dtCourses" />
+        <xs:field xpath="mstns:Name" />
+      </xs:unique>
+    </xs:element>
+  </xs:schema>
+  <dtCourses>
+    <Name>Boone Links</Name>
+    <Date>2013-08-01T10:16:00-04:00</Date>
+    <Hole1>5</Hole1>
+    <Hole2>4</Hole2>
+    <Hole3>4</Hole3>
+    <Hole4>3</Hole4>
+    <Hole5>5</Hole5>
+    <Hole6>4</Hole6>
+    <Hole7>4</Hole7>
+    <Hole8>3</Hole8>
+    <Hole9>4</Hole9>
+    <In>36</In>
+    <Hole10>3</Hole10>
+    <Hole11>5</Hole11>
+    <Hole12>3</Hole12>
+    <Hole13>4</Hole13>
+    <Hole14>4</Hole14>
+    <Hole15>4</Hole15>
+    <Hole16>5</Hole16>
+    <Hole17>4</Hole17>
+    <Hole18>4</Hole18>
+    <Out>36</Out>
+    <Total>72</Total>
+    <H1>17</H1>
+    <H2>1</H2>
+    <H3>15</H3>
+    <H4>9</H4>
+    <H5>11</H5>
+    <H6>3</H6>
+    <H7>5</H7>
+    <H8>13</H8>
+    <H9>7</H9>
+    <H10>8</H10>
+    <H11>12</H11>
+    <H12>2</H12>
+    <H13>16</H13>
+    <H14>4</H14>
+    <H15>14</H15>
+    <H16>10</H16>
+    <H17>6</H17>
+    <H18>18</H18>
+  </dtCourses>
+  <dtCourses>
+    <Name>Lassing Pointe</Name>
+    <Date>2013-08-01T10:24:00-04:00</Date>
+    <Hole1>5</Hole1>
+    <Hole2>3</Hole2>
+    <Hole3>4</Hole3>
+    <Hole4>4</Hole4>
+    <Hole5>3</Hole5>
+    <Hole6>4</Hole6>
+    <Hole7>3</Hole7>
+    <Hole8>5</Hole8>
+    <Hole9>4</Hole9>
+    <In>35</In>
+    <Hole10>5</Hole10>
+    <Hole11>3</Hole11>
+    <Hole12>4</Hole12>
+    <Hole13>4</Hole13>
+    <Hole14>3</Hole14>
+    <Hole15>5</Hole15>
+    <Hole16>4</Hole16>
+    <Hole17>4</Hole17>
+    <Hole18>4</Hole18>
+    <Out>36</Out>
+    <Total>71</Total>
+    <H1>5</H1>
+    <H2>13</H2>
+    <H3>3</H3>
+    <H4>15</H4>
+    <H5>17</H5>
+    <H6>9</H6>
+    <H7>11</H7>
+    <H8>1</H8>
+    <H9>7</H9>
+    <H10>6</H10>
+    <H11>16</H11>
+    <H12>14</H12>
+    <H13>2</H13>
+    <H14>12</H14>
+    <H15>4</H15>
+    <H16>18</H16>
+    <H17>10</H17>
+    <H18>8</H18>
+  </dtCourses>
+  <dtCourses>
+    <Name>The Links Rising Star Casino</Name>
+    <Date>2013-08-18T11:16:00-04:00</Date>
+    <Hole1>4</Hole1>
+    <Hole2>4</Hole2>
+    <Hole3>5</Hole3>
+    <Hole4>3</Hole4>
+    <Hole5>4</Hole5>
+    <Hole6>3</Hole6>
+    <Hole7>4</Hole7>
+    <Hole8>4</Hole8>
+    <Hole9>3</Hole9>
+    <In>34</In>
+    <Hole10>4</Hole10>
+    <Hole11>4</Hole11>
+    <Hole12>5</Hole12>
+    <Hole13>3</Hole13>
+    <Hole14>4</Hole14>
+    <Hole15>4</Hole15>
+    <Hole16>4</Hole16>
+    <Hole17>5</Hole17>
+    <Hole18>4</Hole18>
+    <Out>37</Out>
+    <Total>71</Total>
+    <H1>10</H1>
+    <H2>8</H2>
+    <H3>2</H3>
+    <H4>18</H4>
+    <H5>12</H5>
+    <H6>16</H6>
+    <H7>6</H7>
+    <H8>4</H8>
+    <H9>14</H9>
+    <H10>11</H10>
+    <H11>5</H11>
+    <H12>1</H12>
+    <H13>7</H13>
+    <H14>13</H14>
+    <H15>17</H15>
+    <H16>15</H16>
+    <H17>9</H17>
+    <H18>3</H18>
+  </dtCourses>
+  <dtCourses>
+    <Name>Soone Links</Name>
+    <Date>2013-08-01T10:16:00-04:00</Date>
+    <Hole1>5</Hole1>
+    <Hole2>4</Hole2>
+    <Hole3>4</Hole3>
+    <Hole4>3</Hole4>
+    <Hole5>5</Hole5>
+    <Hole6>4</Hole6>
+    <Hole7>4</Hole7>
+    <Hole8>3</Hole8>
+    <Hole9>4</Hole9>
+    <In>36</In>
+    <Hole10>3</Hole10>
+    <Hole11>5</Hole11>
+    <Hole12>3</Hole12>
+    <Hole13>4</Hole13>
+    <Hole14>4</Hole14>
+    <Hole15>4</Hole15>
+    <Hole16>5</Hole16>
+    <Hole17>4</Hole17>
+    <Hole18>4</Hole18>
+    <Out>36</Out>
+    <Total>72</Total>
+    <H1>17</H1>
+    <H2>1</H2>
+    <H3>15</H3>
+    <H4>9</H4>
+    <H5>11</H5>
+    <H6>3</H6>
+    <H7>5</H7>
+    <H8>13</H8>
+    <H9>7</H9>
+    <H10>8</H10>
+    <H11>12</H11>
+    <H12>2</H12>
+    <H13>16</H13>
+    <H14>4</H14>
+    <H15>14</H15>
+    <H16>10</H16>
+    <H17>6</H17>
+    <H18>18</H18>
+  </dtCourses>
+</dsLeague>

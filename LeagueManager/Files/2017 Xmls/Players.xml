@@ -1,0 +1,466 @@
+<?xml version="1.0" standalone="yes"?>
+<dsLeague xmlns="http://tempuri.org/dsLeague.xsd">
+  <xs:schema id="dsLeague" targetNamespace="http://tempuri.org/dsLeague.xsd" xmlns:mstns="http://tempuri.org/dsLeague.xsd" xmlns="http://tempuri.org/dsLeague.xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" xmlns:msprop="urn:schemas-microsoft-com:xml-msprop" attributeFormDefault="qualified" elementFormDefault="qualified">
+    <xs:element name="dsLeague" msdata:IsDataSet="true" msdata:MainDataTable="http_x003A__x002F__x002F_tempuri.org_x002F_dsLeague.xsd_x003A_dtPlayers" msdata:UseCurrentLocale="true">
+      <xs:complexType>
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+          <xs:element name="dtPlayers">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="Name" type="xs:string" minOccurs="0" />
+                <xs:element name="Team" type="xs:string" minOccurs="0" />
+                <xs:element name="Grade" type="xs:string" minOccurs="0" />
+                <xs:element name="Paid" type="xs:string" minOccurs="0" />
+                <xs:element name="Email" type="xs:string" minOccurs="0" />
+                <xs:element name="Phone" type="xs:string" minOccurs="0" />
+                <xs:element name="NickName" type="xs:string" minOccurs="0" />
+                <xs:element name="DateLeft" type="xs:string" minOccurs="0" />
+                <xs:element name="DateJoined" type="xs:string" minOccurs="0" />
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+        </xs:choice>
+      </xs:complexType>
+    </xs:element>
+  </xs:schema>
+  <dtPlayers>
+    <Name>Archie Clark</Name>
+    <Team>8</Team>
+    <Grade>B</Grade>
+    <Paid />
+    <Email />
+    <Phone />
+    <NickName />
+    <DateLeft />
+    <DateJoined />
+  </dtPlayers>
+  <dtPlayers>
+    <Name>Ben Wright</Name>
+    <Team>12</Team>
+    <Grade>A</Grade>
+    <Paid />
+    <Email />
+    <Phone />
+    <NickName />
+    <DateLeft />
+    <DateJoined />
+  </dtPlayers>
+  <dtPlayers>
+    <Name>Bill Brumback</Name>
+    <Team>11</Team>
+    <Grade>A</Grade>
+    <Paid />
+    <Email />
+    <Phone />
+    <NickName />
+    <DateLeft />
+    <DateJoined />
+  </dtPlayers>
+  <dtPlayers>
+    <Name>Bill Weil</Name>
+    <Team>1</Team>
+    <Grade>A</Grade>
+    <Paid />
+    <Email />
+    <Phone />
+    <NickName />
+    <DateLeft />
+    <DateJoined />
+  </dtPlayers>
+  <dtPlayers>
+    <Name>Brad Pierce</Name>
+    <Team>3</Team>
+    <Grade>B</Grade>
+    <Paid />
+    <Email />
+    <Phone />
+    <NickName />
+    <DateLeft />
+    <DateJoined />
+  </dtPlayers>
+  <dtPlayers>
+    <Name>Brad Wilson</Name>
+    <Team>3</Team>
+    <Grade>A</Grade>
+    <Paid />
+    <Email />
+    <Phone />
+    <NickName />
+    <DateLeft />
+    <DateJoined />
+  </dtPlayers>
+  <dtPlayers>
+    <Name>Dan Hollman</Name>
+    <Team>5</Team>
+    <Grade>B</Grade>
+    <Paid />
+    <Email />
+    <Phone />
+    <NickName />
+    <DateLeft />
+    <DateJoined />
+  </dtPlayers>
+  <dtPlayers>
+    <Name>Dan Nolastname</Name>
+    <Team />
+    <Grade>S</Grade>
+    <Paid />
+    <Email />
+    <Phone />
+    <NickName />
+    <DateLeft />
+    <DateJoined />
+  </dtPlayers>
+  <dtPlayers>
+    <Name>Dave McDonald</Name>
+    <Team>7</Team>
+    <Grade>A</Grade>
+    <Paid />
+    <Email />
+    <Phone />
+    <NickName />
+    <DateLeft />
+    <DateJoined>20170425</DateJoined>
+  </dtPlayers>
+  <dtPlayers>
+    <Name>Dave Vocke</Name>
+    <Team>12</Team>
+    <Grade>B</Grade>
+    <Paid />
+    <Email />
+    <Phone />
+    <NickName />
+    <DateLeft />
+    <DateJoined />
+  </dtPlayers>
+  <dtPlayers>
+    <Name>Dick Booth</Name>
+    <Team />
+    <Grade>S</Grade>
+    <Paid />
+    <Email />
+    <Phone />
+    <NickName />
+    <DateLeft />
+    <DateJoined />
+  </dtPlayers>
+  <dtPlayers>
+    <Name>Ed Lubrecht</Name>
+    <Team />
+    <Grade>S</Grade>
+    <Paid />
+    <Email />
+    <Phone />
+    <NickName />
+    <DateLeft />
+    <DateJoined />
+  </dtPlayers>
+  <dtPlayers>
+    <Name>Gary Scudder</Name>
+    <Team>9</Team>
+    <Grade>A</Grade>
+    <Paid />
+    <Email>gary_scudder@yahoo.com</Email>
+    <Phone>859-496-0664</Phone>
+    <NickName />
+    <DateLeft />
+    <DateJoined />
+  </dtPlayers>
+  <dtPlayers>
+    <Name>Greg Lemker</Name>
+    <Team>9</Team>
+    <Grade>B</Grade>
+    <Paid />
+    <Email>glemker@fuse.net</Email>
+    <Phone>859-620-0465</Phone>
+    <NickName />
+    <DateLeft />
+    <DateJoined />
+  </dtPlayers>
+  <dtPlayers>
+    <Name>Howard Gorman</Name>
+    <Team>10</Team>
+    <Grade>B</Grade>
+    <Paid />
+    <Email>gmanhoward@yahoo.com</Email>
+    <Phone>859-609-4967</Phone>
+    <NickName />
+    <DateLeft />
+    <DateJoined />
+  </dtPlayers>
+  <dtPlayers>
+    <Name>Jeff Behrens</Name>
+    <Team>7</Team>
+    <Grade>A</Grade>
+    <Paid />
+    <Email />
+    <Phone />
+    <NickName />
+    <DateLeft>20170425</DateLeft>
+    <DateJoined />
+  </dtPlayers>
+  <dtPlayers>
+    <Name>Jerry Arrasmith</Name>
+    <Team>6</Team>
+    <Grade>A</Grade>
+    <Paid />
+    <Email />
+    <Phone />
+    <NickName />
+    <DateLeft />
+    <DateJoined />
+  </dtPlayers>
+  <dtPlayers>
+    <Name>Jerry Smith</Name>
+    <Team>4</Team>
+    <Grade>B</Grade>
+    <Paid />
+    <Email />
+    <Phone />
+    <NickName />
+    <DateLeft />
+    <DateJoined />
+  </dtPlayers>
+  <dtPlayers>
+    <Name>John Bain</Name>
+    <Team />
+    <Grade>S</Grade>
+    <Paid />
+    <Email />
+    <Phone />
+    <NickName />
+    <DateLeft />
+    <DateJoined />
+  </dtPlayers>
+  <dtPlayers>
+    <Name>John Huening</Name>
+    <Team>2</Team>
+    <Grade>B</Grade>
+    <Paid />
+    <Email />
+    <Phone />
+    <NickName />
+    <DateLeft />
+    <DateJoined />
+  </dtPlayers>
+  <dtPlayers>
+    <Name>Keith Nolastname</Name>
+    <Team />
+    <Grade>S</Grade>
+    <Paid />
+    <Email />
+    <Phone />
+    <NickName />
+    <DateLeft />
+    <DateJoined />
+  </dtPlayers>
+  <dtPlayers>
+    <Name>Larry Blessing</Name>
+    <Team>2</Team>
+    <Grade>A</Grade>
+    <Paid />
+    <Email />
+    <Phone />
+    <NickName />
+    <DateLeft />
+    <DateJoined />
+  </dtPlayers>
+  <dtPlayers>
+    <Name>Larry Ryder</Name>
+    <Team />
+    <Grade>S</Grade>
+    <Paid />
+    <Email />
+    <Phone />
+    <NickName />
+    <DateLeft />
+    <DateJoined />
+  </dtPlayers>
+  <dtPlayers>
+    <Name>Mike Arthur</Name>
+    <Team />
+    <Grade>S</Grade>
+    <Paid />
+    <Email />
+    <Phone />
+    <NickName />
+    <DateLeft />
+    <DateJoined />
+  </dtPlayers>
+  <dtPlayers>
+    <Name>Paul Kessen</Name>
+    <Team />
+    <Grade>S</Grade>
+    <Paid />
+    <Email />
+    <Phone />
+    <NickName />
+    <DateLeft />
+    <DateJoined />
+  </dtPlayers>
+  <dtPlayers>
+    <Name>Ralph Nolastname</Name>
+    <Team />
+    <Grade>S</Grade>
+    <Paid />
+    <Email />
+    <Phone />
+    <NickName />
+    <DateLeft />
+    <DateJoined />
+  </dtPlayers>
+  <dtPlayers>
+    <Name>Rick Smith</Name>
+    <Team>4</Team>
+    <Grade>A</Grade>
+    <Paid />
+    <Email />
+    <Phone />
+    <NickName />
+    <DateLeft />
+    <DateJoined>20170808</DateJoined>
+  </dtPlayers>
+  <dtPlayers>
+    <Name>Roger Hogan</Name>
+    <Team>4</Team>
+    <Grade>A</Grade>
+    <Paid />
+    <Email />
+    <Phone />
+    <NickName />
+    <DateLeft>20170808</DateLeft>
+    <DateJoined />
+  </dtPlayers>
+  <dtPlayers>
+    <Name>Rork Williams</Name>
+    <Team>5</Team>
+    <Grade>A</Grade>
+    <Paid />
+    <Email />
+    <Phone />
+    <NickName />
+    <DateLeft />
+    <DateJoined />
+  </dtPlayers>
+  <dtPlayers>
+    <Name>Sam Dinn</Name>
+    <Team>6</Team>
+    <Grade>B</Grade>
+    <Paid />
+    <Email>scdinn@yahoo.com</Email>
+    <Phone>859-750-1200</Phone>
+    <NickName />
+    <DateLeft />
+    <DateJoined />
+  </dtPlayers>
+  <dtPlayers>
+    <Name>Scott Scudder</Name>
+    <Team />
+    <Grade>S</Grade>
+    <Paid />
+    <Email />
+    <Phone />
+    <NickName />
+    <DateLeft />
+    <DateJoined />
+  </dtPlayers>
+  <dtPlayers>
+    <Name>Sonny Dehner</Name>
+    <Team>11</Team>
+    <Grade>B</Grade>
+    <Paid />
+    <Email />
+    <Phone />
+    <NickName />
+    <DateLeft />
+    <DateJoined />
+  </dtPlayers>
+  <dtPlayers>
+    <Name>Terry Kesselring</Name>
+    <Team>1</Team>
+    <Grade>B</Grade>
+    <Paid />
+    <Email />
+    <Phone />
+    <NickName />
+    <DateLeft />
+    <DateJoined />
+  </dtPlayers>
+  <dtPlayers>
+    <Name>Tim Behrens</Name>
+    <Team>7</Team>
+    <Grade>B</Grade>
+    <Paid />
+    <Email />
+    <Phone />
+    <NickName />
+    <DateLeft />
+    <DateJoined />
+  </dtPlayers>
+  <dtPlayers>
+    <Name>Tiny Scheper</Name>
+    <Team />
+    <Grade>S</Grade>
+    <Paid />
+    <Email />
+    <Phone />
+    <NickName />
+    <DateLeft />
+    <DateJoined />
+  </dtPlayers>
+  <dtPlayers>
+    <Name>Todd Nolastname</Name>
+    <Team />
+    <Grade>S</Grade>
+    <Paid />
+    <Email />
+    <Phone />
+    <NickName />
+    <DateLeft />
+    <DateJoined />
+  </dtPlayers>
+  <dtPlayers>
+    <Name>Tom Jenning</Name>
+    <Team>10</Team>
+    <Grade>A</Grade>
+    <Paid />
+    <Email />
+    <Phone />
+    <NickName />
+    <DateLeft />
+    <DateJoined />
+  </dtPlayers>
+  <dtPlayers>
+    <Name>Tony Smith</Name>
+    <Team />
+    <Grade>S</Grade>
+    <Paid />
+    <Email />
+    <Phone />
+    <NickName />
+    <DateLeft />
+    <DateJoined />
+  </dtPlayers>
+  <dtPlayers>
+    <Name>Wayne Meyer</Name>
+    <Team />
+    <Grade>S</Grade>
+    <Paid />
+    <Email />
+    <Phone />
+    <NickName />
+    <DateLeft />
+    <DateJoined />
+  </dtPlayers>
+  <dtPlayers>
+    <Name>Will Huenefeld</Name>
+    <Team>8</Team>
+    <Grade>A</Grade>
+    <Paid />
+    <Email />
+    <Phone />
+    <NickName />
+    <DateLeft />
+    <DateJoined />
+  </dtPlayers>
+ </dsLeague>

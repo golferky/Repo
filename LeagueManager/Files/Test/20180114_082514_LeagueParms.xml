@@ -1,0 +1,105 @@
+<?xml version="1.0" standalone="yes"?>
+<dsLeague xmlns="http://tempuri.org/dsLeague.xsd">
+  <xs:schema id="dsLeague" targetNamespace="http://tempuri.org/dsLeague.xsd" xmlns:mstns="http://tempuri.org/dsLeague.xsd" xmlns="http://tempuri.org/dsLeague.xsd" xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:msdata="urn:schemas-microsoft-com:xml-msdata" xmlns:msprop="urn:schemas-microsoft-com:xml-msprop" attributeFormDefault="qualified" elementFormDefault="qualified">
+    <xs:element name="dsLeague" msdata:IsDataSet="true" msdata:MainDataTable="http_x003A__x002F__x002F_tempuri.org_x002F_dsLeague.xsd_x003A_dtLeagueParms" msdata:UseCurrentLocale="true">
+      <xs:complexType>
+        <xs:choice minOccurs="0" maxOccurs="unbounded">
+          <xs:element name="dtLeagueParms">
+            <xs:complexType>
+              <xs:sequence>
+                <xs:element name="Name" type="xs:string" minOccurs="0" />
+                <xs:element name="Secretary" type="xs:string" minOccurs="0" />
+                <xs:element name="Format" type="xs:string" minOccurs="0" />
+                <xs:element name="Cost" type="xs:string" minOccurs="0" />
+                <xs:element name="Teams" type="xs:string" minOccurs="0" />
+                <xs:element name="PayPlaces" type="xs:string" minOccurs="0" />
+                <xs:element name="StartDate" type="xs:dateTime" minOccurs="0" />
+                <xs:element name="EndDate" msdata:DateTimeMode="Local" type="xs:dateTime" minOccurs="0" />
+                <xs:element name="HdcpScores" type="xs:string" minOccurs="0" />
+                <xs:element name="HdcpFormat" type="xs:string" minOccurs="0" />
+                <xs:element name="CarryLastYears" type="xs:string" minOccurs="0" />
+                <xs:element name="MaxHdcp" type="xs:string" minOccurs="0" />
+                <xs:element name="Par3Max" type="xs:string" minOccurs="0" />
+                <xs:element name="Par4Max" type="xs:string" minOccurs="0" />
+                <xs:element name="Par5Max" type="xs:string" minOccurs="0" />
+                <xs:element name="Course" type="xs:string" minOccurs="0" />
+                <xs:element name="Holes" type="xs:string" minOccurs="0" />
+                <xs:element name="Start9" type="xs:string" minOccurs="0" />
+                <xs:element name="Method" type="xs:string" minOccurs="0" />
+                <xs:element name="Skins" type="xs:string" minOccurs="0" />
+                <xs:element name="Closest" type="xs:string" minOccurs="0" />
+                <xs:element name="SplitSeason" type="xs:string" minOccurs="0" />
+                <xs:element name="PostSeason" type="xs:string" minOccurs="0" />
+                <xs:element name="SkinFmt" type="xs:string" minOccurs="0" />
+                <xs:element name="Email" type="xs:string" minOccurs="0" />
+                <xs:element name="EmailPassword" type="xs:string" minOccurs="0" />
+                <xs:element name="DataColumn4" type="xs:string" minOccurs="0" />
+                <xs:element name="DataColumn5" type="xs:string" minOccurs="0" />
+              </xs:sequence>
+            </xs:complexType>
+          </xs:element>
+        </xs:choice>
+      </xs:complexType>
+    </xs:element>
+  </xs:schema>
+  <dtLeagueParms>
+    <Name>Hugh's</Name>
+    <Secretary>Sam Dinn</Secretary>
+    <Format>2 Man Medal</Format>
+    <Cost>30</Cost>
+    <Teams>12</Teams>
+    <PayPlaces>3</PayPlaces>
+    <StartDate>2017-04-11T00:00:00-04:00</StartDate>
+    <EndDate>2017-09-26T00:00:00-04:00</EndDate>
+    <HdcpScores>5</HdcpScores>
+    <HdcpFormat>Std</HdcpFormat>
+    <CarryLastYears>Y</CarryLastYears>
+    <MaxHdcp>99</MaxHdcp>
+    <Par3Max>6</Par3Max>
+    <Par4Max>8</Par4Max>
+    <Par5Max>9</Par5Max>
+    <Course>Boone Links</Course>
+    <Holes>9</Holes>
+    <Start9>F</Start9>
+    <Method>Net</Method>
+    <Skins>2</Skins>
+    <Closest>Y</Closest>
+    <SplitSeason>Y</SplitSeason>
+    <PostSeason>Y</PostSeason>
+    <SkinFmt>Handicap</SkinFmt>
+    <Email />
+    <EmailPassword />
+    <DataColumn4 />
+    <DataColumn5 />
+  </dtLeagueParms>
+  <dtLeagueParms>
+    <Name>Hugh's</Name>
+    <Secretary>Gary Scudder</Secretary>
+    <Format>2 Man Medal</Format>
+    <Cost>30</Cost>
+    <Teams>12</Teams>
+    <PayPlaces>3</PayPlaces>
+    <StartDate>2018-04-10T00:00:00-04:00</StartDate>
+    <EndDate>2018-09-25T00:00:00-04:00</EndDate>
+    <HdcpScores>5</HdcpScores>
+    <HdcpFormat>Std</HdcpFormat>
+    <CarryLastYears>Y</CarryLastYears>
+    <MaxHdcp>99</MaxHdcp>
+    <Par3Max>6</Par3Max>
+    <Par4Max>8</Par4Max>
+    <Par5Max>9</Par5Max>
+    <Course>Boone Links</Course>
+    <Holes>9</Holes>
+    <Start9>F</Start9>
+    <Method>Gross</Method>
+    <Skins>2</Skins>
+    <Closest>Y</Closest>
+    <SplitSeason>Y</SplitSeason>
+    <PostSeason>Y</PostSeason>
+    <SkinFmt>Handicap</SkinFmt>
+    <Email>GughSecretary@gmail.com</Email>
+    <EmailPassword>BooneLinks</EmailPassword>
+    <DataColumn4 />
+    <DataColumn5 />
+  </dtLeagueParms>
+</dsLeague>
