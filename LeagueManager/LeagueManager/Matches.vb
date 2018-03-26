@@ -89,9 +89,10 @@ Public Class Matches
         End If
 
         BldMatchesDataGridFromCSV()
-
-        If dgScores.RowCount < 24 Then
-            MsgBox(String.Format("All 24 scores must be entered before you can show or calculate matches for this date {0},exiting", cbDatesPlayers.SelectedItem))
+        '20180325-remove hardcoded players replacing with league parms
+        Dim iPlayers As Integer = oHelper.rLeagueParmrow("Teams") * 2
+        If dgScores.RowCount < iPlayers Then
+            MsgBox(String.Format("All {0} scores must be entered before you can show or calculate matches for this date {1},exiting", iPlayers, cbDatesPlayers.SelectedItem))
             oHelper.Common_Exit()
             With lbStatus
                 .Text = "Error Calculating Matches"
@@ -104,38 +105,37 @@ Public Class Matches
         End If
 
         If dgScores.RowCount > 0 Then
-            For i = 1 To oHelper.rLeagueParmrow("Teams") / 2
+            For i = 1 To iPlayers
                 Dim aPtr = (i - 1) * 4
                 'A Player Match
-                oHelper.getMatchPts(dgScores, aPtr)
+                oHelper.getMatchPts(dgScores, aPtr + 0)
                 'B Player Match
                 oHelper.getMatchPts(dgScores, aPtr + 1)
                 Dim ihaNet = 0
                 Dim ihbNet = 0
                 Dim ioaNet = 0
                 Dim iobNet = 0
-                If oHelper.iHoleMarker = 1 Then
-                    ihaNet = oHelper.FixNullScore(dgScores.Rows(aPtr).Cells("Out_Net").Value.ToString)
-                    ihbNet = oHelper.FixNullScore(dgScores.Rows(aPtr + 1).Cells("Out_Net").Value.ToString)
-                    ioaNet = oHelper.FixNullScore(dgScores.Rows(aPtr + 2).Cells("Out_Net").Value.ToString)
-                    iobNet = oHelper.FixNullScore(dgScores.Rows(aPtr + 3).Cells("Out_Net").Value.ToString)
-                Else
-                    ihaNet = oHelper.FixNullScore(dgScores.Rows(aPtr).Cells("In_Net").Value.ToString)
-                    ihbNet = oHelper.FixNullScore(dgScores.Rows(aPtr + 1).Cells("In_Net").Value.ToString)
-                    ioaNet = oHelper.FixNullScore(dgScores.Rows(aPtr + 2).Cells("In_Net").Value.ToString)
-                    iobNet = oHelper.FixNullScore(dgScores.Rows(aPtr + 3).Cells("In_Net").Value.ToString)
-                End If
+                '20180325-add variable 
+                Dim s9Played As String = "Out_Net"
+                If oHelper.iHoleMarker <> 1 Then s9Played = "In_Net"
+
+                ihaNet = oHelper.FixNullScore(dgScores.Rows(aPtr + 0).Cells(s9Played).Value.ToString)
+                ihbNet = oHelper.FixNullScore(dgScores.Rows(aPtr + 1).Cells(s9Played).Value.ToString)
+                ioaNet = oHelper.FixNullScore(dgScores.Rows(aPtr + 2).Cells(s9Played).Value.ToString)
+                iobNet = oHelper.FixNullScore(dgScores.Rows(aPtr + 3).Cells(s9Played).Value.ToString)
+
                 Dim ihTeam As Integer = ihaNet + ihbNet
                 Dim ioTeam As Integer = ioaNet + iobNet
 
-                dgScores.Rows(aPtr).Cells("Team_Points").Value = ""
+                dgScores.Rows(aPtr + 0).Cells("Team_Points").Value = ""
                 dgScores.Rows(aPtr + 1).Cells("Team_Points").Value = ""
                 dgScores.Rows(aPtr + 2).Cells("Team_Points").Value = ""
                 dgScores.Rows(aPtr + 3).Cells("Team_Points").Value = ""
+
                 If ihTeam < ioTeam Then
-                    dgScores.Rows(aPtr).Cells("Team_Points").Value = 0.5
+                    dgScores.Rows(aPtr + 0).Cells("Team_Points").Value = 0.5
                     dgScores.Rows(aPtr + 1).Cells("Team_Points").Value = 0.5
-                    dgScores.Rows(aPtr).Cells("Team_Points").Style.BackColor = Color.LightGreen
+                    dgScores.Rows(aPtr + 0).Cells("Team_Points").Style.BackColor = Color.LightGreen
                     dgScores.Rows(aPtr + 1).Cells("Team_Points").Style.BackColor = Color.LightGreen
                 ElseIf ihTeam > ioTeam Then
                     dgScores.Rows(aPtr + 2).Cells("Team_Points").Value = 0.5
@@ -143,11 +143,11 @@ Public Class Matches
                     dgScores.Rows(aPtr + 2).Cells("Team_Points").Style.BackColor = Color.LightGreen
                     dgScores.Rows(aPtr + 3).Cells("Team_Points").Style.BackColor = Color.LightGreen
                 Else
-                    dgScores.Rows(aPtr).Cells("Team_Points").Value = 0.25
+                    dgScores.Rows(aPtr + 0).Cells("Team_Points").Value = 0.25
                     dgScores.Rows(aPtr + 1).Cells("Team_Points").Value = 0.25
                     dgScores.Rows(aPtr + 2).Cells("Team_Points").Value = 0.25
                     dgScores.Rows(aPtr + 3).Cells("Team_Points").Value = 0.25
-                    dgScores.Rows(aPtr).Cells("Team_Points").Style.BackColor = Color.Yellow
+                    dgScores.Rows(aPtr + 0).Cells("Team_Points").Style.BackColor = Color.Yellow
                     dgScores.Rows(aPtr + 1).Cells("Team_Points").Style.BackColor = Color.Yellow
                     dgScores.Rows(aPtr + 2).Cells("Team_Points").Style.BackColor = Color.Yellow
                     dgScores.Rows(aPtr + 3).Cells("Team_Points").Style.BackColor = Color.Yellow
@@ -424,9 +424,8 @@ Public Class Matches
                     ishade = 4
                 End If
 
-                If bbl Then
-                    row.DefaultCellStyle.BackColor = Color.LightBlue
-                End If
+                If bbl Then row.DefaultCellStyle.BackColor = Color.LightBlue
+
                 ishade -= 1
 
                 Dim dv2Scores As New DataView(oHelper.dsLeague.Tables("dtScores"))
@@ -441,12 +440,10 @@ Public Class Matches
                 'prevent column sort
                 oHelper.MakeCellsStrings(row)
                 oHelper.ChangeColorsForStrokes(row)
-             
-                If oHelper.iHoleMarker = 1 Then
-                    If row.Cells("Out_Gross").Value = "" Then row.Cells("Player").Style.BackColor = Color.Pink
-                Else
-                    If row.Cells("In_Gross").Value = "" Then row.Cells("Player").Style.BackColor = Color.Pink
-                End If
+                '20180325-add variable 
+                Dim s9Played As String = "Out_Net"
+                If oHelper.iHoleMarker <> 1 Then s9Played = "In_Net"
+                If row.Cells(s9Played).Value = "" Then row.Cells("Player").Style.BackColor = Color.Pink
             Next
 
         Catch ex As Exception
@@ -455,17 +452,13 @@ Public Class Matches
     End Sub
     Sub UpdateScoresFromDataGrid(row As DataGridViewRow)
         Try
-            If row.Cells("Player").Value Is Nothing Then
-                Exit Sub
-            End If
+            If row.Cells("Player").Value Is Nothing Then Exit Sub
 
             'find the score for this player / date
             Dim sKeys() As Object = {row.Cells("Player").Value, oHelper.dDate.ToString("yyyyMMdd", Globalization.CultureInfo.InvariantCulture)} 'cbDatesPlayers.SelectedItem
             Dim dr As DataRow = oHelper.dsLeague.Tables("dtScores").Rows.Find(sKeys)
             For Each cell As DataGridViewCell In row.Cells
-                If cell.Value IsNot DBNull.Value Then
-                    dr(cell.OwningColumn.Name) = cell.Value
-                End If
+                If cell.Value IsNot DBNull.Value Then dr(cell.OwningColumn.Name) = cell.Value
             Next
 
         Catch ex As Exception

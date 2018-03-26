@@ -1,7 +1,4 @@
-﻿'Imports System.IO
-
-Imports System.ComponentModel
-
+﻿Imports System.ComponentModel
 Public Class frmScoreCard
     Dim oHelper As New Helper.Controls.Helper
     'fields with (Number) are key fields

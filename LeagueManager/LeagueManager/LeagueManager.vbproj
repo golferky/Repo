@@ -135,8 +135,6 @@
     <Compile Include="Matches.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="OIdHelperRoutines.vb" />
-    <Compile Include="OldLeagueSetup.vb" />
     <Compile Include="Player.Designer.vb">
       <DependentUpon>Player.vb</DependentUpon>
     </Compile>
@@ -211,12 +209,6 @@
       <DependentUpon>Partners.vb</DependentUpon>
     </Compile>
     <Compile Include="Partners.vb">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="oldPlayerStats.Designer.vb">
-      <DependentUpon>oldPlayerStats.vb</DependentUpon>
-    </Compile>
-    <Compile Include="oldPlayerStats.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="PlayerStats.Designer.vb">
@@ -323,9 +315,6 @@
     <EmbeddedResource Include="Partners.resx">
       <DependentUpon>Partners.vb</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="oldPlayerStats.resx">
-      <DependentUpon>oldPlayerStats.vb</DependentUpon>
-    </EmbeddedResource>
     <EmbeddedResource Include="PlayerStats.resx">
       <DependentUpon>PlayerStats.vb</DependentUpon>
     </EmbeddedResource>
@@ -379,13 +368,6 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Boone Links Scorecard.ico" />
-    <Content Include="LeagueManager.mdf">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-    </Content>
-    <Content Include="LeagueManager_log.ldf">
-      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
-      <DependentUpon>LeagueManager.mdf</DependentUpon>
-    </Content>
     <Content Include="Enhancementsand Fixes.txt" />
   </ItemGroup>
   <ItemGroup>

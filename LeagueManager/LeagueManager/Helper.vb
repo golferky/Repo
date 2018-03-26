@@ -528,7 +528,6 @@ Namespace Helper.Controls
                 Next
                 row.Cells("Hdcp").ToolTipText = row.Cells("Hdcp").ToolTipText.Trim("-")
 
-
                 Return iHdcp
 
             Catch ex As Exception
@@ -1525,34 +1524,32 @@ Namespace Helper.Controls
         Sub getMatchPts(dg As DataGridView, index As Integer)
             Dim ipNet = 0
             Dim ioNet = 0
-            If iHoleMarker = 1 Then
-                ipNet = FixNullScore(dg.Rows(index).Cells("Out_Net").Value.ToString)
-                ioNet = FixNullScore(dg.Rows(index + 2).Cells("Out_Net").Value.ToString)
-            Else
-                ipNet = FixNullScore(dg.Rows(index).Cells("In_Net").Value.ToString)
-                ioNet = FixNullScore(dg.Rows(index + 2).Cells("In_Net").Value.ToString)
-            End If
+            '20180325
+            Dim s9Played As String = "Out_Net"
+            If iHoleMarker <> 1 Then s9Played = "In_Net"
+            ipNet = FixNullScore(dg.Rows(index + 0).Cells(s9Played).Value.ToString)
+            ioNet = FixNullScore(dg.Rows(index + 2).Cells(s9Played).Value.ToString)
 
             If ipNet > ioNet Then
                 dg.Rows(index + 2).Cells("Points").Style.BackColor = Color.LightGreen
                 dg.Rows(index + 2).Cells("Points").Value = 1
-                dg.Rows(index).Cells("Points").Value = 0
-                dg.Rows(index).Cells("Opponent").Style.BackColor = Color.LightGreen
+                dg.Rows(index + 0).Cells("Points").Value = 0
+                dg.Rows(index + 0).Cells("Opponent").Style.BackColor = Color.LightGreen
             ElseIf ipNet < ioNet Then
-                dg.Rows(index).Cells("Points").Style.BackColor = Color.LightGreen
-                dg.Rows(index).Cells("Points").Value = 1
+                dg.Rows(index + 0).Cells("Points").Style.BackColor = Color.LightGreen
+                dg.Rows(index + 0).Cells("Points").Value = 1
                 dg.Rows(index + 2).Cells("Points").Value = 0
                 dg.Rows(index + 2).Cells("Opponent").Style.BackColor = Color.LightGreen
             Else
-                dg.Rows(index).Cells("Points").Style.BackColor = Color.Yellow
+                dg.Rows(index + 0).Cells("Points").Style.BackColor = Color.Yellow
                 dg.Rows(index + 2).Cells("Points").Style.BackColor = Color.Yellow
-                dg.Rows(index).Cells("Points").Value = 0.5
+                dg.Rows(index + 0).Cells("Points").Value = 0.5
                 dg.Rows(index + 2).Cells("Points").Value = 0.5
-                dg.Rows(index).Cells("Opponent").Style.BackColor = Color.Yellow
+                dg.Rows(index + 0).Cells("Opponent").Style.BackColor = Color.Yellow
                 dg.Rows(index + 2).Cells("Opponent").Style.BackColor = Color.Yellow
             End If
-            dg.Rows(index).Cells("Opponent").Value = dg.Rows(index + 2).Cells("Player").Value
-            dg.Rows(index + 2).Cells("Opponent").Value = dg.Rows(index).Cells("Player").Value
+            dg.Rows(index + 0).Cells("Opponent").Value = dg.Rows(index + 2).Cells("Player").Value
+            dg.Rows(index + 2).Cells("Opponent").Value = dg.Rows(index + 0).Cells("Player").Value
         End Sub
         Function FixNullScore(iNet As String) As Int16
             FixNullScore = 999
@@ -2118,6 +2115,7 @@ Namespace Helper.Controls
             '            Next
 
         End Sub
+        '20180325-changes for bye team
         Sub getMatchScores(sdate As String)
 
             If bloghelper Then LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)

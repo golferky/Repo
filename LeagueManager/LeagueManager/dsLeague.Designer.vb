@@ -1627,6 +1627,8 @@ Partial Public Class dsLeague
         
         Private columnRolledOverCTP5 As Global.System.Data.DataColumn
         
+        Private columnByes As Global.System.Data.DataColumn
+        
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "15.0.0.0")>  _
         Public Sub New()
@@ -1951,6 +1953,14 @@ Partial Public Class dsLeague
         End Property
         
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "15.0.0.0")>  _
+        Public ReadOnly Property ByesColumn() As Global.System.Data.DataColumn
+            Get
+                Return Me.columnByes
+            End Get
+        End Property
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "15.0.0.0"),  _
          Global.System.ComponentModel.Browsable(false)>  _
         Public ReadOnly Property Count() As Integer
@@ -2023,9 +2033,10 @@ Partial Public Class dsLeague
                     ByVal RolledOverCTP2 As String,  _
                     ByVal RolledOverCTP3 As String,  _
                     ByVal RolledOverCTP4 As String,  _
-                    ByVal RolledOverCTP5 As String) As dtLeagueParmsRow
+                    ByVal RolledOverCTP5 As String,  _
+                    ByVal Byes As String) As dtLeagueParmsRow
             Dim rowdtLeagueParmsRow As dtLeagueParmsRow = CType(Me.NewRow,dtLeagueParmsRow)
-            Dim columnValuesArray() As Object = New Object() {Name, Secretary, Format, Cost, Teams, PayPlaces, StartDate, EndDate, HdcpScores, HdcpFormat, CarryLastYears, MaxHdcp, Par3Max, Par4Max, Par5Max, Course, Holes, Start9, Method, Skins, Closest, SplitSeason, PostSeason, SkinFmt, Email, EmailPassword, RolledOverSkins, RolledOverCTP, RolledOverDate, ExtraMoney, ScoresLocked, RolledOverCTP1, RolledOverCTP2, RolledOverCTP3, RolledOverCTP4, RolledOverCTP5}
+            Dim columnValuesArray() As Object = New Object() {Name, Secretary, Format, Cost, Teams, PayPlaces, StartDate, EndDate, HdcpScores, HdcpFormat, CarryLastYears, MaxHdcp, Par3Max, Par4Max, Par5Max, Course, Holes, Start9, Method, Skins, Closest, SplitSeason, PostSeason, SkinFmt, Email, EmailPassword, RolledOverSkins, RolledOverCTP, RolledOverDate, ExtraMoney, ScoresLocked, RolledOverCTP1, RolledOverCTP2, RolledOverCTP3, RolledOverCTP4, RolledOverCTP5, Byes}
             rowdtLeagueParmsRow.ItemArray = columnValuesArray
             Me.Rows.Add(rowdtLeagueParmsRow)
             Return rowdtLeagueParmsRow
@@ -2084,6 +2095,7 @@ Partial Public Class dsLeague
             Me.columnRolledOverCTP3 = MyBase.Columns("RolledOverCTP3")
             Me.columnRolledOverCTP4 = MyBase.Columns("RolledOverCTP4")
             Me.columnRolledOverCTP5 = MyBase.Columns("RolledOverCTP5")
+            Me.columnByes = MyBase.Columns("Byes")
         End Sub
         
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
@@ -2161,6 +2173,8 @@ Partial Public Class dsLeague
             MyBase.Columns.Add(Me.columnRolledOverCTP4)
             Me.columnRolledOverCTP5 = New Global.System.Data.DataColumn("RolledOverCTP5", GetType(String), Nothing, Global.System.Data.MappingType.Element)
             MyBase.Columns.Add(Me.columnRolledOverCTP5)
+            Me.columnByes = New Global.System.Data.DataColumn("Byes", GetType(String), Nothing, Global.System.Data.MappingType.Element)
+            MyBase.Columns.Add(Me.columnByes)
             Me.columnEndDate.DateTimeMode = Global.System.Data.DataSetDateTime.Local
         End Sub
         
@@ -4214,6 +4228,21 @@ Partial Public Class dsLeague
         
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "15.0.0.0")>  _
+        Public Property Byes() As String
+            Get
+                Try 
+                    Return CType(Me(Me.tabledtLeagueParms.ByesColumn),String)
+                Catch e As Global.System.InvalidCastException
+                    Throw New Global.System.Data.StrongTypingException("The value for column 'Byes' in table 'dtLeagueParms' is DBNull.", e)
+                End Try
+            End Get
+            Set
+                Me(Me.tabledtLeagueParms.ByesColumn) = value
+            End Set
+        End Property
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "15.0.0.0")>  _
         Public Function IsNameNull() As Boolean
             Return Me.IsNull(Me.tabledtLeagueParms.NameColumn)
         End Function
@@ -4642,6 +4671,18 @@ Partial Public Class dsLeague
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "15.0.0.0")>  _
         Public Sub SetRolledOverCTP5Null()
             Me(Me.tabledtLeagueParms.RolledOverCTP5Column) = Global.System.Convert.DBNull
+        End Sub
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "15.0.0.0")>  _
+        Public Function IsByesNull() As Boolean
+            Return Me.IsNull(Me.tabledtLeagueParms.ByesColumn)
+        End Function
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "15.0.0.0")>  _
+        Public Sub SetByesNull()
+            Me(Me.tabledtLeagueParms.ByesColumn) = Global.System.Convert.DBNull
         End Sub
     End Class
     
