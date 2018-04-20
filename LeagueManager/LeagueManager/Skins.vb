@@ -13,7 +13,7 @@ Public Class Skins
     Dim sSkinsIndexes As List(Of String)
 
     Private Sub Skins_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-
+        oHelper.LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
         'cant understand why i had to do this because main.helper has all the tables but i get an error
         '-----Unable to cast object of type 'System.Data.DataTable' to type 'dtCoursesDataTable'.
         oHelper = Main.oHelper
@@ -71,17 +71,16 @@ Public Class Skins
         'this causes skins_FormCLosing 
         Me.Close()
     End Sub
-
     Dim fromsizeH As Integer, gvSsizeH As Integer, gvSCsizeH As Integer, gbSCsizeH As Integer
     Private Sub Skins_FormClosing(sender As Object, e As FormClosingEventArgs) Handles MyBase.FormClosing
         SaveScores()
     End Sub
-
     Private Sub btnSkins_Click(sender As Object, e As EventArgs) Handles btnSkins.Click
         CalcSkins()
     End Sub
 
     Private Sub btnSave_Click(sender As Object, e As EventArgs) Handles btnSave.Click
+        oHelper.LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
         bsave = True
         SaveScores()
     End Sub
@@ -115,7 +114,7 @@ Public Class Skins
     End Sub
 
     Private Sub dgScores_CellMouseDoubleClick(sender As Object, e As DataGridViewCellMouseEventArgs) Handles dgScores.CellMouseDoubleClick
-
+        oHelper.LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
         Me.Cursor = Cursors.WaitCursor
         Application.DoEvents()
         oHelper.LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
@@ -137,6 +136,7 @@ Public Class Skins
         Application.DoEvents()
     End Sub
     Private Sub dgScores_SortCompare(sender As Object, e As DataGridViewSortCompareEventArgs) Handles dgScores.SortCompare
+        oHelper.LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
         'If e.Column.Index <> 0 Then
         '    Return
         'End If
@@ -163,6 +163,7 @@ Public Class Skins
         End Try
     End Sub
     Sub checkDotsColors()
+        oHelper.LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
 
         lbStatus.Text = String.Format("Changing dots/colors")
         lbStatus.BackColor = Color.Red
@@ -190,15 +191,13 @@ Public Class Skins
 
     End Sub
     Sub CalcSkins()
+        oHelper.LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
 
         lbStatus.Text = String.Format("Calculating Skins")
         lbStatus.BackColor = Color.Red
         Me.Cursor = Cursors.WaitCursor
         Application.DoEvents()
-        oHelper.LOGIT("--------------------------------------------------------------")
-        oHelper.LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
         ' RemoveHandler dgScores.CellEnter, AddressOf dgScores_CellEnter
-
 
         iTotCTPPlayers = 0
         iTotSkinPlayers = 0
@@ -233,11 +232,12 @@ Public Class Skins
         iEachClosestAmt = (iTotCTPPlayers - iTotCTPPlayers Mod 2) / oHelper.iNumClosests
 
         tbLOSkins.Text = 0
-        tbLOCP1.Text = 0
-        tbLOCP2.Text = 0
+        tbCP1.Text = 0
+        tbCP2.Text = 0
         tbLOPurse.Text = 0
-        tbCP1.Text = iEachClosestAmt
-        tbCP2.Text = iEachClosestAmt
+        tbLOCP1.Text = iEachClosestAmt
+        tbLOCP2.Text = iEachClosestAmt
+        tbLOPurse.Text += iEachClosestAmt * oHelper.iNumClosests
         Dim iExtra As Integer = 0
 
         SaveScores()
@@ -261,15 +261,16 @@ Public Class Skins
         sSkinsIndexes = FCalcSkins()
         sSkinsIndexes.Sort()
         Dim iSkinpot As Integer = oHelper.rLeagueParmrow("Skins") * iTotSkinPlayers + oHelper.rLeagueParmrow("RolledOverSkins")
-        Dim iSkinVal As Integer = Math.Truncate(iSkinpot / sSkinsIndexes.Count)
+        Dim iSkinVal As Integer = 0
 
         If sSkinsIndexes.Count > 0 Then
             '20180130-save to add to pot
             '20180228-Fix extra dollars incorrect, they were missing leftover ctp calc
+            iSkinVal = Math.Truncate(iSkinpot / sSkinsIndexes.Count)
             iExtra = iTotCTPPlayers * 1 - (iEachClosestAmt * oHelper.iNumClosests)
             iExtra = iExtra + (iSkinpot - (iSkinVal * sSkinsIndexes.Count))
         Else
-            iExtra = iSkinpot
+            iExtra = 0
             tbLOSkins.Text = iSkinpot
             tbLOPurse.Text += iSkinpot
         End If
@@ -409,6 +410,7 @@ Public Class Skins
         End Try
     End Sub
     Sub BldSkinsDataGridFromCSV()
+        oHelper.LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
         Try
             'dgscores.EditMode = DataGridViewEditMode.EditProgrammatically
             dgScores.AllowUserToAddRows = False
@@ -488,11 +490,22 @@ Public Class Skins
                             If row("Method") = "Gross" Then
                                 For i = 1 To 9
                                     Dim cell = row("Hole" & i - 1 + oHelper.iHoleMarker)
-                                    If cell.Contains(ChrW(&H25CF) & ChrW(&H25CF)) Then
-                                        cell = oHelper.RemoveSpcChar(cell.Value) - 2 & ChrW(&H25CF) & ChrW(&H25CF)
-                                    ElseIf cell.ToString.Contains(ChrW(&H25CF)) Then
-                                        cell = oHelper.RemoveSpcChar(cell.Value) - 1 & ChrW(&H25CF)
+                                    'check stroke index
+                                    Dim isi As Integer = oHelper.CalcStrokeIndex(i - 1 + oHelper.iHoleMarker)
+                                    If CInt(row("pHdcp")) >= isi Then
+                                        Dim x = CInt(row("pHdcp")) - 9
+                                        If CInt(row("pHdcp")) - 9 >= isi Then
+                                            cell = cell - 2 & ChrW(&H25CF) & ChrW(&H25CF)
+                                        ElseIf CInt(row("pHdcp")) >= isi Then
+                                            cell = cell - 1 & ChrW(&H25CF)
+                                        End If
                                     End If
+                                    row("Hole" & i - 1 + oHelper.iHoleMarker) = cell
+                                    'If cell.Contains(ChrW(&H25CF) & ChrW(&H25CF)) Then
+                                    '    cell = oHelper.RemoveSpcChar(cell.Value) - 2 & ChrW(&H25CF) & ChrW(&H25CF)
+                                    'ElseIf cell.ToString.Contains(ChrW(&H25CF)) Then
+                                    '    cell = oHelper.RemoveSpcChar(cell.Value) - 1 & ChrW(&H25CF)
+                                    'End If
                                 Next
                             End If
                         End If
@@ -638,6 +651,7 @@ Public Class Skins
     End Sub
 
     Private Sub frmSkins_Resize(sender As Object, e As EventArgs) Handles MyBase.Resize
+        oHelper.LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
         Try
             'width
             'If gvSsizeW <> 0 Then
@@ -666,6 +680,7 @@ Public Class Skins
         End Try
     End Sub
     Sub UpdateScoresFromDataGrid(row As DataGridViewRow)
+        oHelper.LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
         Try
             If row.Cells("Player").Value Is Nothing Then
                 Exit Sub
@@ -696,6 +711,7 @@ Public Class Skins
         End Try
     End Sub
     Function FCalcSkins() As List(Of String)
+        oHelper.LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
         FCalcSkins = New List(Of String)
         'this code goes through the listview and highlights the lowest value on each hole and fron 9, back 9 and total
         Dim ilowrow As New List(Of String)
@@ -761,6 +777,7 @@ Public Class Skins
         End If
     End Sub
     Private Sub dgScores_CellContentClick(sender As Object, e As DataGridViewCellEventArgs) Handles dgScores.CellContentClick
+        oHelper.LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
         If e.RowIndex < 0 Then Exit Sub
         Dim dgc As DataGridViewCell = sender.currentcell
         '200180224-ctp
@@ -789,7 +806,6 @@ Public Class Skins
             dgScores.Rows(e.RowIndex).Cells("$Closest").Style.BackColor = Color.Gold
             dgScores.Rows(e.RowIndex).Cells("Player").Style.BackColor = Color.Gold
         End If
-
 
         If Val(oHelper.convDBNulltoSpaces(dgScores.Rows(e.RowIndex).Cells("$Closest").Value)) > 0 Then
             dgScores.Rows(e.RowIndex).Cells("$Closest").Value += iamt

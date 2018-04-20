@@ -1,9 +1,9 @@
-﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
+﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()>
 Partial Class frmLeagueSetup
     Inherits System.Windows.Forms.Form
 
     'Form overrides dispose to clean up the component list.
-    <System.Diagnostics.DebuggerNonUserCode()> _
+    <System.Diagnostics.DebuggerNonUserCode()>
     Protected Overrides Sub Dispose(ByVal disposing As Boolean)
         Try
             If disposing AndAlso components IsNot Nothing Then
@@ -20,7 +20,7 @@ Partial Class frmLeagueSetup
     'NOTE: The following procedure is required by the Windows Form Designer
     'It can be modified using the Windows Form Designer.  
     'Do not modify it using the code editor.
-    <System.Diagnostics.DebuggerStepThrough()> _
+    <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container()
         Dim NameLabel As System.Windows.Forms.Label
@@ -46,14 +46,12 @@ Partial Class frmLeagueSetup
         Dim ClosestLabel As System.Windows.Forms.Label
         Dim SplitSeasonLabel As System.Windows.Forms.Label
         Dim PostSeasonLabel As System.Windows.Forms.Label
-        Dim SkinFmtLabel As System.Windows.Forms.Label
-        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmLeagueSetup))
         Dim EmailLabel As System.Windows.Forms.Label
         Dim EmailPasswordLabel As System.Windows.Forms.Label
+        Dim SkinFmtLabel As System.Windows.Forms.Label
+        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmLeagueSetup))
         Me.DtLeagueParmsBindingNavigator = New System.Windows.Forms.BindingNavigator(Me.components)
         Me.BindingNavigatorAddNewItem = New System.Windows.Forms.ToolStripButton()
-        Me.DtLeagueParmsBindingSource = New System.Windows.Forms.BindingSource(Me.components)
-        Me.DsLeague = New LeagueManager.dsLeague()
         Me.BindingNavigatorCountItem = New System.Windows.Forms.ToolStripLabel()
         Me.BindingNavigatorDeleteItem = New System.Windows.Forms.ToolStripButton()
         Me.BindingNavigatorMoveFirstItem = New System.Windows.Forms.ToolStripButton()
@@ -88,9 +86,11 @@ Partial Class frmLeagueSetup
         Me.ClosestTextBox = New System.Windows.Forms.TextBox()
         Me.SplitSeasonTextBox = New System.Windows.Forms.TextBox()
         Me.PostSeasonTextBox = New System.Windows.Forms.TextBox()
-        Me.SkinFmtTextBox = New System.Windows.Forms.TextBox()
         Me.EmailTextBox = New System.Windows.Forms.TextBox()
         Me.EmailPasswordTextBox = New System.Windows.Forms.TextBox()
+        Me.SkinFmtTextBox = New System.Windows.Forms.TextBox()
+        Me.DtLeagueParmsBindingSource = New System.Windows.Forms.BindingSource(Me.components)
+        Me.DsLeague = New LeagueManager.dsLeague()
         NameLabel = New System.Windows.Forms.Label()
         SecretaryLabel = New System.Windows.Forms.Label()
         FormatLabel = New System.Windows.Forms.Label()
@@ -114,9 +114,9 @@ Partial Class frmLeagueSetup
         ClosestLabel = New System.Windows.Forms.Label()
         SplitSeasonLabel = New System.Windows.Forms.Label()
         PostSeasonLabel = New System.Windows.Forms.Label()
-        SkinFmtLabel = New System.Windows.Forms.Label()
         EmailLabel = New System.Windows.Forms.Label()
         EmailPasswordLabel = New System.Windows.Forms.Label()
+        SkinFmtLabel = New System.Windows.Forms.Label()
         CType(Me.DtLeagueParmsBindingNavigator, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.DtLeagueParmsBindingNavigator.SuspendLayout()
         CType(Me.DtLeagueParmsBindingSource, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -330,6 +330,24 @@ Partial Class frmLeagueSetup
         PostSeasonLabel.TabIndex = 51
         PostSeasonLabel.Text = "Post Season:"
         '
+        'EmailLabel
+        '
+        EmailLabel.AutoSize = True
+        EmailLabel.Location = New System.Drawing.Point(22, 111)
+        EmailLabel.Name = "EmailLabel"
+        EmailLabel.Size = New System.Drawing.Size(35, 13)
+        EmailLabel.TabIndex = 53
+        EmailLabel.Text = "Email:"
+        '
+        'EmailPasswordLabel
+        '
+        EmailPasswordLabel.AutoSize = True
+        EmailPasswordLabel.Location = New System.Drawing.Point(22, 137)
+        EmailPasswordLabel.Name = "EmailPasswordLabel"
+        EmailPasswordLabel.Size = New System.Drawing.Size(84, 13)
+        EmailPasswordLabel.TabIndex = 54
+        EmailPasswordLabel.Text = "Email Password:"
+        '
         'SkinFmtLabel
         '
         SkinFmtLabel.AutoSize = True
@@ -366,16 +384,6 @@ Partial Class frmLeagueSetup
         Me.BindingNavigatorAddNewItem.RightToLeftAutoMirrorImage = True
         Me.BindingNavigatorAddNewItem.Size = New System.Drawing.Size(44, 44)
         Me.BindingNavigatorAddNewItem.Text = "Add new"
-        '
-        'DtLeagueParmsBindingSource
-        '
-        Me.DtLeagueParmsBindingSource.DataMember = "dtLeagueParms"
-        Me.DtLeagueParmsBindingSource.DataSource = Me.DsLeague
-        '
-        'DsLeague
-        '
-        Me.DsLeague.DataSetName = "dsLeague"
-        Me.DsLeague.SchemaSerializationMode = System.Data.SchemaSerializationMode.IncludeSchema
         '
         'BindingNavigatorCountItem
         '
@@ -645,23 +653,6 @@ Partial Class frmLeagueSetup
         Me.PostSeasonTextBox.Size = New System.Drawing.Size(30, 20)
         Me.PostSeasonTextBox.TabIndex = 52
         '
-        'SkinFmtTextBox
-        '
-        Me.SkinFmtTextBox.DataBindings.Add(New System.Windows.Forms.Binding("Text", Me.DtLeagueParmsBindingSource, "SkinFmt", True))
-        Me.SkinFmtTextBox.Location = New System.Drawing.Point(115, 709)
-        Me.SkinFmtTextBox.Name = "SkinFmtTextBox"
-        Me.SkinFmtTextBox.Size = New System.Drawing.Size(76, 20)
-        Me.SkinFmtTextBox.TabIndex = 53
-        '
-        'EmailLabel
-        '
-        EmailLabel.AutoSize = True
-        EmailLabel.Location = New System.Drawing.Point(22, 111)
-        EmailLabel.Name = "EmailLabel"
-        EmailLabel.Size = New System.Drawing.Size(35, 13)
-        EmailLabel.TabIndex = 53
-        EmailLabel.Text = "Email:"
-        '
         'EmailTextBox
         '
         Me.EmailTextBox.DataBindings.Add(New System.Windows.Forms.Binding("Text", Me.DtLeagueParmsBindingSource, "Email", True))
@@ -669,15 +660,6 @@ Partial Class frmLeagueSetup
         Me.EmailTextBox.Name = "EmailTextBox"
         Me.EmailTextBox.Size = New System.Drawing.Size(157, 20)
         Me.EmailTextBox.TabIndex = 54
-        '
-        'EmailPasswordLabel
-        '
-        EmailPasswordLabel.AutoSize = True
-        EmailPasswordLabel.Location = New System.Drawing.Point(22, 137)
-        EmailPasswordLabel.Name = "EmailPasswordLabel"
-        EmailPasswordLabel.Size = New System.Drawing.Size(84, 13)
-        EmailPasswordLabel.TabIndex = 54
-        EmailPasswordLabel.Text = "Email Password:"
         '
         'EmailPasswordTextBox
         '
@@ -687,11 +669,29 @@ Partial Class frmLeagueSetup
         Me.EmailPasswordTextBox.Size = New System.Drawing.Size(134, 20)
         Me.EmailPasswordTextBox.TabIndex = 55
         '
+        'SkinFmtTextBox
+        '
+        Me.SkinFmtTextBox.DataBindings.Add(New System.Windows.Forms.Binding("Text", Me.DtLeagueParmsBindingSource, "SkinFmt", True))
+        Me.SkinFmtTextBox.Location = New System.Drawing.Point(115, 709)
+        Me.SkinFmtTextBox.Name = "SkinFmtTextBox"
+        Me.SkinFmtTextBox.Size = New System.Drawing.Size(76, 20)
+        Me.SkinFmtTextBox.TabIndex = 53
+        '
+        'DtLeagueParmsBindingSource
+        '
+        Me.DtLeagueParmsBindingSource.DataMember = "dtLeagueParms"
+        Me.DtLeagueParmsBindingSource.DataSource = Me.DsLeague
+        '
+        'DsLeague
+        '
+        Me.DsLeague.DataSetName = "dsLeague"
+        Me.DsLeague.SchemaSerializationMode = System.Data.SchemaSerializationMode.IncludeSchema
+        '
         'frmLeagueSetup
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(436, 752)
+        Me.ClientSize = New System.Drawing.Size(436, 799)
         Me.Controls.Add(EmailPasswordLabel)
         Me.Controls.Add(Me.EmailPasswordTextBox)
         Me.Controls.Add(EmailLabel)
@@ -795,7 +795,7 @@ Partial Class frmLeagueSetup
     Friend WithEvents ClosestTextBox As TextBox
     Friend WithEvents SplitSeasonTextBox As TextBox
     Friend WithEvents PostSeasonTextBox As TextBox
-    Friend WithEvents SkinFmtTextBox As TextBox
     Friend WithEvents EmailTextBox As TextBox
     Friend WithEvents EmailPasswordTextBox As TextBox
+    Friend WithEvents SkinFmtTextBox As TextBox
 End Class

@@ -384,17 +384,19 @@ Public Class Standings
                 row("Total") = ""
 
                 If row("team") <> sprevteam Then
-                    Dim ipts = 0.0, ifh = 0.0, ish = 0.0
+                    Dim ipts As Decimal = 0.0
+                    Dim ifh As Decimal = 0.0
+                    Dim ish As Decimal = 0.0
                     Dim bfh = True, bsh = False
-
+                    'total up halves
                     For Each col As DataColumn In dtPoints.Columns
                         If col.ColumnName.Contains("2nd") Then bsh = True
                         If col.ColumnName.Contains("/") Then
-                            ipts += CInt(oHelper.convDBNulltoSpaces(drow(col.ColumnName)))
+                            ipts += CDec(oHelper.convDBNulltoSpaces(drow(col.ColumnName)))
                             If bsh Then
-                                ish += CInt(oHelper.convDBNulltoSpaces(drow(col.ColumnName)))
+                                ish += CDec(oHelper.convDBNulltoSpaces(drow(col.ColumnName)))
                             Else
-                                ifh += CInt(oHelper.convDBNulltoSpaces(drow(col.ColumnName)))
+                                ifh += CDec(oHelper.convDBNulltoSpaces(drow(col.ColumnName)))
                             End If
                         End If
                     Next
@@ -647,11 +649,12 @@ Public Class Standings
 
     End Sub
     Function getPts(sPts) As Decimal
-        getPts = 0
+        getPts = 0.0
         If sPts Is DBNull.Value Then Exit Function
         If sPts.Contains("-") Then
             Dim aPts As New List(Of String)(sPts.ToString.Split("-"))
-            getPts = aPts(0)
+            getPts += CDbl(aPts(0))
+            If aPts.Count > 0 Then getPts += CDbl(aPts(1))
         Else
             getPts = sPts
         End If

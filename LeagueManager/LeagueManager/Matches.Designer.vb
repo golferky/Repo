@@ -36,7 +36,7 @@ Partial Class Matches
         'cbDatesPlayers
         '
         Me.cbDatesPlayers.FormattingEnabled = True
-        Me.cbDatesPlayers.Location = New System.Drawing.Point(224, 39)
+        Me.cbDatesPlayers.Location = New System.Drawing.Point(52, 43)
         Me.cbDatesPlayers.Margin = New System.Windows.Forms.Padding(2)
         Me.cbDatesPlayers.Name = "cbDatesPlayers"
         Me.cbDatesPlayers.Size = New System.Drawing.Size(115, 21)
@@ -45,7 +45,7 @@ Partial Class Matches
         'lbPS
         '
         Me.lbPS.AutoSize = True
-        Me.lbPS.Location = New System.Drawing.Point(265, 19)
+        Me.lbPS.Location = New System.Drawing.Point(93, 23)
         Me.lbPS.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
         Me.lbPS.Name = "lbPS"
         Me.lbPS.Size = New System.Drawing.Size(30, 13)
@@ -54,7 +54,7 @@ Partial Class Matches
         '
         'btnMatches
         '
-        Me.btnMatches.Location = New System.Drawing.Point(753, 11)
+        Me.btnMatches.Location = New System.Drawing.Point(601, 14)
         Me.btnMatches.Margin = New System.Windows.Forms.Padding(2)
         Me.btnMatches.Name = "btnMatches"
         Me.btnMatches.Size = New System.Drawing.Size(106, 30)
@@ -64,15 +64,18 @@ Partial Class Matches
         '
         'dgScores
         '
+        Me.dgScores.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.dgScores.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
-        Me.dgScores.Location = New System.Drawing.Point(57, 150)
+        Me.dgScores.Location = New System.Drawing.Point(48, 157)
         Me.dgScores.Name = "dgScores"
-        Me.dgScores.Size = New System.Drawing.Size(913, 595)
+        Me.dgScores.Size = New System.Drawing.Size(659, 747)
         Me.dgScores.TabIndex = 70
         '
         'btnExit
         '
-        Me.btnExit.Location = New System.Drawing.Point(753, 97)
+        Me.btnExit.Location = New System.Drawing.Point(601, 100)
         Me.btnExit.Margin = New System.Windows.Forms.Padding(2)
         Me.btnExit.Name = "btnExit"
         Me.btnExit.Size = New System.Drawing.Size(106, 30)
@@ -83,7 +86,7 @@ Partial Class Matches
         'lbStatus
         '
         Me.lbStatus.AutoSize = True
-        Me.lbStatus.Location = New System.Drawing.Point(221, 86)
+        Me.lbStatus.Location = New System.Drawing.Point(49, 90)
         Me.lbStatus.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
         Me.lbStatus.Name = "lbStatus"
         Me.lbStatus.Size = New System.Drawing.Size(37, 13)
@@ -92,7 +95,7 @@ Partial Class Matches
         '
         'btnSave
         '
-        Me.btnSave.Location = New System.Drawing.Point(753, 56)
+        Me.btnSave.Location = New System.Drawing.Point(601, 59)
         Me.btnSave.Margin = New System.Windows.Forms.Padding(2)
         Me.btnSave.Name = "btnSave"
         Me.btnSave.Size = New System.Drawing.Size(106, 30)
@@ -104,7 +107,7 @@ Partial Class Matches
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(1051, 806)
+        Me.ClientSize = New System.Drawing.Size(756, 958)
         Me.Controls.Add(Me.btnSave)
         Me.Controls.Add(Me.lbStatus)
         Me.Controls.Add(Me.btnExit)

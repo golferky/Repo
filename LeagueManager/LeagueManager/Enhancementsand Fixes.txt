@@ -1,9 +1,11 @@
 ﻿*************************************************************************************************
-*                                           Change Log-TBD
+*                                           Change Log
 *************************************************************************************************
-* 20180324 - Priority M  - Complexity - Med         - track finances, payment history, distribution history, payment method
+* yyyymmdd - Priority - Complexity -  Description
+* -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+* 20180324 - M        - Med        -  track finances, payment history, distribution history, payment method
 *													- new table/file(Payment file)
-* 20180321 - Priority H  - Complexity - Hard        - account for uneven amount of teams(Terry passing), add a byes column in league parm representing teams # that is a bye(1)
+* 20180403 - Priority H  - Complexity - Hard        - create option for league average opponent
 * 20180318 - Priority L  - Complexity - Hard        - Skins.vb- disabled checkdotscolors until i can figure out fonts
 * 20180304 - Priority L  - Complexity - Hard        - Skins.vb- strikeout not working on colors option
 * 20180226 - Priority H  - Complexity -             -         - Sam cant load files on his pc, need to turn on logging and email log to me
@@ -29,6 +31,10 @@
 *************************************************************************************************
 *                                           Change Log-Completed
 *************************************************************************************************
+* 20180419 - 4.19 versions see below
+* 20180419 - Priority H  - Complexity - Med         - subs not working on scores, adding subs and regulars
+* 20180408 - 4.08 versions see below
+* 20180321 - Priority H  - Complexity - Hard        - account for uneven amount of teams(Terry passing), add a byes column in league parm representing teams # that is a bye(1)
 * 20180306 - 3.06 versions see below
 * 20180306 - Priority H  - Complexity -             - Main.vb - Create a "checkbox for emailing stats for testing
 * 20180228 - 2.28 versions see below

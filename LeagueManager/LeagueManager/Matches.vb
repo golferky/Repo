@@ -7,6 +7,7 @@ Public Class Matches
     Dim fromsizeH As Integer, gvSsizeH As Integer, gvSCsizeH As Integer, gbSCsizeH As Integer
     Dim rs As New Resizer
     Dim bsave As Boolean = False
+    Public sByeOpponent As String
     Private Sub Matches_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         rs.FindAllControls(Me)
         oHelper = Main.oHelper
@@ -104,9 +105,36 @@ Public Class Matches
             Exit Sub
         End If
 
+        sByeOpponent = ""
+        oHelper.bByeFound = False
+        '20180325-find byes opponent
+        If oHelper.rLeagueParmrow("Byes") IsNot DBNull.Value Then
+            For Each col As DataColumn In oHelper.dsLeague.Tables("dtSchedule").Columns
+                Dim wkdate As DateTime = col.ColumnName
+                Dim reformatted As String = wkdate.ToString("yyyyMMdd", Globalization.CultureInfo.InvariantCulture)
+                If cbDatesPlayers.SelectedItem = reformatted Then
+                    For Each row In oHelper.dsLeague.Tables("dtSchedule").Rows
+                        Dim sMatch = row(col).ToString
+                        If sMatch.Split("v")(0) = oHelper.rLeagueParmrow("Byes") Then
+                            sByeOpponent = sMatch.Split("v")(1)
+                            Exit For
+                        End If
+                        If sMatch.Split("v")(1) = oHelper.rLeagueParmrow("Byes") Then
+                            sByeOpponent = sMatch.Split("v")(0)
+                            Exit For
+                        End If
+                    Next
+                    'if byes opponent found, no need to keep searching, exit
+                    If sByeOpponent <> "" Then Exit For
+                End If
+            Next
+        End If
+
         If dgScores.RowCount > 0 Then
-            For i = 1 To iPlayers
+            For i = 1 To Math.Round(oHelper.rLeagueParmrow("Teams") / 2)
                 Dim aPtr = (i - 1) * 4
+                '20180325
+                If oHelper.bByeFound Then aPtr -= 2
                 'A Player Match
                 oHelper.getMatchPts(dgScores, aPtr + 0)
                 'B Player Match
@@ -121,16 +149,20 @@ Public Class Matches
 
                 ihaNet = oHelper.FixNullScore(dgScores.Rows(aPtr + 0).Cells(s9Played).Value.ToString)
                 ihbNet = oHelper.FixNullScore(dgScores.Rows(aPtr + 1).Cells(s9Played).Value.ToString)
-                ioaNet = oHelper.FixNullScore(dgScores.Rows(aPtr + 2).Cells(s9Played).Value.ToString)
-                iobNet = oHelper.FixNullScore(dgScores.Rows(aPtr + 3).Cells(s9Played).Value.ToString)
+
+                If dgScores.Rows(aPtr + 0).Cells("Opponent").Value = "Bye" Then
+                    ioaNet = 999
+                    iobNet = 999
+                Else
+                    ioaNet = oHelper.FixNullScore(dgScores.Rows(aPtr + 2).Cells(s9Played).Value.ToString)
+                    iobNet = oHelper.FixNullScore(dgScores.Rows(aPtr + 3).Cells(s9Played).Value.ToString)
+                End If
 
                 Dim ihTeam As Integer = ihaNet + ihbNet
                 Dim ioTeam As Integer = ioaNet + iobNet
-
-                dgScores.Rows(aPtr + 0).Cells("Team_Points").Value = ""
-                dgScores.Rows(aPtr + 1).Cells("Team_Points").Value = ""
-                dgScores.Rows(aPtr + 2).Cells("Team_Points").Value = ""
-                dgScores.Rows(aPtr + 3).Cells("Team_Points").Value = ""
+                For irow = 0 To 3
+                    dgScores.Rows(aPtr + irow).Cells("Team_Points").Value = ""
+                Next
 
                 If ihTeam < ioTeam Then
                     dgScores.Rows(aPtr + 0).Cells("Team_Points").Value = 0.5
@@ -143,14 +175,10 @@ Public Class Matches
                     dgScores.Rows(aPtr + 2).Cells("Team_Points").Style.BackColor = Color.LightGreen
                     dgScores.Rows(aPtr + 3).Cells("Team_Points").Style.BackColor = Color.LightGreen
                 Else
-                    dgScores.Rows(aPtr + 0).Cells("Team_Points").Value = 0.25
-                    dgScores.Rows(aPtr + 1).Cells("Team_Points").Value = 0.25
-                    dgScores.Rows(aPtr + 2).Cells("Team_Points").Value = 0.25
-                    dgScores.Rows(aPtr + 3).Cells("Team_Points").Value = 0.25
-                    dgScores.Rows(aPtr + 0).Cells("Team_Points").Style.BackColor = Color.Yellow
-                    dgScores.Rows(aPtr + 1).Cells("Team_Points").Style.BackColor = Color.Yellow
-                    dgScores.Rows(aPtr + 2).Cells("Team_Points").Style.BackColor = Color.Yellow
-                    dgScores.Rows(aPtr + 3).Cells("Team_Points").Style.BackColor = Color.Yellow
+                    For irow = 0 To 3
+                        dgScores.Rows(aPtr + irow).Cells("Team_Points").Value = 0.25
+                        dgScores.Rows(aPtr + irow).Cells("Team_Points").Style.BackColor = Color.Yellow
+                    Next
                 End If
             Next
         End If
@@ -165,6 +193,7 @@ Public Class Matches
         Me.Cursor = Cursors.Default
         Application.DoEvents()
     End Sub
+
     Private Sub dgScores_ColumnHeaderMouseClick(sender As Object, e As DataGridViewCellMouseEventArgs) Handles dgScores.ColumnHeaderMouseClick
         With lbStatus
             .Text = String.Format("Sorting Columns ...")
@@ -299,11 +328,6 @@ Public Class Matches
                 oHelper.iHoles = oHelper.rLeagueParmrow("Holes")
             End If
 
-            If oHelper.dsLeague.Tables("dtScores") Is Nothing Then
-                'oHelper.dsLeague.Tables.Add("dtScores").ReadXml(oHelper.getLatestFile("*Scores.xml"))
-
-            End If
-
             Dim dvScores As New DataView(oHelper.dsLeague.Tables("dtScores"))
 
             dvScores.RowFilter = "Date = '" & sdate & "'"
@@ -346,9 +370,6 @@ Public Class Matches
             dgScores.RowTemplate.Height = 40
             dgScores.DefaultCellStyle.Font = New Font("Tahoma", 15)
 
-            'With dgScores
-            '    .DataSource = dtScorecard
-            'End With
             Dim arr As Array = sScoreCardforDGV.Split(",").ToArray
             For Each col As DataColumn In dtScorecard.Columns
                 Dim dgc As New DataGridViewTextBoxColumn
@@ -431,9 +452,7 @@ Public Class Matches
                 Dim dv2Scores As New DataView(oHelper.dsLeague.Tables("dtScores"))
                 dv2Scores.RowFilter = "Player = '" & row.Cells("Player").Value & "' And Date < '" & sdate & "'"
                 dv2Scores.Sort = "Date Desc"
-                If dv2Scores.Count > 0 Then
-                    row.Cells("Phdcp").Value = dv2Scores(0).Item("Hdcp").ToString
-                End If
+                If dv2Scores.Count > 0 Then row.Cells("Phdcp").Value = dv2Scores(0).Item("Hdcp").ToString
 
                 dgScores.Columns("PHdcp").HeaderText = "Hdcp"
 

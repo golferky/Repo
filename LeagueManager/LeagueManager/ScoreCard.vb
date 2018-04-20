@@ -14,6 +14,7 @@ Public Class frmScoreCard
     Dim dgvScoreDate As String
     Dim toolTipHdcp As New ToolTip
     Dim bSaveBtn = False
+    Dim bMatchesSet = False
 
     Private Sub ScoreCard_Load(sender As System.Object, e As System.EventArgs) Handles MyBase.Load
         'Me.Size = My.Computer.Screen.WorkingArea.Size
@@ -97,7 +98,7 @@ Public Class frmScoreCard
         Dim pdate = ""
         cbDatesPlayers.Items.Clear()
         For Each rv As DataRowView In dvsch
-            'check teh sch date against the last score date
+            'check the sch date against the last score date
             If bvalidscores Then
                 'lastscore has valid scores
                 If rv(0) = lastdate Then
@@ -151,6 +152,7 @@ Public Class frmScoreCard
         End If
 
         BldScoreCardDataGridFromFile()
+        If Not bMatchesSet Then Me.Close
         '20180221-calculate number of closests to pins there should be
         oHelper.iNumClosests = 0
         For i = oHelper.iHoleMarker To (oHelper.iHoleMarker - 1) + 9
@@ -177,7 +179,7 @@ Public Class frmScoreCard
     Private Sub btnExit_Click(sender As Object, e As EventArgs) Handles btnExit.Click
         oHelper.LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
         bSaveBtn = False
-        bCloseScreen = True
+        'bCloseScreen = True
         'this makes closing form event kick off
         Me.Close()
         oHelper.bScoreCard = False
@@ -296,7 +298,8 @@ Public Class frmScoreCard
         sScoreCardforDGV = sScoreCardforDGV.Substring(0, Len(sScoreCardforDGV) - 1).Replace(" ", "_")
         Dim dvScores As New DataView(oHelper.dsLeague.Tables("dtScores"))
         dvScores.RowFilter = "Date = '" & cbDatesPlayers.SelectedItem & "'"
-
+        'added sort by match(partner)
+        dvScores.Sort = "Partner"
         Dim dtScorecard As DataTable = dvScores.ToTable(True, sScoreCardforDGV.Split(",").ToArray)
 
         dgScores.Columns.Clear()
@@ -390,6 +393,7 @@ Public Class frmScoreCard
 
     End Sub
     Sub BldScoreCardDataGridFromFile()
+        oHelper.LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
         Try
 
             If oHelper.rLeagueParmrow("ScoresLocked") = "Y" Then
@@ -400,25 +404,22 @@ Public Class frmScoreCard
                 btnSave.Visible = True
             End If
 
-            oHelper.getMatchScores(cbDatesPlayers.SelectedItem)
+            bMatchesSet = False
+            If Not oHelper.getMatchScores(cbDatesPlayers.SelectedItem) Then Exit Sub
+            bMatchesSet = True
 
             dgvScoreDate = cbDatesPlayers.SelectedItem
             'dg.EditMode = DataGridViewEditMode.EditProgrammatically
             'dgScores.AllowUserToAddRows = False
             'dgScores.AllowUserToDeleteRows = False
-            oHelper.LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
+
             '10/1/2017 add code to pull in all scores for a given player
             'check frmScoreCard for event
             '1 - if show scores button pushed, get scores for a given date and check list all scores checklist
             '2 - if double click on a playerevent, get scores for a given player
 
-            If cbDatesPlayers.Text.ToString = "" Then
-                cbDatesPlayers.SelectedItem = oHelper.dDate.ToString("yyyyMMdd")
-            End If
-
-            If oHelper.iHoles = 0 Then
-                oHelper.iHoles = oHelper.rLeagueParmrow("Holes")
-            End If
+            If cbDatesPlayers.Text.ToString = "" Then cbDatesPlayers.SelectedItem = oHelper.dDate.ToString("yyyyMMdd")
+            If oHelper.iHoles = 0 Then oHelper.iHoles = oHelper.rLeagueParmrow("Holes")
 
             oHelper.CalcHoleMarker(cbDatesPlayers.SelectedItem)
             '20180130-moved to main 
@@ -473,6 +474,7 @@ Public Class frmScoreCard
             dgScores.Columns.Insert(18, ncol2)
 
             For Each row As DataGridViewRow In dgScores.Rows
+                oHelper.sPlayer = row.Cells("Player").Value
                 If sSkins(row.Index) = "Y" Then
                     row.Cells("Skins").Value = True
                     iSkins += oHelper.rLeagueParmrow("Skins")
@@ -543,30 +545,34 @@ Public Class frmScoreCard
 
             lbStatus.Text = " Saving scores from this screen..."
             lbStatus.BackColor = Color.Red
-
             'oHelper.bNoRowLeave = True
-
             For Each row As DataGridViewRow In dgScores.Rows
-                '20180131-removed because we no longer have an empty row on scorecard
-                'if were on the last row, its an empty row so dont process it
-                'If row.Index = dgScores.RowCount - 1 Then
-                '    Exit For
-                'End If
                 oHelper.sPlayer = oHelper.convDBNulltoSpaces(row.Cells("Player").Value)
                 If oHelper.sPlayer.Trim = "" Then
                     lbStatus.Text = String.Format("Invalid Player {0},  fix before saving", oHelper.sPlayer)
+                    bCloseScreen = False
                     Exit Sub
                 End If
                 'use ddate because cbdatesplayers.selecteditem has changed the date
+                '20180419 - make key index instead of player name
                 Dim sKeys() As Object = {row.Cells("Player").Value, oHelper.dDate.ToString("yyyyMMdd", Globalization.CultureInfo.InvariantCulture)} 'cbDatesPlayers.SelectedItem}
                 Dim arow As DataRow = oHelper.dsLeague.Tables("dtScores").Rows.Find(sKeys)
-                'if not found, this is a new score
-                Dim bfound = True
+                'if not found, this is a sub
+                'Dim bfound = True
                 If arow Is Nothing Then
-                    arow = oHelper.dsLeague.Tables("dtScores").NewRow
-                    arow("Date") = sKeys(1)
-                    arow("League") = oHelper.rLeagueParmrow("Name")
-                    bfound = False
+                    Dim dvscores As New DataView(oHelper.dsLeague.Tables("dtScores"))
+                    dvscores.RowFilter = String.Format("Date = {0}", oHelper.dDate.ToString("yyyyMMdd", Globalization.CultureInfo.InvariantCulture))
+                    dvscores.Sort = "Partner"
+                    For Each srow As DataRowView In dvscores
+                        If row.Index = CDbl(srow("Partner")) Then
+                            arow = srow.Row
+                            Exit For
+                        End If
+                    Next
+                    'arow = oHelper.dsLeague.Tables("dtScores").NewRow
+                    'arow("Date") = sKeys(1)
+                    'arow("League") = oHelper.rLeagueParmrow("Name")
+                    'bfound = False
                 End If
 
                 'edit each cell before saving
@@ -595,11 +601,11 @@ Public Class frmScoreCard
                 Next
 
                 'get the player from the player table, if not found, its a new player(shouldnt happen)
-                Dim spKeys() As Object = {row.Cells("Player").Value}
-                Dim prow As DataRow = oHelper.dsLeague.Tables("dtPlayers").Rows.Find(spKeys)
-                arow("Grade") = prow.Item("Grade")
-                'put a new record from the datagridview
-                If Not bfound Then oHelper.dsLeague.Tables("dtScores").Rows.Add(arow)
+                'Dim spKeys() As Object = {row.Cells("Player").Value}
+                'Dim prow As DataRow = oHelper.dsLeague.Tables("dtPlayers").Rows.Find(spKeys)
+                'arow("Grade") = prow.Item("Grade")
+                ''put a new record from the datagridview
+                'If Not bfound Then oHelper.dsLeague.Tables("dtScores").Rows.Add(arow)
             Next
             'oHelper.DataTable2XML("dtScores", "Scores")
             oHelper.DataTable2CSV(oHelper.dsLeague.Tables("dtScores"), oHelper.sFilePath & "\" & Now.ToString("yyyyMMdd") & "_Scores.csv")
@@ -677,7 +683,7 @@ Public Class frmScoreCard
         '20180116-check to see if player is already entered
         Dim rptr As Integer = R.Index
         For Each row As DataGridViewRow In dgScores.Rows
-            If row.Cells(sCurrColName).Value = oHelper.sPlayer Then
+            If row.Index <> rptr And row.Cells(sCurrColName).Value = oHelper.sPlayer Then
                 MsgBox(String.Format("You've already entered this player {0}, Try Again", oHelper.sPlayer))
                 R.Cells(sCurrColName).Value = sOldCellValue
                 oHelper.bDGSError = True
@@ -1508,6 +1514,11 @@ Public Class frmScoreCard
     Private Sub frmScoreCard_FormClosing(sender As Object, e As FormClosingEventArgs) Handles MyBase.FormClosing
         Try
             SaveScores()
+            If lbStatus.BackColor = Color.Red Then
+                bCloseScreen = False
+                e.Cancel = True
+                Exit Sub
+            End If
             oHelper.Common_Exit()
         Catch ex As Exception
             MsgBox("Error saving scores, scores not saved")

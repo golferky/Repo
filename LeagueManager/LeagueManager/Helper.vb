@@ -62,6 +62,7 @@ Namespace Helper.Controls
         Public toolTipHdcp As New ToolTip()
         '20180130-num of Closests
         Public iNumClosests = 0
+        Public bByeFound = False
 
         Public Function RemoveSpcChar(ByVal chr As String) As String
             RemoveSpcChar = chr.ToString.Replace(ChrW(&H25CF), String.Empty)
@@ -1465,8 +1466,7 @@ Namespace Helper.Controls
             If iHoles = 0 Then iHoles = rLeagueParmrow("Holes")
 
             'check stroke index
-            Dim isi = ""
-            isi = CalcStrokeIndex(cell.OwningColumn.Name)
+            Dim isi = CalcStrokeIndex(cell.OwningColumn.Name)
             'LOGIT(sPlayer & "-" & iHdcp & "-" & iStrokeIndex & "-" & isi & "-" & cell.OwningColumn.Name & "-")
             'if the handicap > stroke index make color beige
             If iHdcp >= isi Then
@@ -1528,8 +1528,16 @@ Namespace Helper.Controls
             Dim s9Played As String = "Out_Net"
             If iHoleMarker <> 1 Then s9Played = "In_Net"
             ipNet = FixNullScore(dg.Rows(index + 0).Cells(s9Played).Value.ToString)
+            '20180325-bye opponent
+            If Matches.sByeOpponent = dg.Rows(index + 0).Cells("Team").Value Then
+                dg.Rows(index + 0).Cells("Points").Style.BackColor = Color.LightGreen
+                dg.Rows(index + 0).Cells("Points").Value = 1
+                dg.Rows(index + 0).Cells("Opponent").Value = "Bye"
+                bByeFound = True
+                Exit Sub
+            End If
+            sPlayer = dg.Rows(index).Cells("Player").Value
             ioNet = FixNullScore(dg.Rows(index + 2).Cells(s9Played).Value.ToString)
-
             If ipNet > ioNet Then
                 dg.Rows(index + 2).Cells("Points").Style.BackColor = Color.LightGreen
                 dg.Rows(index + 2).Cells("Points").Value = 1
@@ -1563,9 +1571,7 @@ Namespace Helper.Controls
         Function buildSchedule() As DataTable
 
             Try
-
                 'Build the column header 
-
                 Dim dtSchedule = New DataTable
                 dtSchedule.Columns.Add("Date")
                 '20180301
@@ -2116,7 +2122,7 @@ Namespace Helper.Controls
 
         End Sub
         '20180325-changes for bye team
-        Sub getMatchScores(sdate As String)
+        Sub getMatchScores_20180409(sdate As String)
 
             If bloghelper Then LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
             CalcHoleMarker(sdate)
@@ -2149,9 +2155,8 @@ Namespace Helper.Controls
                     Dim sKeys() As Object = {player("Name"), sdate}
                     Dim drow As DataRow = dsLeague.Tables("dtScores").Rows.Find(sKeys)
                     'if player is not in the scores for that day, check to see if he has a sub
-                    Dim bsub = False
                     If drow Is Nothing Then
-                        'find this players partner in players file
+                        'find this players partner in filtered players file
                         For Each partner As DataRowView In dvPlayers
                             'find this players team number in players file
                             If partner("Team") = player("Team") Then
@@ -2193,6 +2198,89 @@ Namespace Helper.Controls
 
             dvscores.Sort = "Partner"
 
+        End Sub
+        Function getMatchScores(sdate As String) As Boolean
+            If bloghelper Then LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
+            getMatchScores = False
+            CalcHoleMarker(sdate)
+            Dim dtschedule As New DataTable
+            dtschedule = buildSchedule()
+            Dim sKey = DateTime.ParseExact(sdate, "yyyyMMdd", Nothing).ToString("MM\/dd\/yyyy").Trim("0")
+            Dim rSch As DataRow = dtschedule.Rows.Find(sKey)
+            If rSch Is Nothing Then
+                MsgBox("No scheduled matches found for this date, must exit")
+                Exit Function
+            End If
+            Dim ip# = 0
+
+            For iMatch = 1 To rLeagueParmrow("Teams") / 2
+                Dim sMatch = rSch(iMatch.ToString).ToString
+                sTeam = sMatch.Split("v")(1)
+                'save this players Partner in splayer
+                sPlayer = getPlayer(sTeam, "B")
+                If getPlayer(sTeam, "A") = "" Then Exit Function
+                getScore(getPlayer(sTeam, "A"), sdate, ip#)
+                ip# += 1
+                'save this players Partner in splayer
+                sPlayer = getPlayer(sTeam, "A")
+                If getPlayer(sTeam, "B") = "" Then Exit Function
+                getScore(getPlayer(sTeam, "B"), sdate, ip#)
+                ip# += 1
+                sTeam = sMatch.Split("v")(0)
+                'save this players Partner in splayer
+                sPlayer = getPlayer(sTeam, "B")
+                If getPlayer(sTeam, "A") = "" Then Exit Function
+                getScore(getPlayer(sTeam, "A"), sdate, ip#)
+                ip# += 1
+                'save this players Partner in splayer
+                sPlayer = getPlayer(sTeam, "A")
+                If getPlayer(sTeam, "B") = "" Then Exit Function
+                getScore(getPlayer(sTeam, "B"), sdate, ip#)
+                ip# += 1
+            Next
+            Dim dvscores As New DataView(dsLeague.Tables("dtScores"))
+            dvscores.Sort = "Partner"
+            'mark as good scores
+            getMatchScores = True
+        End Function
+        Private Function getPlayer(sTeam, sGrade) As String
+            getPlayer = ""
+            Dim sPlayersRowFilter = String.Format("Team ='{0}' AND Grade = '{1}'", sTeam, sGrade)
+            Dim dvPlayers = New DataView(dsLeague.Tables("dtPlayers")) With
+                {
+                 .RowFilter = sPlayersRowFilter
+                }
+            If dvPlayers.Count > 0 Then
+                getPlayer = dvPlayers(0)("Name")
+            Else
+                MsgBox(String.Format("Team {0} is missing an {1} player, fix player file and try again", sTeam, sGrade))
+            End If
+
+        End Function
+        Private Sub getScore(sthisPlayer As String, sDate As String, ip#)
+            Dim sKey() As Object = {sthisPlayer, sDate}
+            Dim drow = dsLeague.Tables("dtScores").Rows.Find(sKey)
+            Dim dvscores As New DataView(dsLeague.Tables("dtScores"))
+            If drow Is Nothing Then
+                Dim srowfilter = String.Format("Player <> '{0}' AND Date = '{1}' AND Team = '{2}'", sPlayer, sDate, sTeam)
+                dvscores.RowFilter = srowfilter
+                If dvscores.Count = 0 Then
+                    Dim rowView As DataRowView = dvscores.AddNew
+                    ' Change values in the DataRow.
+                    rowView("League") = sLeagueName
+                    rowView("Player") = sthisPlayer
+                    rowView("Group") = 0
+                    rowView("Team") = sTeam
+                    rowView("Date") = sDate
+                    rowView("Partner") = CStr(ip#).PadLeft(2, "0")
+                    rowView.EndEdit()
+                Else
+                    dvscores(0)("Partner") = CStr(ip#).PadLeft(2, "0")
+                End If
+            Else
+                drow("Partner") = CStr(ip#).PadLeft(2, "0")
+                drow.EndEdit()
+            End If
         End Sub
         Public Sub ReloadScores()
             If dsLeague.Tables("dtScores") IsNot Nothing Then

@@ -34,4 +34,5 @@
         oHelper.DataTable2CSV(DsLeague.Tables(stable), oHelper.sFilePath & "\" & Now.ToString("yyyyMMdd") & "_LeagueParms.csv")
         'DsLeague.WriteXml(oHelper.sFilePath & "\" & DateTime.Now.ToString("yyyyMMdd_") & "LeagueParms.xml", XmlWriteMode.WriteSchema)
     End Sub
+
 End Class

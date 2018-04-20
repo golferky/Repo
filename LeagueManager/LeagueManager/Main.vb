@@ -1,7 +1,7 @@
 ﻿'*************************************************************************************************
 Imports System.IO.Packaging
 Public Class Main
-    Dim cVersion = "Version : 3.06"
+    Dim cVersion = "Version : 4.19"
     Public oHelper As Helper.Controls.Helper
     Dim bLoad = True
     'Private Teams As ArrayList = New ArrayList
@@ -102,9 +102,6 @@ Public Class Main
         oHelper.GGmail = New GGSMTP_GMAIL(oHelper.rLeagueParmrow("Email"), oHelper.rLeagueParmrow("EmailPassword"))
         'GetXSDNameByFileName(oHelper.dsLeague.Tables("dtScores"),
         oHelper.MyCourse = oHelper.dsLeague.Tables("dtCourses").Select("Name = '" & oHelper.rLeagueParmrow("Course") & "'")
-        If oHelper.rLeagueParmrow("Closest") = "Y" Then
-
-        End If
         lblProcessMsg.Text = "Done-Loading League Tables"
         Me.Cursor = Cursors.Default
         Application.DoEvents()
@@ -517,6 +514,7 @@ Public Class Main
 
     Private Sub PlayerSetup_Click(sender As System.Object, e As System.EventArgs) Handles btnPlayerSetup.Click
         frmPlayer.Show()
+        'reload player table after updating
     End Sub
 
     Private Sub ScoreSetup_Click(sender As System.Object, e As System.EventArgs)
