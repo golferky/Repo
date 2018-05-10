@@ -55,6 +55,8 @@ Partial Class Skins
         Me.tbLOCP1 = New System.Windows.Forms.TextBox()
         Me.tbLOSkins = New System.Windows.Forms.TextBox()
         Me.dgScores = New System.Windows.Forms.DataGridView()
+        Me.cbSkins = New System.Windows.Forms.CheckBox()
+        Me.cbCTP = New System.Windows.Forms.CheckBox()
         Me.GroupBox3.SuspendLayout()
         Me.GroupBox1.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
@@ -381,11 +383,37 @@ Partial Class Skins
         Me.dgScores.Size = New System.Drawing.Size(1439, 1018)
         Me.dgScores.TabIndex = 0
         '
+        'cbSkins
+        '
+        Me.cbSkins.AutoSize = True
+        Me.cbSkins.Checked = True
+        Me.cbSkins.CheckState = System.Windows.Forms.CheckState.Checked
+        Me.cbSkins.Location = New System.Drawing.Point(828, 72)
+        Me.cbSkins.Name = "cbSkins"
+        Me.cbSkins.Size = New System.Drawing.Size(103, 17)
+        Me.cbSkins.TabIndex = 88
+        Me.cbSkins.Text = "Mark Skins Paid"
+        Me.cbSkins.UseVisualStyleBackColor = True
+        '
+        'cbCTP
+        '
+        Me.cbCTP.AutoSize = True
+        Me.cbCTP.Checked = True
+        Me.cbCTP.CheckState = System.Windows.Forms.CheckState.Checked
+        Me.cbCTP.Location = New System.Drawing.Point(828, 100)
+        Me.cbCTP.Name = "cbCTP"
+        Me.cbCTP.Size = New System.Drawing.Size(101, 17)
+        Me.cbCTP.TabIndex = 89
+        Me.cbCTP.Text = "Mark CTP  Paid"
+        Me.cbCTP.UseVisualStyleBackColor = True
+        '
         'Skins
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(1431, 992)
+        Me.Controls.Add(Me.cbCTP)
+        Me.Controls.Add(Me.cbSkins)
         Me.Controls.Add(Me.dgScores)
         Me.Controls.Add(Me.GroupBox4)
         Me.Controls.Add(Me.GroupBox2)
@@ -446,4 +474,6 @@ Partial Class Skins
     Friend WithEvents tbCP2 As TextBox
     Friend WithEvents Label9 As Label
     Friend WithEvents tbLOCP2 As TextBox
+    Friend WithEvents cbSkins As CheckBox
+    Friend WithEvents cbCTP As CheckBox
 End Class

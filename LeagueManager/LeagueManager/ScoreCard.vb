@@ -74,13 +74,18 @@ Public Class frmScoreCard
         dvscores.Sort = "Date desc"
         dvscores.RowFilter = String.Format("Date = {0}", dvscores(0)("Date"))
         Dim lastdate = dvscores(0)("Date")
+        'Dim lastdate = CDate(
+        '    dvscores(0)("Date").ToString.Substring(0, 4) & "/" &
+        '    dvscores(0)("Date").ToString.Substring(4, 2) & "/" &
+        '    dvscores(0)("Date").ToString.Substring(6, 2)).AddDays(7).ToString("yyyyMMdd")
+
         Dim bvalidscores = True
-        For Each row As DataRowView In dvscores
-            If oHelper.convDBNulltoSpaces(row("Hdcp")).Trim = "" Then
-                bvalidscores = False
-                Exit For
-            End If
-        Next
+        'For Each row As DataRowView In dvscores
+        '    If oHelper.convDBNulltoSpaces(row("Hdcp")).Trim = "" Then
+        '        bvalidscores = False
+        '        Exit For
+        '    End If
+        'Next
 
         Dim dtschedule As New DataTable()
         dtschedule = oHelper.buildSchedule()
@@ -94,36 +99,28 @@ Public Class frmScoreCard
             row("Date") = reformatted
         Next
         Dim dvsch As New DataView(dtschedule)
-        dvsch.Sort = "Date desc"
+        'dvsch.Sort = "Date desc"
         Dim pdate = ""
         cbDatesPlayers.Items.Clear()
+        Dim bdone = False
         For Each rv As DataRowView In dvsch
             'check the sch date against the last score date
-            If bvalidscores Then
-                'lastscore has valid scores
-                If rv(0) = lastdate Then
-                    cbDatesPlayers.Items.Add(rv(0))
-                    Exit For
-                ElseIf rv(0) < lastdate Then
-                    'add dates this schedule that are before last date
-                    cbDatesPlayers.Items.Add(rv(0))
-                End If
+            cbDatesPlayers.Items.Add(rv(0))
+            If bdone Then
+                Exit For
             End If
-            pdate = rv(0)
+            'lastscore has valid scores
+            If rv(0) = lastdate Then bdone = True
         Next
-        cbDatesPlayers.Items.Add(pdate)
 
         'oHelper.BuildControls(gbScoringSgboreCard, 1, 18, "Scorecard")
         bCloseScreen = False
         oHelper.bScoreCard = True
         oHelper.bColors = False
         oHelper.bDots = False
-        If rbColors.Checked Then
-            oHelper.bColors = True
-        End If
-        If rbDots.Checked Then
-            oHelper.bDots = True
-        End If
+        If rbColors.Checked Then oHelper.bColors = True
+        If rbDots.Checked Then oHelper.bDots = True
+
         '20180121-removed this from form
         'gbDefGames.Visible = True
         gbDefMeth.Visible = True
@@ -150,7 +147,7 @@ Public Class frmScoreCard
                 cbDatesPlayers.SelectedItem = reformatted
             End If
         End If
-
+        cbDatesPlayers.SelectedIndex = cbDatesPlayers.Items.Count - 1
         BldScoreCardDataGridFromFile()
         If Not bMatchesSet Then Me.Close
         '20180221-calculate number of closests to pins there should be
@@ -377,7 +374,7 @@ Public Class frmScoreCard
                 'If cbScoresLocked.Checked = True Then
                 '    .ReadOnly = True
                 'End If
-
+                .SortMode = DataGridViewColumnSortMode.NotSortable
             End With
         Next
 
@@ -436,6 +433,7 @@ Public Class frmScoreCard
 
             dgScores.AllowUserToAddRows = False
             dgScores.AllowUserToDeleteRows = False
+
             tbSkins.Text = "0"
             tbCP1.Text = "0"
             tbCP2.Text = "0"
@@ -700,7 +698,7 @@ Public Class frmScoreCard
         R.Cells("PHdcp").Value = oHelper.iHdcp
         R.Cells(sCurrColName).Value = oHelper.sPlayer
         Dim MyPlayer As DataRow = oHelper.dsLeague.Tables("dtPlayers").Rows.Find(oHelper.sPlayer)
-        R.Cells("Team").Value = MyPlayer("Team")
+        If R.Cells("Team").Value = "" Then R.Cells("Team").Value = MyPlayer("Team")
 
         If rbColors.Checked Then oHelper.bColors = True Else oHelper.bColors = False
         If rbDots.Checked Then oHelper.bDots = True Else oHelper.bDots = False
@@ -738,13 +736,15 @@ Public Class frmScoreCard
                 If oHelper.iHoleMarker = 1 Then
                     R.Cells("Out_Gross").Value = ""
                     R.Cells("Out_Net").Value = ""
+                    '20180510-turn off read only for method=score
+                    R.Cells("Out_Gross").ReadOnly = False
                 Else
                     R.Cells("In_Gross").Value = ""
                     R.Cells("In_Net").Value = ""
+                    '20180510-turn off read only for method=score
+                    R.Cells("In_Gross").ReadOnly = False
                 End If
                 R.Cells("Hdcp").Value = ""
-                '20180219-turn off read only for method=score
-                R.Cells("Out_Gross").ReadOnly = False
                 Dim mbr = MsgBox("Score method is being used, hole scores will be cleared", MsgBoxStyle.OkCancel)
                 If mbr = MsgBoxResult.Cancel Then
                     R.Cells(sCurrColName).Value = sOldCellValue
@@ -757,12 +757,19 @@ Public Class frmScoreCard
             ElseIf sMethod = "Gross".ToUpper Then
                 '20180219-clear out scores from score method
                 If sOldCellValue = "Score" Then
-                    R.Cells("Out_Gross").Value = ""
-                    R.Cells("Out_Net").Value = ""
+                    If oHelper.iHoleMarker = 1 Then
+                        R.Cells("Out_Gross").Value = ""
+                        R.Cells("Out_Net").Value = ""
+                        '20180219-turn off read only for method=score
+                        R.Cells("Out_Gross").ReadOnly = True
+                    Else
+                        R.Cells("In_Gross").Value = ""
+                        R.Cells("In_Net").Value = ""
+                        '20180510-turn off read only for method=score
+                        R.Cells("In_Gross").ReadOnly = False
+                    End If
                     R.Cells("Hdcp").Value = ""
                 End If
-                '20180219-turn off read only for method=score
-                R.Cells("Out_Gross").ReadOnly = True
                 '20180219-clear gross / net score 
                 If oHelper.iHoleMarker = 1 Then
                     R.Cells("Out_Gross").Value = R.Cells("Out_Net").Value
@@ -778,8 +785,17 @@ Public Class frmScoreCard
             ElseIf sMethod = "Net".ToUpper Then
                 '20180219-clear out scores from score method
                 If sOldCellValue = "Score" Then
-                    R.Cells("Out_Gross").Value = ""
-                    R.Cells("Out_Net").Value = ""
+                    If oHelper.iHoleMarker = 1 Then
+                        R.Cells("Out_Gross").Value = ""
+                        R.Cells("Out_Net").Value = ""
+                        '20180219-turn off read only for method=score
+                        R.Cells("Out_Gross").ReadOnly = True
+                    Else
+                        R.Cells("In_Gross").Value = ""
+                        R.Cells("In_Net").Value = ""
+                        '20180510-turn off read only for method=score
+                        R.Cells("In_Gross").ReadOnly = False
+                    End If
                     R.Cells("Hdcp").Value = ""
                 End If
                 '20180219-turn off read only for method=score
@@ -1053,7 +1069,8 @@ Public Class frmScoreCard
                     Throw New FormatException
                 End If
             End If
-
+            oHelper.bAllHolesEntered = True
+            editrest(R, sCurrColName)
         Catch ex As FormatException
             MsgBox(String.Format("This Score ({0}) must be a number, setting back to {1}", sScore, sOldCellValue))
             R.Cells(sCurrColName).Value = sOldCellValue
@@ -1184,7 +1201,7 @@ Public Class frmScoreCard
         'If dgScores.RowCount >= 24 Then
         '    gbDefGames.Visible = False
         '    gbDefMeth.Visible = False
-        'Else
+        'Else("Hdcp"
         '    gbDefGames.Visible = True
         '    gbDefMeth.Visible = True
         'End If

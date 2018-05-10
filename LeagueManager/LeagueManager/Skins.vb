@@ -162,34 +162,34 @@ Public Class Skins
         Catch ex As Exception
         End Try
     End Sub
-    Sub checkDotsColors()
-        oHelper.LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
+    'Sub checkDotsColors()
+    '    oHelper.LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
 
-        lbStatus.Text = String.Format("Changing dots/colors")
-        lbStatus.BackColor = Color.Red
-        Me.Cursor = Cursors.WaitCursor
-        Application.DoEvents()
+    '    lbStatus.Text = String.Format("Changing dots/colors")
+    '    lbStatus.BackColor = Color.Red
+    '    Me.Cursor = Cursors.WaitCursor
+    '    Application.DoEvents()
 
-        oHelper.bCalcSkins = True
-        If rbColors.Checked Then
-            oHelper.bColors = True
-            oHelper.bDots = False
-        Else
-            oHelper.bColors = False
-            oHelper.bDots = True
-        End If
-        For Each row As DataGridViewRow In dgScores.Rows
-            oHelper.ChangeColorsForStrokes(row)
-        Next
-        '20180228-recolor and strikeout
-        CalcSkins()
-        oHelper.bCalcSkins = False
-        lbStatus.Text = String.Format("Finished Changing dots/colors")
-        lbStatus.BackColor = Color.LightGreen
-        Me.Cursor = Cursors.Default
-        Application.DoEvents()
+    '    oHelper.bCalcSkins = True
+    '    If rbColors.Checked Then
+    '        oHelper.bColors = True
+    '        oHelper.bDots = False
+    '    Else
+    '        oHelper.bColors = False
+    '        oHelper.bDots = True
+    '    End If
+    '    For Each row As DataGridViewRow In dgScores.Rows
+    '        oHelper.ChangeColorsForStrokes(row)
+    '    Next
+    '    '20180228-recolor and strikeout
+    '    CalcSkins()
+    '    oHelper.bCalcSkins = False
+    '    lbStatus.Text = String.Format("Finished Changing dots/colors")
+    '    lbStatus.BackColor = Color.LightGreen
+    '    Me.Cursor = Cursors.Default
+    '    Application.DoEvents()
 
-    End Sub
+    'End Sub
     Sub CalcSkins()
         oHelper.LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
 
@@ -231,13 +231,18 @@ Public Class Skins
 
         iEachClosestAmt = (iTotCTPPlayers - iTotCTPPlayers Mod 2) / oHelper.iNumClosests
 
+        Dim iSkinpot As Integer = oHelper.rLeagueParmrow("Skins") * iTotSkinPlayers + oHelper.rLeagueParmrow("RolledOverSkins")
+        tbSkins.Text = 0
+        tbPurse.Text = 0
         tbLOSkins.Text = 0
         tbCP1.Text = 0
         tbCP2.Text = 0
         tbLOPurse.Text = 0
-        tbLOCP1.Text = iEachClosestAmt
-        tbLOCP2.Text = iEachClosestAmt
-        tbLOPurse.Text += iEachClosestAmt * oHelper.iNumClosests
+        tbLOCP1.Text = 0
+        tbLOCP2.Text = 0
+        'tbLOCP1.Text = iEachClosestAmt
+        'tbLOCP2.Text = iEachClosestAmt
+        'tbLOPurse.Text += iEachClosestAmt * oHelper.iNumClosests
         Dim iExtra As Integer = 0
 
         SaveScores()
@@ -256,11 +261,14 @@ Public Class Skins
             Application.DoEvents()
             Exit Sub
         End If
+        '20180508
+        For Each row In dgScores.Rows
 
+        Next
         'sSkinsIndexes = oHelper.CalcSkins(dgScores)
         sSkinsIndexes = FCalcSkins()
         sSkinsIndexes.Sort()
-        Dim iSkinpot As Integer = oHelper.rLeagueParmrow("Skins") * iTotSkinPlayers + oHelper.rLeagueParmrow("RolledOverSkins")
+        'Dim iSkinpot As Integer = oHelper.rLeagueParmrow("Skins") * iTotSkinPlayers + oHelper.rLeagueParmrow("RolledOverSkins")
         Dim iSkinVal As Integer = 0
 
         If sSkinsIndexes.Count > 0 Then
@@ -312,6 +320,7 @@ Public Class Skins
         Dim iCtpsDol = 0.0
         Dim iEarnytd = 0.00
 
+        'Loop through each row and check to see if check box checked for ctp 1/2
         For Each row As DataGridViewRow In dgScores.Rows
             If row.Cells("Player").Value <> "*** Total ***" Then
                 Dim iEarn = 0.0
@@ -321,19 +330,23 @@ Public Class Skins
                     iEarn += Val(row.Cells("$Skins").Value)
                     iSkinsDol += Val(row.Cells("$Skins").Value)
                 End If
+                '2018042-this wont ever be true because these check boxes dont get populated when calc skins button is pushed(Which is how we got here)
+                'If row.Cells("CTP_1").Value = True Then
+                '    iEarn += iEachClosestAmt
+                '    iCtpsDol += iEachClosestAmt
+                'End If
+                'If row.Cells("CTP_2").Value = True Then
+                '    iEarn += iEachClosestAmt
+                '    iCtpsDol += iEachClosestAmt
+                'End If
 
-                If row.Cells("CTP_1").Value = True Then
-                    iEarn += iEachClosestAmt
-                    iCtpsDol += iEachClosestAmt
-
+                '20180424 - Fix if already done
+                If IsNumeric(row.Cells("$Closest").Value) Then
+                    iEarn += row.Cells("$Closest").Value
+                    iCtpsDol += row.Cells("$Closest").Value
                     row.Cells("$Closest").Style.BackColor = Color.Gold
                     row.Cells("Player").Style.BackColor = Color.Gold
-                End If
-                If row.Cells("CTP_2").Value = True Then
-                    iEarn += iEachClosestAmt
-                    iCtpsDol += iEachClosestAmt
-                    row.Cells("$Closest").Style.BackColor = Color.Gold
-                    row.Cells("Player").Style.BackColor = Color.Gold
+                    tbCP1.Text += CInt(row.Cells("$Closest").Value)
                 End If
 
                 row.Cells("$Earn").Value = iEarn
@@ -602,7 +615,7 @@ Public Class Skins
                 'row.Cells("$Closest").Value = ""
             Next
 
-            '20180224-save off y/n values
+            '20180224-save off y/n values from gridview
             Dim sCTP1 As New List(Of String)
             Dim sCTP2 As New List(Of String)
             For Each skin As DataGridViewRow In dgScores.Rows
@@ -615,7 +628,7 @@ Public Class Skins
             ncol.HeaderText = "CTP 1"
             ncol.Name = "CTP_1"
             ncol.DataPropertyName = "CTP1"
-            '20180201-remove hardcoded column 21,22
+            '20180201-remove hardcoded column 22,23
             ncol.Width = dgScores.Columns(21).Width
             dgScores.Columns.RemoveAt(21)
             dgScores.Columns.Insert(21, ncol)
@@ -628,6 +641,7 @@ Public Class Skins
             dgScores.Columns.RemoveAt(22)
             dgScores.Columns.Insert(22, ncol2)
 
+            'lop through each row loo
             For Each row As DataGridViewRow In dgScores.Rows
                 Dim ictp = 0
                 If sCTP1(row.Index) = "Y" Then
@@ -785,7 +799,6 @@ Public Class Skins
         If sender.currentrow.cells("Player").value = "*** Total ***" Then Exit Sub
 
         Dim cell As DataGridViewCheckBoxCell = sender.currentcell
-
         Dim iamt As Integer = iEachClosestAmt
 
         'add or subtract the amts from purse
@@ -891,6 +904,10 @@ Public Class Skins
 
         Me.Cursor = Cursors.Default
         Application.DoEvents()
+
+    End Sub
+
+    Private Sub cbSkins_CheckedChanged(sender As Object, e As EventArgs) Handles cbSkins.CheckedChanged
 
     End Sub
 

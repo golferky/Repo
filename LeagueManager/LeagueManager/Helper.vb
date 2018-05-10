@@ -3,6 +3,7 @@ Imports System.Data.OleDb
 Imports System.IO
 Imports System.Text
 Imports System.Net.Mail
+'Imports System.Web
 
 Namespace Helper.Controls
     Public Class Helper
@@ -2206,6 +2207,8 @@ Namespace Helper.Controls
             Dim dtschedule As New DataTable
             dtschedule = buildSchedule()
             Dim sKey = DateTime.ParseExact(sdate, "yyyyMMdd", Nothing).ToString("MM\/dd\/yyyy").Trim("0")
+            sKey = sdate.Substring(4, 2).Trim("0") & "/" & sdate.Substring(6, 2).Trim("0") & "/" & sdate.Substring(0, 4)
+
             Dim rSch As DataRow = dtschedule.Rows.Find(sKey)
             If rSch Is Nothing Then
                 MsgBox("No scheduled matches found for this date, must exit")
@@ -2239,7 +2242,7 @@ Namespace Helper.Controls
                 ip# += 1
             Next
             Dim dvscores As New DataView(dsLeague.Tables("dtScores"))
-            dvscores.Sort = "Partner"
+            dvscores.Sort = "Date,Partner"
             'mark as good scores
             getMatchScores = True
         End Function
@@ -2291,110 +2294,46 @@ Namespace Helper.Controls
             CSV2DataTable(dsLeague.Tables("dtScores"), getLatestFile("*Scores.csv"))
             dsLeague.Tables("dtScores").PrimaryKey = New DataColumn() {dsLeague.Tables("dtScores").Columns("Player"), dsLeague.Tables("dtScores").Columns("Date")}
         End Sub
+        Function Create_Html(dt As DataTable) As String
 
-        '20180303-create html from data table
+            'Populating a DataTable from database.
 
-        ''' This provides a simple way to convert a DataTable to an HTML file.
-        ''' </summary>
-        ''' <param name="targetTable">This the table to convert.</param>
-        ''' <returns>This is the HTML output, which can saved as a file.</returns>
-        Public Function ConvertToHtmlFile(ByVal targetTable As DataTable) As String
-            Dim myHtmlFile As String = ""
+            'Building an HTML string.
+            Dim html As New StringBuilder()
 
+            'Table start.
+            'html.Append("<table border = '1'>")
+            html.Append("<table border='1px' cellpadding='5' cellspacing='0' ")
+            html.Append("style='border: solid 1px Silver; font-size: x-small;'>")
 
-            If (targetTable Is Nothing) Then
-                Throw New System.ArgumentNullException("targetTable")
-            Else
-                'Continue.
-            End If
+            'Building the Header row.
+            html.Append("<tr>")
+            For Each column As DataColumn In dt.Columns
+                html.Append("<th>")
+                html.Append(column.ColumnName)
+                html.Append("</th>")
+            Next
+            html.Append("</tr>")
 
+            'Building the Data rows.
+            For Each row As DataRow In dt.Rows
+                html.Append("<tr>")
+                For Each column As DataColumn In dt.Columns
+                    html.Append("<td>")
+                    html.Append(row(column.ColumnName))
+                    html.Append("</td>")
+                Next
+                html.Append("</tr>")
+            Next
 
-            'Get a worker object.
-            Dim myBuilder As System.Text.StringBuilder = New System.Text.StringBuilder()
+            'Table end.
+            html.Append("</table>")
 
-
-            'Open tags and write the top portion.
-            myBuilder.Append("<html xmlns='http://www.w3.org/1999/xhtml'>")
-            myBuilder.Append("<head>")
-            myBuilder.Append("<title>")
-            myBuilder.Append("Page-")
-            myBuilder.Append(Guid.NewGuid().ToString())
-            myBuilder.Append("</title>")
-            myBuilder.Append("</head>")
-            myBuilder.Append("<body>")
-            myBuilder.Append("<table border='1px' cellpadding='5' cellspacing='0' ")
-            myBuilder.Append("style='border: solid 1px Silver; font-size: x-small;'>")
-
-
-            'Add the headings row.
-
-
-            myBuilder.Append("<tr align='left' valign='top'>")
-
-
-            For Each myColumn As DataColumn In targetTable.Columns
-                myBuilder.Append("<td align='left' valign='top'>")
-                myBuilder.Append(myColumn.ColumnName)
-                myBuilder.Append("</td>")
-            Next myColumn
-
-
-            myBuilder.Append("</tr>")
-
-
-
-
-            'Add the data rows.
-            For Each myRow As DataRow In targetTable.Rows
-                myBuilder.Append("<tr align='left' valign='top'>")
-
-
-                For Each myColumn As DataColumn In targetTable.Columns
-                    myBuilder.Append("<td align='left' valign='top'>")
-                    myBuilder.Append(myRow(myColumn.ColumnName).ToString())
-                    myBuilder.Append("</td>")
-                Next myColumn
-
-
-
-
-                myBuilder.Append("</tr>")
-            Next myRow
-
-
-            'Close tags.
-            myBuilder.Append("</table>")
-            myBuilder.Append("</body>")
-            myBuilder.Append("</html>")
-
-
-            'Get the string for return.
-            myHtmlFile = myBuilder.ToString()
-
-
-            Return myHtmlFile
-        End Function
-
-        Public Function ConvertToHTMLString(ByVal ADatatable As Data.DataTable) As String
-
-            Dim s As New Text.StringBuilder
-
-            s.Append("<html><body><table><thead><tr>")
-
-            Dim cols = (From a As Data.DataColumn In ADatatable.Columns).ToList
-            cols.ForEach(Sub(a) s.AppendFormat("<th>{0}</th>", a.ColumnName))
-
-            s.Append("</tr></thead><tbody>")
-
-            Dim rows = (From a As Data.DataRow In ADatatable.Rows).ToList
-            'rows.ForEach(Sub(a) cols.ForEach(Sub(b) s.Append("<tr>").AppendFormat("<td>{0}</td>", a(b)).Append("</tr>")))
-
-            rows.ForEach(Sub(a) s.AppendFormat("<tr>").Append(String.Join(String.Empty, cols.Select(Function(b) "<td>" & a(b) & "</td>").ToArray)).Append("</tr>"))
-
-            s.Append("</tbody></table></body></html>")
-
-            Return s.ToString
-
+            'Append the HTML string to Placeholder.
+            '        PlaceHolder1.Controls.Add(New Literal() With {
+            '  .Text = html.ToString()
+            '})
+            Return html.ToString
         End Function
 
         'this code put in for the extra b player, put an * by his name (2nd instance) if hes in there twice

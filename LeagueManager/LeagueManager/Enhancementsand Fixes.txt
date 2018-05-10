@@ -3,12 +3,22 @@
 *************************************************************************************************
 * yyyymmdd - Priority - Complexity -  Description
 * -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-* 20180324 - M        - Med        -  track finances, payment history, distribution history, payment method
-*													- new table/file(Payment file)
-* 20180403 - Priority H  - Complexity - Hard        - create option for league average opponent
-* 20180318 - Priority L  - Complexity - Hard        - Skins.vb- disabled checkdotscolors until i can figure out fonts
-* 20180304 - Priority L  - Complexity - Hard        - Skins.vb- strikeout not working on colors option
-* 20180226 - Priority H  - Complexity -             -         - Sam cant load files on his pc, need to turn on logging and email log to me
+* 20180510 - M        - MH          - when enter Score for a player on the back 9, it says outGross not found
+* 20180508 - M        - MH          - when player has no previous scores, its not doing score card right if hes a sub
+* 20180508 - M        - MH          - list players scores abending
+* 20180508 - H        - Easy        - add checkbox to mark all skins and ctp paid
+* 20180430 - HH       - Med         - Need to account for Rainouts
+* 20180423 - L        - Easy        - Fix Money on CTP1/2 on Scorecard(showing all money to ctp1)
+* 20180423 - L        - Easy        - Fix Money on Skins when Skins have already been calculated (showing carryovers because nothing is checked)
+* 20180423 - L        - Easy        - add Grade to Matches grid
+* 20180423 - M        - Med         - Create HTML file for standings and other sheets
+
+* 20180324 - M        - Med         - track finances, payment history, distribution history, payment method
+*									- new table/file(Payment file)
+* 20180403 - L        - Hard        - create option for league average opponent
+* 20180318 - L        - Hard        - Skins.vb- disabled checkdotscolors until 
+* 20180304 - L        - Hard        - Skins.vb- strikeout not working on colors option
+* 20180226 - H        -             - Sam cant load files on his pc, need to turn on logging and email log to me
 *************************************************************************************************
 * 20180219 - My Review
 * 20180302 - Priority L  - Complexity - Hard        - Standings.vb - Create html printable standings, reports
@@ -31,6 +41,10 @@
 *************************************************************************************************
 *                                           Change Log-Completed
 *************************************************************************************************
+* yyyymmdd - Priority - Complexity -  Description
+* 20180504 - H        - E          -  when resorting grid on scorecard, it messes up matches, prevent it
+* 20180504 - H        - E          -  When preloading scorecard, use most recent instead of first
+* 20180430 - HH       - Med         -  Scores only allow the first week to be entered
 * 20180419 - 4.19 versions see below
 * 20180419 - Priority H  - Complexity - Med         - subs not working on scores, adding subs and regulars
 * 20180408 - 4.08 versions see below

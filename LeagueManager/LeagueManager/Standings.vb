@@ -1,4 +1,5 @@
 ﻿Imports System.IO.Packaging
+Imports System.Text
 Public Class Standings
     Dim oHelper As New Helper.Controls.Helper
     Dim dtSchedule As DataTable
@@ -458,8 +459,11 @@ Public Class Standings
                 End Try
 
             End Using
-            Dim sHtml = oHelper.ConvertToHtmlFile(dtStandings)
-            sHtml = oHelper.ConvertToHTMLString(dtStandings)
+
+            'Dim sHtml = oHelper.ConvertToHtmlFile(dtStandings)
+            'sHtml = oHelper.ConvertToHTMLString(dtStandings)
+            Dim sHtml As String = oHelper.Create_Html(dtStandings)
+            sHtml = ConvertDataGridViewToHTMLWithFormatting(dgStandings)
             If semailfile <> Nothing Then btnEmail.Visible = True
         Catch ex As Exception
             MsgBox("Error " & ex.Message & vbCrLf & ex.StackTrace)
@@ -467,6 +471,161 @@ Public Class Standings
 
 
     End Sub
+    Public Function ConvertDataGridViewToHTMLWithFormatting(ByVal dgv As DataGridView) As String
+        Try
+
+            Dim sb As StringBuilder = New StringBuilder()
+            sb.AppendLine("<html><body><center><table border='1' cellpadding='0' cellspacing='0'>")
+            sb.AppendLine("<tr>")
+            For i As Integer = 0 To dgv.Columns.Count - 1
+                sb.Append(DGVHeaderCellToHTMLWithFormatting(dgv, i))
+                sb.Append(DGVCellFontAndValueToHTML(dgv.Columns(i).HeaderText, dgv.Columns(i).HeaderCell.Style.Font))
+                sb.AppendLine("</td>")
+            Next
+
+            sb.AppendLine("</tr>")
+            For rowIndex As Integer = 0 To dgv.Rows.Count - 1
+                sb.AppendLine("<tr>")
+                For Each dgvc As DataGridViewCell In dgv.Rows(rowIndex).Cells
+                    sb.AppendLine(DGVCellToHTMLWithFormatting(dgv, rowIndex, dgvc.ColumnIndex))
+                    Dim cellValue As String = If(dgvc.Value Is Nothing, String.Empty, dgvc.Value.ToString())
+                    sb.AppendLine(DGVCellFontAndValueToHTML(cellValue, dgvc.Style.Font))
+                    sb.AppendLine("</td>")
+                Next
+
+                sb.AppendLine("</tr>")
+            Next
+
+            sb.AppendLine("</table></center></body></html>")
+            Return sb.ToString()
+        Catch ex As Exception
+            MsgBox("Error " & ex.Message & vbCrLf & ex.StackTrace)
+        End Try
+
+    End Function
+
+    Public Function DGVHeaderCellToHTMLWithFormatting(ByVal dgv As DataGridView, ByVal col As Integer) As String
+        Dim sb As StringBuilder = New StringBuilder()
+        sb.Append("<td")
+        sb.Append(DGVCellColorToHTML(dgv.Columns(col).HeaderCell.Style.ForeColor, dgv.Columns(col).HeaderCell.Style.BackColor))
+        sb.Append(DGVCellAlignmentToHTML(dgv.Columns(col).HeaderCell.Style.Alignment))
+        sb.Append(">")
+        Return sb.ToString()
+    End Function
+
+    Public Function DGVCellToHTMLWithFormatting(ByVal dgv As DataGridView, ByVal row As Integer, ByVal col As Integer) As String
+        Dim sb As StringBuilder = New StringBuilder()
+        sb.Append("<td")
+        sb.Append(DGVCellColorToHTML(dgv.Rows(row).Cells(col).Style.ForeColor, dgv.Rows(row).Cells(col).Style.BackColor))
+        sb.Append(DGVCellAlignmentToHTML(dgv.Rows(row).Cells(col).Style.Alignment))
+        sb.Append(">")
+        Return sb.ToString()
+    End Function
+
+    Public Function DGVCellColorToHTML(ByVal foreColor As Color, ByVal backColor As Color) As String
+        If foreColor.Name = "0" AndAlso backColor.Name = "0" Then Return String.Empty
+        Dim sb As StringBuilder = New StringBuilder()
+        sb.Append(" style=""")
+        If foreColor.Name <> "0" AndAlso backColor.Name <> "0" Then
+            sb.Append("color:#")
+            sb.Append(foreColor.R.ToString("X2") + foreColor.G.ToString("X2") + foreColor.B.ToString("X2"))
+            sb.Append("; background-color:#")
+            sb.Append(backColor.R.ToString("X2") + backColor.G.ToString("X2") + backColor.B.ToString("X2"))
+        ElseIf foreColor.Name <> "0" AndAlso backColor.Name = "0" Then
+            sb.Append("color:#")
+            sb.Append(foreColor.R.ToString("X2") + foreColor.G.ToString("X2") + foreColor.B.ToString("X2"))
+        Else
+            sb.Append("background-color:#")
+            sb.Append(backColor.R.ToString("X2") + backColor.G.ToString("X2") + backColor.B.ToString("X2"))
+        End If
+
+        sb.Append(";""")
+        Return sb.ToString()
+    End Function
+
+    Public Function DGVCellFontAndValueToHTML(ByVal value As String, ByVal font As Font) As String
+        'If font Is Nothing OrElse font = Me.Font AndAlso Not (font.Bold Or font.Italic Or font.Underline Or font.Strikeout) Then Return value
+        If font Is Nothing OrElse Not (font.Bold Or font.Italic Or font.Underline Or font.Strikeout) Then Return value
+        Dim sb As StringBuilder = New StringBuilder()
+        sb.Append(" ")
+        If font.Bold Then sb.Append("<b>")
+        If font.Italic Then sb.Append("<i>")
+        If font.Strikeout Then sb.Append("<strike>")
+        If font.Underline Then sb.Append("<u>")
+        Dim size As String = String.Empty
+        If font.Size <> Me.Font.Size Then size = "font-size: " & font.Size & "pt;"
+        If font.FontFamily.Name <> Me.Font.Name Then
+            sb.Append("<span style=""font-family: ")
+            sb.Append(font.FontFamily.Name)
+            sb.Append("; ")
+            sb.Append(size)
+            sb.Append(""">")
+        End If
+
+        sb.Append(value)
+        If font.FontFamily.Name <> Me.Font.Name Then sb.Append("</span>")
+        If font.Underline Then sb.Append("</u>")
+        If font.Strikeout Then sb.Append("</strike>")
+        If font.Italic Then sb.Append("</i>")
+        If font.Bold Then sb.Append("</b>")
+        Return sb.ToString()
+    End Function
+
+    Public Function DGVCellAlignmentToHTML(ByVal align As DataGridViewContentAlignment) As String
+        If align = DataGridViewContentAlignment.NotSet Then Return String.Empty
+        Dim horizontalAlignment As String = String.Empty
+        Dim verticalAlignment As String = String.Empty
+        CellAlignment(align, horizontalAlignment, verticalAlignment)
+        Dim sb As StringBuilder = New StringBuilder()
+        sb.Append(" align='")
+        sb.Append(horizontalAlignment)
+        sb.Append("' valign='")
+        sb.Append(verticalAlignment)
+        sb.Append("'")
+        Return sb.ToString()
+    End Function
+
+    Private Sub CellAlignment(ByVal align As DataGridViewContentAlignment, ByRef horizontalAlignment As String, ByRef verticalAlignment As String)
+        Select Case align
+            Case DataGridViewContentAlignment.MiddleRight
+                horizontalAlignment = "right"
+                verticalAlignment = "middle"
+            Case DataGridViewContentAlignment.MiddleLeft
+                horizontalAlignment = "left"
+                verticalAlignment = "middle"
+            Case DataGridViewContentAlignment.MiddleCenter
+                horizontalAlignment = "centre"
+                verticalAlignment = "middle"
+            Case DataGridViewContentAlignment.TopCenter
+                horizontalAlignment = "centre"
+                verticalAlignment = "top"
+            Case DataGridViewContentAlignment.BottomCenter
+                horizontalAlignment = "centre"
+                verticalAlignment = "bottom"
+            Case DataGridViewContentAlignment.TopLeft
+                horizontalAlignment = "left"
+                verticalAlignment = "top"
+            Case DataGridViewContentAlignment.BottomLeft
+                horizontalAlignment = "left"
+                verticalAlignment = "bottom"
+            Case DataGridViewContentAlignment.TopRight
+                horizontalAlignment = "right"
+                verticalAlignment = "top"
+            Case DataGridViewContentAlignment.BottomRight
+                horizontalAlignment = "right"
+                verticalAlignment = "bottom"
+            Case Else
+                horizontalAlignment = "left"
+                verticalAlignment = "middle"
+        End Select
+    End Sub
+
+    '=======================================================
+    'Service provided by Telerik (www.telerik.com)
+    'Conversion powered by Refactoring Essentials.
+    'Twitter: @telerik
+    'Facebook: facebook.com/telerik
+    '=======================================================
     Function BuilddtPoints() As DataTable
         Return BuilddtPoints(False)
     End Function
@@ -545,8 +704,6 @@ Public Class Standings
                     End If
                 End If
 
-                Dim sColname As String = CInt(score("Date").ToString.Substring(4, 2)).ToString + "/" + CInt(score("Date").ToString.Substring(6, 2)).ToString + "/" + score("Date").ToString.Substring(0, 4)
-
                 Dim dPoints As Decimal = 0.00
                 Dim dTeamPoints As Decimal = 0.00
                 If score("Points") IsNot DBNull.Value Then
@@ -556,6 +713,7 @@ Public Class Standings
                     If score("Team_Points") <> "" Then dTeamPoints = score("Team_Points")
                 End If
 
+                Dim sColname As String = CInt(score("Date").ToString.Substring(4, 2)).ToString + "/" + CInt(score("Date").ToString.Substring(6, 2)).ToString + "/" + score("Date").ToString.Substring(0, 4)
                 If sScore IsNot DBNull.Value Then
                     drow(sColname) = ""
                     'default to points and team points 
