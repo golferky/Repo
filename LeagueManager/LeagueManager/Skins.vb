@@ -907,7 +907,7 @@ Public Class Skins
 
     End Sub
 
-    Private Sub cbSkins_CheckedChanged(sender As Object, e As EventArgs) Handles cbSkins.CheckedChanged
+    Private Sub cbSkins_CheckedChanged(sender As Object, e As EventArgs) 
 
     End Sub
 

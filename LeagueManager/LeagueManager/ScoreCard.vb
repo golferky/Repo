@@ -147,7 +147,9 @@ Public Class frmScoreCard
                 cbDatesPlayers.SelectedItem = reformatted
             End If
         End If
-        cbDatesPlayers.SelectedIndex = cbDatesPlayers.Items.Count - 1
+        'cbDatesPlayers.SelectedIndex = cbDatesPlayers.Items.Count - 1
+        cbDatesPlayers.SelectedItem = lastdate
+        cbScoresLocked.Checked = False
         BldScoreCardDataGridFromFile()
         If Not bMatchesSet Then Me.Close
         '20180221-calculate number of closests to pins there should be
@@ -518,11 +520,11 @@ Public Class frmScoreCard
     Sub SaveScores()
         Try
             '20180201-save when exiting
-            If cbScoresLocked.Checked Then
-                oHelper.rLeagueParmrow("ScoresLocked") = "Y"
-            Else
-                oHelper.rLeagueParmrow("ScoresLocked") = "N"
-            End If
+            'If cbScoresLocked.Checked Then
+            '    oHelper.rLeagueParmrow("ScoresLocked") = "Y"
+            'Else
+            '    oHelper.rLeagueParmrow("ScoresLocked") = "N"
+            'End If
             oHelper.DataTable2CSV(oHelper.dsLeague.Tables("dtLeagueParms"), oHelper.sFilePath & "\" & Now.ToString("yyyyMMdd") & "_LeagueParms.csv")
 
             If Not cbScoresLocked.Checked Then
@@ -538,7 +540,7 @@ Public Class frmScoreCard
                     End If
                 End If
             Else
-                Exit Sub
+                'Exit Sub
             End If
 
             lbStatus.Text = " Saving scores from this screen..."
@@ -1445,9 +1447,13 @@ Public Class frmScoreCard
         Application.DoEvents()
         cbScoresLocked.AutoCheck = False
         If cbScoresLocked.Checked Then
-            oHelper.rLeagueParmrow("ScoresLocked") = "Y"
             btnSave.Visible = False
             dgScores.ReadOnly = True
+            If oHelper.rLeagueParmrow("ScoresLocked") <> "Y" Then
+                oHelper.rLeagueParmrow("ScoresLocked") = "Y"
+                '20180516 - save scores when locking
+                SaveScores()
+            End If
         Else
             oHelper.rLeagueParmrow("ScoresLocked") = "N"
             '20180228-rebuild read only fields
@@ -1528,6 +1534,40 @@ Public Class frmScoreCard
 
     End Sub
 
+    Private Sub cbMarkPaid_CheckedChanged(sender As Object, e As EventArgs) Handles cbMarkPaid.CheckedChanged
+        For Each row In dgScores.Rows
+            calcCTPSkins(row.cells("Skins"))
+            calcCTPSkins(row.cells("Closest"))
+        Next
+    End Sub
+    Sub calcCTPSkins(cell As DataGridViewCheckBoxCell)
+        Dim iPurse As Integer = tbPurse.Text
+        Dim iTotSkins As Integer = tbSkins.Text
+        Dim iTotCTP As Integer = tbCP1.Text + tbPCP2.Text
+        Dim iamt As Integer = 0
+        If cell.OwningColumn.Name = "Skins" Then
+            iamt = oHelper.rLeagueParmrow(cell.OwningColumn.Name)
+        Else
+            iamt = 1
+        End If
+
+        If cell.Value = True Then
+            cell.Value = False
+            iamt = iamt * -1
+        Else
+            cell.Value = True
+        End If
+        If cell.OwningColumn.Name = "Skins" Then
+            tbSkins.Text = iTotSkins + iamt
+        ElseIf cell.OwningColumn.Name = "Closest" Then
+            tbCP1.Text = iTotCTP + iamt
+        End If
+        iPurse += iamt
+        tbPurse.Text = iPurse
+
+        dgScores.EndEdit()
+    End Sub
+
     Private Sub frmScoreCard_FormClosing(sender As Object, e As FormClosingEventArgs) Handles MyBase.FormClosing
         Try
             SaveScores()
@@ -1605,35 +1645,38 @@ Public Class frmScoreCard
         If dgc.OwningColumn.Name <> "Skins" Then
             If Not dgc.OwningColumn.Name.StartsWith("Closest") Then Exit Sub
         End If
-        Dim cell As DataGridViewCheckBoxCell = sender.currentcell
-        Dim iPurse As Integer = tbPurse.Text
-        Dim iTotSkins As Integer = tbSkins.Text
-        Dim iTotCTP As Integer = tbCP1.Text + tbPCP2.Text
-        Dim iamt As Integer = 0
-        If cell.OwningColumn.Name = "Skins" Then
-            iamt = oHelper.rLeagueParmrow(cell.OwningColumn.Name)
-        Else
-            iamt = 1
-        End If
-        'this checks what it was before you got in here
-        '20180219-fix ckbox and amount on click		[ReadOnly]	True	Boolean
+        calcCTPSkins(sender.currentcell)
+        '20180512 - use calcskinsctp subroutine instead of code below
 
-        'If CBool(sender.currentcell.value) = True Then
-        If cell.Value = True Then
-            cell.Value = False
-            iamt = iamt * -1
-        Else
-            cell.Value = True
-        End If
-        If cell.OwningColumn.Name = "Skins" Then
-            tbSkins.Text = iTotSkins + iamt
-        ElseIf cell.OwningColumn.Name = "Closest" Then
-            tbCP1.Text = iTotCTP + iamt
-        End If
-        iPurse += iamt
-        tbPurse.Text = iPurse
+        'Dim cell As DataGridViewCheckBoxCell = sender.currentcell
+        'Dim iPurse As Integer = tbPurse.Text
+        'Dim iTotSkins As Integer = tbSkins.Text
+        'Dim iTotCTP As Integer = tbCP1.Text + tbPCP2.Text
+        'Dim iamt As Integer = 0
+        'If cell.OwningColumn.Name = "Skins" Then
+        '    iamt = oHelper.rLeagueParmrow(cell.OwningColumn.Name)
+        'Else
+        '    iamt = 1
+        'End If
+        ''this checks what it was before you got in here
+        ''20180219-fix ckbox and amount on click		[ReadOnly]	True	Boolean
 
-        dgScores.EndEdit()
+        ''If CBool(sender.currentcell.value) = True Then
+        'If cell.Value = True Then
+        '    cell.Value = False
+        '    iamt = iamt * -1
+        'Else
+        '    cell.Value = True
+        'End If
+        'If cell.OwningColumn.Name = "Skins" Then
+        '    tbSkins.Text = iTotSkins + iamt
+        'ElseIf cell.OwningColumn.Name = "Closest" Then
+        '    tbCP1.Text = iTotCTP + iamt
+        'End If
+        'iPurse += iamt
+        'tbPurse.Text = iPurse
+
+        'dgScores.EndEdit()
     End Sub
     Public Function GetCheckedRows1(
         ByVal GridView As DataGridView,

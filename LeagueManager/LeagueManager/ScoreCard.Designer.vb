@@ -75,6 +75,7 @@ Partial Class frmScoreCard
         Me.Label12 = New System.Windows.Forms.Label()
         Me.Label11 = New System.Windows.Forms.Label()
         Me.Label10 = New System.Windows.Forms.Label()
+        Me.cbMarkPaid = New System.Windows.Forms.CheckBox()
         Me.gbDefMeth.SuspendLayout()
         Me.gbDefGames.SuspendLayout()
         Me.GroupBox3.SuspendLayout()
@@ -670,11 +671,22 @@ Partial Class frmScoreCard
         Me.Label10.TabIndex = 78
         Me.Label10.Text = "Match Won"
         '
+        'cbMarkPaid
+        '
+        Me.cbMarkPaid.AutoSize = True
+        Me.cbMarkPaid.Location = New System.Drawing.Point(966, 74)
+        Me.cbMarkPaid.Name = "cbMarkPaid"
+        Me.cbMarkPaid.Size = New System.Drawing.Size(129, 17)
+        Me.cbMarkPaid.TabIndex = 90
+        Me.cbMarkPaid.Text = "Mark CTP/Skins Paid"
+        Me.cbMarkPaid.UseVisualStyleBackColor = True
+        '
         'frmScoreCard
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(1486, 882)
+        Me.Controls.Add(Me.cbMarkPaid)
         Me.Controls.Add(Me.GroupBox5)
         Me.Controls.Add(Me.gbHoleLegend)
         Me.Controls.Add(Me.cbScoresLocked)
@@ -768,4 +780,5 @@ Partial Class frmScoreCard
     Friend WithEvents tbPCP2 As TextBox
     Friend WithEvents Label20 As Label
     Friend WithEvents tbCP2 As TextBox
+    Friend WithEvents cbMarkPaid As CheckBox
 End Class

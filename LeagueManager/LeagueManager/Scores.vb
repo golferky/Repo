@@ -48,9 +48,9 @@ Public Class Scores
             sArray.Add("Points-40-true-false-ml")
             sArray.Add("Team_Points-40-true-false-ml")
             sArray.Add("Opponent-170-true-false-ml")
-            If oHelper.bScoresbyPlayer Then
-                sArray.Remove("Player(1)-cPat170")
-            End If
+            'player column not needed, its in the heading 
+            If oHelper.bScoresbyPlayer Then sArray.Remove("Player(1)-cPat170")
+
             Dim sColFormat = New List(Of String)
             Dim sScoreCardforDGV = ""
             'strip parenthesis and add gross/net for In/Out
@@ -90,8 +90,12 @@ Public Class Scores
                 oHelper.CalcHoleMarker(row("Date"))
                 If oHelper.iHoleMarker = 10 Then
                     Dim sKeys() As Object = {oHelper.sPlayer, row("Date")}
-                    Dim iscore = oHelper.dsLeague.Tables("dtScores").Rows.Find(sKeys)
+                    Dim iscore As DataRow = oHelper.dsLeague.Tables("dtScores").Rows.Find(sKeys)
                     row("Out_Gross") = iscore("In_Gross")
+                    row("Out_Net") = iscore("In_Net")
+                    For i = 1 To 9
+                        row("Hole" & i) = iscore("Hole" & i - 1 + oHelper.iHoleMarker)
+                    Next
                 End If
             Next
             'adjust hole by hole for handicap and back nine scores show on 1-9
@@ -99,18 +103,13 @@ Public Class Scores
                 Dim sMethod = oHelper.convDBNulltoSpaces(score("Method")).Trim
                 'skip hole adjustments for "Score" method
                 'if outgross is null, this is a back 9 score
-                Dim iadjscoreptr = 0
-                If oHelper.convDBNulltoSpaces(score("Out_Gross")).Trim = "" Then
-                    iadjscoreptr = 9
-                    score("Out_Gross") = score("In_Gross")
-                    score("Out_Net") = score("In_Net")
-                End If
                 If sMethod = "Score" Then Continue For
+                'Dim iadjscoreptr = oHelper.iHoleMarker - 1
                 For i = 1 To 9
-                    Dim iscore = score("Hole" & i + iadjscoreptr)
+                    Dim iscore = score("Hole" & i)
                     'if the handicap > stroke index adjust net score to gross
                     If sMethod = "Net" Then
-                        Dim isi = oHelper.CalcStrokeIndex("Hole" & i + iadjscoreptr)
+                        Dim isi = oHelper.CalcStrokeIndex("Hole" & i)
                         If oHelper.iHdcp >= isi Then
                             'check stroke index
                             iscore += 1
@@ -200,6 +199,7 @@ Public Class Scores
                 row.HeaderCell.Style.Alignment = DataGridViewContentAlignment.MiddleCenter
                 oHelper.CalcHoleMarker(row.Cells("Date").Value)
                 oHelper.ChangeColorsForStrokes(row)
+                If oHelper.iHoleMarker = 10 Then row.Cells("Date").Style.BackColor = Color.LightBlue
             Next
 
         Catch ex As Exception

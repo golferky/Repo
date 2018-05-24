@@ -1,7 +1,7 @@
 ﻿'*************************************************************************************************
 Imports System.IO.Packaging
 Public Class Main
-    Dim cVersion = "Version : 5.04"
+    Dim cVersion = "Version : 5.23"
     Public oHelper As Helper.Controls.Helper
     Dim bLoad = True
     'Private Teams As ArrayList = New ArrayList
