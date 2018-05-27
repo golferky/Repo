@@ -129,6 +129,8 @@ Public Class Matches
                 End If
             Next
         End If
+        '20180525-resorts by match
+        'oHelper.getMatchScores(cbDatesPlayers.SelectedItem)
 
         If dgScores.RowCount > 0 Then
             For i = 1 To Math.Round(oHelper.rLeagueParmrow("Teams") / 2)
@@ -324,13 +326,13 @@ Public Class Matches
 
             oHelper.CalcHoleMarker(sdate)
 
-            If oHelper.iHoles = 0 Then
-                oHelper.iHoles = oHelper.rLeagueParmrow("Holes")
-            End If
+            If oHelper.iHoles = 0 Then oHelper.iHoles = oHelper.rLeagueParmrow("Holes")
 
             Dim dvScores As New DataView(oHelper.dsLeague.Tables("dtScores"))
 
             dvScores.RowFilter = "Date = '" & sdate & "'"
+
+            'dvScores.Sort = "Date, Partner"
             Dim sMatchFields = cMatchFields
             If oHelper.iHoleMarker = 10 Then sMatchFields = cMatchFields.Replace("Out_", "In_")
             Dim sArray = New List(Of String)(sMatchFields.Split(","))
@@ -363,6 +365,14 @@ Public Class Matches
             'replace spaces with underscores for csv column matchups
             sScoreCardforDGV = sScoreCardforDGV.Substring(0, Len(sScoreCardforDGV) - 1).Replace(" ", "_")
 
+            '20180525-resort by match #
+            For Each row In dvScores
+                Dim x = CStr(row("Partner"))
+                Dim xx = row("Partner")
+                row("Partner") = CStr(row("Partner").PadLeft(2, "0"))
+            Next
+
+            dvScores.Sort = "Partner"
             Dim dtScorecard As DataTable = dvScores.ToTable(True, sScoreCardforDGV.Split(",").ToArray)
 
             dgScores.Columns.Clear()
@@ -429,6 +439,8 @@ Public Class Matches
             For Each row As DataRow In dtScorecard.Rows
                 dgScores.Rows.Add(row.ItemArray)
             Next
+            'rename previous hdcp to hdcp
+            dgScores.Columns("PHdcp").HeaderText = "Hdcp"
 
             Dim ishade = 4, bbl = False
 
@@ -449,12 +461,11 @@ Public Class Matches
 
                 ishade -= 1
 
+                'this gets the most recent handicap up to this date
                 Dim dv2Scores As New DataView(oHelper.dsLeague.Tables("dtScores"))
                 dv2Scores.RowFilter = "Player = '" & row.Cells("Player").Value & "' And Date < '" & sdate & "'"
-                dv2Scores.Sort = "Date Desc"
+                dv2Scores.Sort = "Date desc"
                 If dv2Scores.Count > 0 Then row.Cells("Phdcp").Value = dv2Scores(0).Item("Hdcp").ToString
-
-                dgScores.Columns("PHdcp").HeaderText = "Hdcp"
 
                 'prevent column sort
                 oHelper.MakeCellsStrings(row)

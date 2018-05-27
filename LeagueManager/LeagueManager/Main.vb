@@ -1,7 +1,7 @@
 ﻿'*************************************************************************************************
 Imports System.IO.Packaging
 Public Class Main
-    Dim cVersion = "Version : 5.23"
+    Dim cVersion = "Version : 5.27"
     Public oHelper As Helper.Controls.Helper
     Dim bLoad = True
     'Private Teams As ArrayList = New ArrayList
@@ -272,143 +272,143 @@ Public Class Main
     '		End If
     '	Next
     'End Sub
-    Sub Genschedule()
-        Dim sHolidays = oHelper.getHolidayList(Now.Year)
-        Dim sTuesHol As New List(Of Date)
-        For Each sholiday In sHolidays
-            If sholiday.DayOfWeek = DayOfWeek.Tuesday Then
-                sTuesHol.Add(sholiday)
-            End If
-        Next
-        'Dim xx = GenerateRoundRobinEven(12)
-        'For Each x In xx
-        '    Dim zz = x
+    'Sub Genschedule()
+    '    Dim sHolidays = oHelper.getHolidayList(Now.Year)
+    '    Dim sTuesHol As New List(Of Date)
+    '    For Each sholiday In sHolidays
+    '        If sholiday.DayOfWeek = DayOfWeek.Tuesday Then
+    '            sTuesHol.Add(sholiday)
+    '        End If
+    '    Next
+    '    'Dim xx = GenerateRoundRobinEven(12)
+    '    'For Each x In xx
+    '    '    Dim zz = x
 
-        'Next
-        Dim iteams As Integer = oHelper.dsLeague.Tables("dtLeagueParms").Rows(0)("Teams")
-        Dim iNumWeeks = DateDiff("w", oHelper.dsLeague.Tables("dtLeagueParms").Rows(0)("EndDate"), oHelper.dsLeague.Tables("dtLeagueParms").Rows(0)("StartDate"))
-        Dim dt As New DataTable
-        Dim istartdate As Date = oHelper.dsLeague.Tables("dtLeagueParms").Rows(0)("StartDate")
-        Dim iweeks As Integer = ((oHelper.dsLeague.Tables("dtLeagueParms").Rows(0)("Teams") - 1) * 2) + sTuesHol.Count - 1
-        For i = 1 To iweeks
-            Dim bitstues = False
-            For Each stdate In sTuesHol
-                If stdate = istartdate Then
-                    bitstues = True
-                    Exit For
-                End If
-            Next
-            If Not bitstues Then
-                dt.Columns.Add(istartdate)
-            End If
-            istartdate = istartdate.AddDays(7)
-        Next
+    '    'Next
+    '    Dim iteams As Integer = oHelper.dsLeague.Tables("dtLeagueParms").Rows(0)("Teams")
+    '    Dim iNumWeeks = DateDiff("w", oHelper.dsLeague.Tables("dtLeagueParms").Rows(0)("EndDate"), oHelper.dsLeague.Tables("dtLeagueParms").Rows(0)("StartDate"))
+    '    Dim dt As New DataTable
+    '    Dim istartdate As Date = oHelper.dsLeague.Tables("dtLeagueParms").Rows(0)("StartDate")
+    '    Dim iweeks As Integer = ((oHelper.dsLeague.Tables("dtLeagueParms").Rows(0)("Teams") - 1) * 2) + sTuesHol.Count - 1
+    '    For i = 1 To iweeks
+    '        Dim bitstues = False
+    '        For Each stdate In sTuesHol
+    '            If stdate = istartdate Then
+    '                bitstues = True
+    '                Exit For
+    '            End If
+    '        Next
+    '        If Not bitstues Then
+    '            dt.Columns.Add(istartdate)
+    '        End If
+    '        istartdate = istartdate.AddDays(7)
+    '    Next
 
-        'build a table for each team for each week (12 teams x 11 weeks)
-        'Dim allteams As New List(Of String)
-        'For ii = 1 To iteams
-        '    allteams.Add(ii)
-        'Next
+    '    'build a table for each team for each week (12 teams x 11 weeks)
+    '    'Dim allteams As New List(Of String)
+    '    'For ii = 1 To iteams
+    '    '    allteams.Add(ii)
+    '    'Next
 
-        '-----
-        Dim aAllTeams As New List(Of ArrayList)
-        For icurrteam = 0 To iteams - 1
-            'Teams.Clear() if this is declared above
-            Dim Teams As ArrayList = New ArrayList
-            Teams2.Clear()
+    '    '-----
+    '    Dim aAllTeams As New List(Of ArrayList)
+    '    For icurrteam = 0 To iteams - 1
+    '        'Teams.Clear() if this is declared above
+    '        Dim Teams As ArrayList = New ArrayList
+    '        Teams2.Clear()
 
-            Dim delimStr As String = vbCrLf
-            Dim delimiter As Char() = delimStr.ToCharArray()
+    '        Dim delimStr As String = vbCrLf
+    '        Dim delimiter As Char() = delimStr.ToCharArray()
 
-            For s = 0 To iteams - 1
-                Teams.Add(New Team(s))
-            Next
+    '        For s = 0 To iteams - 1
+    '            Teams.Add(New Team(s))
+    '        Next
 
-            If Teams.Count Mod 2 <> 0 Then
-                Teams.Add(New Team("Bye"))
-            End If
+    '        If Teams.Count Mod 2 <> 0 Then
+    '            Teams.Add(New Team("Bye"))
+    '        End If
 
-            Teams.Sort()
-            'at this point, teams has all 12 teams in it at random
-            'find team 1 and remove it
+    '        Teams.Sort()
+    '        'at this point, teams has all 12 teams in it at random
+    '        'find team 1 and remove it
 
-            Dim iteam2delete = 0
-            For Each team As Team In Teams
-                If team.TeamName = icurrteam Then
-                    Teams.RemoveAt(iteam2delete)
-                    Exit For
-                End If
-                iteam2delete += 1
-            Next
-            'at this point we have all of a teams opponents in teams array
-            aAllTeams.Add(Teams)
-        Next
+    '        Dim iteam2delete = 0
+    '        For Each team As Team In Teams
+    '            If team.TeamName = icurrteam Then
+    '                Teams.RemoveAt(iteam2delete)
+    '                Exit For
+    '            End If
+    '            iteam2delete += 1
+    '        Next
+    '        'at this point we have all of a teams opponents in teams array
+    '        aAllTeams.Add(Teams)
+    '    Next
 
-        Dim iteam = 1
-        oHelper.bloghelper = True
-        For Each team In aAllTeams
-            Dim xxxxxxxxxxxxxxxxxxxxxxxxx = ""
-            Dim steams = ""
-            For Each steam In team
-                steams = steams & (steam.teamname + 1) & "-"
-            Next
-            oHelper.LOGIT("Team #" & iteam & "-" & steams)
-            iteam += 1
+    '    Dim iteam = 1
+    '    oHelper.bloghelper = True
+    '    For Each team In aAllTeams
+    '        Dim xxxxxxxxxxxxxxxxxxxxxxxxx = ""
+    '        Dim steams = ""
+    '        For Each steam In team
+    '            steams = steams & (steam.teamname + 1) & "-"
+    '        Next
+    '        oHelper.LOGIT("Team #" & iteam & "-" & steams)
+    '        iteam += 1
 
-        Next
+    '    Next
 
-        oHelper.bloghelper = False
+    '    oHelper.bloghelper = False
 
-        ' Teams2 = New ArrayList(Teams.ToArray())
-        'For Each team In Teams
-        '    Dim x = ""
-        '    Dim j = oHelper.GetRandomNumber(0, Teams2.Count - 1)
-        'Next
-        '-----
+    '    ' Teams2 = New ArrayList(Teams.ToArray())
+    '    'For Each team In Teams
+    '    '    Dim x = ""
+    '    '    Dim j = oHelper.GetRandomNumber(0, Teams2.Count - 1)
+    '    'Next
+    '    '-----
 
-        'Dim OneTeamSch As New List(Of String)
-        'Dim AllTeamsSch As New List(Of String)
+    '    'Dim OneTeamSch As New List(Of String)
+    '    'Dim AllTeamsSch As New List(Of String)
 
-        'For i = 1 To iteams
-        '    AllTeamsSch.Add(i)
-        'Next
+    '    'For i = 1 To iteams
+    '    '    AllTeamsSch.Add(i)
+    '    'Next
 
-        'For i = 0 To iteams - 1
-        '    'generate a number of 0 to 11, - 10, etc
-        '    Dim j = oHelper.GetRandomNumber(0, allteams.Count - 1)
-        '    'use that number as a subscript into the all teams list for its opponent
-        '    AllTeamsSch(i) = AllTeamsSch(i) & "-" & allteams(j)
-        '    Dim y = ""
-        '    'OneTeamSch.Add(allteams(j))
+    '    'For i = 0 To iteams - 1
+    '    '    'generate a number of 0 to 11, - 10, etc
+    '    '    Dim j = oHelper.GetRandomNumber(0, allteams.Count - 1)
+    '    '    'use that number as a subscript into the all teams list for its opponent
+    '    '    AllTeamsSch(i) = AllTeamsSch(i) & "-" & allteams(j)
+    '    '    Dim y = ""
+    '    '    'OneTeamSch.Add(allteams(j))
 
-        'Next
+    '    'Next
 
-        'Dim x = ""
-        'oHelper.dsLeague = New dsLeague
-        'this converts the csvs to xml eliminating the need for microsoft office
-        'this replaces csv2datable
-        'CreateTables(New List(Of String)("dtLeagueParms,dtCourses,dtPlayers,dtScores".Split(",")))
+    '    'Dim x = ""
+    '    'oHelper.dsLeague = New dsLeague
+    '    'this converts the csvs to xml eliminating the need for microsoft office
+    '    'this replaces csv2datable
+    '    'CreateTables(New List(Of String)("dtLeagueParms,dtCourses,dtPlayers,dtScores".Split(",")))
 
-        'oHelper.dsLeague.Tables("dtLeagueParms").PrimaryKey = New DataColumn() {oHelper.dsLeague.Tables("dtLeagueParms").Columns("Name")}
-        'oHelper.dsLeague.Tables("dtCourses").PrimaryKey = New DataColumn() {oHelper.dsLeague.Tables("dtCourses").Columns("Name")}
-        'oHelper.dsLeague.Tables("dtPlayers").PrimaryKey = New DataColumn() {oHelper.dsLeague.Tables("dtPlayers").Columns("Name")}
-        'Helper.dsLeague.Tables("dtScores").PrimaryKey = New DataColumn() {oHelper.dsLeague.Tables("dtScores").Columns("Player"), oHelper.dsLeague.Tables("dtScores").Columns("Date")}
+    '    'oHelper.dsLeague.Tables("dtLeagueParms").PrimaryKey = New DataColumn() {oHelper.dsLeague.Tables("dtLeagueParms").Columns("Name")}
+    '    'oHelper.dsLeague.Tables("dtCourses").PrimaryKey = New DataColumn() {oHelper.dsLeague.Tables("dtCourses").Columns("Name")}
+    '    'oHelper.dsLeague.Tables("dtPlayers").PrimaryKey = New DataColumn() {oHelper.dsLeague.Tables("dtPlayers").Columns("Name")}
+    '    'Helper.dsLeague.Tables("dtScores").PrimaryKey = New DataColumn() {oHelper.dsLeague.Tables("dtScores").Columns("Player"), oHelper.dsLeague.Tables("dtScores").Columns("Date")}
 
-        'test loading a new schedule
+    '    'test loading a new schedule
 
-        'If oHelper.sLeagueName <> "" Then
-        '    CreateTables(New List(Of String)("dtSchedule".Split(",")))
-        '    oHelper.buildSchedule()
-        'End If
-        'Dim line = File.ReadAllText(oHelper.sFilePath & "\" & "t.csv")
-        'Dim x = line.Replace(vbLf, String.Empty).Split(vbCrLf)
-        'Dim z = ""
+    '    'If oHelper.sLeagueName <> "" Then
+    '    '    CreateTables(New List(Of String)("dtSchedule".Split(",")))
+    '    '    oHelper.buildSchedule()
+    '    'End If
+    '    'Dim line = File.ReadAllText(oHelper.sFilePath & "\" & "t.csv")
+    '    'Dim x = line.Replace(vbLf, String.Empty).Split(vbCrLf)
+    '    'Dim z = ""
 
-        'For Each table As DataTable In oHelper.dsLeague.Tables
-        '    Dim sfilename = "\" & table.TableName.Substring(2) & ".csv"
-        '    oHelper.DataTable2CSV(table, oHelper.sFilePath & sfilename)
-        'Next
-    End Sub
+    '    'For Each table As DataTable In oHelper.dsLeague.Tables
+    '    '    Dim sfilename = "\" & table.TableName.Substring(2) & ".csv"
+    '    '    oHelper.DataTable2CSV(table, oHelper.sFilePath & sfilename)
+    '    'Next
+    'End Sub
     Private Const BYE As Integer = -1
 
     ' Return an array where results(i, j) gives the opponent of

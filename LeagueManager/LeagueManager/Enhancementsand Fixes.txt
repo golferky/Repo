@@ -38,6 +38,10 @@
 *                                           Change Log-Completed
 *************************************************************************************************
 * yyyymmdd - Priority - Complexity -  Description
+* 20180527 - M        - Med         - Standings not calculating halves properly first half has one too many weeks
+* 20180524 - M        - Med         - rainouts caused schedule to be off in standings
+* 20180525 - H        - Med         - Matches grid not sorted properly
+* 20180524 - H        - Med         - grade missing on scores
 * 20180523 - H        - Easy        - when scorecard loads, if scores are locked, it pulls in the next date causing the current scores to be wiped out
 * 20180516 - H        - Easy        - when clicking on lock scores, if you dont save first, scores are lost
 * 20180512 - M        - MH          - when enter Score for a player on the back 9, it says outGross not found

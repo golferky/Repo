@@ -573,8 +573,15 @@ Public Class frmScoreCard
                     'arow("Date") = sKeys(1)
                     'arow("League") = oHelper.rLeagueParmrow("Name")
                     'bfound = False
+
                 End If
 
+                '20180525-add grade
+                If row.Index Mod 2 = 0 Then
+                    arow("Grade") = "A"
+                Else
+                    arow("Grade") = "B"
+                End If
                 'edit each cell before saving
                 For Each cell As DataGridViewCell In row.Cells
                     If cell.OwningColumn.Name = "Team" Then
