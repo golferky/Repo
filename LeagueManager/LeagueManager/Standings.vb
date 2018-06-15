@@ -126,12 +126,8 @@ Public Class Standings
                     col.ReadOnly = True
                     If col.Name.Contains("/") Then
                         .Columns(col.Name).Width = 40
-                        If cbHdcp.Checked Then
-                            .Columns(col.Name).Width += 10
-                        End If
-                        If cbScore.Checked Then
-                            .Columns(col.Name).Width += 10
-                        End If
+                        If cbHdcp.Checked Then .Columns(col.Name).Width += 10
+                        If cbScore.Checked Then .Columns(col.Name).Width += 10
                         .Columns(col.Name).HeaderText = col.Name.Substring(0, col.Name.LastIndexOf("/"))
                         Dim x = ""
                     ElseIf col.Name.Contains("Half") Or col.Name.Contains("Total") Or col.Name = "Rnds" Or col.Name = "Team Points" Then
@@ -141,7 +137,9 @@ Public Class Standings
 
             End With
 
-            buildEmailFile()
+            If Not buildEmailFile() Then
+                MsgBox("Couldnt update the standings file because its in use")
+            End If
 
             For Each row As DataGridViewRow In dgStandings.Rows
                 'checkbox order ind pts, team pts, score, handicap
@@ -279,12 +277,8 @@ Public Class Standings
                 Next
 
                 If row.Cells("Team").Value <> sprevteam Then
-                    If cb1stHalf.Checked Then
-                        row.Cells("Team 1st Half").Value = drow("Team 1st Half")
-                    End If
-                    If cb2ndHalf.Checked Then
-                        row.Cells("Team 2nd Half").Value = drow("Team 2nd Half")
-                    End If
+                    If cb1stHalf.Checked Then row.Cells("Team 1st Half").Value = drow("Team 1st Half")
+                    If cb2ndHalf.Checked Then row.Cells("Team 2nd Half").Value = drow("Team 2nd Half")
 
                     row.Cells("Team Points").Value = drow("Team Points")
                     sprevteam = row.Cells("Team").Value
@@ -292,36 +286,13 @@ Public Class Standings
 
             Next
 
-            'Using sw As New IO.StreamWriter(semailfile, False)
-            '    Try
-            '        Dim sline = ""
-            '        For Each col As DataGridViewColumn In dgStandings.Columns
-            '            sline = sline & col.HeaderText & ","
-            '        Next
-            '        sw.WriteLine(sline)
-
-            '        For Each row As DataGridViewRow In dgStandings.Rows
-            '            sline = ""
-            '            For Each item As DataGridViewTextBoxCell In row.Cells
-            '                sline = sline & item.Value & ","
-            '            Next
-            '            sw.WriteLine(sline)
-            '        Next
-            '        sw.Close()
-
-            '    Catch ex As Exception
-
-            '    End Try
-
-            'End Using
-            '20180220 - fix issue with no fiel to email crash
-            'If semailfile <> Nothing Then btnEmail.Visible = True
         Catch ex As Exception
             MsgBox("Error " & ex.Message & vbCrLf & ex.StackTrace)
         End Try
 
     End Sub
-    Sub buildEmailFile()
+    Function buildEmailFile() As Boolean
+        buildEmailFile = True
         Try
             Dim dtStandings = New DataTable
             dtStandings = BuilddtPoints(True)
@@ -466,11 +437,14 @@ Public Class Standings
             sHtml = ConvertDataGridViewToHTMLWithFormatting(dgStandings)
             If semailfile <> Nothing Then btnEmail.Visible = True
         Catch ex As Exception
-            MsgBox("Error " & ex.Message & vbCrLf & ex.StackTrace)
+            buildEmailFile = False
+
+            If Not ex.Message.ToUpper.Contains("CANNOT ACCESS THE FILE") Then MsgBox("Error " & ex.Message & vbCrLf & ex.StackTrace)
+
         End Try
 
 
-    End Sub
+    End Function
     Public Function ConvertDataGridViewToHTMLWithFormatting(ByVal dgv As DataGridView) As String
         Try
 
@@ -619,13 +593,6 @@ Public Class Standings
                 verticalAlignment = "middle"
         End Select
     End Sub
-
-    '=======================================================
-    'Service provided by Telerik (www.telerik.com)
-    'Conversion powered by Refactoring Essentials.
-    'Twitter: @telerik
-    'Facebook: facebook.com/telerik
-    '=======================================================
     Function BuilddtPoints() As DataTable
         Return BuilddtPoints(False)
     End Function
@@ -634,7 +601,11 @@ Public Class Standings
         Try
             'copy the schedule table 
             Dim dtStandings As DataTable = oHelper.dsLeague.Tables("dtSchedule").Clone()
-            sEndDate = oHelper.rLeagueParmrow("EndDate")
+            sEndDate = oHelper.rLeagueParmrow("EndDate").ToString
+
+            '20180527-post season makes season 2 weeks earlier
+            If oHelper.rLeagueParmrow("PostSeason").ToString.ToUpper = "Y" Then sEndDate = sEndDate.AddDays(-14)
+
             dtStandings.TableName = "dtStandings"
             'only build the schedule up thru the end date
             For index As Integer = dtStandings.Columns.Count - 1 To 0 Step -1
@@ -645,6 +616,9 @@ Public Class Standings
             Next
 
             iNumWeeksSplit = dtStandings.Columns.Count / 2
+            '20180527-post season makes season 2 weeks earlier
+            'If oHelper.rLeagueParmrow("PostSeason").ToString.ToUpper = "Y" Then iNumWeeksSplit -= 1
+
             sHalfwayDate = dtStandings.Columns.Item(iNumWeeksSplit).ToString
 
             With dtStandings
@@ -693,15 +667,16 @@ Public Class Standings
                     dtStandings.Rows.Add(drow)
                 End If
                 If sScore IsNot DBNull.Value Then
-                    If score("date") < CDate(sHalfwayDate).ToString("yyyyMMdd") Then
-                        If cb1stHalf.Checked Then
-                            drow("Rnds") += 1
-                        End If
-                    Else
-                        If cb2ndHalf.Checked Then
-                            drow("Rnds") += 1
-                        End If
-                    End If
+                    drow("Rnds") += 1
+                    'If score("date") < CDate(sHalfwayDate).ToString("yyyyMMdd") Then
+                    '    If cb1stHalf.Checked Then
+                    '        drow("Rnds") += 1
+                    '    End If
+                    'Else
+                    '    If cb2ndHalf.Checked Then
+                    '        drow("Rnds") += 1
+                    '    End If
+                    'End If
                 End If
 
                 Dim dPoints As Decimal = 0.00

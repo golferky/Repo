@@ -124,7 +124,6 @@ Partial Class Main
         '
         'btnPlayerStats
         '
-        Me.btnPlayerStats.Enabled = False
         Me.btnPlayerStats.Location = New System.Drawing.Point(20, 123)
         Me.btnPlayerStats.Margin = New System.Windows.Forms.Padding(2)
         Me.btnPlayerStats.Name = "btnPlayerStats"
@@ -132,7 +131,6 @@ Partial Class Main
         Me.btnPlayerStats.TabIndex = 9
         Me.btnPlayerStats.Text = " Player Stats"
         Me.btnPlayerStats.UseVisualStyleBackColor = True
-        Me.btnPlayerStats.Visible = False
         '
         'btnMatches
         '

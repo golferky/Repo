@@ -1447,6 +1447,69 @@ Namespace Helper.Controls
             'dgscores.Columns("TotalPrice").DefaultCellStyle = currencyCellStyle
 
         End Sub
+        Public Sub SBPMarkSubPar(cell As DataGridViewCell, iscore As Integer, iPar As Integer)
+            If iHdcp = 99 Then Exit Sub
+            'cell.Style.Font = New Font("Arial", 19, FontStyle.Regular)
+            cell.Style.ForeColor = Color.Black
+            cell.Style.BackColor = Color.White
+            cell.Value = RemoveSpcChar(cell.Value)
+            Dim sFont = "Tahoma"
+            Dim iFontSize = 12
+            Dim bFontStrikeout = False
+            If cell.Style.Font IsNot Nothing Then
+                If cell.Style.Font.Strikeout = True Then
+                    bFontStrikeout = True
+                End If
+            End If
+            cell.Style.Font = New Font(sFont, iFontSize, FontStyle.Regular)
+            'check scores against handicap
+            'is this a stroke hole?
+            If iHoles = 0 Then iHoles = rLeagueParmrow("Holes")
+
+            'check stroke index
+            Dim isi = SBPCalcStrokeIndex(cell.OwningColumn.Name)
+            'LOGIT(sPlayer & "-" & iHdcp & "-" & iStrokeIndex & "-" & isi & "-" & cell.OwningColumn.Name & "-")
+            'if the handicap > stroke index make color beige
+            If iHdcp >= isi Then
+                If bColors Then cell.Style.BackColor = Color.Beige
+                If bDots Then cell.Value = cell.Value & ChrW(&H25CF)
+                'if double stroke hole, make color b/a
+                If iHdcp - iHoles >= isi Then
+                    If bColors Then cell.Style.BackColor = Color.BlanchedAlmond
+                    If bDots Then cell.Value = cell.Value & ChrW(&H25CF)
+                End If
+            End If
+
+            If bColors Then
+                cell.Style.Font = New Font(sFont, iFontSize, FontStyle.Regular)
+                If iscore < iPar Then
+                    iFontSize += 3
+                    cell.Style.Font = New Font(sFont, iFontSize, FontStyle.Bold)
+                    cell.Style.ForeColor = Color.OrangeRed
+                    'if this is a total score (> 10) of some sort, dont check for birdies, eagles
+                    If iscore > 10 Then Exit Sub
+                    'birdie
+                    If iscore < iPar - 1 Then
+                        'cell.Style.Font = New Font("Arial", 20, FontStyle.Bold)
+                        cell.Style.ForeColor = Color.DarkRed
+                    End If
+                    'eagle
+                    If iscore < iPar - 2 Then
+                        iFontSize += 3
+                        cell.Style.Font = New Font(sFont, iFontSize, FontStyle.Bold)
+                    End If
+                    'over par is black,even is gray
+                ElseIf iscore > iPar Then
+                    cell.Style.ForeColor = Color.Blue
+                End If
+            End If
+            If bFontStrikeout Then
+                cell.Style.Font = New Font(sFont, iFontSize, cell.Style.Font.Style Or FontStyle.Strikeout)
+                Debug.Print(sPlayer & " hole " & cell.OwningColumn.Name & " has s/o on")
+            End If
+
+        End Sub
+
         Public Sub MarkSubPar(cell As DataGridViewCell, iscore As Integer, iPar As Integer)
             If iHdcp = 99 Then Exit Sub
             'cell.Style.Font = New Font("Arial", 19, FontStyle.Regular)
@@ -1623,7 +1686,27 @@ Namespace Helper.Controls
 
             End Try
         End Function
+        Function SBPCalcStrokeIndex(sHole As String) As String
+            Try
+                'LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
+                'check stroke index
+                SBPCalcStrokeIndex = 0
+                Dim sHoleDesc As String = ""
+                sHoleDesc = sHole.Replace("Hole", "")
+                sHoleDesc = "H" & sHoleDesc
+                Dim isi = MyCourse(0).Item(sHoleDesc)
+                'if 9 holes and its an odd stroke index, adjust for remainder when we divide by 2
+                If iHoles = 9 Then
+                    If isi Mod 2 Then
+                        isi += 1
+                    End If
+                    isi = Math.Round((isi) / 2, 0)
+                End If
+                Return isi
+            Catch ex As Exception
 
+            End Try
+        End Function
         Function CalcStrokeIndex(sHole As String) As String
             Try
                 'LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
@@ -1776,7 +1859,75 @@ Namespace Helper.Controls
             End Try
 
         End Sub
+        Public Sub SBPChangeColorsForStrokes(ByVal R As DataGridViewRow)
+            'LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
+            'this sub will call marksubpar routine to color the cell for birdies and eagles
+            Try
+                'keep new rows from being evaluated
+                '20180307-evaluate this statement, should this be here
+                If R.Cells.Item("pHdcp").Value.ToString = "" Then Exit Sub
 
+                iHdcp = R.Cells.Item("pHdcp").Value.ToString
+                'this takes a 9 hole handicap and makes it 18 hole handicap
+                If iHoles > 9 Then iHdcp *= 2
+                'figure out hole by hole
+                'if holes 1-18 all zeros, then we used a "Score" method and no hole by hole can be done
+                'if holes 1-9 are zero but holes 10-18 are populated, we have a back 9 only score
+                'if holes 10-18 are zero but holes 1-9 are populated, we have a frnt 9 only score
+                If Not bCalcSkins Then
+                    If convDBNulltoSpaces(R.Cells("Points").Value).Trim <> "" Then
+                        'did this player win, change to green?
+                        If R.Cells("Points").Value = "1" Then
+                            R.Cells("Points").Style.BackColor = Color.LightGreen
+                            'did he tie, change to yellow
+                        ElseIf R.Cells("Points").Value = "0.5" Then
+                            R.Cells("Points").Style.BackColor = Color.Yellow
+                        Else
+                            R.Cells("Opponent").Style.BackColor = Color.LightGreen
+                        End If
+                    End If
+                    If convDBNulltoSpaces(R.Cells("Team_Points").Value).Trim <> "" Then
+                        If R.Cells("Team_Points").Value = "1" Then
+                            R.Cells("Team_Points").Style.BackColor = Color.LightGreen
+                        ElseIf R.Cells("Team_Points").Value = "0.5" Then
+                            R.Cells("Team_Points").Style.BackColor = Color.Yellow
+                        End If
+                    End If
+                End If
+
+                colorScores(R, "Gross", "", True)
+                colorScores(R, "Net", "", True)
+
+                For Each cell As DataGridViewCell In R.Cells
+                    Dim sColName = cell.OwningColumn.Name
+                    'this changes sub name to color aqua
+                    If sColName = "Player" Then
+                        Dim dvplayers As New DataView(dsLeague.Tables("dtPlayers"))
+                        dvplayers.RowFilter = "Name = '" & R.Cells(sColName).Value & "'"
+                        sPlayer = R.Cells(sColName).Value.ToString
+                        'this shouldnt happen (if no rows returned)
+                        If dvplayers.Count = 0 Then Exit Sub
+                        'if no team, they are a sub
+                        Dim sTeam As String = convDBNulltoSpaces(dvplayers(0).Item("Team")).Trim
+                        If sTeam = "" Then If sTeam <> R.Cells("Team").Value Then R.Cells(sColName).Style.BackColor = Color.Aqua
+                    ElseIf sColName.Contains("Hole") Then
+                        If cell.Value IsNot Nothing Then
+                            Try
+                                Dim iScore As String = RemoveSpcChar(convDBNulltoSpaces(cell.Value).Trim)
+                                If iScore <> "" Then SBPMarkSubPar(cell, iScore, MyCourse(0)(sColName).ToString)
+                            Catch ex As Exception
+                                'Dim x = ""
+                                'MsgBox(sPlayer & " " & cell.OwningColumn.Name)
+                            End Try
+                        End If
+                    End If
+                Next
+
+            Catch ex As Exception
+                MsgBox("Error " & ex.Message & vbCrLf & ex.StackTrace)
+            End Try
+
+        End Sub
         Function ChkForMax(sScore As String, sHole As String) As String
             ChkForMax = ""
             'check par against hole max

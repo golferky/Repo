@@ -490,16 +490,11 @@ Public Class frmScoreCard
                     tbPurse.Text = iPurse
                 End If
                 oHelper.ChangeColorsForStrokes(row)
-                'End If
                 'pull last score before this to get previous handicap
                 Dim dv2Scores As New DataView(oHelper.dsLeague.Tables("dtScores"))
                 dv2Scores.RowFilter = "Player = '" & row.Cells("Player").Value & "' And Date < '" & cbDatesPlayers.SelectedItem & "'"
                 dv2Scores.Sort = " Date Desc"
-                If dv2Scores.Count > 0 Then
-                    row.Cells("Phdcp").Value = dv2Scores(0).Item("Hdcp").ToString
-                End If
-                'End If
-                'If row.Cells("Out_Net").Value.ToString = "" Then
+                If dv2Scores.Count > 0 Then row.Cells("Phdcp").Value = dv2Scores(0).Item("Hdcp").ToString
                 If row.Cells("Method").Value.ToString = " Net" Then
                     If oHelper.iHoleMarker = 1 Then
                         row.Cells("Out_Gross").Value = CInt(row.Cells("Out_Net").Value.ToString) + CInt(row.Cells("PHdcp").Value.ToString)
@@ -641,7 +636,7 @@ Public Class frmScoreCard
             '        calcSkinsCTP(sender.currentcell)
             '    End If
             'End If
-
+            'if no change, then exit 
             If dgr.CurrentCell.Value = sOldCellValue Then Exit Sub
             Dim R As DataGridViewRow = dgr.CurrentRow
             If R.Cells("Phdcp").Value Is Nothing Then oHelper.iHdcp = 99
@@ -866,7 +861,7 @@ Public Class frmScoreCard
                 'this flag prevents rowleave from being invoked
                 oHelper.bDGSError = True
                 R.Cells(sCurrColName).Value = sOldCellValue
-                Exit Sub
+                'Exit Sub
             End Try
             '20171003 - allow all scores to be entered as hole 1 
             '20171008 - allow all scores to be entered as hole 10 
@@ -889,20 +884,25 @@ Public Class frmScoreCard
                     Exit For
                 End Try
             Next
+
+            If dgScores.Columns.Contains("Out_Gross") Then
+                R.Cells("Out_Gross").Value = calcScores(R)
+            Else
+                R.Cells("In_Gross").Value = calcScores(R)
+            End If
+
             If bgoodScore Then
                 If R.Cells("Method").Value.ToString.StartsWith("S") Or R.Cells("Method").Value = "" Then
                     R.Cells("Method").Value = oHelper.BuildScoreCardMethods(gbDefMeth)
                 End If
-            End If
-            If dgScores.Columns.Contains("Out_Gross") Then
-                R.Cells("Out_Gross").Value = calcScores(R)
-                '99 means this is this guys first score
-                If oHelper.iHdcp <> 99 Then R.Cells("Out_Net").Value = R.Cells("Out_Gross").Value - oHelper.iHdcp
-            Else
-                R.Cells("In_Gross").Value = calcScores(R)
-                If oHelper.iHdcp <> 99 Then R.Cells("In_Net").Value = R.Cells("In_Gross").Value - oHelper.iHdcp
-            End If
 
+                If dgScores.Columns.Contains("Out_Gross") Then
+                    '99 means this is this guys first score
+                    If oHelper.iHdcp <> 99 Then R.Cells("Out_Net").Value = R.Cells("Out_Gross").Value - oHelper.iHdcp
+                Else
+                    If oHelper.iHdcp <> 99 Then R.Cells("In_Net").Value = R.Cells("In_Gross").Value - oHelper.iHdcp
+                End If
+            End If
             oHelper.ValidateCell(R.Cells(sCurrColName))
 
         Catch ex As Exception
@@ -1034,7 +1034,7 @@ Public Class frmScoreCard
     End Sub
     Sub editrest(R As DataGridViewRow, sCurrColName As String)
         If oHelper.bAllHolesEntered Then
-            R.Cells("Hdcp").Value = oHelper.GetNewHdcp(R, cbDatesPlayers.SelectedItem)
+            If oHelper.bAllHolesEntered Then R.Cells("Hdcp").Value = oHelper.GetNewHdcp(R, cbDatesPlayers.SelectedItem)
 
             ' Dim cell As DataGridViewCell
             '' Set up the ToolTip text for the datagridviewcell.
@@ -1046,12 +1046,12 @@ Public Class frmScoreCard
                 If sPHdcp = "" Then R.Cells("PHdcp").Value = R.Cells("Hdcp").Value
             Catch ex As Exception
             End Try
-            If dgScores.Columns.Contains("Out_Gross") Then
+            If dgScores.Columns.Contains("Out_Gross") And oHelper.bAllHolesEntered Then
                 sScore = R.Cells("Out_Gross").Value
                 R.Cells("Out_Net").Value = sScore - R.Cells("PHdcp").Value
             End If
 
-            If dgScores.Columns.Contains("In_Gross") Then
+            If dgScores.Columns.Contains("In_Gross") And oHelper.bAllHolesEntered Then
                 sScore = R.Cells("In_Gross").Value
                 R.Cells("In_Net").Value = sScore - R.Cells("PHdcp").Value
             End If
@@ -1064,7 +1064,7 @@ Public Class frmScoreCard
         Try
             If dgScores.Columns.Contains("Out_Gross") Then
                 sScore = R.Cells("Out_Gross").Value
-                If IsNumeric(sScore) Then
+                If IsNumeric(sScore) And oHelper.bAllHolesEntered Then
                     R.Cells("Out_Net").Value = sScore - R.Cells("PHdcp").Value
                 Else
                     Throw New FormatException
@@ -1072,7 +1072,7 @@ Public Class frmScoreCard
             End If
             If dgScores.Columns.Contains("In_Gross") Then
                 sScore = R.Cells("In_Gross").Value
-                If IsNumeric(sScore) Then
+                If IsNumeric(sScore) And oHelper.bAllHolesEntered Then
                     R.Cells("In_Net").Value = sScore - R.Cells("PHdcp").Value
                 Else
                     Throw New FormatException
@@ -1123,36 +1123,59 @@ Public Class frmScoreCard
         End Try
     End Sub
     Private Sub dgScores_RowLeave(sender As Object, e As DataGridViewCellEventArgs) Handles dgScores.RowLeave
-        oHelper.LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name & " row - " & e.RowIndex)
-        Try
-            Dim wrow As DataGridViewRow = sender.currentrow
-            oHelper.sPlayer = wrow.Cells("Player").Value
-            oHelper.bDGSError = False
-            'if flag set to not test row leave, exit without checking
-            If oHelper.bNoRowLeave Then
-                Exit Sub
-            End If
+        'oHelper.LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name & " row - " & e.RowIndex)
 
-            If wrow.IsNewRow Or oHelper.sPlayer = "" Then
-                Exit Sub
-            End If
-            'chck all the scores with a numeric column heading to see if all holes are entered, if not exit row leave
-            For Each score In wrow.Cells
-                If score.owningcolumn.name.startswith("Hole") Then
-                    If score.value Is Nothing Then Exit Sub
-                    If Not IsNumeric(oHelper.RemoveSpcChar(score.value)) Then
-                        Exit Sub
-                    End If
-                End If
-            Next
+        'Try
+        '    'if flag set to not test row leave, exit without checking
+        '    If oHelper.bNoRowLeave Then Exit Sub
 
-        Catch ex As Exception
-            MsgBox("Error " & ex.Message & vbCrLf & ex.StackTrace)
-        End Try
+        '    Dim wrow As DataGridViewRow = sender.currentrow
+        '    oHelper.sPlayer = wrow.Cells("Player").Value
+        '    Debug.Print("Current Player - " & oHelper.sPlayer & " Row " & e.RowIndex)
+        '    oHelper.sPlayer = wrow.Cells("Player").Value
+        '    oHelper.bDGSError = False
 
+        '    If wrow.IsNewRow Or oHelper.sPlayer = "" Then Exit Sub
+
+        '    'chck all the scores with a numeric column heading to see if all holes are entered, if not exit row leave
+        '    For Each score In wrow.Cells
+        '        If score.owningcolumn.name.startswith("Hole") Then
+        '            If score.value Is Nothing Then
+        '                resetGross_Net_Hdcp(wrow)
+        '                Exit Sub
+        '            End If
+        '            If Not IsNumeric(oHelper.RemoveSpcChar(score.value)) Then
+        '                resetGross_Net_Hdcp(wrow)
+        '                Exit Sub
+        '            End If
+        '        End If
+        '    Next
+        '    oHelper.bAllHolesEntered = True
+
+        'Catch ex As Exception
+        '    MsgBox("Error " & ex.Message & vbCrLf & ex.StackTrace)
+        'End Try
 
     End Sub
+    Sub resetGross_Net_Hdcp(wrow As DataGridViewRow)
+        Debug.Print("Current Player - " & oHelper.sPlayer)
+        Debug.Print(wrow.Cells("Player").Value)
+        Debug.Print(wrow.Cells("Hole1").Value)
+        Debug.Print(wrow.Cells("Out_Gross").Value)
+        Debug.Print(wrow.Cells("Out_Net").Value)
+        Debug.Print(wrow.Cells("Phdcp").Value)
+        Debug.Print(wrow.Cells("Hdcp").Value)
 
+        wrow.Cells("Hdcp").Value = wrow.Cells("PHdcp").Value
+        For Each cell In wrow.Cells
+            If cell.owningcolumn.name = "In_Gross" Or cell.owningcolumn.name = "Out_Gross" Or cell.owningcolumn.name = "In_Net" Or cell.owningcolumn.name = "Out_Net" Then
+                cell.Value = DBNull.Value
+            End If
+        Next
+        Debug.Print(wrow.Cells("Phdcp").Value)
+
+        oHelper.bAllHolesEntered = False
+    End Sub
     Private Sub dgScores_RowEnter(sender As Object, e As DataGridViewCellEventArgs) Handles dgScores.RowEnter
         oHelper.LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name & " row - " & e.RowIndex)
 

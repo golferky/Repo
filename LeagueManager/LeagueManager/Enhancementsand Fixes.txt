@@ -10,10 +10,9 @@
 * 20180423 - M        - Med         - Create HTML file for standings and other sheets
 * 20180324 - M        - Med         - Track finances, payment history, distribution history, payment method
 *									- New table/file(Payment file)
-* 20180403 - L        - Hard        - Create option for league average opponent
+* 20180403 - L        - Hard        - Create option for league average opponent noshow
 * 20180318 - L        - Hard        - Skins.vb- disabled checkdotscolors until 
 * 20180304 - L        - Hard        - Skins.vb- strikeout not working on colors option
-* 20180226 - L        -             - Sam cant load files on his pc, need to turn on logging and email log to me
 *************************************************************************************************
 * 20180219 - My Review
 * 20180302 - L        - Hard        - Standings.vb - Create html printable standings, reports
@@ -38,7 +37,8 @@
 *                                           Change Log-Completed
 *************************************************************************************************
 * yyyymmdd - Priority - Complexity -  Description
-* 20180527 - M        - Med         - Standings not calculating halves properly first half has one too many weeks
+* 20180613 - H        - Med         - Look at NoRowLeave routine, doesnt appear to do anything
+* 20180612 - H        - Med         - Noshows need to save hdcp and phdcp* 20180527 - M        - Med         - Standings not calculating halves properly first half has one too many weeks
 * 20180524 - M        - Med         - rainouts caused schedule to be off in standings
 * 20180525 - H        - Med         - Matches grid not sorted properly
 * 20180524 - H        - Med         - grade missing on scores
