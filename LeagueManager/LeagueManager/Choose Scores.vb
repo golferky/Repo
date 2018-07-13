@@ -10,7 +10,7 @@ Public Class frmChooseScores
     Dim strConnString = String.Empty
     Dim dvScores As DataView
     Dim dvCourses As DataView
-    Public oHelper As Helper.Controls.Helper
+    Public oHelper As Helper
     Public oHelperLV As Helper_LV
 
     Dim scores(18) As String

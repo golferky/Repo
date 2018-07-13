@@ -1,8 +1,9 @@
 ﻿'*************************************************************************************************
 Imports System.IO.Packaging
 Public Class Main
-    Dim cVersion = "Version : 6.15"
-    Public oHelper As Helper.Controls.Helper
+    Dim cVersion = "Version : 6.26"
+    Public oHelper As Helper
+    Public owa As WA
     Dim bLoad = True
     'Private Teams As ArrayList = New ArrayList
     Private Teams2 As ArrayList = New ArrayList
@@ -24,11 +25,11 @@ Public Class Main
         'Me.WindowState = FormWindowState.Maximized
         Me.SetStyle(ControlStyles.SupportsTransparentBackColor, True)
         Me.BackColor = Color.Transparent
-        oHelper = New Helper.Controls.Helper
+        oHelper = New Helper
         Dim sDocs = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)
         '12/19/2017 note this is removed for now 
         Me.Icon = New Icon(Me.Icon, New Size(Me.Icon.Width * 5, Me.Icon.Height * 5))
-
+        oHelper.bloghelper = True
         'load cookie settings
         If IO.File.Exists(sDocs & "\Leaguemanager.ini") Then
             Using sr As New IO.StreamReader(sDocs & "\Leaguemanager.ini", False)
@@ -105,7 +106,7 @@ Public Class Main
         lblProcessMsg.Text = "Done-Loading League Tables"
         Me.Cursor = Cursors.Default
         Application.DoEvents()
-
+        oHelper.bloghelper = False
     End Sub
     Sub CreateSch()
         '20180115 - latest attempt to build a schedule
@@ -166,7 +167,7 @@ Public Class Main
         'oFiles = oDirectory.GetFiles("*.xml")
         oFiles = oDirectory.GetFiles("*.csv")
         'sort by date desc
-        Helper.Controls.Helper.arraySort(oFiles)
+        oHelper.arraySort(oFiles)
         'oHelper.arraySort(oFiles)
         Dim sArrayOfFiles As New List(Of String)
 
@@ -211,6 +212,8 @@ Public Class Main
         'save this in helper so other subroutines can use
         oHelper.sArrayOfFiles = sArrayOfFiles
         For Each saFile In sArrayOfFiles
+            oHelper.LOGIT(String.Format("File used : {0}", saFile))
+
             Dim sfile = "dt" & oHelper.getSubstring(saFile, "_", ".")
             sfile = sfile.Replace(oHelper.getSubstring(cbLeagues.SelectedItem, 0, " ") & "_", "")
             If Not oHelper.dsLeague.Tables.Contains(sfile) Then oHelper.dsLeague.Tables.Add(sfile)
@@ -725,7 +728,7 @@ Public Class Main
         'oFiles = oDirectory.GetFiles("*.xml")
         oFiles = oDirectory.GetFiles("*.csv")
         'sort by date desc
-        Helper.Controls.Helper.arraySort(oFiles)
+        oHelper.arraySort(oFiles)
         'oHelper.arraySort(oFiles)
         Dim sArrayOfFiles As New List(Of String)
 
@@ -778,6 +781,10 @@ Public Class Main
 
         zipPackage.Close()
 
+    End Sub
+
+    Private Sub Button1_Click_1(sender As Object, e As EventArgs) Handles Button1.Click
+        Finance.Show()
     End Sub
 End Class
 Public Class Team

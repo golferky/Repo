@@ -1,5 +1,5 @@
 ﻿Public Class LastFive
-    Dim oHelper As Helper.Controls.Helper
+    Dim oHelper As Helper
     Dim fromsizeW As Integer, lvsizeW As Integer
     Dim lv1 As New SI.Controls.LvSort
 

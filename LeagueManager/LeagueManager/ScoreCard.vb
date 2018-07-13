@@ -1,6 +1,6 @@
 ﻿Imports System.ComponentModel
 Public Class frmScoreCard
-    Dim oHelper As New Helper.Controls.Helper
+    Dim oHelper As New Helper
     'fields with (Number) are key fields
     'field width-read only-tabstop-MiddleRight
     'Public Const sScoreCard As String = "Method,Team,Group(3),Player(1),Date(2),Holes,PHdcp,Hdcp,Skins,Closest,$Earn,$Skins,$Closest,#Skins,#Closests,Points,Team_Points,Opponent"

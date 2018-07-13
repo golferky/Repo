@@ -1,6 +1,6 @@
 ﻿Imports System.IO
 Public Class Skins
-    Dim oHelper As New Helper.Controls.Helper
+    Dim oHelper As New Helper
     'Dim oHelper = Main.oHelper
     Dim fromsizeW As Integer, gvSsizeW As Integer, gvSCsizeW As Integer, gbSCsizeW As Integer
     Dim bsave As Boolean = False

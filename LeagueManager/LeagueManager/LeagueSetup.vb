@@ -1,5 +1,5 @@
 ﻿Public Class frmLeagueSetup
-    Dim oHelper As Helper.Controls.Helper
+    Dim oHelper As Helper
     Dim stable = "dtLeagueParms"
     Private Sub frmLeagueSetup_Load(sender As System.Object, e As System.EventArgs) Handles MyBase.Load
         oHelper = Main.oHelper

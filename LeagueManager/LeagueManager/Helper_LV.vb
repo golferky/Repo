@@ -1,5 +1,5 @@
 ﻿Public Class Helper_LV
-    Dim oHelper As New Helper.Controls.Helper
+    Dim oHelper As New Helper
 
     Sub ListScoresWithHandicap(ByVal ListView1 As ListView, Score As DataRowView, dvCourse As DataView, ByVal sfirstField As String, ByVal bHdcp As Boolean, iLowHdcp As Integer)
 

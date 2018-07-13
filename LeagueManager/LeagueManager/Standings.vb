@@ -1,7 +1,7 @@
 ﻿Imports System.IO.Packaging
 Imports System.Text
 Public Class Standings
-    Dim oHelper As New Helper.Controls.Helper
+    Dim oHelper As New Helper
     Dim dtSchedule As DataTable
     'put here cause 2 subs use these
     Dim sPlayer = ""
@@ -445,6 +445,8 @@ Public Class Standings
 
 
     End Function
+#Region "Future Changes"
+
     Public Function ConvertDataGridViewToHTMLWithFormatting(ByVal dgv As DataGridView) As String
         Try
 
@@ -593,6 +595,7 @@ Public Class Standings
                 verticalAlignment = "middle"
         End Select
     End Sub
+#End Region
     Function BuilddtPoints() As DataTable
         Return BuilddtPoints(False)
     End Function
@@ -688,7 +691,8 @@ Public Class Standings
                     If score("Team_Points") <> "" Then dTeamPoints = score("Team_Points")
                 End If
 
-                Dim sColname As String = CInt(score("Date").ToString.Substring(4, 2)).ToString + "/" + CInt(score("Date").ToString.Substring(6, 2)).ToString + "/" + score("Date").ToString.Substring(0, 4)
+                'Dim sColname As String = CInt(score("Date").ToString.Substring(4, 2)).ToString + "/" + CInt(score("Date").ToString.Substring(6, 2)).ToString + "/" + score("Date").ToString.Substring(0, 4)
+                Dim sColname As String = CInt(score("Date").ToString.Substring(4, 2)).ToString + "/" + CInt(score("Date").ToString.Substring(6, 2)).ToString + "/" + score("Date").ToString.Substring(2, 2)
                 If sScore IsNot DBNull.Value Then
                     drow(sColname) = ""
                     'default to points and team points 

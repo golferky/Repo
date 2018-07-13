@@ -4,9 +4,67 @@ Imports System.IO
 Imports System.Text
 Imports System.Net.Mail
 'Imports System.Web
+Public Class WA
+    Dim fromsizeW As Integer, lvsizeW As Integer
 
-Namespace Helper.Controls
-    Public Class Helper
+    Public dsLeague As DataSet
+    Public sFilePath As String
+    Public sLeagueName As String
+    Public sGroupNumber As Integer
+    Public sFrontBack As String
+    Public dDate As Date
+    Public iHoles As Integer
+    Public iHoleMarker As Integer
+    Public iHdcp As Integer
+    Public sCourse As String
+    Public sTeam As String
+    Public sPlayer As String
+    Public sPlayerToFind As String
+    Public sFindPlayerOption As String
+    Public bexit As Boolean = False
+    Public bloghelper As Boolean = False
+    Public bReorderCols As Boolean = False
+    Public bDGSError As Boolean = False
+    Public bNoRowLeave As Boolean = False
+    Public bCalcSkins As Boolean = False
+    Public bScoreCard As Boolean = False
+    Public bScoresbyPlayer As Boolean = False
+    Public bDots As Boolean = False
+    Public bColors As Boolean = False
+    Public dt As DataTable
+
+    'fields with (Number) are key fields
+    'field-width-read only-tabstop-MiddleRight
+    Public Const cPat40 = "40-false-true-mr"
+    Public Const cPat40nt = "40-true-false-mr"
+    Public Const cPathole = "40-false-true-ml"
+    Public Const cPat60 = "60-false-true-mc"
+    Public Const cPatMeth = "80-false-true-mc"
+    Public Const cPat120 = "120-false-true-ml"
+    Public Const cPat170 = "170-false-false-ml"
+    Public Const cPat170nt = "170-true-false-ml"
+    Public Const cBaseScoreCard As String = "Player(1)-cPat170,Method-cPatMeth,Team,Group(3),Holes,Hdcp-cPat40nt"
+    '20180224-change to read only
+    'Public Const cSkinsFields As String = "Skins-cPat40,Closest-cPat60,$Earn-cPat40nt,$Skins-cPat40nt,$Closest-cPat40nt,#Skins-cPat40nt,#Closests-cPat60"
+    Public Const cSkinsFields As String = "Skins-cPat40nt,Closest-cPat60nt,$Earn-cPat40nt,$Skins-cPat40nt,$Closest-cPat40nt,#Skins-cPat40nt,#Closests-cPat40nt"
+    Public MyCourse() As Data.DataRow
+    Public bAllHolesEntered = False
+    Public sArrayOfFiles As New List(Of String)
+    Public rLeagueParmrow As DataRowView
+    Public bsch = False
+    Public bscores = False
+    Public bplayer = False
+    Public bcourses = False
+    Public GGmail As GGSMTP_GMAIL
+    Public sFileInUseMessage As String
+    ' Create the ToolTip and associate with the Form container.
+    Public toolTipHdcp As New ToolTip()
+    '20180130-num of Closests
+    Public iNumClosests = 0
+    Public bByeFound = False
+End Class
+'Namespace Helper
+Public Class Helper
         'Dim lvwColumnSorter As ListViewColumnSorter
         Dim fromsizeW As Integer, lvsizeW As Integer
 
@@ -34,6 +92,7 @@ Namespace Helper.Controls
         Public bScoresbyPlayer As Boolean = False
         Public bDots As Boolean = False
         Public bColors As Boolean = False
+        Public dt As DataTable
 
         'fields with (Number) are key fields
         'field-width-read only-tabstop-MiddleRight
@@ -140,14 +199,20 @@ Namespace Helper.Controls
         Public Function CSV2DataTableOLEDB(ByVal filename As String) As DataTable
             CSV2DataTableOLEDB = Nothing
             Try
+                'Provider = Microsoft.ACE.OLEDB.12.0;Data Source=c:\myFolder\myExcel2007file.xlsx;
+                'builder.add("Extended Properties = "Excel 12.0 Xml;HDR=YES";
+                '.Provider = "Microsoft.Jet.OLEDB.4.0",
+                'DataSource = sFilePath 'Application.StartupPath & IO.Path.DirectorySeparatorChar
 
                 Dim Builder As New OleDbConnectionStringBuilder With
                 {
-                    .Provider = "Microsoft.Jet.OLEDB.4.0",
-                    .DataSource = Application.StartupPath & IO.Path.DirectorySeparatorChar
+                    .Provider = "Microsoft.ACE.OLEDB.12.0",
+                    .DataSource = sFilePath 'Application.StartupPath & IO.Path.DirectorySeparatorChar
                 }
 
-                Builder.Add("Extended Properties", "text;HDR=Yes;FMT=Delimited(,)")
+                'Builder.Add("Extended Properties", "text;HDR=Yes;FMT=Delimited(,);readonly=False")
+                Builder.Add("Extended Properties", "Excel 12.0 Xml;HDR=YES")
+                'builder.add("
 
                 Using cn As New OleDbConnection With
             {
@@ -1682,7 +1747,7 @@ Namespace Helper.Controls
                 Next
                 dtSchedule.PrimaryKey = New DataColumn() {dtSchedule.Columns(0)}
                 buildSchedule = dtSchedule
-            Catch ex As exception
+            Catch ex As Exception
 
             End Try
         End Function
@@ -2274,83 +2339,83 @@ Namespace Helper.Controls
 
         End Sub
         '20180325-changes for bye team
-        Sub getMatchScores_20180409(sdate As String)
+        'Sub getMatchScores_20180409(sdate As String)
 
-            If bloghelper Then LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
-            CalcHoleMarker(sdate)
-            Dim dtschedule As New DataTable
-            dtschedule = buildSchedule()
-            Dim sKey = DateTime.ParseExact(sdate, "yyyyMMdd", Nothing).ToString("MM\/dd\/yyyy").Trim("0")
-            Dim rSch As DataRow = dtschedule.Rows.Find(sKey)
-            If rSch Is Nothing Then
-                MsgBox("No scheduled matches found for this date, must exit")
-                Exit Sub
-            End If
-            Dim dvPlayers As DataView
-            dvPlayers = New DataView(dsLeague.Tables("dtPlayers"))
-            Dim sPlayersRowFilter = ""
-            Dim sSD = rLeagueParmrow("StartDate")
-            Dim sED = rLeagueParmrow("EndDate")
-            Dim ip# = 0
-            Dim dvscores As New DataView(dsLeague.Tables("dtScores"))
-            For iMatch = 1 To rLeagueParmrow("Teams") / 2
-                Dim sMatch = rSch(iMatch.ToString).ToString
-                Dim sHt = sMatch.Split("v")(0)
-                Dim sVt = sMatch.Split("v")(1)
-                sPlayersRowFilter = String.Format("Team IN ('{0}','{1}') AND ISNULL(DateJoined,'00010101') <= '{2}' AND ISNULL(DateLeft,'99999999') > '{3}'", sHt, sVt, sSD, sED)
-                dvPlayers = New DataView(dsLeague.Tables("dtPlayers")) With
-                {
-                 .RowFilter = sPlayersRowFilter, .Sort = "Team, Grade"
-                }
+        '    If bloghelper Then LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
+        '    CalcHoleMarker(sdate)
+        '    Dim dtschedule As New DataTable
+        '    dtschedule = buildSchedule()
+        '    Dim sKey = DateTime.ParseExact(sdate, "yyyyMMdd", Nothing).ToString("MM\/dd\/yyyy").Trim("0")
+        '    Dim rSch As DataRow = dtschedule.Rows.Find(sKey)
+        '    If rSch Is Nothing Then
+        '        MsgBox("No scheduled matches found for this date, must exit")
+        '        Exit Sub
+        '    End If
+        '    Dim dvPlayers As DataView
+        '    dvPlayers = New DataView(dsLeague.Tables("dtPlayers"))
+        '    Dim sPlayersRowFilter = ""
+        '    Dim sSD = rLeagueParmrow("StartDate")
+        '    Dim sED = rLeagueParmrow("EndDate")
+        '    Dim ip# = 0
+        '    Dim dvscores As New DataView(dsLeague.Tables("dtScores"))
+        '    For iMatch = 1 To rLeagueParmrow("Teams") / 2
+        '        Dim sMatch = rSch(iMatch.ToString).ToString
+        '        Dim sHt = sMatch.Split("v")(0)
+        '        Dim sVt = sMatch.Split("v")(1)
+        '        sPlayersRowFilter = String.Format("Team IN ('{0}','{1}') AND ISNULL(DateJoined,'00010101') <= '{2}' AND ISNULL(DateLeft,'99999999') > '{3}'", sHt, sVt, sSD, sED)
+        '        dvPlayers = New DataView(dsLeague.Tables("dtPlayers")) With
+        '        {
+        '         .RowFilter = sPlayersRowFilter, .Sort = "Team, Grade"
+        '        }
 
-                For Each player As DataRowView In dvPlayers
-                    Dim sKeys() As Object = {player("Name"), sdate}
-                    Dim drow As DataRow = dsLeague.Tables("dtScores").Rows.Find(sKeys)
-                    'if player is not in the scores for that day, check to see if he has a sub
-                    If drow Is Nothing Then
-                        'find this players partner in filtered players file
-                        For Each partner As DataRowView In dvPlayers
-                            'find this players team number in players file
-                            If partner("Team") = player("Team") Then
-                                'if the player name <> the missing player, we have his partner
-                                If player("Name") <> partner("Name") Then
-                                    'now find all the scores for that team and eliminate his partner
-                                    Dim dvSubScore As DataView
-                                    dvSubScore = New DataView(dsLeague.Tables("dtScores")) With
-                                    {
-                                        .RowFilter = String.Format("Team = {0} and Player <> '{1}' and Date = '{2}'", player("Team"), player("Name"), sdate)
-                                    }
-                                    'add the missing player as an empty score
-                                    If dvSubScore.Count <> 2 Then
-                                        Dim rowView As DataRowView = dvscores.AddNew
-                                        ' Change values in the DataRow.
-                                        rowView("League") = sLeagueName
-                                        rowView("Player") = player("Name")
-                                        'rowView("Method") = "Score"
-                                        rowView("Group") = 0
-                                        rowView("Team") = player("Team")
-                                        'rowView("Hdcp") = row("Handicap")
-                                        rowView("Date") = sdate
-                                        'rowView("Skins") = "N"
-                                        'rowView("Closest") = "N"
-                                        rowView("Partner") = ip#
-                                        rowView.EndEdit()
-                                    End If
-                                    Exit For
-                                End If
-                            End If
-                        Next
-                    Else
-                        drow("Partner") = CStr(ip#).PadLeft(2, "0")
-                        drow.EndEdit()
-                    End If
-                    ip# += 1
-                Next
-            Next
+        '        For Each player As DataRowView In dvPlayers
+        '            Dim sKeys() As Object = {player("Name"), sdate}
+        '            Dim drow As DataRow = dsLeague.Tables("dtScores").Rows.Find(sKeys)
+        '            'if player is not in the scores for that day, check to see if he has a sub
+        '            If drow Is Nothing Then
+        '                'find this players partner in filtered players file
+        '                For Each partner As DataRowView In dvPlayers
+        '                    'find this players team number in players file
+        '                    If partner("Team") = player("Team") Then
+        '                        'if the player name <> the missing player, we have his partner
+        '                        If player("Name") <> partner("Name") Then
+        '                            'now find all the scores for that team and eliminate his partner
+        '                            Dim dvSubScore As DataView
+        '                            dvSubScore = New DataView(dsLeague.Tables("dtScores")) With
+        '                            {
+        '                                .RowFilter = String.Format("Team = {0} and Player <> '{1}' and Date = '{2}'", player("Team"), player("Name"), sdate)
+        '                            }
+        '                            'add the missing player as an empty score
+        '                            If dvSubScore.Count <> 2 Then
+        '                                Dim rowView As DataRowView = dvscores.AddNew
+        '                                ' Change values in the DataRow.
+        '                                rowView("League") = sLeagueName
+        '                                rowView("Player") = player("Name")
+        '                                'rowView("Method") = "Score"
+        '                                rowView("Group") = 0
+        '                                rowView("Team") = player("Team")
+        '                                'rowView("Hdcp") = row("Handicap")
+        '                                rowView("Date") = sdate
+        '                                'rowView("Skins") = "N"
+        '                                'rowView("Closest") = "N"
+        '                                rowView("Partner") = ip#
+        '                                rowView.EndEdit()
+        '                            End If
+        '                            Exit For
+        '                        End If
+        '                    End If
+        '                Next
+        '            Else
+        '                drow("Partner") = CStr(ip#).PadLeft(2, "0")
+        '                drow.EndEdit()
+        '            End If
+        '            ip# += 1
+        '        Next
+        '    Next
 
-            dvscores.Sort = "Partner"
+        '    dvscores.Sort = "Partner"
 
-        End Sub
+        'End Sub
         Function getMatchScores(sdate As String) As Boolean
             If bloghelper Then LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
             getMatchScores = False
@@ -2358,11 +2423,12 @@ Namespace Helper.Controls
             Dim dtschedule As New DataTable
             dtschedule = buildSchedule()
             Dim sKey = DateTime.ParseExact(sdate, "yyyyMMdd", Nothing).ToString("MM\/dd\/yyyy").Trim("0")
-            sKey = sdate.Substring(4, 2).Trim("0") & "/" & sdate.Substring(6, 2).Trim("0") & "/" & sdate.Substring(0, 4)
+        'sKey = sdate.Substring(4, 2).Trim("0") & "/" & sdate.Substring(6, 2).Trim("0") & "/" & sdate.Substring(0, 4)
+        sKey = sdate.Substring(4, 2).Trim("0") & "/" & sdate.Substring(6, 2) & "/" & sdate.Substring(0, 4)
 
-            Dim rSch As DataRow = dtschedule.Rows.Find(sKey)
+        Dim rSch As DataRow = dtschedule.Rows.Find(sKey)
             If rSch Is Nothing Then
-                MsgBox("No scheduled matches found for this date, must exit")
+                MsgBox(String.Format("No scheduled matches found for this date {0}, must exit", sKey))
                 Exit Function
             End If
             Dim ip# = 0
@@ -2437,13 +2503,37 @@ Namespace Helper.Controls
             End If
         End Sub
         Public Sub ReloadScores()
-            If dsLeague.Tables("dtScores") IsNot Nothing Then
-                dsLeague.Tables.Remove("dtScores")
-            End If
+            If dsLeague.Tables("dtScores") IsNot Nothing Then dsLeague.Tables.Remove("dtScores")
             'dsLeague.Tables.Add("dtScores").ReadXml(getLatestFile("*Scores.xml"))
             dsLeague.Tables.Add("dtScores")
             CSV2DataTable(dsLeague.Tables("dtScores"), getLatestFile("*Scores.csv"))
             dsLeague.Tables("dtScores").PrimaryKey = New DataColumn() {dsLeague.Tables("dtScores").Columns("Player"), dsLeague.Tables("dtScores").Columns("Date")}
+        End Sub
+        Public Sub SortCompare(sender As Object, e As DataGridViewSortCompareEventArgs)
+            'If e.Column.Index <> 0 Then
+            '    Return
+            'End If
+            Try
+
+                Dim c1 As Integer
+                If e.CellValue1 Is DBNull.Value Then
+                    c1 = 0
+                Else
+                    c1 = e.CellValue1
+                End If
+                Dim c2 As Integer
+                If e.CellValue2 Is DBNull.Value Then
+                    c2 = 0
+                Else
+                    c2 = e.CellValue2
+                End If
+                e.SortResult = If(CInt(c1) < CInt(c2), -1, 1)
+
+                e.Handled = True
+            Catch
+                Dim x = ""
+            End Try
+
         End Sub
         Function Create_Html(dt As DataTable) As String
 
@@ -2500,4 +2590,4 @@ Namespace Helper.Controls
         'Next
     End Class
 
-End Namespace
+'End Namespace

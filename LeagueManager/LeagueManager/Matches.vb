@@ -1,6 +1,6 @@
 ﻿Imports System.IO
 Public Class Matches
-    Dim oHelper As New Helper.Controls.Helper
+    Dim oHelper As New Helper
     Public Const cMatchFields As String = "Team-cPat40nt,Player-cPat170,Out_Gross-v,PHdcp-cPat40nt,Out_Net-cPat40nt,Points-cPat40nt,Team_Points-cPat40nt,Opponent-cPat170nt"
     Dim sMatchFields = New List(Of String)("Points,Team_Points,Opponent".Split(","))
     Dim fromsizeW As Integer, gvSsizeW As Integer, gvSCsizeW As Integer, gbSCsizeW As Integer

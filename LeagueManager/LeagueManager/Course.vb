@@ -1,6 +1,6 @@
 ﻿Imports System.IO
 Public Class frmCourse
-    Dim oHelper As Helper.Controls.Helper
+    Dim oHelper As Helper
     Dim stable = "dtCourses"
     Private Sub frmCourse_Load(sender As System.Object, e As System.EventArgs) Handles MyBase.Load
         oHelper = Main.oHelper

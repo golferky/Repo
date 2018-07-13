@@ -28,6 +28,7 @@ Partial Class Main
         Me.btnPlayerSetup = New System.Windows.Forms.Button()
         Me.btnExit = New System.Windows.Forms.Button()
         Me.GroupBox1 = New System.Windows.Forms.GroupBox()
+        Me.Button1 = New System.Windows.Forms.Button()
         Me.btnLast5 = New System.Windows.Forms.Button()
         Me.btnPlayerStats = New System.Windows.Forms.Button()
         Me.btnMatches = New System.Windows.Forms.Button()
@@ -97,6 +98,7 @@ Partial Class Main
         '
         'GroupBox1
         '
+        Me.GroupBox1.Controls.Add(Me.Button1)
         Me.GroupBox1.Controls.Add(Me.btnLast5)
         Me.GroupBox1.Controls.Add(Me.btnPlayerStats)
         Me.GroupBox1.Controls.Add(Me.btnMatches)
@@ -107,10 +109,20 @@ Partial Class Main
         Me.GroupBox1.Margin = New System.Windows.Forms.Padding(2)
         Me.GroupBox1.Name = "GroupBox1"
         Me.GroupBox1.Padding = New System.Windows.Forms.Padding(2)
-        Me.GroupBox1.Size = New System.Drawing.Size(325, 177)
+        Me.GroupBox1.Size = New System.Drawing.Size(325, 234)
         Me.GroupBox1.TabIndex = 9
         Me.GroupBox1.TabStop = False
         Me.GroupBox1.Text = "Scoring and Games"
+        '
+        'Button1
+        '
+        Me.Button1.Location = New System.Drawing.Point(20, 173)
+        Me.Button1.Margin = New System.Windows.Forms.Padding(2)
+        Me.Button1.Name = "Button1"
+        Me.Button1.Size = New System.Drawing.Size(131, 24)
+        Me.Button1.TabIndex = 11
+        Me.Button1.Text = "Financial"
+        Me.Button1.UseVisualStyleBackColor = True
         '
         'btnLast5
         '
@@ -187,11 +199,11 @@ Partial Class Main
         Me.GroupBox2.Controls.Add(Me.btnLeagueSetup)
         Me.GroupBox2.Controls.Add(Me.btnCourseSetup)
         Me.GroupBox2.Controls.Add(Me.btnPlayerSetup)
-        Me.GroupBox2.Location = New System.Drawing.Point(35, 339)
+        Me.GroupBox2.Location = New System.Drawing.Point(41, 396)
         Me.GroupBox2.Margin = New System.Windows.Forms.Padding(2)
         Me.GroupBox2.Name = "GroupBox2"
         Me.GroupBox2.Padding = New System.Windows.Forms.Padding(2)
-        Me.GroupBox2.Size = New System.Drawing.Size(151, 189)
+        Me.GroupBox2.Size = New System.Drawing.Size(151, 170)
         Me.GroupBox2.TabIndex = 10
         Me.GroupBox2.TabStop = False
         Me.GroupBox2.Text = "Setup Functions"
@@ -221,11 +233,11 @@ Partial Class Main
         Me.GroupBox3.Controls.Add(Me.btnZip)
         Me.GroupBox3.Controls.Add(Me.btnSchedule)
         Me.GroupBox3.Controls.Add(Me.btnShowScores)
-        Me.GroupBox3.Location = New System.Drawing.Point(200, 339)
+        Me.GroupBox3.Location = New System.Drawing.Point(196, 396)
         Me.GroupBox3.Margin = New System.Windows.Forms.Padding(2)
         Me.GroupBox3.Name = "GroupBox3"
         Me.GroupBox3.Padding = New System.Windows.Forms.Padding(2)
-        Me.GroupBox3.Size = New System.Drawing.Size(149, 189)
+        Me.GroupBox3.Size = New System.Drawing.Size(149, 170)
         Me.GroupBox3.TabIndex = 14
         Me.GroupBox3.TabStop = False
         Me.GroupBox3.Text = "Utilities"
@@ -270,7 +282,7 @@ Partial Class Main
         'lbScoresFile
         '
         Me.lbScoresFile.AutoSize = True
-        Me.lbScoresFile.Location = New System.Drawing.Point(38, 568)
+        Me.lbScoresFile.Location = New System.Drawing.Point(32, 595)
         Me.lbScoresFile.Name = "lbScoresFile"
         Me.lbScoresFile.Size = New System.Drawing.Size(88, 13)
         Me.lbScoresFile.TabIndex = 17
@@ -371,4 +383,5 @@ Partial Class Main
     Friend WithEvents btnZip As Button
     Friend WithEvents cbLogging As CheckBox
     Friend WithEvents cbMail As CheckBox
+    Friend WithEvents Button1 As Button
 End Class
