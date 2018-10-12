@@ -1,9 +1,9 @@
 ﻿'*************************************************************************************************
 Imports System.IO.Packaging
 Public Class Main
-    Dim cVersion = "Version : 6.26"
+    Dim cVersion = "Version : 2018.10.04"
     Public oHelper As Helper
-    Public owa As WA
+    'Public owa As WA
     Dim bLoad = True
     'Private Teams As ArrayList = New ArrayList
     Private Teams2 As ArrayList = New ArrayList
@@ -11,7 +11,7 @@ Public Class Main
 
     Private Sub Main_Load(sender As System.Object, e As System.EventArgs) Handles MyBase.Load
         'Genschedule()
-        lbVersion.Text = cVersion
+        Me.Text = Me.Text & " " & cVersion
         lblProcessMsg.Text = "Loading League Tables..."
 
         Me.Cursor = Cursors.WaitCursor
@@ -30,6 +30,7 @@ Public Class Main
         '12/19/2017 note this is removed for now 
         Me.Icon = New Icon(Me.Icon, New Size(Me.Icon.Width * 5, Me.Icon.Height * 5))
         oHelper.bloghelper = True
+
         'load cookie settings
         If IO.File.Exists(sDocs & "\Leaguemanager.ini") Then
             Using sr As New IO.StreamReader(sDocs & "\Leaguemanager.ini", False)
@@ -58,7 +59,7 @@ Public Class Main
             Dim dialog As New FolderBrowserDialog With
             {
             .RootFolder = Environment.SpecialFolder.Desktop,
-            .SelectedPath = "e:\LeagueManager\Files",
+            .SelectedPath = "G:\LeagueManager\Files",
             .Description = "Select League Files Path"
             }
             If dialog.ShowDialog() = Windows.Forms.DialogResult.OK Then
@@ -99,14 +100,36 @@ Public Class Main
 
         bLoad = False
         GetLeague()
+
+        '20180930 -setup dates
+        dtScore.Text = oHelper.dDate
+        dtRSStart.Text = oHelper.rLeagueParmrow("StartDate")
+        dtRSEnd.Text = oHelper.rLeagueParmrow("EndDate")
+        'dvscores(0)("Date").ToString.Substring(6, 2)).AddDays(7).ToString("yyyyMMdd")
+        'dtPSStart.Text = oHelper.rLeagueParmrow("EndDate").AddDays(-7)
+        'dtPSEnd.Text = oHelper.rLeagueParmrow("EndDate")
+        dtPSStart.Text = DateTime.ParseExact(oHelper.rLeagueParmrow("PostSeasonDt"), "yyyyMMdd", Nothing).ToString("MM\/dd\/yyyy").Trim("0")
+        'oHelper.rLeagueParmrow("PostSeasonDt")
+        dtPSEnd.Text = DateTime.ParseExact(oHelper.rLeagueParmrow("PostSeasonDt"), "yyyyMMdd", Nothing).AddDays(7).ToString("MM\/dd\/yyyy").Trim("0")
         'setup email function
         oHelper.GGmail = New GGSMTP_GMAIL(oHelper.rLeagueParmrow("Email"), oHelper.rLeagueParmrow("EmailPassword"))
         'GetXSDNameByFileName(oHelper.dsLeague.Tables("dtScores"),
         oHelper.MyCourse = oHelper.dsLeague.Tables("dtCourses").Select("Name = '" & oHelper.rLeagueParmrow("Course") & "'")
+        ''get the date of the schedule for this week
+        ''just use the Column names which have dates of the schedule table
+        ''this loop will compare the league start date and flip the hole marker based on front/back
+        '20180126-only build dates for the last date of completed scores
+        Dim dvscores As New DataView(oHelper.dsLeague.Tables("dtScores"))
+        dvscores.Sort = "Date desc"
+        dvscores.RowFilter = String.Format("Date = {0}", dvscores(0)("Date"))
+        oHelper.sDateLastScore = dvscores(0)("Date")
+
         lblProcessMsg.Text = "Done-Loading League Tables"
         Me.Cursor = Cursors.Default
         Application.DoEvents()
         oHelper.bloghelper = False
+        'debugging playerstats, uncomment below
+        'PlayerStats_Click(sender, e)
     End Sub
     Sub CreateSch()
         '20180115 - latest attempt to build a schedule
@@ -197,6 +220,7 @@ Public Class Main
             'load first entry
             If sArrayOfFiles.Count = 0 Then
                 sArrayOfFiles.Add(sfile.FullName)
+                oHelper.LOGIT(String.Format("File used : {0}", sfile.FullName))
                 Continue For
             End If
             Dim bnoupd = False
@@ -212,8 +236,6 @@ Public Class Main
         'save this in helper so other subroutines can use
         oHelper.sArrayOfFiles = sArrayOfFiles
         For Each saFile In sArrayOfFiles
-            oHelper.LOGIT(String.Format("File used : {0}", saFile))
-
             Dim sfile = "dt" & oHelper.getSubstring(saFile, "_", ".")
             sfile = sfile.Replace(oHelper.getSubstring(cbLeagues.SelectedItem, 0, " ") & "_", "")
             If Not oHelper.dsLeague.Tables.Contains(sfile) Then oHelper.dsLeague.Tables.Add(sfile)
@@ -539,7 +561,7 @@ Public Class Main
     Private Sub ScoreCard_Click(sender As System.Object, e As System.EventArgs) Handles btnScoreCard.Click
 
         If oHelper.bsch Then
-            lblProcessMsg.Text = String.Format("Loading Scores")
+            lblProcessMsg.Text = String.Format("Loading Scores from {0}", lbScoresFile.Text)
             lblProcessMsg.BackColor = Color.Red
             Me.Cursor = Cursors.WaitCursor
             Application.DoEvents()
@@ -786,6 +808,7 @@ Public Class Main
     Private Sub Button1_Click_1(sender As Object, e As EventArgs) Handles Button1.Click
         Finance.Show()
     End Sub
+
 End Class
 Public Class Team
     Implements IComparable

@@ -324,13 +324,26 @@ Public Class Matches
                 cbDatesPlayers.SelectedItem = sdate
             End If
 
-            oHelper.CalcHoleMarker(sdate)
+            'oHelper.CalcHoleMarker(sdate)
+            '20181003 - if scores already exist int able, dont use date to determine which 9 were playing, we can swap nines and override schedule
+            'oHelper.CalcHoleMarker(sdate)
+            Dim dvscores As New DataView(oHelper.dsLeague.Tables("dtScores"))
+            dvscores.RowFilter = String.Format("Date = {0}", oHelper.dDate.ToString("yyyyMMdd", Globalization.CultureInfo.InvariantCulture))
+
+            For Each srow As DataRowView In dvscores
+                If srow("Hole1") <> "" Then
+                    oHelper.iHoleMarker = 1
+                ElseIf srow("Hole10") <> "" Then
+                    oHelper.iHoleMarker = 10
+                End If
+                Exit For
+            Next
 
             If oHelper.iHoles = 0 Then oHelper.iHoles = oHelper.rLeagueParmrow("Holes")
 
-            Dim dvScores As New DataView(oHelper.dsLeague.Tables("dtScores"))
+            'Dim dvScores As New DataView(oHelper.dsLeague.Tables("dtScores"))
 
-            dvScores.RowFilter = "Date = '" & sdate & "'"
+            'dvScores.RowFilter = "Date = '" & sdate & "'"
 
             'dvScores.Sort = "Date, Partner"
             Dim sMatchFields = cMatchFields

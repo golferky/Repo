@@ -5,6 +5,7 @@
 
         BldScoresDataGridFromFile()
         '    rs.FindAllControls(Me)
+        Me.Text = Me.Text & " - " & Main.cbLeagues.SelectedItem
     End Sub
     Sub BldScoresDataGridFromFile()
         Try
@@ -30,39 +31,53 @@
 
             Dim wdt As DataTable = dv.ToTable(True, sDetails.Split(",").ToArray)
             wdt.Columns("Player").ColumnName = "Balance"
-            wdt.Columns.Add("Earned")
+            'wdt.Columns.Add("Earned")
             wdt.Columns.Add("Skins")
             wdt.Columns.Add("CTP")
+            wdt.Columns.Add("Earned To Date")
+
             Dim dgcw As New DataGridViewTextBoxColumn
-            dgcw.Name = "Earned"
-            dgcw.ValueType = GetType(System.String)
-            dgFinance.Columns.Add(dgcw)
-            dgcw = New DataGridViewTextBoxColumn
+            'dgcw.Name = "Earned"
+            'dgcw.ValueType = GetType(System.String)
+            'dgFinance.Columns.Add(dgcw)
+            'dgcw = New DataGridViewTextBoxColumn
             dgcw.Name = "Skins"
+            dgcw.Width = 30
             dgFinance.Columns.Add(dgcw)
             dgcw = New DataGridViewTextBoxColumn
             dgcw.Name = "CTP"
+            dgcw.Width = 30
+            dgFinance.Columns.Add(dgcw)
+            dgcw = New DataGridViewTextBoxColumn
+            dgcw.Name = "Earned To Date"
             dgFinance.Columns.Add(dgcw)
 
             Dim ibal As Integer = 0, iEarned = 0, iSkins = 0, iCTP = 0
             For Each row As DataRow In wdt.Rows
                 If row("Detail").contains("Invoice") Then
-                    ibal += row("Due") * -1
+                    ibal += row("Earned") * -1
+                ElseIf row("Detail").contains("Payment") Then
+                    ibal += row("Earned") * -1
                 ElseIf row("DatePaid") Is DBNull.Value Then
-                    ibal += row("Due") * -1
+                    ibal += row("Earned")
                 End If
-                If row("Desc") = "Skin " Then
-                    iEarned += row("Due")
-                    row("Earned") = iEarned
+
+                If row("Desc").ToString.Contains("Skin") Then
+                    iEarned += row("Earned")
                     iSkins += 1
-                ElseIf row("Desc") = "CTP" Then
-                    iEarned += row("Due")
-                    row("Earned") = iEarned
+                ElseIf row("Desc").ToString.Contains("CTP") Then
+                    iEarned += row("Earned")
                     iCTP += 1
+                ElseIf row("Desc").ToString.Contains("Reg Season") Or row("Desc").ToString.Contains("Club Champ") Then
+                    iEarned += row("Earned")
                 End If
+
+                If row("Detail").contains("Payment") Then iEarned += row("Earned") * -1
+
                 row("Balance") = ibal
                 row("Skins") = iSkins
                 row("CTP") = iCTP
+                row("Earned To Date") = iEarned
                 dgFinance.Rows.Add(row.ItemArray)
             Next
             dgFinance.Columns.Item("Player").HeaderText = "Balance"

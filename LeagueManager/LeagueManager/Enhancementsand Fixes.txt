@@ -1,18 +1,23 @@
 ﻿*************************************************************************************************
 *                                           Change Log
 *************************************************************************************************
-* yyyymmdd - Priority - Complexity -  Description
+* yyyymmdd - Priority - Complexity -  Module       Description
 * -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-* 20180430 - L        - Med         - Need to account for Rainouts
-* 20180423 - M        - Med         - Fix Money on CTP1/2 on Scorecard(showing all money to ctp1)
-* 20180423 - L        - Easy        - Fix Money on Skins when Skins have already been calculated (showing carryovers because nothing is checked)
+* 20181004 - ML       - Med to hard - scores.vb not taking front/back 9 into account for averages
+* 20180930 - ML       - Med to hard - dsleague.xsd change postseason flag to postseasondate
+* 20180925 - ML       - Med to hard - Scorecard.vb when combining league championship and regular league, need to swap front and back for scores
+* 20180919 - ML       - Med to hard - Playerstats.vb show league average stats for each hole and rank
+* 20180919 - M        - Easy        - Standings.vb Re-sorting numeric columns arent working right (col sort needed)
+* 20180812 - M        - Med         - Scorecard.vb when sub for a player(add the player subbed for in the datagridview cell and remove it on save)
+* 20180811 - M        - Med         - Scorecard.vb CTP not calc dollars right and should put null in for $$ when clearing out a ctp
+* 20180801 - M        - Med         - dont allow standings until matches have been done for that week
+* 20180801 - M        - Med         - need a date scores locked
+* 20180430 - L        - Hard        - Need to account for Rainouts
 * 20180423 - L        - Easy        - Add Grade to Matches grid
 * 20180423 - M        - Med         - Create HTML file for standings and other sheets
 * 20180324 - M        - Med         - Track finances, payment history, distribution history, payment method
 *									- New table/file(Payment file)
-* 20180403 - L        - Hard        - Create option for league average opponent noshow
-* 20180318 - L        - Hard        - Skins.vb- disabled checkdotscolors until 
-* 20180304 - L        - Hard        - Skins.vb- strikeout not working on colors option
+* 20180403 - L        - Hard        - Create option for league average for opponent noshow
 *************************************************************************************************
 * 20180219 - My Review
 * 20180302 - L        - Hard        - Standings.vb - Create html printable standings, reports
@@ -37,10 +42,31 @@
 *                                           Change Log-Completed
 *************************************************************************************************
 * yyyymmdd - Priority - Complexity -  Description
+* 20181004 - ML       - Med to hard - Finance.vb, FinanceDetails.vb shore up screens
+* 20181003 - ML       - Med to hard - Scorecard.vb, Skins.vb,Matches.vb - enable scorecard to be able to swap nines(front and back)
+* 20180923 - H        - Med         - Scorecard.vb and designer add checkbox to calc matches and club championship in the same week
+* 20180919 - M        - Med         - Standings.vb subs checkbox crashes 2018.09.19
+* 20180905 - M        - Easy        - LastFive.vb no show players scores are being included check for method is dbnull
+* 20180829 - H        - Med         - ctp not saving when saving/exiting skins
+* 20180829 - H        - Easy        - noshow player caused abend on skins for method, add dbnull check
+* 20180821 - H        - Easy        - Player last name issue with names like McDonald, ohelper.fplayer makes it Mcdonald, causing player mismatches
+* 20180810 - M        - Med         - Scorecard.vb calculate skins as you go
+* 20180811 - M        - Med         - Scorecard.vb when player noshows, copy previous handicap to current handicap for saving
+* 20180810 - M        - Med         - Scorecard.vb add checkbox column to allow scores to be cleared
+* 20180423 - M        - Med         - Fix Money on CTP1/2 on Scorecard(showing all money to ctp1)
+* 20180423 - L        - Easy        - Fix Money on Skins when Skins have already been calculated (showing carryovers because nothing is checked)
+* 20180801 - M        - Med         - prize money for CTP is showing in CTP1 only, should be divided into 1,2
+* 20180802 - M        - Medium      - add boolean switch for when datagrid changes so we dont try to save
+* 20180802 - M        - Easy        - change strikeout for skins to be colored yellow
+* 20180726 - H        - Easy        - Player last name issue with names like McDonald, ohelper.fplayer makes it Mcdonald, causing player mismatches
+* 20180724 - H        - Med         - Player no show doesnt put his new handicap on the blank score in the scores.csv file
+* 20180720 - M        - Med         - standings.csv isnt calculating 2nd half points
+* 20180720 - M        - Med         - date logic in standings not correct due to schedule date format mm/dd/yyyy and it needs yyyymmdd for halfway compare
 * 20180613 - H        - Med         - Look at NoRowLeave routine, doesnt appear to do anything
-* 20180612 - H        - Med         - Noshows need to save hdcp and phdcp* 20180527 - M        - Med         - Standings not calculating halves properly first half has one too many weeks
+* 20180612 - H        - Med         - Noshows need to save hdcp and phdcp
+* 20180527 - M        - Med         - Standings not calculating halves properly first half has one too many weeks
 * 20180524 - M        - Med         - rainouts caused schedule to be off in standings
-* 20180525 - H        - Med         - Matches grid not sorted properly
+* 20180525 - H        - Med         - Matches grid not sorted properly 
 * 20180524 - H        - Med         - grade missing on scores
 * 20180523 - H        - Easy        - when scorecard loads, if scores are locked, it pulls in the next date causing the current scores to be wiped out
 * 20180516 - H        - Easy        - when clicking on lock scores, if you dont save first, scores are lost
@@ -48,32 +74,34 @@
 * 20180512 - M        - MH          - list players scores abending
 * 20180508 - M        - MH          - when player has no previous scores, its not doing score card right if hes a sub
 * 20180508 - H        - Easy        - add checkbox to mark all skins and ctp paid
-* 20180504 - H        - E          -  when resorting grid on scorecard, it messes up matches, prevent it
-* 20180504 - H        - E          -  When preloading scorecard, use most recent instead of first
+* 20180504 - H        - E           -  when resorting grid on scorecard, it messes up matches, prevent it
+* 20180504 - H        - E           -  When preloading scorecard, use most recent instead of first
 * 20180430 - HH       - Med         -  Scores only allow the first week to be entered
 * 20180419 - 4.19 versions see below
-* 20180419 - Priority H  - Complexity - Med         - subs not working on scores, adding subs and regulars
+* 20180419 - H        - Med         - subs not working on scores, adding subs and regulars
 * 20180408 - 4.08 versions see below
-* 20180321 - Priority H  - Complexity - Hard        - account for uneven amount of teams(Terry passing), add a byes column in league parm representing teams # that is a bye(1)
+* 20180321 - H        - Hard        - account for uneven amount of teams(Terry passing), add a byes column in league parm representing teams # that is a bye(1)
+* 20180318 - L        - Hard        - Skins.vb- disabled checkdotscolors until 
+* 20180304 - L        - Hard        - Skins.vb- strikeout not working on colors option
 * 20180306 - 3.06 versions see below
-* 20180306 - Priority H  - Complexity -             - Main.vb - Create a "checkbox for emailing stats for testing
+* 20180306 - H        -             - Main.vb - Create a "checkbox for emailing stats for testing
 * 20180228 - 2.28 versions see below
-* 20180226 - Priority H  - Complexity -             - Standings.vb - Create a "Sam" friendly standings sheet for email
-* 20180226 - Priority H  - Complexity -             - Skins.vb - When Clicking 'Show Skins' a crash when no scores are saved
-* 20180226 - Priority H  - Complexity -             - Scorecard.vb - Player search not working right (SD)
-* 20180226 - Priority H  - Complexity -             - Helper.MarkSubpar.vb - Scores < 2 strokes < par, arnet resetting dots to colors, needed to call ohelper.calcskins
-* 20180228 - Priority H  - Complexity -             - Scorecard.vb - Clicking 'Lock scores' on scorecard several times caused checkboxes to dissappear and be replaced by y/n, any time we went to unlock the scores caused the issue
-* 20180226 - Priority MH - Complexity - Med to Hard - Extra money not correct always its a dollar short on our example, needed to add ctp uneven amt in
-* 20180226 - Priority H  - Complexity -             - Standings.vb - Clicking 'Show 2nd half' gives an error "File in use"-cant reproduce 2/28
+* 20180226 - H        -             - Standings.vb - Create a "Sam" friendly standings sheet for email
+* 20180226 - H        -             - Skins.vb - When Clicking 'Show Skins' a crash when no scores are saved
+* 20180226 - H        -             - Scorecard.vb - Player search not working right (SD)
+* 20180226 - H        -             - Helper.MarkSubpar.vb - Scores < 2 strokes < par, arnet resetting dots to colors, needed to call ohelper.calcskins
+* 20180228 - H        -             - Scorecard.vb - Clicking 'Lock scores' on scorecard several times caused checkboxes to dissappear and be replaced by y/n, any time we went to unlock the scores caused the issue
+* 20180226 - MH       - Med to Hard - Extra money not correct always its a dollar short on our example, needed to add ctp uneven amt in
+* 20180226 - H        -             - Standings.vb - Clicking 'Show 2nd half' gives an error "File in use"-cant reproduce 2/28
 * 20180225 - 2.25 versions see below
-* 20180219 - Priority H  - Complexity - Hard        - Scores.vb - BuildScoresDataGridFromFile-Handle individual CTP carry overs for each hole, need extra columns on Scores screen
-* 20180225 - Priority H  - Complexity - Med         - Scorecard.vb-dgScores_CellMouseDoubleClick - Fix Mouse click to expand columns
-* 20180225 - Priority H  - Complexity - Med         - several.vb - Make CTP a value of dollar amount in parm instead of y or n
-* 20180224 - Priority H  - Complexity - Med         - Skins.vb - Make CTPs a checkbox
-* 20180224 - Priority H  - Complexity - Med         - ScoreCard.vb - Columns past checkboxes should always be read only and they arent, ctp1 and 2 are also on scorecard
-* 20180219 - Priority H  - Complexity - Hard        - Handle individual CTP carry overs for each hole, need extra columns on Scorecard and Skins screens, save off code before this change
-* 20180219 - Priority MH - Complexity - Med to Hard - Make sure CTP dont exceed dollar amts
-* 20180219 - Priority M  - Complexity - Easy to Med - Show total $ collected on skins screen
+* 20180219 - H        - Hard        - Scores.vb - BuildScoresDataGridFromFile-Handle individual CTP carry overs for each hole, need extra columns on Scores screen
+* 20180225 - H        - Med         - Scorecard.vb-dgScores_CellMouseDoubleClick - Fix Mouse click to expand columns
+* 20180225 - H        - Med         - several.vb - Make CTP a value of dollar amount in parm instead of y or n
+* 20180224 - H        - Med         - Skins.vb - Make CTPs a checkbox
+* 20180224 - H        - Med         - ScoreCard.vb - Columns past checkboxes should always be read only and they arent, ctp1 and 2 are also on scorecard
+* 20180219 - H        - Hard        - Handle individual CTP carry overs for each hole, need extra columns on Scorecard and Skins screens, save off code before this change
+* 20180219 - MH       - Med to Hard - Make sure CTP dont exceed dollar amts
+* 20180219 - M        - Easy to Med - Show total $ collected on skins screen
 * 20180221 - 2.21 versions see below
 * 20180221 - fixed in 2.21 - Priority L  - Complexity - Easy        - change sort order on skins to show winners first
 * 20180220 - 2.20 versions see below

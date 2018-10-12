@@ -378,14 +378,14 @@ Partial Class Skins
         Me.dgScores.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
         Me.dgScores.Location = New System.Drawing.Point(-5, 166)
         Me.dgScores.Name = "dgScores"
-        Me.dgScores.Size = New System.Drawing.Size(1439, 1018)
+        Me.dgScores.Size = New System.Drawing.Size(1143, 703)
         Me.dgScores.TabIndex = 0
         '
         'Skins
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(1431, 992)
+        Me.ClientSize = New System.Drawing.Size(1135, 677)
         Me.Controls.Add(Me.dgScores)
         Me.Controls.Add(Me.GroupBox4)
         Me.Controls.Add(Me.GroupBox2)

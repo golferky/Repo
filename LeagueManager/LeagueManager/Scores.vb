@@ -2,18 +2,16 @@
 Public Class Scores
     Dim oHelper As New LeagueManager.Helper
     Dim rs As New Resizer
-    Dim sf9Rnds = 0, sb9Rnds = 0, sf9aRnds = 0, sb9aRnds = 0
-    Dim f9gAvg As Decimal = 0.0, b9gAvg As Decimal = 0.0, f9nAvg As Decimal = 0.0, b9nAvg As Decimal = 0.0
-    Dim earned = 0, skins = 0, ctp = 0
-    Dim Points As Decimal = 0.00, tPoints As Decimal = 0.00
-    Dim lHoles As New List(Of Decimal)
-    Dim ltoPar As New List(Of Decimal)
-
+    Dim sColFormat = New List(Of String)
+    Dim dtScoreCard As DataTable
+    Dim sStatsDesc As String() = {"Eagles", "Birdies", "Pars", "Bogeys", "DoubleBogeys", "Others"}
+    Dim sScoreOnlyDesc As String() = {"Rnds", "F9", "B9"}
     Private Sub Scores_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         oHelper = Main.oHelper
         BldScoresDataGridFromFile()
         '    rs.FindAllControls(Me)
     End Sub
+
     Sub BldScoresDataGridFromFile()
         Try
             Me.Cursor = Cursors.WaitCursor
@@ -51,19 +49,22 @@ Public Class Scores
                     Exit For
                 End If
             Next
-
             sArray.Add("Points-40-true-false-ml")
             sArray.Add("Team_Points-40-true-false-ml")
             sArray.Add("Opponent-170-true-false-ml")
             'player column not needed, its in the heading 
-            If oHelper.bScoresbyPlayer Then sArray.Remove("Player(1)-cPat170")
+            If oHelper.bScoresbyPlayer Then
+                'sArray.Remove("Method-cPatMeth") 'cannot remote, used for other fields(avg,rank,topar)
+                sArray.Remove("Player(1)-cPat170")
+                sArray.Remove("Group(3)")
+                sArray.Remove("Team")
+            End If
 
-            Dim sColFormat = New List(Of String)
             Dim sScoreCardforDGV = ""
             'strip parenthesis and add gross/net for In/Out
             'fields can have a pattern associated for cell length, centering,
             For Each parm As String In sArray
-                'set detault pattern
+                'set default pattern
                 Dim sPat = oHelper.cPat40
                 Dim sParm = ""
 
@@ -74,7 +75,9 @@ Public Class Scores
                     sPat = parm.Substring(parm.IndexOf("-") + 1)
                 End If
 
-                If parm.Contains("(") Then sParm = parm.Substring(0, parm.IndexOf("("))
+                If parm.Contains("(") Then
+                    sParm = parm.Substring(0, parm.IndexOf("("))
+                End If
 
                 If sParm = "Holes" Then
                     If sParm = "Holes" Then
@@ -88,16 +91,17 @@ Public Class Scores
                             'and were on hole 10
                             If i = 9 Then
                                 sScoreCardforDGV = sScoreCardforDGV + "Out Gross,Out Net,"
-                                sColFormat.Add("cPatMeth")
-                                sColFormat.Add("cPatMeth")
+                                sColFormat.Add("cPat30")
+                                sColFormat.Add("cPat30")
                             ElseIf i = 18 Then
                                 sScoreCardforDGV = sScoreCardforDGV + "In Gross,In Net,"
-                                sColFormat.Add("cPatMeth")
-                                sColFormat.Add("cPatMeth")
+                                sColFormat.Add("cPat30")
+                                sColFormat.Add("cPat30")
                             End If
                         Next
                         Continue For
                     End If
+
                     Continue For
                 End If
                 sScoreCardforDGV = sScoreCardforDGV + sParm + ","
@@ -108,96 +112,76 @@ Public Class Scores
             'replace spaces with underscores for csv column matchups
             sScoreCardforDGV = sScoreCardforDGV.Substring(0, Len(sScoreCardforDGV) - 1).Replace(" ", "_")
 
-            Dim dtScorecard As DataTable = dvScores.ToTable(True, sScoreCardforDGV.Split(",").ToArray)
+            dtScoreCard = dvScores.ToTable(True, sScoreCardforDGV.Split(",").ToArray)
 
-            Dim newrow As DataRow
-            newrow = dtScorecard.NewRow
-            newrow("Method") = "*** Avg ***"
-            newrow("Date") = ""
-            dtScorecard.Rows.Add(newrow)
+            oHelper.CreateColumnsWithFormat("Rnds", dtScoreCard, sColFormat)
+            oHelper.CreateColumnsWithFormat("F9", dtScoreCard, sColFormat)
+            oHelper.CreateColumnsWithFormat("B9", dtScoreCard, sColFormat)
 
-            newrow = dtScorecard.NewRow
-            newrow("Method") = "*** ToPar ***"
-            newrow("Date") = ""
-            dtScorecard.Rows.Add(newrow)
-
-            newrow = dtScorecard.NewRow
-            newrow("Method") = "*** Rank ***"
-            newrow("Date") = ""
-            dtScorecard.Rows.Add(newrow)
-
-            newrow = dtScorecard.NewRow
-            newrow("Method") = "*** Eagles ***"
-            newrow("Date") = ""
-            dtScorecard.Rows.Add(newrow)
-
-            newrow = dtScorecard.NewRow
-            newrow("Method") = "*** Birdies ***"
-            newrow("Date") = ""
-            dtScorecard.Rows.Add(newrow)
-
-            newrow = dtScorecard.NewRow
-            newrow("Method") = "*** Pars ***"
-            newrow("Date") = ""
-            dtScorecard.Rows.Add(newrow)
-
-            newrow = dtScorecard.NewRow
-            newrow("Method") = "*** Bogies ***"
-            newrow("Date") = ""
-            dtScorecard.Rows.Add(newrow)
-
-            newrow = dtScorecard.NewRow
-            newrow("Method") = "*** Dbls ***"
-            newrow("Date") = ""
-            dtScorecard.Rows.Add(newrow)
-
-            newrow = dtScorecard.NewRow
-            newrow("Method") = "*** Others ***"
-            newrow("Date") = ""
-            dtScorecard.Rows.Add(newrow)
-
-            'adjust hole by hole for handicap and back nine scores show on 1-9
-
-            For Each score As DataRow In dtScorecard.Rows
-                Dim sMethod = oHelper.convDBNulltoSpaces(score("Method")).Trim
-                'skip hole adjustments for "Score" method
-                'if outgross is null, this is a back 9 score
-                If sMethod = "Score" Then Continue For
-                'Dim iadjscoreptr = oHelper.iHoleMarker - 1
-                For i = 1 To 18
-                    Dim iscore = score("Hole" & i)
-                    'if the handicap > stroke index adjust net score to gross
-                    If sMethod = "Net" Then
-                        Dim isi = oHelper.CalcStrokeIndex("Hole" & i)
-                        If oHelper.iHdcp >= isi Then
-                            'check stroke index
-                            iscore += 1
-                            If oHelper.iHdcp - oHelper.iHoles >= isi Then iscore += 1
-                        End If
-                    End If
-                    'replace the score with adjustment and hole pointer
-                    score("Hole" & i) = iscore
-                Next
-
+            ''add col for each stat
+            For Each fld As String In oHelper.cStatsFields.Split(",")
+                oHelper.CreateColumnsWithFormat(fld, dtScoreCard, sColFormat)
             Next
 
-            'dtScorecard.Columns("Out_Gross").ColumnName = "Gross"
-            'dtScorecard.Columns("Out_Net").ColumnName = "Net"
+            'add col for each Score only field
+            For Each fld As String In sScoreOnlyDesc
+                oHelper.CreateColumnsWithFormat("SO_" & fld, dtScoreCard, sColFormat)
+            Next
+
+            Dim newrow As DataRow = Nothing
+            'create avg ytd and scores only (so) avg ytd
+            For Each sDate As String In Main.cbLeagues.Items
+                createTotalRow(dtScoreCard, newrow, String.Format("{0} Avg", sDate.Substring(sDate.IndexOf("(") + 1, 4)))
+                createTotalRow(dtScoreCard, newrow, String.Format("{0} ToPar", sDate.Substring(sDate.IndexOf("(") + 1, 4)))
+                createTotalRow(dtScoreCard, newrow, String.Format("{0} Rank", sDate.Substring(sDate.IndexOf("(") + 1, 4)))
+            Next
+
+            createTotalRow(dtScoreCard, newrow, "Avg")
+            createTotalRow(dtScoreCard, newrow, "ToPar")
+            createTotalRow(dtScoreCard, newrow, "Rank")
+
+            'Turn all Net scores into Gross Scores and accum stats
+            For Each score As DataRow In dtScoreCard.Rows
+                'if non numeric date(method), were done
+                If Not IsNumeric(score("Date")) Then Exit For
+                'if this scores method = score only(no hole by hole) then add so
+                AccumScores(score, String.Format("Method = {0} And Date = 'Avg'", "'" & score("Date").ToString.Substring(0, 4) & "'"))
+                'career stats
+                AccumScores(score, String.Format("Method = 'Career' And Date = 'Avg'"))
+            Next
+
+            Dim foundRows() As DataRow = Nothing
+            'calculate total rounds, front 9 and back 9, average scores per holes
+            foundRows = dtScoreCard.Select(String.Format("Date Like {0}", "'%Avg%'"))
+            If foundRows Is Nothing Then
+                MsgBox("Error calculating Career Avg...contact programmer")
+                Exit Sub
+            End If
+
+            Dim drRounds() As DataRow = Nothing
+            'process each year
+            For Each row In foundRows
+                drRounds = dtScoreCard.Select(String.Format("Method = '{0}' and Date = '{1}'", row("Method"), row("Date").ToString.Replace("Avg", "ToPar"))) '"*** Y-2017 Avg ***"
+                calcToPar(row, drRounds)
+                Dim drRank() As DataRow = dtScoreCard.Select(String.Format("Method = '{0}' and Date = '{1}'", row("Method"), row("Date").ToString.Replace("Avg", "Rank"))) '"*** Y-2017 Avg ***"
+                calcRank(drRounds(0), drRank(0))
+            Next
+
             dgScores.Columns.Clear()
             dgScores.RowTemplate.Height = 40
             dgScores.DefaultCellStyle.Font = New Font("Tahoma", 15)
 
             Dim arr As Array = sScoreCardforDGV.Split(",").ToArray
-            For Each col As DataColumn In dtScorecard.Columns
-                Dim dgc As New DataGridViewTextBoxColumn
-                dgc.Name = col.ColumnName
-                dgc.ValueType = GetType(System.String)
-                dgScores.Columns.Add(dgc)
+            For Each col As DataColumn In dtScoreCard.Columns
+                If Not col.ColumnName.StartsWith("SO_") Then
+                    Dim dgc As New DataGridViewTextBoxColumn
+                    With dgc
+                        .Name = col.ColumnName
+                        .ValueType = GetType(System.String)
+                    End With
+                    dgScores.Columns.Add(dgc)
+                End If
             Next
-
-            'With dgScores
-            '    .DataSource = dtScorecard
-            'End With
 
             Dim sdel = "-"
             For Each col As DataGridViewColumn In dgScores.Columns
@@ -215,6 +199,8 @@ Public Class Scores
                                 sformat = oHelper.cPat120
                             Case "cPat170"
                                 sformat = oHelper.cPat170
+                            Case "cPatHole"
+                                sformat = oHelper.cPat20
                             Case Else
                                 sformat = oHelper.cPat40
                         End Select
@@ -225,6 +211,13 @@ Public Class Scores
                 Catch ex As Exception
                     Dim x = ""
                 End Try
+                '20181009 - these are new fields added for accumulation only
+                If sformat.Split(sdel)(0) = "" Then
+                    col.Width = 40
+                    col.DataGridView.ReadOnly = True
+                    col.DataGridView.TabStop = True
+                    Continue For
+                End If
                 Dim scolname = col.Name
                 Dim sWidth = sformat.Split(sdel)(0)
                 Dim sRO = sformat.Split(sdel)(1)
@@ -233,6 +226,7 @@ Public Class Scores
                 col.Width = sWidth
                 col.DataGridView.ReadOnly = sRO
                 col.DataGridView.TabStop = sTabstop
+                col.SortMode = DataGridViewColumnSortMode.NotSortable
                 Select Case sAlign
                     Case "mr"
                         col.HeaderCell.Style.Alignment = DataGridViewContentAlignment.MiddleRight
@@ -246,508 +240,364 @@ Public Class Scores
                 If col.Name.Contains("Hole") Then col.HeaderText = col.HeaderText.Replace("Hole", "")
             Next
 
-            For Each row As DataRow In dtScorecard.Rows
+            For Each row As DataRow In dtScoreCard.Rows
                 dgScores.Rows.Add(row.ItemArray)
             Next
 
-            For i = 0 To 18 Step 1
-                lHoles.Add(0.00)
-            Next
-            'topar eagles, birdies, pars, bogies, doubles, others
-            For i = 0 To 5 Step 1
-                ltoPar.Add(0)
-            Next
-
-            sf9Rnds = 0
-            sb9Rnds = 0
-            sf9aRnds = 0
-            sb9aRnds = 0
-            f9gAvg = 0.0
-            b9gAvg = 0.0
-            f9nAvg = 0.0
-            b9nAvg = 0.0
-            For Each row As DataGridViewRow In dgScores.Rows
-                row.Height = 30
-                If row.Cells("Method").Value.ToString.Contains("*** Avg ***") Then
-                    updateAvg(row)
-                    Continue For
-                ElseIf row.Cells("Method").Value.ToString.Contains("*** ToPar ***") Then
-                    updateToPar(row)
-                    Continue For
-                ElseIf row.Cells("Method").Value.ToString.Contains("*** Rank ***") Then
-                    updateRank(row)
-                    Continue For
-                ElseIf row.Cells("Method").Value.ToString.Contains("*** Eagles ***") Then
-                    row.Cells("Method").Value = row.Cells("Method").Value.replace("*", "").replace(" ", "")
-                    row.Cells("Date").Value = ltoPar(0)
-                    Continue For
-                ElseIf row.Cells("Method").Value.ToString.Contains("*** Birdies ***") Then
-                    row.Cells("Method").Value = row.Cells("Method").Value.replace("*", "").replace(" ", "")
-                    row.Cells("Date").Value = ltoPar(1)
-                    Continue For
-                ElseIf row.Cells("Method").Value.ToString.Contains("*** Pars ***") Then
-                    row.Cells("Method").Value = row.Cells("Method").Value.replace("*", "").replace(" ", "")
-                    row.Cells("Date").Value = ltoPar(2)
-                    Continue For
-                ElseIf row.Cells("Method").Value.ToString.Contains("*** Bogies ***") Then
-                    row.Cells("Method").Value = row.Cells("Method").Value.replace("*", "").replace(" ", "")
-                    row.Cells("Date").Value = ltoPar(3)
-                    Continue For
-                ElseIf row.Cells("Method").Value.ToString.Contains("*** Dbls ***") Then
-                    row.Cells("Method").Value = row.Cells("Method").Value.replace("*", "").replace(" ", "")
-                    row.Cells("Date").Value = ltoPar(4)
-                    Continue For
-                ElseIf row.Cells("Method").Value.ToString.Contains("*** Others ***") Then
-                    row.Cells("Method").Value = row.Cells("Method").Value.replace("*", "").replace(" ", "")
-                    row.Cells("Date").Value = ltoPar(5)
-                    Exit For
-                ElseIf row.Cells("Method").Value.ToString = "" Then
-                    Continue For
-                End If
-                row.HeaderCell.Style.Alignment = DataGridViewContentAlignment.MiddleCenter
-                oHelper.CalcHoleMarker(row.Cells("Date").Value)
-                oHelper.SBPChangeColorsForStrokes(row)
-                If oHelper.iHoleMarker = 10 Then
-                    sb9aRnds += 1
-                    row.Cells("Date").Style.BackColor = Color.LightBlue
-                    If row.Cells("Method").Value <> "Score" Then
-                        sb9Rnds += 1
-                    Else
-                        row.Cells("In_Net").Value = row.Cells("In_Gross").Value - row.Cells("Phdcp").Value
-                    End If
-                Else
-                    sf9aRnds += 1
-                    If row.Cells("Method").Value <> "Score" Then
-                        sf9Rnds += 1
-                    Else
-                        row.Cells("Out_Net").Value = row.Cells("Out_Gross").Value - row.Cells("Phdcp").Value
-                    End If
-                End If
-                For Each cell As DataGridViewCell In row.Cells
-                    If cell.OwningColumn.Name.StartsWith("Hole") Then
-                        Dim iHole As String = cell.Value.ToString.Replace(ChrW(&H25CF), "")
-                        Dim iholeindex As Integer = cell.OwningColumn.Name.Replace("Hole", "")
-                        If IsNumeric(iHole) Then
-                            lHoles(iholeindex) = lHoles(iholeindex) + iHole
-                            calctoPar(iHole, cell.OwningColumn.Name)
+            Try
+                Dim sFont = "Tahoma"
+                Dim iFontSize = 8
+                oHelper.bColors = True
+                For Each row As DataGridViewRow In dgScores.Rows
+                    row.Height = 25
+                    'If row.Cells("Method").Value Is Nothing Then Continue For
+                    Dim sStat As String = row.Cells("Date").Value
+                    row.HeaderCell.Style.Alignment = DataGridViewContentAlignment.MiddleCenter
+                    'numeric date indicates a score card
+                    If Not IsNumeric(sStat) Then
+                        If sStat <> "Rank" Then
+                            row.Cells("Method").Style.BackColor = Color.LightGray
+                            ChangeFont(row)
+                            ColorCells(row)
+                            Continue For
+                        Else
+                            row.Cells("Method").Style.BackColor = Color.LightGray
+                            ChangeFont(row)
+                            Continue For
                         End If
-                    ElseIf cell.Value Is DBNull.Value Or Not IsNumeric(cell.Value) Then
-                        Continue For
-                    ElseIf cell.OwningColumn.Name = "Out_Gross" Then
-                        f9gAvg += cell.Value
-                    ElseIf cell.OwningColumn.Name = "Out_Net" Then
-                        f9nAvg += cell.Value
-                    ElseIf cell.OwningColumn.Name = "In_Gross" Then
-                        b9gAvg += cell.Value
-                    ElseIf cell.OwningColumn.Name = "In_Net" Then
-                        b9nAvg += cell.Value
-                    ElseIf cell.OwningColumn.Name = "$Skins" Then
-                        skins += cell.Value
-                    ElseIf cell.OwningColumn.Name = "$Closest" Then
-                        ctp += cell.Value
-                    ElseIf cell.OwningColumn.Name = "$Earn" Then
-                        earned += cell.Value
-                    ElseIf cell.OwningColumn.Name = "Points" Then
-                        Points += cell.Value
-                    ElseIf cell.OwningColumn.Name = "Team_Points" Then
-                        tPoints += cell.Value
                     End If
+                    '20181004 - override calcholemarker because of cc and league in same sch
+                    oHelper.CalcHoleMarker(row.Cells("Date").Value)
+                    If row.Cells("Method").Value = "Gross" Or row.Cells("Method").Value = "Net" Then
+                        If row.Cells("Hole1").Value IsNot DBNull.Value Then
+                            oHelper.iHoleMarker = 1
+                        Else
+                            oHelper.iHoleMarker = 10
+                        End If
+                    End If
+                    If oHelper.iHoleMarker = 10 Then
+                        For i = 0 To 3
+                            row.Cells(i).Style.BackColor = Color.LightBlue
+                        Next
+                    End If
+                    oHelper.SBPChangeColorsForStrokes(row)
+
                 Next
-            Next
+                oHelper.bColors = False
+            Catch ex As Exception
+                Dim x = ""
+            End Try
 
         Catch ex As Exception
-            MsgBox("Error " & ex.Message & vbCrLf & ex.StackTrace)
+            MsgBox(oHelper.GetExceptionInfo(ex))
         End Try
         Me.Cursor = Cursors.Default
         Application.DoEvents()
     End Sub
-    Sub calctoPar(ihole As String, holeNum As String)
-        Dim bother = True
-        For i = -2 To 3 Step 1
-            If ihole = oHelper.MyCourse(0)(holeNum).ToString + i Then
-                ltoPar(i + 2) += 1
-                bother = False
-                Exit For
-            End If
+    Sub ChangeFont(row As DataGridViewRow)
+        Dim cell As DataGridViewCell = Nothing
+        Dim sFont = "Tahoma"
+        Dim iFontSize = 8
+
+        For Each dgc As DataGridViewCell In row.Cells
+            If dgc.OwningColumn.Name.Contains("Method") Or dgc.OwningColumn.Name.Contains("Date") Then Continue For
+            With dgc
+                .Style.Font = New Font(sFont, iFontSize, FontStyle.Regular)
+                .Style.ForeColor = Color.Black
+                .Style.BackColor = Color.White
+            End With
         Next
-        If bother Then ltoPar(5) += 1
+
     End Sub
-    Sub updateAvg(totrow As DataGridViewRow)
+    Sub ColorCells(row As DataGridViewRow)
         Try
-            totrow.DefaultCellStyle.BackColor = Color.LightCyan
-            totrow.Cells("Method").Value = "Avg"
-            totrow.Cells("Date").Value = "Rnds = " & sf9aRnds + sb9aRnds
-            Dim d2dec As Decimal = 0.0
-            If sf9aRnds > 0 Then
-                d2dec = (f9gAvg / sf9aRnds)
-                totrow.Cells("Out_Gross").Value = d2dec.ToString("##.0")
-                d2dec = (f9nAvg / sf9aRnds) '.ToString("##.0")
-                totrow.Cells("Out_Net").Value = d2dec.ToString("##.0")
-            End If
-
-            If sb9aRnds > 0 Then
-                d2dec = (b9gAvg / sb9aRnds) '.ToString("##.0")
-                totrow.Cells("In_Gross").Value = d2dec.ToString("##.0")
-                d2dec = (b9nAvg / sb9aRnds) '.ToString("##.0")
-                totrow.Cells("In_Net").Value = d2dec.ToString("##.0")
-            End If
-
-            totrow.Cells("$Earn").Value = earned
-            totrow.Cells("$Skins").Value = skins
-            totrow.Cells("$Closest").Value = ctp
-
-            totrow.Cells("Points").Value = Points '.ToString("##.0")
-            totrow.Cells("Team_Points").Value = tPoints '.ToString("##.0")
-
-            Debug.Print("f9 " & sf9Rnds)
-            Debug.Print("b9 " & sb9Rnds)
-
-            'dgScores.Rows(dgScores.Rows.Count - 1).Cells("Group").Value = dgScores.Rows.Count - 1
-
-            For i = 1 To 9 Step 1
-                Debug.Print("Total " & lHoles(i))
-                If lHoles(i) > 0 And sf9aRnds > 0 Then
-                    d2dec = lHoles(i) / sf9Rnds
-                    totrow.Cells("Hole" & i).Value = d2dec.ToString("##.0")
-                End If
-            Next
-
-            For i = 10 To 18 Step 1
-                Debug.Print("Total " & lHoles(i))
-                If lHoles(i) > 0 And sb9aRnds > 0 Then
-                    d2dec = lHoles(i) / sb9Rnds
-                    totrow.Cells("Hole" & i).Value = d2dec.ToString("##.0")
-                End If
-            Next
-
-
-            'oHelper.SBPChangeColorsForStrokes(totrow)
-            Dim sbdots = oHelper.bDots
-            oHelper.bDots = False
-            For Each cell As DataGridViewCell In totrow.Cells
-                Dim sColName = cell.OwningColumn.Name
-                If sColName.Contains("Hole") Then
-                    If oHelper.convDBNulltoSpaces(cell.Value).Trim <> "" Then
-                        If cell.Value.ToString < oHelper.MyCourse(0)(sColName).ToString Then
-                            cell.Style.BackColor = Color.OrangeRed
-                        Else
-                            cell.Style.BackColor = Color.White
-                        End If
-                    End If
-                End If
-
-            Next
-
-            oHelper.bDots = sbdots
-
-        Catch ex As Exception
-            MsgBox("Error " & ex.Message & vbCrLf & ex.StackTrace)
-        End Try
-    End Sub
-    Sub updateToPar(totrow As DataGridViewRow)
-
-        Try
-            totrow.DefaultCellStyle.BackColor = Color.LightCyan
-            totrow.Cells("Method").Value = "ToPar"
-
-            For Each cell As DataGridViewCell In totrow.Cells
-
-                Dim col = cell.OwningColumn.Name
-                Dim dec As Decimal = 0.0
-
-                If col.Contains("Hole") Then
-                    Dim i = col.Replace("Hole", "")
-                    If i < 10 Then
-                        If lHoles(i) > 0 And sf9Rnds > 0 Then
-                            Debug.Print("Topar " & col & "-" & lHoles(i) & "-" & sf9Rnds & "-" & oHelper.MyCourse(0)(col).ToString)
-                            dec = (lHoles(i) - (sf9Rnds * oHelper.MyCourse(0)(col).ToString)) / sf9Rnds
-                            cell.Value = dec.ToString("0.0")
+            For i = 1 To 18
+                Dim cell As DataGridViewCell = row.Cells("Hole" & i)
+                If IsNumeric(row.Cells("Hole" & i).Value) Then
+                    If row.Cells("Hole" & i).Value > 0 Then
+                        Dim iPar As Integer = oHelper.MyCourse(0)("Hole" & i).ToString
+                        Dim iScore As String = row.Cells("Hole" & i).Value
+                        If Not row.Cells("Date").Value.ToString.Contains("ToPar") Then
+                            If cell.Value < iPar Then cell.Style.BackColor = Color.Red
                         End If
                     Else
-                        If lHoles(i) > 0 And sb9Rnds > 0 Then
-                            Debug.Print("Topar " & col & "-" & lHoles(i) & "-" & sb9Rnds & "-" & oHelper.MyCourse(0)(col).ToString)
-                            dec = (lHoles(i) - (sb9Rnds * oHelper.MyCourse(0)(col).ToString)) / sb9Rnds
-                            cell.Value = dec.ToString("0.0")
+                        If row.Cells("Date").Value.ToString.Contains("ToPar") Then
+                            If row.Cells("Hole" & i).Value < 0 Then
+                                cell.Value = cell.Value * -1
+                                cell.Style.BackColor = Color.Red
+                            End If
+                        Else
+                            row.Cells("Hole" & i).Value = ""
                         End If
+
                     End If
                 End If
             Next
+            If IsNumeric(row.Cells("Out_Gross").Value) Then
+                If row.Cells("Out_Gross").Value < oHelper.MyCourse(0)("Out").ToString Then row.Cells("Out_Gross").Style.BackColor = Color.Red
+            End If
+            If IsNumeric(row.Cells("Out_Net").Value) Then
+                If row.Cells("Out_Net").Value < oHelper.MyCourse(0)("Out").ToString Then row.Cells("Out_Net").Style.BackColor = Color.Red
+            End If
+
+            If IsNumeric(row.Cells("In_Gross").Value) Then
+                If row.Cells("In_Gross").Value < oHelper.MyCourse(0)("In").ToString Then row.Cells("In_Gross").Style.BackColor = Color.Red
+            End If
+
+            If IsNumeric(row.Cells("In_Net").Value) Then
+                If row.Cells("In_Net").Value < oHelper.MyCourse(0)("In").ToString Then row.Cells("In_Net").Style.BackColor = Color.Red
+            End If
+
         Catch ex As Exception
-            MsgBox("Error " & ex.Message & vbCrLf & ex.StackTrace)
+            MsgBox(oHelper.GetExceptionInfo(ex))
         End Try
-
     End Sub
+    Sub calcRank(toPar As DataRow, drRank As DataRow)
 
-    Sub updateRank(totrow As DataGridViewRow)
-
+        Dim sRank As New List(Of rank)
+        Dim ii = 0
         Try
-            totrow.DefaultCellStyle.BackColor = Color.LightCyan
-            totrow.Cells("Method").Value = "Rank"
-            Dim sRank As New List(Of rank)
-
-            Dim srow As DataGridViewRow
-            For Each row In dgScores.Rows
-                If row.Cells("Method").Value.ToString = "" Then Continue For
-                If row.cells("Method").value = "ToPar" Then
-                    srow = row
-                    Exit For
-                End If
-            Next
-            Dim ii = 0
-            For Each cell In srow.Cells
-                If cell.owningcolumn.name.contains("Hole") And oHelper.convDBNulltoSpaces(cell.value) <> " " Then
-                    sRank.Add(New rank(ii, cell.value))
+            'For Each cell In row.Cells
+            For i = 1 To 18
+                Dim sscore = toPar("Hole" & i)
+                If sscore IsNot DBNull.Value Then
+                    sRank.Add(New rank(ii, sscore))
                     ii += 1
                 End If
             Next
+
             '         y, then x is descending, x then y is ascending
             sRank.Sort(Function(x, y) y.toPar.CompareTo(x.toPar))
 
             For i = 0 To 17 Step 1
                 If i > sRank.Count - 1 Then Exit For
-                totrow.Cells("Hole" & sRank(i).Hole + 1).Value = i + 1
+                drRank("Hole" & sRank(i).Hole + 1) = i + 1
             Next
+
         Catch ex As Exception
-            MsgBox("Error " & ex.Message & vbCrLf & ex.StackTrace)
+            MsgBox(oHelper.GetExceptionInfo(ex))
         End Try
 
     End Sub
-    'Sub oldBldScoresDataGridFromFile()
-    '    Try
-    '        Me.Cursor = Cursors.WaitCursor
-    '        Application.DoEvents()
-    '        oHelper.LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
-    '        '10/1/2017 add code to pull in all scores for a given player
-    '        'check frmScoreCard for event
-    '        '1 - if show scores button pushed, get scores for a given date and check list all scores checklist
-    '        '2 - if double click on a playerevent, get scores for a given player
+    Sub calcToPar(row As DataRow, drToPar() As DataRow)
+        Dim d2dec As Decimal = 0.0
 
-    '        'scores by player only keeps 9 holes for some leagues
-    '        Dim dvScores As New DataView(oHelper.dsLeague.Tables("dtScores"))
-    '        dvScores.RowFilter = "Player = '" & oHelper.sPlayer & "'"
-    '        dvScores.RowFilter = dvScores.RowFilter
-    '        Me.Text = "Scores for Player-" & oHelper.sPlayer
-    '        oHelper.iHoles = oHelper.dsLeague.Tables("dtLeagueParms").Rows(0).Item("Holes")
-    '        oHelper.iHoleMarker = 1
-    '        dvScores.Sort = "Date"
+        Try
+            If IsNumeric(row("Out_Gross")) Then
+                If row("Out_Gross") > 0 Then
+                    d2dec = CInt(row("Out_Gross")) / CInt(row("F9") + CInt(row("SO_F9")))
+                    row("Out_Gross") = d2dec.ToString("##.0")
+                End If
+            End If
+            If IsNumeric(row("Out_Net")) Then
+                If row("Out_Net") > 0 Then
+                    d2dec = CInt(row("Out_Net")) / CInt(row("F9") + CInt(row("SO_F9")))
+                    row("Out_Net") = d2dec.ToString("##.0")
+                End If
+            End If
+            If IsNumeric(row("In_Gross")) Then
+                If row("In_Gross") > 0 Then
+                    d2dec = CInt(row("In_Gross")) / CInt(row("B9") + CInt(row("SO_B9")))
+                    row("In_Gross") = d2dec.ToString("##.0")
+                End If
+            End If
+            If IsNumeric(row("In_Net")) Then
+                If row("In_Net") > 0 Then
+                    d2dec = CInt(row("In_Net")) / CInt(row("B9") + CInt(row("SO_B9")))
+                    row("In_Net") = d2dec.ToString("##.0")
+                End If
+            End If
 
-    '        'create array from above defined fields we want out of scorecard
-    '        Dim sArray = New List(Of String)
-    '        sArray.AddRange(oHelper.cBaseScoreCard.Replace("Holes", "Date(2)-cPat120,Holes").Split(","))
-    '        sArray.AddRange(oHelper.cSkinsFields.Split(","))
-    '        '20180222-expand #closests to track each individual hle for carry overs
-    '        Dim ictpctr = 1
-    '        For Each fld In sArray
-    '            If fld.Contains("#Closests") Then
-    '                For i = oHelper.iHoleMarker To (oHelper.iHoleMarker - 1) + 9
-    '                    If oHelper.MyCourse(0)("Hole" & i) = 3 Then
-    '                        sArray.Add("CTP " & ictpctr & "-cPat40nt")
-    '                        ictpctr += 1
-    '                    End If
-    '                Next
-    '                sArray.Remove(fld)
-    '                Exit For
-    '            End If
-    '        Next
+            For i = 1 To 18
+                calcHolebyHole(row, i, drToPar(0))
+            Next
+        Catch ex As Exception
+            MsgBox(oHelper.GetExceptionInfo(ex))
+        End Try
 
-    '        sArray.Add("Points-40-true-false-ml")
-    '        sArray.Add("Team_Points-40-true-false-ml")
-    '        sArray.Add("Opponent-170-true-false-ml")
-    '        'player column not needed, its in the heading 
-    '        If oHelper.bScoresbyPlayer Then sArray.Remove("Player(1)-cPat170")
+    End Sub
+    Sub calcHolebyHole(row As DataRow, i As Integer, drToPar As DataRow)
+        Dim d2dec As Decimal = 0.0
+        Try
+            If Not row("Hole" & i) > 0 Then Exit Sub
+            d2dec = CInt(row("Hole" & i)) / CInt(row(IIf(i < 10, "F9", "B9")))
+            row("Hole" & i) = d2dec.ToString("#.0")
+            d2dec -= oHelper.MyCourse(0)("Hole" & i).ToString
+            'this updates the ytd topar
+            drToPar("Hole" & i) = d2dec.ToString("#.0")
+        Catch ex As Exception
+            MsgBox(oHelper.GetExceptionInfo(ex))
+        End Try
 
-    '        Dim sColFormat = New List(Of String)
-    '        Dim sScoreCardforDGV = ""
-    '        'strip parenthesis and add gross/net for In/Out
-    '        'fields can have a pattern associated for cell length, centering,
-    '        For Each parm As String In sArray
-    '            'set detault pattern
-    '            Dim sPat = oHelper.cPat40
-    '            Dim sParm = ""
+    End Sub
+    Function AccumScores(score As DataRow, sselect As String)
+        Dim sMethod = oHelper.convDBNulltoSpaces(score("Method")).Trim
+        Dim foundRows() As DataRow = dtScoreCard.Select(sselect)
 
-    '            If UBound(parm.Split("-")) = 0 Then
-    '                sParm = parm
-    '            Else
-    '                sParm = parm.Split("-")(0)
-    '                sPat = parm.Substring(parm.IndexOf("-") + 1)
-    '            End If
+        Try
+            If foundRows.Count > 1 Then
+                MsgBox(String.Format("Contact Developer, error in {0}{1}", vbCrLf, sselect))
+                Exit Function
+            End If
+            For Each row In foundRows
+                Dim scolprefix As String = ""
+                If sMethod = "Score" Then scolprefix = "SO_"
 
-    '            If parm.Contains("(") Then sParm = parm.Substring(0, parm.IndexOf("("))
+                'row("Rnds") += 1
+                row(scolprefix & "Rnds") += 1
+                If IsNumeric(score("Out_Gross")) Then
+                    row(scolprefix & "F9") += 1
+                    row("Out_Gross") = CInt(row("Out_Gross")) + score("Out_Gross")
+                End If
+                If IsNumeric(score("Out_Net")) Then
+                    row(scolprefix & "Out_Net") = CInt(row(scolprefix & "Out_Net")) + score("Out_Net")
+                ElseIf IsNumeric(score("Out_Gross")) Then
+                    row("Out_Net") = row("Out_Net") + CInt(score("Out_Gross")) - score("Phdcp")
+                End If
 
-    '            If sParm = "Holes" Then
-    '                sScoreCardforDGV = sScoreCardforDGV + oHelper.CreateHolesFromParm(sColFormat)
-    '                Continue For
-    '            End If
-    '            sScoreCardforDGV = sScoreCardforDGV + sParm + ","
-    '            sColFormat.Add(sPat)
-    '        Next
-    '        'remove trailing comma
+                If IsNumeric(score("In_Gross")) Then
+                    row(scolprefix & "B9") += 1
+                    row("In_Gross") = CInt(row("In_Gross")) + score("In_Gross")
+                End If
+                If IsNumeric(score("In_Net")) Then
+                    row("In_Net") = CInt(row("In_Net")) + score("In_Net")
+                ElseIf IsNumeric(score("In_Gross")) Then
+                    row("In_Net") = CInt(row("In_Net")) + CInt(score("In_Gross")) - score("Phdcp")
+                End If
+                ' calculate skins ctp, etc
+                Try
+                    Dim sStats As String() = {"$Earn", "$Skins", "$Closest", "#Skins", "CTP_1", "CTP_2", "Points", "Team_Points"}
+                    For Each stat In sStats
+                        If IsNumeric(score(stat)) Then
+                            row(stat) = CDec(row(stat)) + score(stat)
+                        End If
+                    Next
 
-    '        'replace spaces with underscores for csv column matchups
-    '        sScoreCardforDGV = sScoreCardforDGV.Substring(0, Len(sScoreCardforDGV) - 1).Replace(" ", "_")
+                Catch ex As Exception
+                    Dim x = ""
+                End Try
 
-    '        Dim dtScorecard As DataTable = dvScores.ToTable(True, sScoreCardforDGV.Split(",").ToArray)
-    '        'dtScorecard.PrimaryKey = New DataColumn() {dtScorecard.Columns("Date")}
-    '        Dim dv2scores As New DataView(dtScorecard)
-    '        For Each row As DataRowView In dv2scores
-    '            oHelper.CalcHoleMarker(row("Date"))
-    '            If oHelper.iHoleMarker = 10 Then
-    '                Dim sKeys() As Object = {oHelper.sPlayer, row("Date")}
-    '                Dim iscore As DataRow = oHelper.dsLeague.Tables("dtScores").Rows.Find(sKeys)
-    '                row("Out_Gross") = iscore("In_Gross")
-    '                row("Out_Net") = iscore("In_Net")
-    '                For i = 1 To 9
-    '                    row("Hole" & i) = iscore("Hole" & i - 1 + oHelper.iHoleMarker)
-    '                Next
-    '            End If
-    '        Next
-    '        'adjust hole by hole for handicap and back nine scores show on 1-9
-    '        For Each score As DataRowView In dv2scores
-    '            Dim sMethod = oHelper.convDBNulltoSpaces(score("Method")).Trim
-    '            'skip hole adjustments for "Score" method
-    '            'if outgross is null, this is a back 9 score
-    '            If sMethod = "Score" Then Continue For
-    '            'Dim iadjscoreptr = oHelper.iHoleMarker - 1
-    '            For i = 1 To 9
-    '                Dim iscore = score("Hole" & i)
-    '                'if the handicap > stroke index adjust net score to gross
-    '                If sMethod = "Net" Then
-    '                    Dim isi = oHelper.CalcStrokeIndex("Hole" & i)
-    '                    If oHelper.iHdcp >= isi Then
-    '                        'check stroke index
-    '                        iscore += 1
-    '                        If oHelper.iHdcp - oHelper.iHoles >= isi Then iscore += 1
-    '                    End If
-    '                End If
-    '                'replace teh score with adjustment and hole pointer
-    '                score("Hole" & i) = iscore
-    '            Next
+                For i = 1 To 18
+                    Dim iscore = score("Hole" & i)
+                    If iscore Is DBNull.Value Then Continue For
+                    'if the handicap > stroke index adjust net score to gross
+                    If score("Method") = "Net" Then
+                        Dim isi = oHelper.CalcStrokeIndex("Hole" & i)
+                        If oHelper.iHdcp >= isi Then
+                            'check stroke index
+                            iscore += 1
+                            If oHelper.iHdcp - oHelper.iHoles >= isi Then iscore += 1
+                        End If
+                    End If
+                    row("Hole" & i) = CInt(row("Hole" & i)) + iscore
 
-    '        Next
+                    'add to stats rows
+                    Dim istart = oHelper.MyCourse(0)("Hole" & i).ToString - 2 'start with `
+                    Try
+                        For x = 0 To sStatsDesc.Length - 1
+                            If iscore = istart Then
+                                row(sStatsDesc(x)) += 1
+                                Exit For
+                            End If
+                            istart += 1
+                        Next
+                    Catch ex As Exception
+                        Dim x = ""
+                    End Try
 
-    '        dtScorecard.Columns("Out_Gross").ColumnName = "Gross"
-    '        dtScorecard.Columns("Out_Net").ColumnName = "Net"
-    '        dgScores.Columns.Clear()
-    '        dgScores.RowTemplate.Height = 40
-    '        dgScores.DefaultCellStyle.Font = New Font("Tahoma", 15)
+                Next
+            Next
+        Catch ex As Exception
+            MsgBox(oHelper.GetExceptionInfo(ex))
+        End Try
+    End Function
 
-    '        Dim arr As Array = sScoreCardforDGV.Split(",").ToArray
-    '        For Each col As DataColumn In dtScorecard.Columns
-    '            Dim dgc As New DataGridViewTextBoxColumn
-    '            dgc.Name = col.ColumnName
-    '            dgc.ValueType = GetType(System.String)
-    '            dgScores.Columns.Add(dgc)
-    '        Next
+    Function createTotalRow(dtscorecard As DataTable, newrow As DataRow, fld As String)
+        Try
+            newrow = dtscorecard.NewRow
+            If UBound(fld.Split(" ")) > 0 Then
+                If IsNumeric(fld.Substring(0, 4)) Then
+                    newrow("Method") = fld.Substring(0, 4)
+                    newrow("Date") = String.Format("{0}", fld.Substring(5))
+                End If
+            Else
+                newrow("Method") = "Career"
+                newrow("Date") = fld
+            End If
 
-    '        'With dgScores
-    '        '    .DataSource = dtScorecard
-    '        'End With
+            If fld.Contains("Avg") Then
+                newrow("In_Gross") = 0
+                newrow("In_Gross") = 0
+                newrow("In_Net") = 0
+                newrow("Out_Gross") = 0
+                newrow("Out_Net") = 0
+                newrow("$Earn") = 0
+                newrow("$Skins") = 0
+                newrow("$Closest") = 0
+                newrow("#Skins") = 0
+                newrow("CTP_1") = 0
+                newrow("CTP_2") = 0
+                newrow("Points") = 0
+                newrow("Team_Points") = 0
+                newrow("Rnds") = 0
+                newrow("F9") = 0
+                newrow("B9") = 0
+                For i = 1 To 18
+                    newrow("Hole" & i) = 0
+                Next
+                For Each col As DataColumn In dtscorecard.Columns
+                    If sStatsDesc.Contains(col.ColumnName) Then newrow(col.ColumnName) = 0
+                    If col.ColumnName.Contains("SO_") Then
+                        newrow(col.ColumnName) = 0
+                    End If
+                Next
+            End If
+            dtscorecard.Rows.Add(newrow)
+        Catch ex As Exception
+            MsgBox(oHelper.GetExceptionInfo(ex))
+        End Try
 
-    '        Dim sdel = "-"
-    '        For Each col As DataGridViewColumn In dgScores.Columns
-    '            Dim sformat = ""
-    '            Try
-    '                If sColFormat(col.Index).StartsWith("cPat") Then
-    '                    Select Case sColFormat(col.Index)
-    '                        Case "cPat40nt"
-    '                            sformat = oHelper.cPat40nt
-    '                        Case "cPat60"
-    '                            sformat = oHelper.cPat60
-    '                        Case "cPatMeth"
-    '                            sformat = oHelper.cPatMeth
-    '                        Case "cPat120"
-    '                            sformat = oHelper.cPat120
-    '                        Case "cPat170"
-    '                            sformat = oHelper.cPat170
-    '                        Case Else
-    '                            sformat = oHelper.cPat40
-    '                    End Select
-    '                Else
-    '                    sformat = sColFormat(col.Index)
-    '                End If
+    End Function
 
-    '            Catch ex As Exception
-    '                Dim x = ""
-    '            End Try
-    '            Dim scolname = col.Name
-    '            Dim sWidth = sformat.Split(sdel)(0)
-    '            Dim sRO = sformat.Split(sdel)(1)
-    '            Dim sTabstop = sformat.Split(sdel)(2)
-    '            Dim sAlign = sformat.Split(sdel)(3)
-    '            col.Width = sWidth
-    '            col.DataGridView.ReadOnly = sRO
-    '            col.DataGridView.TabStop = sTabstop
-    '            Select Case sAlign
-    '                Case "mr"
-    '                    col.HeaderCell.Style.Alignment = DataGridViewContentAlignment.MiddleRight
-    '                Case "mc"
-    '                    col.HeaderCell.Style.Alignment = DataGridViewContentAlignment.MiddleCenter
-    '                Case "ml"
-    '                    col.HeaderCell.Style.Alignment = DataGridViewContentAlignment.MiddleLeft
-    '            End Select
-
-    '            col.HeaderText = col.HeaderText.Replace("_", " ")
-    '            If col.Name.Contains("Hole") Then col.HeaderText = col.HeaderText.Replace("Hole", "")
-    '        Next
-
-    '        For Each row As DataRow In dtScorecard.Rows
-    '            dgScores.Rows.Add(row.ItemArray)
-    '        Next
-
-    '        For Each row As DataGridViewRow In dgScores.Rows
-    '            row.Height = 30
-    '            If row.IsNewRow Then Continue For
-    '            row.HeaderCell.Style.Alignment = DataGridViewContentAlignment.MiddleCenter
-    '            oHelper.CalcHoleMarker(row.Cells("Date").Value)
-    '            oHelper.ChangeColorsForStrokes(row)
-    '            If oHelper.iHoleMarker = 10 Then row.Cells("Date").Style.BackColor = Color.LightBlue
-    '        Next
-
-    '    Catch ex As Exception
-    '        MsgBox("Error " & ex.Message & vbCrLf & ex.StackTrace)
-    '    End Try
-    '    Me.Cursor = Cursors.Default
-    '    Application.DoEvents()
-    'End Sub
     Private Sub dgScores_CellMouseDoubleClick(sender As Object, e As DataGridViewCellMouseEventArgs) Handles dgScores.CellMouseDoubleClick
-        'future expansion, must figure out a way to load the scorecard dgscores datagrid
-        'oHelper.LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
-        'Dim cell As DataGridViewTextBoxCell = sender.currentcell
-        'If cell.OwningColumn.Name = "Date" Then
-        '    Dim mbResult As MsgBoxResult = MsgBox("List all scores for for " & cell.Value & "?", MsgBoxStyle.YesNo)
-        '    If mbResult = MsgBoxResult.Yes Then
-        '        oHelper.bScoresbyPlayer = False
-        '        oHelper.dDate = Date.ParseExact(cell.Value, "yyyymmdd", System.Globalization.DateTimeFormatInfo.InvariantInfo)
-        '        'oHelper.BldScoreCardDataGridFromCSVforPlayer()
-        '        'oHelper.BldScoreCardDataGridFromCSV(dgScores)
-        '        frmScoreCard.Show()
-        '    End If
-        'End If
+        Dim x = sender
+        Dim xx = ""
     End Sub
     Private Sub dgScores_ColumnHeaderMouseClick(sender As Object, e As DataGridViewCellMouseEventArgs) Handles dgScores.ColumnHeaderMouseClick
+
         oHelper.LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
-        Dim newColumn As DataGridViewColumn = sender.Columns(e.ColumnIndex)
-        oHelper.bScoresbyPlayer = True
-        Me.Cursor = Cursors.WaitCursor
-        Application.DoEvents()
-        Dim dgv = sender
-        For Each row As DataGridViewRow In dgv.rows
-            'row.Height = 30
-            oHelper.ChangeColorsForStrokes(row)
-        Next
-        oHelper.bScoresbyPlayer = False
-        Me.Cursor = Cursors.Default
-        Application.DoEvents()
+        Try
+            Dim newColumn As DataGridViewColumn = sender.Columns(e.ColumnIndex)
+            oHelper.bScoresbyPlayer = True
+            Me.Cursor = Cursors.WaitCursor
+            Application.DoEvents()
+            Dim dgv = sender
+            For Each row As DataGridViewRow In dgv.rows
+                'row.Height = 30
+                oHelper.ChangeColorsForStrokes(row)
+            Next
+            oHelper.bScoresbyPlayer = False
+            Me.Cursor = Cursors.Default
+            Application.DoEvents()
+        Catch ex As Exception
+            MsgBox(oHelper.GetExceptionInfo(ex))
+        End Try
+
     End Sub
     Private Sub dgScores_SortCompare(sender As Object, e As DataGridViewSortCompareEventArgs) Handles dgScores.SortCompare
         'If e.Column.Index <> 0 Then
         '    Return
         'End If
+        '20180725 - dont allow sort for now
+        Exit Sub
         Try
-            e.SortResult = If(CInt(e.CellValue1) < CInt(e.CellValue2), -1, 1)
-            e.Handled = True
+            'e.SortResult = If(CInt(e.CellValue1) < CInt(e.CellValue2), -1, 1)
+            'e.Handled = True
+            Main.oHelper.SortCompare(sender, e)
         Catch
+            Dim x = ""
         End Try
+
     End Sub
     Private Sub Scores_Resize(sender As Object, e As EventArgs) Handles MyBase.Resize
         rs.ResizeAllControls(Me)

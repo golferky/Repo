@@ -52,6 +52,8 @@ Partial Class frmLeagueSetup
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmLeagueSetup))
         Me.DtLeagueParmsBindingNavigator = New System.Windows.Forms.BindingNavigator(Me.components)
         Me.BindingNavigatorAddNewItem = New System.Windows.Forms.ToolStripButton()
+        Me.DtLeagueParmsBindingSource = New System.Windows.Forms.BindingSource(Me.components)
+        Me.DsLeague = New LeagueManager.dsLeague()
         Me.BindingNavigatorCountItem = New System.Windows.Forms.ToolStripLabel()
         Me.BindingNavigatorDeleteItem = New System.Windows.Forms.ToolStripButton()
         Me.BindingNavigatorMoveFirstItem = New System.Windows.Forms.ToolStripButton()
@@ -85,12 +87,10 @@ Partial Class frmLeagueSetup
         Me.SkinsTextBox = New System.Windows.Forms.TextBox()
         Me.ClosestTextBox = New System.Windows.Forms.TextBox()
         Me.SplitSeasonTextBox = New System.Windows.Forms.TextBox()
-        Me.PostSeasonTextBox = New System.Windows.Forms.TextBox()
+        Me.PostSeasonDtTextBox = New System.Windows.Forms.TextBox()
         Me.EmailTextBox = New System.Windows.Forms.TextBox()
         Me.EmailPasswordTextBox = New System.Windows.Forms.TextBox()
         Me.SkinFmtTextBox = New System.Windows.Forms.TextBox()
-        Me.DtLeagueParmsBindingSource = New System.Windows.Forms.BindingSource(Me.components)
-        Me.DsLeague = New LeagueManager.dsLeague()
         NameLabel = New System.Windows.Forms.Label()
         SecretaryLabel = New System.Windows.Forms.Label()
         FormatLabel = New System.Windows.Forms.Label()
@@ -326,9 +326,9 @@ Partial Class frmLeagueSetup
         PostSeasonLabel.AutoSize = True
         PostSeasonLabel.Location = New System.Drawing.Point(22, 683)
         PostSeasonLabel.Name = "PostSeasonLabel"
-        PostSeasonLabel.Size = New System.Drawing.Size(70, 13)
+        PostSeasonLabel.Size = New System.Drawing.Size(84, 13)
         PostSeasonLabel.TabIndex = 51
-        PostSeasonLabel.Text = "Post Season:"
+        PostSeasonLabel.Text = "Post Season Dt:"
         '
         'EmailLabel
         '
@@ -384,6 +384,16 @@ Partial Class frmLeagueSetup
         Me.BindingNavigatorAddNewItem.RightToLeftAutoMirrorImage = True
         Me.BindingNavigatorAddNewItem.Size = New System.Drawing.Size(44, 44)
         Me.BindingNavigatorAddNewItem.Text = "Add new"
+        '
+        'DtLeagueParmsBindingSource
+        '
+        Me.DtLeagueParmsBindingSource.DataMember = "dtLeagueParms"
+        Me.DtLeagueParmsBindingSource.DataSource = Me.DsLeague
+        '
+        'DsLeague
+        '
+        Me.DsLeague.DataSetName = "dsLeague"
+        Me.DsLeague.SchemaSerializationMode = System.Data.SchemaSerializationMode.IncludeSchema
         '
         'BindingNavigatorCountItem
         '
@@ -645,13 +655,13 @@ Partial Class frmLeagueSetup
         Me.SplitSeasonTextBox.Size = New System.Drawing.Size(30, 20)
         Me.SplitSeasonTextBox.TabIndex = 50
         '
-        'PostSeasonTextBox
+        'PostSeasonDtTextBox
         '
-        Me.PostSeasonTextBox.DataBindings.Add(New System.Windows.Forms.Binding("Text", Me.DtLeagueParmsBindingSource, "PostSeason", True))
-        Me.PostSeasonTextBox.Location = New System.Drawing.Point(115, 680)
-        Me.PostSeasonTextBox.Name = "PostSeasonTextBox"
-        Me.PostSeasonTextBox.Size = New System.Drawing.Size(30, 20)
-        Me.PostSeasonTextBox.TabIndex = 52
+        Me.PostSeasonDtTextBox.DataBindings.Add(New System.Windows.Forms.Binding("Text", Me.DtLeagueParmsBindingSource, "PostSeasonDt", True))
+        Me.PostSeasonDtTextBox.Location = New System.Drawing.Point(115, 680)
+        Me.PostSeasonDtTextBox.Name = "PostSeasonDtTextBox"
+        Me.PostSeasonDtTextBox.Size = New System.Drawing.Size(63, 20)
+        Me.PostSeasonDtTextBox.TabIndex = 52
         '
         'EmailTextBox
         '
@@ -676,16 +686,6 @@ Partial Class frmLeagueSetup
         Me.SkinFmtTextBox.Name = "SkinFmtTextBox"
         Me.SkinFmtTextBox.Size = New System.Drawing.Size(76, 20)
         Me.SkinFmtTextBox.TabIndex = 53
-        '
-        'DtLeagueParmsBindingSource
-        '
-        Me.DtLeagueParmsBindingSource.DataMember = "dtLeagueParms"
-        Me.DtLeagueParmsBindingSource.DataSource = Me.DsLeague
-        '
-        'DsLeague
-        '
-        Me.DsLeague.DataSetName = "dsLeague"
-        Me.DsLeague.SchemaSerializationMode = System.Data.SchemaSerializationMode.IncludeSchema
         '
         'frmLeagueSetup
         '
@@ -743,7 +743,7 @@ Partial Class frmLeagueSetup
         Me.Controls.Add(SplitSeasonLabel)
         Me.Controls.Add(Me.SplitSeasonTextBox)
         Me.Controls.Add(PostSeasonLabel)
-        Me.Controls.Add(Me.PostSeasonTextBox)
+        Me.Controls.Add(Me.PostSeasonDtTextBox)
         Me.Controls.Add(Me.DtLeagueParmsBindingNavigator)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.Name = "frmLeagueSetup"
@@ -794,7 +794,7 @@ Partial Class frmLeagueSetup
     Friend WithEvents SkinsTextBox As TextBox
     Friend WithEvents ClosestTextBox As TextBox
     Friend WithEvents SplitSeasonTextBox As TextBox
-    Friend WithEvents PostSeasonTextBox As TextBox
+    Friend WithEvents PostSeasonDtTextBox As TextBox
     Friend WithEvents EmailTextBox As TextBox
     Friend WithEvents EmailPasswordTextBox As TextBox
     Friend WithEvents SkinFmtTextBox As TextBox

@@ -27,8 +27,8 @@
         Me.Controls.Add(lv1)
         lv1.Top = 129
         lv1.Left = 15
-        lv1.Width = 500
-        lv1.Height = 500
+        lv1.Width = 400
+        lv1.Height = 1000
         lv1.View = View.Details
         lv1.Name = "Last 5"
     End Sub

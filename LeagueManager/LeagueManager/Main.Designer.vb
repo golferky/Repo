@@ -51,9 +51,25 @@ Partial Class Main
         Me.btnChangeFolder = New System.Windows.Forms.Button()
         Me.cbLogging = New System.Windows.Forms.CheckBox()
         Me.cbMail = New System.Windows.Forms.CheckBox()
+        Me.dtScore = New System.Windows.Forms.DateTimePicker()
+        Me.Label2 = New System.Windows.Forms.Label()
+        Me.GroupBox4 = New System.Windows.Forms.GroupBox()
+        Me.GroupBox6 = New System.Windows.Forms.GroupBox()
+        Me.dtPSStart = New System.Windows.Forms.DateTimePicker()
+        Me.Label5 = New System.Windows.Forms.Label()
+        Me.Label6 = New System.Windows.Forms.Label()
+        Me.dtPSEnd = New System.Windows.Forms.DateTimePicker()
+        Me.GroupBox5 = New System.Windows.Forms.GroupBox()
+        Me.dtRSStart = New System.Windows.Forms.DateTimePicker()
+        Me.Label4 = New System.Windows.Forms.Label()
+        Me.Label3 = New System.Windows.Forms.Label()
+        Me.dtRSEnd = New System.Windows.Forms.DateTimePicker()
         Me.GroupBox1.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
         Me.GroupBox3.SuspendLayout()
+        Me.GroupBox4.SuspendLayout()
+        Me.GroupBox6.SuspendLayout()
+        Me.GroupBox5.SuspendLayout()
         Me.SuspendLayout()
         '
         'btnLeagueSetup
@@ -199,11 +215,11 @@ Partial Class Main
         Me.GroupBox2.Controls.Add(Me.btnLeagueSetup)
         Me.GroupBox2.Controls.Add(Me.btnCourseSetup)
         Me.GroupBox2.Controls.Add(Me.btnPlayerSetup)
-        Me.GroupBox2.Location = New System.Drawing.Point(41, 396)
+        Me.GroupBox2.Location = New System.Drawing.Point(35, 396)
         Me.GroupBox2.Margin = New System.Windows.Forms.Padding(2)
         Me.GroupBox2.Name = "GroupBox2"
         Me.GroupBox2.Padding = New System.Windows.Forms.Padding(2)
-        Me.GroupBox2.Size = New System.Drawing.Size(151, 170)
+        Me.GroupBox2.Size = New System.Drawing.Size(157, 170)
         Me.GroupBox2.TabIndex = 10
         Me.GroupBox2.TabStop = False
         Me.GroupBox2.Text = "Setup Functions"
@@ -222,7 +238,7 @@ Partial Class Main
         'Label1
         '
         Me.Label1.AutoSize = True
-        Me.Label1.Location = New System.Drawing.Point(38, 46)
+        Me.Label1.Location = New System.Drawing.Point(208, 26)
         Me.Label1.Name = "Label1"
         Me.Label1.Size = New System.Drawing.Size(74, 13)
         Me.Label1.TabIndex = 12
@@ -237,7 +253,7 @@ Partial Class Main
         Me.GroupBox3.Margin = New System.Windows.Forms.Padding(2)
         Me.GroupBox3.Name = "GroupBox3"
         Me.GroupBox3.Padding = New System.Windows.Forms.Padding(2)
-        Me.GroupBox3.Size = New System.Drawing.Size(149, 170)
+        Me.GroupBox3.Size = New System.Drawing.Size(164, 170)
         Me.GroupBox3.TabIndex = 14
         Me.GroupBox3.TabStop = False
         Me.GroupBox3.Text = "Utilities"
@@ -265,15 +281,15 @@ Partial Class Main
         'cbLeagues
         '
         Me.cbLeagues.FormattingEnabled = True
-        Me.cbLeagues.Location = New System.Drawing.Point(35, 73)
+        Me.cbLeagues.Location = New System.Drawing.Point(211, 52)
         Me.cbLeagues.Name = "cbLeagues"
-        Me.cbLeagues.Size = New System.Drawing.Size(325, 21)
+        Me.cbLeagues.Size = New System.Drawing.Size(131, 21)
         Me.cbLeagues.TabIndex = 15
         '
         'lblProcessMsg
         '
         Me.lblProcessMsg.AutoSize = True
-        Me.lblProcessMsg.Location = New System.Drawing.Point(38, 116)
+        Me.lblProcessMsg.Location = New System.Drawing.Point(208, 109)
         Me.lblProcessMsg.Name = "lblProcessMsg"
         Me.lblProcessMsg.Size = New System.Drawing.Size(91, 13)
         Me.lblProcessMsg.TabIndex = 16
@@ -291,11 +307,12 @@ Partial Class Main
         'lbVersion
         '
         Me.lbVersion.AutoSize = True
-        Me.lbVersion.Location = New System.Drawing.Point(287, 29)
+        Me.lbVersion.Location = New System.Drawing.Point(364, 26)
         Me.lbVersion.Name = "lbVersion"
         Me.lbVersion.Size = New System.Drawing.Size(42, 13)
         Me.lbVersion.TabIndex = 18
         Me.lbVersion.Text = "Version"
+        Me.lbVersion.Visible = False
         '
         'btnChangeFolder
         '
@@ -327,11 +344,136 @@ Partial Class Main
         Me.cbMail.Text = "Email Backups"
         Me.cbMail.UseVisualStyleBackColor = True
         '
+        'dtScore
+        '
+        Me.dtScore.Format = System.Windows.Forms.DateTimePickerFormat.[Short]
+        Me.dtScore.Location = New System.Drawing.Point(35, 42)
+        Me.dtScore.Name = "dtScore"
+        Me.dtScore.Size = New System.Drawing.Size(95, 20)
+        Me.dtScore.TabIndex = 21
+        '
+        'Label2
+        '
+        Me.Label2.AutoSize = True
+        Me.Label2.Location = New System.Drawing.Point(32, 26)
+        Me.Label2.Name = "Label2"
+        Me.Label2.Size = New System.Drawing.Size(61, 13)
+        Me.Label2.TabIndex = 22
+        Me.Label2.Text = "Score Date"
+        '
+        'GroupBox4
+        '
+        Me.GroupBox4.Controls.Add(Me.GroupBox6)
+        Me.GroupBox4.Controls.Add(Me.GroupBox5)
+        Me.GroupBox4.Controls.Add(Me.Label2)
+        Me.GroupBox4.Controls.Add(Me.dtScore)
+        Me.GroupBox4.Location = New System.Drawing.Point(379, 158)
+        Me.GroupBox4.Name = "GroupBox4"
+        Me.GroupBox4.Size = New System.Drawing.Size(166, 346)
+        Me.GroupBox4.TabIndex = 23
+        Me.GroupBox4.TabStop = False
+        Me.GroupBox4.Text = "Control Dates"
+        '
+        'GroupBox6
+        '
+        Me.GroupBox6.Controls.Add(Me.dtPSStart)
+        Me.GroupBox6.Controls.Add(Me.Label5)
+        Me.GroupBox6.Controls.Add(Me.Label6)
+        Me.GroupBox6.Controls.Add(Me.dtPSEnd)
+        Me.GroupBox6.Location = New System.Drawing.Point(29, 210)
+        Me.GroupBox6.Name = "GroupBox6"
+        Me.GroupBox6.Size = New System.Drawing.Size(107, 100)
+        Me.GroupBox6.TabIndex = 28
+        Me.GroupBox6.TabStop = False
+        Me.GroupBox6.Text = "Post Season"
+        '
+        'dtPSStart
+        '
+        Me.dtPSStart.Format = System.Windows.Forms.DateTimePickerFormat.[Short]
+        Me.dtPSStart.Location = New System.Drawing.Point(6, 34)
+        Me.dtPSStart.Name = "dtPSStart"
+        Me.dtPSStart.Size = New System.Drawing.Size(95, 20)
+        Me.dtPSStart.TabIndex = 23
+        '
+        'Label5
+        '
+        Me.Label5.AutoSize = True
+        Me.Label5.Location = New System.Drawing.Point(6, 61)
+        Me.Label5.Name = "Label5"
+        Me.Label5.Size = New System.Drawing.Size(26, 13)
+        Me.Label5.TabIndex = 26
+        Me.Label5.Text = "End"
+        '
+        'Label6
+        '
+        Me.Label6.AutoSize = True
+        Me.Label6.Location = New System.Drawing.Point(3, 18)
+        Me.Label6.Name = "Label6"
+        Me.Label6.Size = New System.Drawing.Size(29, 13)
+        Me.Label6.TabIndex = 24
+        Me.Label6.Text = "Start"
+        '
+        'dtPSEnd
+        '
+        Me.dtPSEnd.Format = System.Windows.Forms.DateTimePickerFormat.[Short]
+        Me.dtPSEnd.Location = New System.Drawing.Point(6, 77)
+        Me.dtPSEnd.Name = "dtPSEnd"
+        Me.dtPSEnd.Size = New System.Drawing.Size(95, 20)
+        Me.dtPSEnd.TabIndex = 25
+        '
+        'GroupBox5
+        '
+        Me.GroupBox5.Controls.Add(Me.dtRSStart)
+        Me.GroupBox5.Controls.Add(Me.Label4)
+        Me.GroupBox5.Controls.Add(Me.Label3)
+        Me.GroupBox5.Controls.Add(Me.dtRSEnd)
+        Me.GroupBox5.Location = New System.Drawing.Point(29, 73)
+        Me.GroupBox5.Name = "GroupBox5"
+        Me.GroupBox5.Size = New System.Drawing.Size(107, 100)
+        Me.GroupBox5.TabIndex = 27
+        Me.GroupBox5.TabStop = False
+        Me.GroupBox5.Text = "Regular Season"
+        '
+        'dtRSStart
+        '
+        Me.dtRSStart.Format = System.Windows.Forms.DateTimePickerFormat.[Short]
+        Me.dtRSStart.Location = New System.Drawing.Point(6, 34)
+        Me.dtRSStart.Name = "dtRSStart"
+        Me.dtRSStart.Size = New System.Drawing.Size(95, 20)
+        Me.dtRSStart.TabIndex = 23
+        '
+        'Label4
+        '
+        Me.Label4.AutoSize = True
+        Me.Label4.Location = New System.Drawing.Point(6, 61)
+        Me.Label4.Name = "Label4"
+        Me.Label4.Size = New System.Drawing.Size(26, 13)
+        Me.Label4.TabIndex = 26
+        Me.Label4.Text = "End"
+        '
+        'Label3
+        '
+        Me.Label3.AutoSize = True
+        Me.Label3.Location = New System.Drawing.Point(3, 18)
+        Me.Label3.Name = "Label3"
+        Me.Label3.Size = New System.Drawing.Size(29, 13)
+        Me.Label3.TabIndex = 24
+        Me.Label3.Text = "Start"
+        '
+        'dtRSEnd
+        '
+        Me.dtRSEnd.Format = System.Windows.Forms.DateTimePickerFormat.[Short]
+        Me.dtRSEnd.Location = New System.Drawing.Point(6, 77)
+        Me.dtRSEnd.Name = "dtRSEnd"
+        Me.dtRSEnd.Size = New System.Drawing.Size(95, 20)
+        Me.dtRSEnd.TabIndex = 25
+        '
         'Main
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(406, 741)
+        Me.ClientSize = New System.Drawing.Size(582, 741)
+        Me.Controls.Add(Me.GroupBox4)
         Me.Controls.Add(Me.cbMail)
         Me.Controls.Add(Me.btnChangeFolder)
         Me.Controls.Add(Me.lbVersion)
@@ -352,6 +494,12 @@ Partial Class Main
         Me.GroupBox1.ResumeLayout(False)
         Me.GroupBox2.ResumeLayout(False)
         Me.GroupBox3.ResumeLayout(False)
+        Me.GroupBox4.ResumeLayout(False)
+        Me.GroupBox4.PerformLayout()
+        Me.GroupBox6.ResumeLayout(False)
+        Me.GroupBox6.PerformLayout()
+        Me.GroupBox5.ResumeLayout(False)
+        Me.GroupBox5.PerformLayout()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -384,4 +532,17 @@ Partial Class Main
     Friend WithEvents cbLogging As CheckBox
     Friend WithEvents cbMail As CheckBox
     Friend WithEvents Button1 As Button
+    Friend WithEvents dtScore As DateTimePicker
+    Friend WithEvents Label2 As Label
+    Friend WithEvents GroupBox4 As GroupBox
+    Friend WithEvents GroupBox6 As GroupBox
+    Friend WithEvents dtPSStart As DateTimePicker
+    Friend WithEvents Label5 As Label
+    Friend WithEvents Label6 As Label
+    Friend WithEvents dtPSEnd As DateTimePicker
+    Friend WithEvents GroupBox5 As GroupBox
+    Friend WithEvents dtRSStart As DateTimePicker
+    Friend WithEvents Label4 As Label
+    Friend WithEvents Label3 As Label
+    Friend WithEvents dtRSEnd As DateTimePicker
 End Class

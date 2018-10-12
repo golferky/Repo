@@ -24,7 +24,17 @@ Public Class Standings
 
             Dim dtStandings = New DataTable
             dtStandings = BuilddtPoints()
+            'future 20180720
+            Dim dvStandingsDGV As New DataView(dtStandings)
+            Dim sStdDGV As String = "Player,Team 1st Half,Team 2nd Half,Team Points,"
+            For Each col As DataColumn In dtStandings.Columns
+                If col.ColumnName.Contains("/") Then sStdDGV = sStdDGV & col.ColumnName & ","
+            Next
+            sStdDGV = sStdDGV.Substring(0, Len(sStdDGV) - 1).Replace(" ", "_")
             'build this table for points collection
+            'Dim dtPoints As DataTable = dvStandingsDGV.ToTable(True, sStdDGV.Split(",").ToArray)
+            'end 20170720 future
+            'points table is for team points only
             Dim dtPoints As DataTable = dtStandings.Clone
             dtPoints.TableName = "dtPoints"
             dtPoints.PrimaryKey = New DataColumn() {dtPoints.Columns("Team")}
@@ -35,7 +45,8 @@ Public Class Standings
                     Continue For
                 End If
             Next
-
+            dtPoints.PrimaryKey = New DataColumn() {dtPoints.Columns("Team")}
+            'dtpoints has just team number and a column for points each week
             Dim sprevteam = 0, sprevgrade = ""
             For Each row As DataRow In dtStandings.Rows
                 Dim sTeam = row("Team")
@@ -51,46 +62,56 @@ Public Class Standings
                     Next
                     dtPoints.Rows.Add(drow)
                 End If
+
+                'accumulate points from gridview
                 For Each col As DataColumn In dtStandings.Columns
-                    If col.ColumnName.Contains("/") Then
-                        'accumulate points from gridview
-                        drow(col.ColumnName) += getPts(row(col.ColumnName))
-                    End If
+                    If col.ColumnName.Contains("/") Then drow(col.ColumnName) += getPts(row(col.ColumnName))
                 Next
-                'combine individual points to team points
-
-
+                'combine individual points to team points and update dtpoints table
                 If cb1stHalf.Checked Then
                     drow("Team 1st Half") += CDec(row("1st Half")) + CDec(row("Team 1st Half"))
                     drow("Team Points") += CDec(row("1st Half")) + CDec(row("Team 1st Half"))
                 End If
 
                 If cb2ndHalf.Checked Then
+                    Debug.Print(String.Format("--before--team {3} 2nd half {0} team 2nd half {1} team points {2}", row("2nd Half"), row("Team 2nd Half"), drow("Team Points"), row("Team")))
                     drow("Team 2nd Half") += CDec(row("2nd Half")) + CDec(row("Team 2nd Half"))
                     drow("Team Points") += CDec(row("2nd Half")) + CDec(row("Team 2nd Half"))
+                    Debug.Print(String.Format("--after--2nd half {0} team 2nd half {1} team points {2}", row("2nd Half"), row("Team 2nd Half"), drow("Team Points")))
                 End If
             Next
 
-            dtPoints.PrimaryKey = New DataColumn() {dtPoints.Columns("Team")}
+            'dtPoints.PrimaryKey = New DataColumn() {dtPoints.Columns("Team")}
+
+            'now lets create a standings table based on checkboxes and radio buttons
             For index As Integer = dtStandings.Columns.Count - 1 To 0 Step -1
                 Dim columnName As String = dtStandings.Columns(index).ColumnName
+                'Debug.Print(String.Format("processing index {0}, name {1}", index, columnName))
                 If Not cb1stHalf.Checked Then
-                    If columnName.Contains("1st Half") Then
-                        dtStandings.Columns.RemoveAt(index)
-                        Continue For
-                    End If
-                    If columnName.Contains("/") And columnName < sHalfwayDate Then
-                        dtStandings.Columns.RemoveAt(index)
-                        Continue For
+                    'If columnName.Contains("1st Half") Then
+                    '    dtStandings.Columns.RemoveAt(index)
+                    '    Continue For
+                    'End If
+                    ' CDate(sHalfwayDate).ToString("yyyyMMdd")
+                    If columnName.Contains("/") Then
+                        If CDate(columnName).ToString("yyyyMMdd") < CDate(sHalfwayDate).ToString("yyyyMMdd") Then
+                            'Debug.Print(String.Format("not 1st half, removing index {0}, name {1}", index, columnName))
+                            dtStandings.Columns.RemoveAt(index)
+                            Continue For
+                        End If
                     End If
                 End If
                 If Not cb2ndHalf.Checked Then
-                    If columnName.Contains("2nd Half") Then
-                        dtStandings.Columns.RemoveAt(index)
-                        Continue For
-                    End If
-                    If columnName.Contains("/") And columnName >= sHalfwayDate Then
-                        dtStandings.Columns.RemoveAt(index)
+                    'If columnName.Contains("2nd Half") Then
+                    '    dtStandings.Columns.RemoveAt(index)
+                    '    Continue For
+                    'End If
+                    If columnName.Contains("/") Then
+                        If CDate(columnName).ToString("yyyyMMdd") >= CDate(sHalfwayDate).ToString("yyyyMMdd") Then
+                            'Debug.Print(String.Format("not 2nd half, removing index {0}, name {1}", index, columnName))
+                            dtStandings.Columns.RemoveAt(index)
+                            Continue For
+                        End If
                     End If
                 End If
             Next
@@ -98,19 +119,38 @@ Public Class Standings
             Dim dvStandings As New DataView(dtStandings)
 
             Dim i = 0
-            For Each row As DataRowView In dvStandings
-                'loop through and delete subs if its not checked
-                If Not cbSubs.Checked Then
-                    oHelper.dsLeague.Tables("dtPlayers").PrimaryKey = New DataColumn() {oHelper.dsLeague.Tables("dtPlayers").Columns("Name")}
-                    Dim sKeys() As Object = {row.Item("Player")}
-                    Dim drow As DataRow = oHelper.dsLeague.Tables("dtPlayers").Rows.Find(sKeys)
-                    If drow.Item("Grade") = "S" Then
-                        dvStandings.Table.Rows(i).Delete()
-                        i -= 1
-                    End If
-                    i += 1
-                End If
-            Next
+            Try
+                Dim sPrvTeam As String = "", bAplayer As Boolean = False, bBplayer As Boolean = False
+                For Each row As DataRowView In dvStandings
+                    'If row.Item("Team") <> sPrvTeam Then
+                    '    sPrvTeam = row.Item("Team")
+                    '    bAplayer = False
+                    '    bBplayer = False
+                    'End If
+                    'loop through and delete subs if its not checked
+                    If Not cbSubs.Checked Then
+                            oHelper.dsLeague.Tables("dtPlayers").PrimaryKey = New DataColumn() {oHelper.dsLeague.Tables("dtPlayers").Columns("Name")}
+                            Dim sKeys() As Object = {row.Item("Player")}
+                            Dim drow As DataRow = oHelper.dsLeague.Tables("dtPlayers").Rows.Find(sKeys)
+                            Try
+                            If drow.Item("Grade") Is DBNull.Value Then
+                                dvStandings.Table.Rows(i).Delete()
+                                i -= 1
+                            ElseIf drow.Item("Grade") = "S" Then
+                                dvStandings.Table.Rows(i).Delete()
+                                i -= 1
+                            End If
+                        Catch ex As Exception
+
+                            End Try
+                            i += 1
+                        End If
+                Next
+
+            Catch ex As Exception
+
+            End Try
+
             dgStandings.Columns.Clear()
             dgStandings.AllowUserToAddRows = False
             dgStandings.AllowUserToDeleteRows = False
@@ -121,25 +161,21 @@ Public Class Standings
                 .Columns("Grade").Width = 36
                 .Columns("Team").Width = 35
                 .Columns("Total").Width = 36
-
+                dgStandings.ColumnHeadersDefaultCellStyle.Font = New Font("Tahoma", 8, FontStyle.Bold)
+                'adjust columns for each field being added
                 For Each col As DataGridViewTextBoxColumn In dgStandings.Columns
-                    col.ReadOnly = True
-                    If col.Name.Contains("/") Then
-                        .Columns(col.Name).Width = 40
-                        If cbHdcp.Checked Then .Columns(col.Name).Width += 10
-                        If cbScore.Checked Then .Columns(col.Name).Width += 10
-                        .Columns(col.Name).HeaderText = col.Name.Substring(0, col.Name.LastIndexOf("/"))
-                        Dim x = ""
+                    col.ReadOnly = True                 'make all columns read only
+                    If col.Name.Contains("/") Then      'is this a date column
+                        .Columns(col.Name).Width = 40   'yep, make width 40
+                        'If cbHdcp.Checked Then .Columns(col.Name).Width += 10   'if hdcp, adjust by 10
+                        'If cbScore.Checked Then .Columns(col.Name).Width += 10  'if score, adjust by 10
+                        .Columns(col.Name).HeaderText = col.Name.Substring(0, col.Name.LastIndexOf("/")) 'just use mm/dd
                     ElseIf col.Name.Contains("Half") Or col.Name.Contains("Total") Or col.Name = "Rnds" Or col.Name = "Team Points" Then
                         .Columns(col.Name).Width = 36
                     End If
                 Next
 
             End With
-
-            If Not buildEmailFile() Then
-                MsgBox("Couldnt update the standings file because its in use")
-            End If
 
             For Each row As DataGridViewRow In dgStandings.Rows
                 'checkbox order ind pts, team pts, score, handicap
@@ -151,9 +187,8 @@ Public Class Standings
 
                 row.Cells("Team Points").Value = ""
                 'alternate color to differentiate teams
-                If row.Cells("Team").Value Mod 2 Then
-                    row.DefaultCellStyle.BackColor = Color.LightGray
-                End If
+                If row.Cells("Team").Value Mod 2 Then row.DefaultCellStyle.BackColor = Color.Lightblue
+
                 Dim ipts = 0.0
                 Dim itpts = 0.0
                 'loop through each column and decide which items to delete from gridview cell (Score/hdcp/ind points/team points)
@@ -286,6 +321,8 @@ Public Class Standings
 
             Next
 
+            If Not buildEmailFile() Then MsgBox("Couldnt update the standings file because its in use")
+
         Catch ex As Exception
             MsgBox("Error " & ex.Message & vbCrLf & ex.StackTrace)
         End Try
@@ -343,13 +380,14 @@ Public Class Standings
                 End If
             Next
 
+            'this loop will roll all team points into the first players totals and clear out the rest
             Dim dvStandings As New DataView(dtStandings)
             For Each row As DataRowView In dvStandings
                 oHelper.sPlayer = row("Player") & "-" & row("Grade")
                 Dim sKeys() As Object = {row("Team")}
                 Dim drow As DataRow = dtPoints.Rows.Find(sKeys)
-                If cb1stHalf.Checked Then row("1st Half") = ""
-                If cb2ndHalf.Checked Then row("2nd Half") = ""
+                'If cb1stHalf.Checked Then row("1st Half") = ""
+                'If cb2ndHalf.Checked Then row("2nd Half") = ""
 
                 row("1st half") = ""
                 row("2nd half") = ""
@@ -359,13 +397,11 @@ Public Class Standings
                     Dim ipts As Decimal = 0.0
                     Dim ifh As Decimal = 0.0
                     Dim ish As Decimal = 0.0
-                    Dim bfh = True, bsh = False
                     'total up halves
                     For Each col As DataColumn In dtPoints.Columns
-                        If col.ColumnName.Contains("2nd") Then bsh = True
                         If col.ColumnName.Contains("/") Then
                             ipts += CDec(oHelper.convDBNulltoSpaces(drow(col.ColumnName)))
-                            If bsh Then
+                            If CDate(col.ColumnName).ToString("yyyyMMdd") >= CDate(sHalfwayDate).ToString("yyyyMMdd") Then
                                 ish += CDec(oHelper.convDBNulltoSpaces(drow(col.ColumnName)))
                             Else
                                 ifh += CDec(oHelper.convDBNulltoSpaces(drow(col.ColumnName)))
@@ -435,6 +471,9 @@ Public Class Standings
             'sHtml = oHelper.ConvertToHTMLString(dtStandings)
             Dim sHtml As String = oHelper.Create_Html(dtStandings)
             sHtml = ConvertDataGridViewToHTMLWithFormatting(dgStandings)
+            Dim swhtml As New IO.StreamWriter(semailfile.replace("csv", "html"), False)
+            swhtml.WriteLine(sHtml)
+            swhtml.Close()
             If semailfile <> Nothing Then btnEmail.Visible = True
         Catch ex As Exception
             buildEmailFile = False
@@ -455,7 +494,8 @@ Public Class Standings
             sb.AppendLine("<tr>")
             For i As Integer = 0 To dgv.Columns.Count - 1
                 sb.Append(DGVHeaderCellToHTMLWithFormatting(dgv, i))
-                sb.Append(DGVCellFontAndValueToHTML(dgv.Columns(i).HeaderText, dgv.Columns(i).HeaderCell.Style.Font))
+                'sb.Append(DGVCellFontAndValueToHTML(dgv.Columns(i).HeaderText, dgv.Columns(i).HeaderCell.Style.Font))
+                sb.Append(DGVCellFontAndValueToHTML(dgv.Columns(i).HeaderText, dgStandings.ColumnHeadersDefaultCellStyle.Font))
                 sb.AppendLine("</td>")
             Next
 
@@ -483,6 +523,12 @@ Public Class Standings
     Public Function DGVHeaderCellToHTMLWithFormatting(ByVal dgv As DataGridView, ByVal col As Integer) As String
         Dim sb As StringBuilder = New StringBuilder()
         sb.Append("<td")
+        sb.Append(" width=" & Chr(34) & dgv.Columns(col).Width & Chr(34) & " ")
+        'Dim sHdr = dgv.Columns(col).HeaderText
+        'If sHdr.Contains("Half") Or sHdr.Contains("Points") Or sHdr.Contains("/") Then
+        '    sb.Append(" width=" & Chr(34) & "40" & Chr(34) & " ")
+        'End If
+
         sb.Append(DGVCellColorToHTML(dgv.Columns(col).HeaderCell.Style.ForeColor, dgv.Columns(col).HeaderCell.Style.BackColor))
         sb.Append(DGVCellAlignmentToHTML(dgv.Columns(col).HeaderCell.Style.Alignment))
         sb.Append(">")
@@ -492,7 +538,12 @@ Public Class Standings
     Public Function DGVCellToHTMLWithFormatting(ByVal dgv As DataGridView, ByVal row As Integer, ByVal col As Integer) As String
         Dim sb As StringBuilder = New StringBuilder()
         sb.Append("<td")
-        sb.Append(DGVCellColorToHTML(dgv.Rows(row).Cells(col).Style.ForeColor, dgv.Rows(row).Cells(col).Style.BackColor))
+        If dgv.Rows(row).DefaultCellStyle.BackColor <> DefaultBackColor Then
+            sb.Append(DGVCellColorToHTML(dgv.Rows(row).DefaultCellStyle.ForeColor, dgv.Rows(row).DefaultCellStyle.BackColor))
+        Else
+            sb.Append(DGVCellColorToHTML(dgv.Rows(row).Cells(col).Style.ForeColor, dgv.Rows(row).Cells(col).Style.BackColor))
+        End If
+
         sb.Append(DGVCellAlignmentToHTML(dgv.Rows(row).Cells(col).Style.Alignment))
         sb.Append(">")
         Return sb.ToString()
@@ -607,15 +658,14 @@ Public Class Standings
             sEndDate = oHelper.rLeagueParmrow("EndDate").ToString
 
             '20180527-post season makes season 2 weeks earlier
-            If oHelper.rLeagueParmrow("PostSeason").ToString.ToUpper = "Y" Then sEndDate = sEndDate.AddDays(-14)
+            '20180930-dont adjust postseason Date
+            'If oHelper.rLeagueParmrow("PostSeason").ToString.ToUpper = "Y" Then sEndDate = sEndDate.AddDays(-14)
 
             dtStandings.TableName = "dtStandings"
-            'only build the schedule up thru the end date
+            'only build the schedule up thru the end date, this eliminates post season tournament from schedule
             For index As Integer = dtStandings.Columns.Count - 1 To 0 Step -1
                 Dim columnName As String = dtStandings.Columns(index).ColumnName
-                If columnName > sEndDate Then
-                    dtStandings.Columns.RemoveAt(index)
-                End If
+                If columnName > sEndDate Then dtStandings.Columns.RemoveAt(index)
             Next
 
             iNumWeeksSplit = dtStandings.Columns.Count / 2
@@ -636,7 +686,7 @@ Public Class Standings
                 .Columns.Add("Team 2nd Half", GetType(String))
                 .Columns.Add("Total", GetType(String))
                 .Columns.Add("Team Points", GetType(String))
-                .DefaultView.Sort = "Team"
+                .DefaultView.Sort = "Team, Grade"
             End With
 
             dtStandings.PrimaryKey = New DataColumn() {dtStandings.Columns("Player"), dtStandings.Columns("Team")}
@@ -644,66 +694,72 @@ Public Class Standings
             If Not oHelper.dsLeague.Tables.Contains("dtScores") Then oHelper.DataTable2CSV(oHelper.dsLeague.Tables("dtScores"), oHelper.sFilePath & "\" & Now.ToString("yyyyMMdd") & "_Scores.csv")
             Dim dvScores As New DataView(oHelper.dsLeague.Tables("dtScores"))
             'dvScores.RowFilter = "Date >= " & sEndDate.ToString("yyyyMMdd").Substring(0, 4) & "0101"
+            'this gets a whole years worth of scores
             dvScores.RowFilter += String.Format("date >= {0} and date < {1}", sEndDate.ToString("yyyyMMdd").Substring(0, 4) & "0101", sEndDate.ToString("yyyMMdd").Substring(0, 4) + 1) & "0101"
             'dvScores.Sort = "Team,Date,Grade"
             Dim sPoints = "", sTeamPoints = ""
-            For Each score As DataRowView In dvScores
-                oHelper.sPlayer = score("Player")
+            Try
 
-                'Dim sScore = IIf(score("Out_Gross") Is DBNull.Value, score("In_Gross"), score("Out_Gross"))
-                Dim sScore = IIf(oHelper.convDBNulltoSpaces(score("Out_Gross")).Trim = "", oHelper.convDBNulltoSpaces(score("In_Gross")).Trim, oHelper.convDBNulltoSpaces(score("Out_Gross")).Trim)
-                If sScore = "" Then sScore = "NA"
-                Dim sKeys() As Object = {score("Player"), score("Team")}
-                Dim drow As DataRow = dtStandings.Rows.Find(sKeys)
-                If drow Is Nothing Then
-                    drow = dtStandings.NewRow
-                    drow("Player") = score("Player")
-                    drow("Team") = score("Team")
-                    drow("Grade") = score("Grade")
-                    drow("Rnds") = 0
-                    drow("1st Half") = 0
-                    drow("Team 1st Half") = 0
-                    drow("2nd Half") = 0
-                    drow("Team 2nd Half") = 0
-                    drow("Total") = 0
-                    drow("Team Points") = 0
-                    dtStandings.Rows.Add(drow)
-                End If
-                If sScore IsNot DBNull.Value Then
-                    drow("Rnds") += 1
-                    'If score("date") < CDate(sHalfwayDate).ToString("yyyyMMdd") Then
-                    '    If cb1stHalf.Checked Then
-                    '        drow("Rnds") += 1
-                    '    End If
-                    'Else
-                    '    If cb2ndHalf.Checked Then
-                    '        drow("Rnds") += 1
-                    '    End If
-                    'End If
-                End If
+                For Each score As DataRowView In dvScores
+                    oHelper.sPlayer = score("Player")
 
-                Dim dPoints As Decimal = 0.00
-                Dim dTeamPoints As Decimal = 0.00
-                If score("Points") IsNot DBNull.Value Then
-                    If score("Points") <> "" Then dPoints = score("Points")
-                End If
-                If score("Team_Points") IsNot DBNull.Value Then
-                    If score("Team_Points") <> "" Then dTeamPoints = score("Team_Points")
-                End If
+                    'Dim sScore = IIf(score("Out_Gross") Is DBNull.Value, score("In_Gross"), score("Out_Gross"))
+                    Dim sScore As String = ""
+                    Try
+                        sScore = IIf(oHelper.convDBNulltoSpaces(score("Out_Gross")).Trim = "", oHelper.convDBNulltoSpaces(score("In_Gross")).Trim, oHelper.convDBNulltoSpaces(score("Out_Gross")).Trim)
+                    Catch ex As Exception
 
-                'Dim sColname As String = CInt(score("Date").ToString.Substring(4, 2)).ToString + "/" + CInt(score("Date").ToString.Substring(6, 2)).ToString + "/" + score("Date").ToString.Substring(0, 4)
-                Dim sColname As String = CInt(score("Date").ToString.Substring(4, 2)).ToString + "/" + CInt(score("Date").ToString.Substring(6, 2)).ToString + "/" + score("Date").ToString.Substring(0, 4)
-                If sScore IsNot DBNull.Value Then
+                    End Try
+                    If sScore = "" Then sScore = "NS"
+                    Dim sKeys() As Object = {score("Player"), score("Team")}
+                    Dim drow As DataRow = dtStandings.Rows.Find(sKeys)
+                    If drow Is Nothing Then
+                        drow = dtStandings.NewRow
+                        drow("Player") = score("Player")
+                        drow("Team") = score("Team")
+                        drow("Grade") = score("Grade")
+                        drow("Rnds") = 0
+                        drow("1st Half") = 0
+                        drow("Team 1st Half") = 0
+                        drow("2nd Half") = 0
+                        drow("Team 2nd Half") = 0
+                        drow("Total") = 0
+                        drow("Team Points") = 0
+                        dtStandings.Rows.Add(drow)
+                    End If
+
+                    If sScore <> "NS" Then drow("Rnds") += 1
+
+                    Dim dPoints As Decimal = 0.00
+                    Dim dTeamPoints As Decimal = 0.00
+                    Try
+                        If score("Points") IsNot DBNull.Value Then dPoints = score("Points")
+                        'If score("Points") <> "" Then dPoints = score("Points")
+                        'End If
+                    Catch ex As Exception
+
+                    End Try
+                    Try
+                        If IsNumeric(score("Team_Points")) Then dTeamPoints = score("Team_Points")
+                        'If score("Team_Points") IsNot DBNull.Value Then dTeamPoints = score("Team_Points")
+                        'If score("Team_Points") <> "" Then dTeamPoints = score("Team_Points")
+                        'End If
+
+                    Catch ex As Exception
+
+                    End Try
+
+                    'Dim sColname As String = CInt(score("Date").ToString.Substring(4, 2)).ToString + "/" + CInt(score("Date").ToString.Substring(6, 2)).ToString + "/" + score("Date").ToString.Substring(0, 4)
+                    Dim sColname As String = CInt(score("Date").ToString.Substring(4, 2)).ToString + "/" + CInt(score("Date").ToString.Substring(6, 2)).ToString + "/" + score("Date").ToString.Substring(0, 4)
+                    'show noshow players
+                    ' If sScore <> "NS" Then
                     drow(sColname) = ""
                     'default to points and team points 
                     sPoints = dPoints
-                    If dPoints < 1 Then
-                        sPoints = sPoints.Replace("0.", ".")
-                    End If
+                    'get rid of leading zero in front of decimal point
+                    If dPoints < 1 Then sPoints = sPoints.Replace("0.", ".")
                     sTeamPoints = dTeamPoints
-                    If dTeamPoints < 1 Then
-                        sTeamPoints = sTeamPoints.Replace("0.", ".")
-                    End If
+                    If dTeamPoints < 1 Then sTeamPoints = sTeamPoints.Replace("0.", ".")
                     '20180302-if email run, dont add pts, tp, opp
                     If email Then
                         drow(sColname) = sScore & "-" & score("Hdcp")
@@ -711,19 +767,23 @@ Public Class Standings
                         drow(sColname) = sPoints & "-" & sTeamPoints & "-" & sScore & "-" & score("Hdcp") & "-" & score("Opponent")
                     End If
 
-                End If
+                    'End If
 
-                'calculate team first half, second half, total points 
-                If score("date") < CDate(sHalfwayDate).ToString("yyyyMMdd") Then
-                    drow("1st Half") += dPoints
-                    drow("Team 1st Half") += dTeamPoints
-                Else
-                    drow("2nd Half") += dPoints
-                    drow("Team 2nd Half") += dTeamPoints
-                End If
-                drow("Total") += dPoints
-                drow("Team Points") += dTeamPoints
-            Next
+                    'calculate team first half, second half, total points 
+                    If score("date") < CDate(sHalfwayDate).ToString("yyyyMMdd") Then
+                        drow("1st Half") += dPoints
+                        drow("Team 1st Half") += dTeamPoints
+                    Else
+                        drow("2nd Half") += dPoints
+                        drow("Team 2nd Half") += dTeamPoints
+                    End If
+                    drow("Total") += dPoints
+                    drow("Team Points") += dTeamPoints
+                Next
+
+            Catch ex As Exception
+
+            End Try
             'dtStandings.DefaultView.Sort = "Team"
             Return dtStandings.DefaultView.ToTable
         Catch ex As Exception
