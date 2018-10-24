@@ -3,16 +3,10 @@
 *************************************************************************************************
 * yyyymmdd - Priority - Complexity -  Module       Description
 * -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-* 20181017 - ML       - Med to hard - scorecard.vb when going back to prior years looking for partnets, pull player file from the date entered
-* 20181004 - ML       - Med to hard - scores.vb not taking front/back 9 into account for averages
-* 20180930 - ML       - Med to hard - dsleague.xsd change postseason flag to postseasondate
-* 20180925 - ML       - Med to hard - Scorecard.vb when combining league championship and regular league, need to swap front and back for scores
 * 20180919 - ML       - Med to hard - Playerstats.vb show league average stats for each hole and rank
 * 20180919 - M        - Easy        - Standings.vb Re-sorting numeric columns arent working right (col sort needed)
 * 20180812 - M        - Med         - Scorecard.vb when sub for a player(add the player subbed for in the datagridview cell and remove it on save)
-* 20180811 - M        - Med         - Scorecard.vb CTP not calc dollars right and should put null in for $$ when clearing out a ctp
 * 20180801 - M        - Med         - dont allow standings until matches have been done for that week
-* 20180801 - M        - Med         - need a date scores locked
 * 20180430 - L        - Hard        - Need to account for Rainouts
 * 20180423 - L        - Easy        - Add Grade to Matches grid
 * 20180423 - M        - Med         - Create HTML file for standings and other sheets
@@ -43,6 +37,10 @@
 *                                           Change Log-Completed
 *************************************************************************************************
 * yyyymmdd - Priority - Complexity -  Description
+* 20181017 - ML       - Med to hard - scorecard.vb when going back to prior years looking for partnets, pull player file from the date entered
+* 20181004 - ML       - Med to hard - scores.vb not taking front/back 9 into account for averages
+* 20180930 - ML       - Med to hard - dsleague.xsd change postseason flag to postseasondate
+* 20180925 - ML       - Med to hard - Scorecard.vb when combining league championship and regular league, need to swap front and back for scores
 * 20181004 - ML       - Med to hard - Finance.vb, FinanceDetails.vb shore up screens
 * 20181003 - ML       - Med to hard - Scorecard.vb, Skins.vb,Matches.vb - enable scorecard to be able to swap nines(front and back)
 * 20180923 - H        - Med         - Scorecard.vb and designer add checkbox to calc matches and club championship in the same week
@@ -53,9 +51,11 @@
 * 20180821 - H        - Easy        - Player last name issue with names like McDonald, ohelper.fplayer makes it Mcdonald, causing player mismatches
 * 20180810 - M        - Med         - Scorecard.vb calculate skins as you go
 * 20180811 - M        - Med         - Scorecard.vb when player noshows, copy previous handicap to current handicap for saving
+* 20180811 - M        - Med         - Scorecard.vb CTP not calc dollars right and should put null in for $$ when clearing out a ctp
 * 20180810 - M        - Med         - Scorecard.vb add checkbox column to allow scores to be cleared
 * 20180423 - M        - Med         - Fix Money on CTP1/2 on Scorecard(showing all money to ctp1)
 * 20180423 - L        - Easy        - Fix Money on Skins when Skins have already been calculated (showing carryovers because nothing is checked)
+* 20180801 - M        - Med         - need a date scores locked just use each date of each file
 * 20180801 - M        - Med         - prize money for CTP is showing in CTP1 only, should be divided into 1,2
 * 20180802 - M        - Medium      - add boolean switch for when datagrid changes so we dont try to save
 * 20180802 - M        - Easy        - change strikeout for skins to be colored yellow
