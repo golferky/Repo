@@ -8,7 +8,7 @@ Public Class frmScoreCard
     'Dim sMatchFields = New List(Of String)("Points,Team_Points,Opponent".Split(","))
     Dim fromsizeW As Integer, gvSsizeW As Integer, gvSCsizeW As Integer, gbSCsizeW As Integer
     Dim fromsizeH As Integer, gvSsizeH As Integer, gvSCsizeH As Integer, gbSCsizeH As Integer
-    'Dim bCloseScreen As Boolean = False
+    Dim bCloseScreen As Boolean = False
     Dim rs As New Resizer
     Public sOldCellValue As String
     Public sOldPSkins As String
@@ -19,22 +19,59 @@ Public Class frmScoreCard
     Dim bSaveBtn = False
     Dim bMatchesSet = False
     Dim bFormLoad = False
-    Dim iSkins As Integer = 0, iCTP As Integer = 0, iPCTP As Integer = 0, iPCTP1 As Integer = 0, iPCTP2 As Integer = 0, iPurse As Integer = 0
 
     Private Sub ScoreCard_Load(sender As System.Object, e As System.EventArgs) Handles MyBase.Load
+        'Me.Size = My.Computer.Screen.WorkingArea.Size
+        'Me.WindowState = FormWindowState.Maximized
+        '        float widthRatio = Screen.PrimaryScreen.Bounds.Width / 1280;
+        'float heightRatio = Screen.PrimaryScreen.Bounds.Height / 800.0F;
+        'SizeF Scale() = New SizeF(widthRatio, heightRatio);
+        'this.Scale(Scale);
+        'foreach(Control control In this.Controls)
+        '{
+        'Control.Font = New Font("Verdana", Control.Font.SizeInPoints * heightRatio * widthRatio);
+        '}
 
-        oHelper.LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
+        ' Usage:
+        '  Resizing functionality requires only three lines of code on a form:
+        '
+        '  1. Create a form-level reference to the Resize class:
+        '     Dim myResizer as Resizer
+        '
+        '  2. In the Form_Load event, call the  Resizer class FIndAllControls method:
+        '     myResizer.FindAllControls(Me)
+        '
+        '  3. In the Form_Resize event, call the  Resizer class ResizeAllControls method:
+        '     myResizer.ResizeAllControls(Me)
+        '
+        'rs.FindAllControls(Me)
+        'Dim r As New Relative(Me)
+
+        ''width
+        'fromsizeW = Me.Size.Width
+        'gvSsizeW = dgScores.Size.Width
+        'gvSCsizeW = dgScoreCard.Size.Width
+        'gbSCsizew = gbScoring.Size.Width
+        ''height
+        'fromsizeH = Me.Size.Height
+        'gvSsizeH = dgScores.Size.Height
+        'gvSCsizeH = dgScoreCard.Size.Height
+        'gbSCsizeH = gbScoring.Size.Height
+
+        'dgScores.Dispose()
+        'frmChooseScores.Font = New Font("tahoma", 15)
         lbStatus.Text = String.Format("Loading Scores from {0}", Main.lbScoresFile.Text)
-        oHelper.status_Msg(lbStatus, Me)
-        'copy main's helper
+        lbStatus.BackColor = Color.Red
+        Me.Cursor = Cursors.WaitCursor
+        Application.DoEvents()
+
+        dgScores.AllowUserToAddRows = True
         oHelper = Main.oHelper
         oHelper.LOGIT(Reflection.MethodBase.GetCurrentMethod().Name & " -------------------------")
         oHelper.dsLeague.Tables("dtPlayers").PrimaryKey = New DataColumn() {oHelper.dsLeague.Tables("dtPlayers").Columns("Name")}
 
         Dim dtschedule As New DataTable()
-        'build a table of schedule with dates in rows instead of columns
         dtschedule = oHelper.buildSchedule()
-        'reformat dates into yyyymmdd format
         For Each row In dtschedule.Rows
             If row(1) Is DBNull.Value Then
                 dtschedule.Rows.Remove(row)
@@ -44,48 +81,39 @@ Public Class frmScoreCard
             Dim reformatted As String = wkdate.ToString("yyyyMMdd", Globalization.CultureInfo.InvariantCulture)
             row("Date") = reformatted
         Next
-
-        cbDatesPlayers.Items.Clear()
-        'Dim bdone = False
-        'Dim wdate As Date = DateTime.ParseExact(oHelper.sDateLastScore, "yyyyMMdd", Nothing).ToString("MM\/dd\/yyyy").Trim("0") 'oHelper.sDateLastScore
-        'Dim reformatteddt As String = wdate.ToString("yyyyMMdd", Globalization.CultureInfo.InvariantCulture)
         Dim dvsch As New DataView(dtschedule)
         'dvsch.Sort = "Date desc"
+        Dim pdate = ""
+        cbDatesPlayers.Items.Clear()
+        Dim bdone = False
         For Each rv As DataRowView In dvsch
             'check the sch date against the last score date
             cbDatesPlayers.Items.Add(rv(0))
-            'lastscore has last score in scores file
-            'If rv(0) >= oHelper.sDateLastScore Then
-            '    oHelper.sDateLastScore = rv(0)
-            '    Exit For
-            'End If
+            If bdone Then Exit For
+            'lastscore has valid scores
+            If rv(0) = oHelper.sDateLastScore Then bdone = True
         Next
 
-        Dim wkdate2 = Date.ParseExact(cbDatesPlayers.Items.Item(cbDatesPlayers.Items.Count - 1), "yyyyMMdd", System.Globalization.DateTimeFormatInfo.InvariantInfo).AddDays(7)
-        cbDatesPlayers.Items.Add(wkdate2.ToString("yyyyMMdd", Globalization.CultureInfo.InvariantCulture))
-        wkdate2 = wkdate2.AddDays(7)
-        cbDatesPlayers.Items.Add(wkdate2.ToString("yyyyMMdd", Globalization.CultureInfo.InvariantCulture))
-        'cbDatesPlayers.Items.Add(Date.ParseExact(slastweek, "yyyyMMdd", System.Globalization.DateTimeFormatInfo.InvariantInfo).AddDays(14))
-        cbDatesPlayers.SelectedItem = oHelper.sDateLastScore
-
-        oHelper.dDate = Date.ParseExact(cbDatesPlayers.SelectedItem, "yyyyMMdd", System.Globalization.DateTimeFormatInfo.InvariantInfo)
-
         'oHelper.BuildControls(gbScoringSgboreCard, 1, 18, "Scorecard")
-        'bCloseScreen = False
-        'oHelper.bScoreCard = True
-
-        'set defaults for form
+        bCloseScreen = False
+        oHelper.bScoreCard = True
         oHelper.bColors = False
         oHelper.bDots = False
         If rbColors.Checked Then oHelper.bColors = True
         If rbDots.Checked Then oHelper.bDots = True
 
+        '20180121-removed this from form
+        'gbDefGames.Visible = True
         gbDefMeth.Visible = True
         If oHelper.rLeagueParmrow("Method") = "Net" Then
             rbNet.Checked = True
         ElseIf oHelper.rLeagueParmrow("Method") = "Gross" Then
             rbGross.Checked = True
         End If
+        tbCP1.Text = 0
+        tbCP2.Text = 0
+        tbSkins.Text = 0
+        tbPurse.Text = 0
 
         lbStatus.Text = ""
         rbColors.TabStop = False
@@ -93,18 +121,12 @@ Public Class frmScoreCard
         rbGross.TabStop = False
         rbNet.TabStop = False
         rbScore.TabStop = False
-        rbBack.TabStop = False
-        rbFront.TabStop = False
-        cbScoresLocked.Checked = False
         btnShowScores.TabStop = False
 
-        tbCP1.Text = 0
-        tbCP2.Text = 0
-        tbSkins.Text = 0
-        tbPurse.Text = 0
-
+        cbDatesPlayers.SelectedItem = oHelper.sDateLastScore
+        oHelper.dDate = Date.ParseExact(cbDatesPlayers.SelectedItem, "yyyyMMdd", System.Globalization.DateTimeFormatInfo.InvariantInfo)
+        cbScoresLocked.Checked = False
         BldScoreCardDataGridFromFile()
-
         If Not bMatchesSet Then Me.Close()
         '20180221-calculate number of closests to pins there should be
         oHelper.iNumClosests = 0
@@ -117,7 +139,6 @@ Public Class frmScoreCard
         Else
             rbBack.Checked = True
         End If
-        If oHelper.bCCLeague Then cbMatches.Checked = True
         ' Set up the delays for the ToolTip.
         toolTipHdcp = oHelper.toolTipHdcp
         toolTipHdcp.AutoPopDelay = 5000
@@ -130,250 +151,233 @@ Public Class frmScoreCard
         'AddHandler dgScores_CellClick() = New System.Windows.Forms.DataGridViewCellEventHandler(AddressOf dgScores_CellClick)
         'AddHandler lv1.SelectedIndexChanged, AddressOf lv1_SelectedIndexChanged
         'AddHandler dgScores.CellClick, AddressOf dgScores_CellClick
-
         lbStatus.Text = String.Format("Finished Loading Scores from {0}", Main.lbScoresFile.Text)
-        oHelper.status_Msg(lbStatus, Me)
-        bFormLoad = False
+        lbStatus.BackColor = Color.LightGreen
+        Me.Cursor = Cursors.Default
+        Application.DoEvents()
+
     End Sub
     Private Sub btnExit_Click(sender As Object, e As EventArgs) Handles btnExit.Click
         oHelper.LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
         bSaveBtn = False
+        'bCloseScreen = True
         'this makes closing form event kick off
         Me.Close()
+        oHelper.bScoreCard = False
         Exit Sub
     End Sub
 
     'this function is called to validate that all holes were entered and to add up scores to net/gross calculations
     Function calcScores(R As DataGridViewRow) As Integer
         calcScores = 0
-        With oHelper
-            .bAllHolesEntered = True
-            Try
-
-                For i = .iHoleMarker To .iHoleMarker + .iHoles - 1
-                    Dim iScore As String = .RemoveSpcChar(R.Cells("Hole" & i).Value)
-                    If iScore <> "" Then
-                        If Not IsNumeric(iScore) Then
-                            .bAllHolesEntered = False
-                            Continue For
-                        End If
-                        '20180127-decrease for net method
-                        If R.Cells("Method").Value.ToString.StartsWith("N") Then
-                            Dim isi = .CalcStrokeIndex("Hole" & i)
-                            If .iHdcp >= isi Then
-                                'check stroke index 
-                                iScore += 1
-                                'check for 2 strokes
-                                If .iHdcp - .iHoles >= isi Then iScore += 1
-                            End If
-                        End If
-                        calcScores += iScore
-                    Else
-                        .bAllHolesEntered = False
-                        Exit For
+        oHelper.bAllHolesEntered = True
+        Try
+            For i = oHelper.iHoleMarker To oHelper.iHoleMarker + oHelper.iHoles - 1
+                Dim iScore As String = ""
+                iScore = oHelper.RemoveSpcChar(R.Cells("Hole" & i).Value)
+                If iScore <> "" Then
+                    If Not IsNumeric(iScore) Then
+                        oHelper.bAllHolesEntered = False
+                        Continue For
                     End If
-                Next
+                    '20180127-decrease for net method
+                    If R.Cells("Method").Value.ToString.StartsWith("N") Then
+                        Dim isi = oHelper.CalcStrokeIndex("Hole" & i)
+                        If oHelper.iHdcp >= isi Then
+                            'check stroke index 
+                            iScore += 1
+                            If oHelper.iHdcp - oHelper.iHoles >= isi Then iScore += 1
+                        End If
+                    End If
+                    calcScores = calcScores + iScore
+                Else
+                    oHelper.bAllHolesEntered = False
+                End If
+            Next
 
-            Catch ex As Exception
-                MsgBox(oHelper.GetExceptionInfo(ex))
-            End Try
-        End With
+        Catch ex As Exception
+
+        End Try
     End Function
     Function GetPHdcp() As String
         GetPHdcp = ""
-
         Dim dvscores As New DataView(oHelper.dsLeague.Tables("dtScores"))
-        With dvscores
-            '20181014-future try to search internet to find a top row solution
-            .RowFilter = String.Format("Player = '{0}' and Date < '{1}'", oHelper.sPlayer, cbDatesPlayers.SelectedItem)
-            .Sort = "Date DESC"
-            If .Count > 0 Then GetPHdcp = .Item(0).Item("Hdcp")
-        End With
-        
+        dvscores.RowFilter = "Player = '" & oHelper.sPlayer & "'" & " and Date < '" & cbDatesPlayers.SelectedItem & "'"
+        dvscores.Sort = "Date DESC"
+        If dvscores.Count > 0 Then
+            GetPHdcp = dvscores.Item(0).Item("Hdcp")
+        End If
+
     End Function
     Sub rebuildReadOnly()
-        Try
+        If cbScoresLocked.Checked = True Then
+            dgScores.ReadOnly = True
+            'Exit Sub
+        Else
+            dgScores.ReadOnly = False
+        End If
 
-            If cbScoresLocked.Checked = True Then
-                dgScores.ReadOnly = True
-                'Exit Sub
+        'create array from above defined fields we want out of scorecard
+        Dim sArray = New List(Of String)
+        sArray.AddRange(oHelper.cBaseScoreCard.Replace("Holes", "Date(2)-cPat120,Holes").Split(","))
+        sArray.AddRange(oHelper.cSkinsFields.Split(","))
+        '20180222-expand #closests to track each individual hle for carry overs
+        Dim ictpctr = 1
+        For Each fld In sArray
+            If fld.Contains("#Closests") Then
+                For i = oHelper.iHoleMarker To (oHelper.iHoleMarker - 1) + 9
+                    If oHelper.MyCourse(0)("Hole" & i) = 3 Then
+                        sArray.Add("CTP " & ictpctr & "-cPat40nt")
+                        ictpctr += 1
+                    End If
+                Next
+                sArray.Remove(fld)
+                Exit For
+            End If
+        Next
+
+        sArray.Add("Points-cPat40nt")
+        sArray.Add("Team_Points-cPat40nt")
+        sArray.Add("Opponent-cPat170nt")
+
+        Dim sColFormat = New List(Of String)
+        Dim sScoreCardforDGV = ""
+        'strip parenthesis and add gross/net for In/Out
+        'fields can have a pattern associated for cell length, centering,
+
+        For Each parm As String In sArray
+            'set detault pattern
+            Dim sPat = "cPat40"
+            Dim sParm = ""
+
+            If UBound(parm.Split("-")) = 0 Then
+                sParm = parm
             Else
-                dgScores.ReadOnly = False
+                sParm = parm.Split("-")(0)
+                sPat = parm.Substring(parm.IndexOf("-") + 1)
             End If
 
-            'create array from above defined fields we want out of scorecard
-            Dim sArray = New List(Of String)
-            sArray.AddRange(oHelper.cBaseScoreCard.Replace("Holes", "Date(2)-cPat120,Holes").Split(","))
-            sArray.AddRange(oHelper.cSkinsFields.Split(","))
-            '20180222-expand #closests to track each individual hle for carry overs
-            Dim ictpctr = 1
-            For Each fld In sArray
-                If fld.Contains("#Closests") Then
-                    For i = oHelper.iHoleMarker To (oHelper.iHoleMarker - 1) + 9
-                        If oHelper.MyCourse(0)("Hole" & i) = 3 Then
-                            sArray.Add("CTP " & ictpctr & "-cPat40nt")
-                            ictpctr += 1
-                        End If
-                    Next
-                    sArray.Remove(fld)
-                    Exit For
-                End If
-            Next
+            If parm.Contains("(") Then
+                sParm = parm.Substring(0, parm.IndexOf("("))
+            End If
 
-            sArray.Add("Points-cPat40nt")
-            sArray.Add("Team_Points-cPat40nt")
-            sArray.Add("Opponent-cPat170nt")
-
-            Dim sColFormat = New List(Of String)
-            Dim sScoreCardforDGV = ""
-            'strip parenthesis and add gross/net for In/Out
-            'fields can have a pattern associated for cell length, centering,
-
-            For Each parm As String In sArray
-                'set detault pattern
-                Dim sPat = "cPat40"
-                Dim sParm = ""
-
-                If UBound(parm.Split("-")) = 0 Then
-                    sParm = parm
+            If sParm = "Holes" Then
+                sScoreCardforDGV = sScoreCardforDGV + oHelper.CreateHolesFromParm(sColFormat)
+                Continue For
+            ElseIf sParm = "Date" Then
+                If oHelper.bScoresbyPlayer Then
+                    sColFormat.Add(sPat)
                 Else
-                    sParm = parm.Split("-")(0)
-                    sPat = parm.Substring(parm.IndexOf("-") + 1)
-                End If
-
-                If parm.Contains("(") Then
-                    sParm = parm.Substring(0, parm.IndexOf("("))
-                End If
-
-                If sParm = "Holes" Then
-                    sScoreCardforDGV = sScoreCardforDGV + oHelper.CreateHolesFromParm(sColFormat)
                     Continue For
-                ElseIf sParm = "Date" Then
-                    If oHelper.bScoresbyPlayer Then
-                        sColFormat.Add(sPat)
-                    Else
-                        Continue For
-                    End If
                 End If
-                sScoreCardforDGV = sScoreCardforDGV + sParm + ","
-                sColFormat.Add(sPat)
-            Next
+            End If
+            sScoreCardforDGV = sScoreCardforDGV + sParm + ","
+            sColFormat.Add(sPat)
+        Next
 
-            'replace spaces with underscores for csv column matchups
-            sScoreCardforDGV = sScoreCardforDGV.Substring(0, Len(sScoreCardforDGV) - 1).Replace(" ", "_")
-            Dim dvScores As New DataView(oHelper.dsLeague.Tables("dtScores"))
-            dvScores.RowFilter = "Date = '" & cbDatesPlayers.SelectedItem & "'"
-            'added sort by match(partner)
-            dvScores.Sort = "Partner"
-            Dim dtScorecard As DataTable = dvScores.ToTable(True, sScoreCardforDGV.Split(",").ToArray)
+        'replace spaces with underscores for csv column matchups
+        sScoreCardforDGV = sScoreCardforDGV.Substring(0, Len(sScoreCardforDGV) - 1).Replace(" ", "_")
+        Dim dvScores As New DataView(oHelper.dsLeague.Tables("dtScores"))
+        dvScores.RowFilter = "Date = '" & cbDatesPlayers.SelectedItem & "'"
+        'added sort by match(partner)
+        dvScores.Sort = "Partner"
+        Dim dtScorecard As DataTable = dvScores.ToTable(True, sScoreCardforDGV.Split(",").ToArray)
 
-            dgScores.Columns.Clear()
+        dgScores.Columns.Clear()
 
-            oHelper.bNoRowLeave = True
-            dgScores.RowTemplate.Height = 20
-            dgScores.DefaultCellStyle.Font = New Font("Tahoma", 11)
+        oHelper.bNoRowLeave = True
+        dgScores.RowTemplate.Height = 20
+        dgScores.DefaultCellStyle.Font = New Font("Tahoma", 11)
 
-            'With dgScores
-            '    .DataSource = dtScorecard
-            'End With
-            Dim arr As Array = sScoreCardforDGV.Split(",").ToArray
-            For Each col As DataColumn In dtScorecard.Columns
-                Dim dgc As New DataGridViewTextBoxColumn
-                dgc.Name = col.ColumnName
-                dgc.ValueType = GetType(System.String)
-                dgScores.Columns.Add(dgc)
-            Next
+        'With dgScores
+        '    .DataSource = dtScorecard
+        'End With
+        Dim arr As Array = sScoreCardforDGV.Split(",").ToArray
+        For Each col As DataColumn In dtScorecard.Columns
+            Dim dgc As New DataGridViewTextBoxColumn
+            dgc.Name = col.ColumnName
+            dgc.ValueType = GetType(System.String)
+            dgScores.Columns.Add(dgc)
+        Next
 
-            Dim sdel = "-"
-            For Each col As DataGridViewColumn In dgScores.Columns
-                With col
-                    Dim sformat = sColFormat(.Index)
-                    Try
-                        Select Case sColFormat(.Index)
-                            Case "cPat40nt"
-                                sformat = oHelper.cPat40nt
-                            Case "cPatHole"
-                                sformat = oHelper.cPathole
-                            Case "cPat60"
-                                sformat = oHelper.cPat60
-                            Case "cPat120"
-                                sformat = oHelper.cPat120
-                            Case "cPatMeth"
-                                sformat = oHelper.cPatMeth
-                            Case "cPat170"
-                                sformat = oHelper.cPat170
-                            Case "cPat170nt"
-                                sformat = oHelper.cPat170nt
-                            Case Else
-                                sformat = oHelper.cPat40
-                        End Select
-
-                    Catch ex As Exception
-                        Dim x = ""
-                    End Try
-
-                    Dim scolname = .Name
-                    Dim sWidth = sformat.Split(sdel)(0)
-                    Dim sRO = sformat.Split(sdel)(1)
-                    Dim sTabstop = sformat.Split(sdel)(2)
-                    Dim sAlign = sformat.Split(sdel)(3)
-
-                    .Width = sWidth
-                    'oHelper.LOGIT(dgScores.Rows(0).Cells(.Name).Value & "-" & dgScores.Rows(0).Cells(.Name).ReadOnly)
-                    .ReadOnly = sRO
-                    .DataGridView.TabStop = sTabstop
-                    Select Case sAlign
-                        Case "mr"
-                            .HeaderCell.Style.Alignment = DataGridViewContentAlignment.MiddleRight
-                            .DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight
-                        Case "mc"
-                            .HeaderCell.Style.Alignment = DataGridViewContentAlignment.MiddleCenter
-                            .DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter
-                        Case "ml"
-                            .HeaderCell.Style.Alignment = DataGridViewContentAlignment.MiddleLeft
-                            .DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleLeft
+        Dim sdel = "-"
+        For Each col As DataGridViewColumn In dgScores.Columns
+            With col
+                Dim sformat = sColFormat(.Index)
+                Try
+                    Select Case sColFormat(.Index)
+                        Case "cPat40nt"
+                            sformat = oHelper.cPat40nt
+                        Case "cPatHole"
+                            sformat = oHelper.cPathole
+                        Case "cPat60"
+                            sformat = oHelper.cPat60
+                        Case "cPat120"
+                            sformat = oHelper.cPat120
+                        Case "cPatMeth"
+                            sformat = oHelper.cPatMeth
+                        Case "cPat170"
+                            sformat = oHelper.cPat170
+                        Case "cPat170nt"
+                            sformat = oHelper.cPat170nt
+                        Case Else
+                            sformat = oHelper.cPat40
                     End Select
 
-                    .HeaderText = .HeaderText.Replace("_", " ")
-                    If .Name.Contains("Hole") Then
-                        .HeaderText = .HeaderText.Replace("Hole", "")
-                    End If
+                Catch ex As Exception
+                    Dim x = ""
+                End Try
 
-                    '20180201-force read only of scores are locked
-                    'If cbScoresLocked.Checked = True Then
-                    '    .ReadOnly = True
-                    'End If
-                    .SortMode = DataGridViewColumnSortMode.NotSortable
+                Dim scolname = .Name
+                Dim sWidth = sformat.Split(sdel)(0)
+                Dim sRO = sformat.Split(sdel)(1)
+                Dim sTabstop = sformat.Split(sdel)(2)
+                Dim sAlign = sformat.Split(sdel)(3)
 
-                End With
-            Next
+                .Width = sWidth
+                'oHelper.LOGIT(dgScores.Rows(0).Cells(.Name).Value & "-" & dgScores.Rows(0).Cells(.Name).ReadOnly)
+                .ReadOnly = sRO
+                .DataGridView.TabStop = sTabstop
+                Select Case sAlign
+                    Case "mr"
+                        .HeaderCell.Style.Alignment = DataGridViewContentAlignment.MiddleRight
+                        .DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleRight
+                    Case "mc"
+                        .HeaderCell.Style.Alignment = DataGridViewContentAlignment.MiddleCenter
+                        .DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter
+                    Case "ml"
+                        .HeaderCell.Style.Alignment = DataGridViewContentAlignment.MiddleLeft
+                        .DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleLeft
+                End Select
 
-            For Each row As DataRow In dtScorecard.Rows
-                dgScores.Rows.Add(row.ItemArray)
-                oHelper.ChangeColorsForStrokes(dgScores.Rows(dgScores.RowCount - 1))
-            Next
+                .HeaderText = .HeaderText.Replace("_", " ")
+                If .Name.Contains("Hole") Then
+                    .HeaderText = .HeaderText.Replace("Hole", "")
+                End If
 
-            If dtScorecard.Rows.Count <> oHelper.rLeagueParmrow("Teams") * 2 Then
-                MsgBox(String.Format("Score card file has {0} and should have {1}, fix before saving", dtScorecard.Rows.Count, oHelper.rLeagueParmrow("Teams") * 2))
-                Throw New Exception("Not Enough scores")
-            End If
+                '20180201-force read only of scores are locked
+                'If cbScoresLocked.Checked = True Then
+                '    .ReadOnly = True
+                'End If
+                .SortMode = DataGridViewColumnSortMode.NotSortable
 
-        Catch ex As Exception
-            MsgBox(oHelper.GetExceptionInfo(ex))
-        End Try
+            End With
+        Next
+
+        If dtScorecard.Rows.Count <> oHelper.rLeagueParmrow("Teams") * 2 Then
+            MsgBox(String.Format("Score card file has {0} and should have {1}, fix before continuing", dtScorecard.Rows.Count, oHelper.rLeagueParmrow("Teams") * 2))
+            Exit Sub
+        End If
+
+        For Each row As DataRow In dtScorecard.Rows
+            dgScores.Rows.Add(row.ItemArray)
+            oHelper.ChangeColorsForStrokes(dgScores.Rows(dgScores.RowCount - 1))
+        Next
+
     End Sub
     Sub BldScoreCardDataGridFromFile()
         oHelper.LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
         Try
-            'change mm/dd/yyyy to yyyymmdd
-            Dim reformatted1 As String = cbDatesPlayers.SelectedItem
-            Dim wkdate As Date = oHelper.rLeagueParmrow("PostSeasonDt")
-            Dim reformatted2 As String = wkdate.ToString("yyyyMMdd", Globalization.CultureInfo.InvariantCulture)
-            If reformatted1 >= reformatted2 Then
-                oHelper.bCCLeague = True
-            Else
-                oHelper.bCCLeague = False
-            End If
 
             If oHelper.rLeagueParmrow("ScoresLocked") = "Y" Then
                 cbScoresLocked.Checked = True
@@ -408,11 +412,10 @@ Public Class frmScoreCard
 
             For Each srow As DataRowView In dvscores
                 If srow("Hole1") IsNot DBNull.Value Then
-                    If IsNumeric(srow("Hole1")) Then oHelper.iHoleMarker = 1
+                    oHelper.iHoleMarker = 1
                 ElseIf srow("Hole10") IsNot DBNull.Value Then
-                    If IsNumeric(srow("Hole10")) Then oHelper.iHoleMarker = 10
+                    oHelper.iHoleMarker = 10
                 End If
-                If oHelper.iHoleMarker = 0 Then oHelper.CalcHoleMarker(oHelper.dDate.ToString("yyyyMMdd", Globalization.CultureInfo.InvariantCulture))
                 Exit For
             Next
 
@@ -431,14 +434,11 @@ Public Class frmScoreCard
             dgScores.AllowUserToAddRows = False
             dgScores.AllowUserToDeleteRows = False
 
-            iSkins = 0
-            iCTP = 0
-            iPurse = 0
             tbSkins.Text = "0"
             tbCP1.Text = "0"
             tbCP2.Text = "0"
             tbPurse.Text = "0"
-
+            Dim iSkins As Integer = 0, iCTP As Integer = 0, iPCTP As Integer = 0, iPCTP1 As Integer = 0, iPCTP2 As Integer = 0, iPurse As Integer = 0
             Dim dt = New DataTable
             If Not oHelper.CSV2DataTable(dt, oHelper.getLatestFile("*LeagueParms.csv")) Then
                 MsgBox(String.Format("File in use, close file and restart {0} {1}", vbCrLf, oHelper.getLatestFile("*LeagueParms.csv")))
@@ -591,6 +591,7 @@ Public Class frmScoreCard
                 oHelper.sPlayer = oHelper.convDBNulltoSpaces(row.Cells("Player").Value)
                 If oHelper.sPlayer.Trim = "" Then
                     lbStatus.Text = String.Format("Invalid Player {0},  fix before saving", oHelper.sPlayer)
+                    bCloseScreen = False
                     Exit Sub
                 End If
                 'use ddate because cbdatesplayers.selecteditem has changed the date
@@ -633,7 +634,6 @@ Public Class frmScoreCard
                     If cell.OwningColumn.Name = "Team" Then
                         If oHelper.convDBNulltoSpaces(cell.Value).Trim = "" Then
                             lbStatus.Text = String.Format("Invalid Team {0} for Player {1}{2} you need to fix before saving", cell.Value, row.Cells("Player").Value, vbCrLf)
-                            lbStatus.BackColor = Color.Red
                             Exit Sub
                         End If
                         'ElseIf cell.OwningColumn.Name = "Group" Then
@@ -693,6 +693,11 @@ Public Class frmScoreCard
             End If
             '20180201-first time through if boolean changed-skins and ctp get edited in another event
             If sCurrColName = "Skins" Or sCurrColName = "Closest" Or sCurrColName = "Clear" Then Exit Sub
+            '    Dim cell As DataGridViewCheckBoxCell = sender.currentcell
+            '    If CBool(sender.currentcell.value) = True Then
+            '        calcSkinsCTP(sender.currentcell)
+            '    End If
+            'End If
             'if no change, then exit 
             If dgr.CurrentCell.Value = sOldCellValue Then Exit Sub
             Dim R As DataGridViewRow = dgr.CurrentRow
@@ -705,6 +710,13 @@ Public Class frmScoreCard
             ElseIf sCurrColName.StartsWith("Hole") Then
                 editHoles(R, sCurrColName)
                 editrest(R, sCurrColName)
+                'ElseIf sCurrColName = "Skins" Then
+                '    editSkins(R, sCurrColName)
+                'ElseIf sCurrColName = "Closest" Then
+                '    editCTP(R, sCurrColName)
+                '20180219-correct spelling on closests - was closest
+                'ElseIf sCurrColName = "#Closests" Then
+                '    editnumCTP(R, sCurrColName)
             ElseIf sCurrColName = "Team" Then
                 editTeam(R, sCurrColName)
                 '20180220-do gross on score method
@@ -902,6 +914,7 @@ Public Class frmScoreCard
                 '20180219-add check for < 0 on #net method
                 If Not IsNumeric(sScore) Or (R.Cells("Method").Value <> "Net" And sScore < 1) Then
                     Throw New NotSupportedException
+                    'Dim x As Integer = R.Cells(sCurrColName).Value
                 ElseIf Len(sScore) <> 1 And Len(sScore) <> 9 Then
                     Throw New NotSupportedException
                 End If
@@ -959,7 +972,89 @@ Public Class frmScoreCard
         End Try
 
     End Sub
+    Sub editSkins(R As DataGridViewRow, sCurrColName As String)
+        '20180201-being done in mouse click event
+        'R.Cells(sCurrColName).Value = oHelper.convDBNulltoSpaces(R.Cells("Skins").Value.ToString.ToUpper)
+        ''save the league skin amt
+        'Dim iamt As Integer = oHelper.rLeagueParmrow("Skins")
+        ''if the new value is a y
+        'If R.Cells(sCurrColName).Value = "Y" Then
+        '    'then check the old value for an n, if it was were good to go, if not zero the amt, nothing changed
+        '    If sOldCellValue = "Y" Then iamt = 0
+        'ElseIf R.Cells(sCurrColName).Value <> "N" Then
+        '    MsgBox(String.Format("{0} must be Y or N, changed to N, change back if needed", sCurrColName))
+        '    If sOldCellValue <> "Y" Then
+        '        iamt = 0
+        '    Else
+        '        iamt = iamt * -1
+        '    End If
+        '    R.Cells(sCurrColName).Value = "N"
+        'Else
+        '    'the new value is an n, check the old value for an n, if it was zero the amt, nothing changed, else, make the amt negative 
+        '    If sOldCellValue <> "Y" Then
+        '        iamt = 0
+        '    Else
+        '        iamt = iamt * -1
+        '    End If
+        'End If
+        ''save it to the textbox
+        'Dim ipamt = iamt
+        'iamt += tbSkins.Text
+        'ipamt += tbPurse.Text
+        'tbSkins.Text = iamt
+        'tbPurse.Text = ipamt
 
+    End Sub
+    Sub editCTP(R As DataGridViewRow, sCurrColName As String)
+        'R.Cells(sCurrColName).Value = oHelper.convDBNulltoSpaces(R.Cells(sCurrColName).Value).Trim.ToUpper
+        ''save the league closest 
+        ''this will change to parm when i get to it
+        ''im iamt As Integer = oHelper.rLeagueParmrow(sCurrColName)
+        'Dim iamt As Integer = 1
+        ''if the new value is a y
+        'If R.Cells(sCurrColName).Value = "Y" Then
+        '    'then check the old value for an n, if it was were good to go, if not zero the amt, nothing changed
+        '    If sOldCellValue = "Y" Then iamt = 0
+        'ElseIf R.Cells(sCurrColName).Value <> "N" Then
+        '    MsgBox(String.Format("{0} must be Y or N, changed to N, change back if needed", sCurrColName))
+        '    If sOldCellValue <> "Y" Then
+        '        iamt = 0
+        '    Else
+        '        iamt = iamt * -1
+        '    End If
+        '    R.Cells(sCurrColName).Value = "N"
+        'Else
+        '    'the new value is an n, check the old value for an n, if it was zero the amt, nothing changed, else, make the amt negative 
+        '    If sOldCellValue <> "Y" Then
+        '        iamt = 0
+        '    Else
+        '        iamt = iamt * -1
+        '    End If
+        'End If
+        ''save it to the textbox
+        'Dim ipamt = iamt
+        'iamt += tbCTP.Text
+        'ipamt += tbPurse.Text
+        'tbCTP.Text = iamt
+        'tbPurse.Text = ipamt
+
+    End Sub
+    Sub editnumCTP(R As DataGridViewRow, sCurrColName As String)
+
+        Dim iCTP = 0
+        For Each row As DataGridViewRow In dgScores.Rows
+            Dim cell As DataGridViewCheckBoxCell = row.Cells("#Closests")
+            If cell.Value = True Then
+                iCTP += 1
+            End If
+        Next
+
+        If iCTP > oHelper.iNumClosests Then
+            MsgBox(String.Format("There are only {0} closests to pins, cant have more, try again", oHelper.iNumClosests))
+            oHelper.bDGSError = True
+            R.Cells(sCurrColName).Value = sOldCellValue
+        End If
+    End Sub
     Sub editTeam(R As DataGridViewRow, sCurrColName As String)
         'check the team number before leaving a row
         Dim steam As Integer
@@ -991,9 +1086,8 @@ Public Class frmScoreCard
             R.Cells("Team").Value = sOldCellValue
             oHelper.bDGSError = True
         Catch ex As TeamDuplicate
-            'MsgBox(String.Format("This Team ({0}) already has 2 players entered, setting back to {1}", R.Cells("Team").Value, sOldCellValue))
-            MsgBox(String.Format("(Team {0}) {1}, setting back to {2}", R.Cells("Team").Value, ex.Message, sOldCellValue))
-            R.Cells("Team").Value = sOldCellValue
+            MsgBox(String.Format("This Team ({0}) already has 2 players entered, setting back to {1}", R.Cells("Team").Value, sOldCellValue))
+            R.Cells("Team").Value = ""
             oHelper.bDGSError = True
         Catch ex As Exception
             'MsgBox(ex.Message & vbCrLf & ex.StackTrace)
@@ -1182,25 +1276,25 @@ Public Class frmScoreCard
         tbPurse.Text = iSkinsDol + iCtpsDol
 
     End Sub
-    'Sub resetGross_Net_Hdcp(wrow As DataGridViewRow)
-    '    Debug.Print("Current Player - " & oHelper.sPlayer)
-    '    Debug.Print(wrow.Cells("Player").Value)
-    '    Debug.Print(wrow.Cells("Hole1").Value)
-    '    Debug.Print(wrow.Cells("Out_Gross").Value)
-    '    Debug.Print(wrow.Cells("Out_Net").Value)
-    '    Debug.Print(wrow.Cells("Phdcp").Value)
-    '    Debug.Print(wrow.Cells("Hdcp").Value)
+    Sub resetGross_Net_Hdcp(wrow As DataGridViewRow)
+        Debug.Print("Current Player - " & oHelper.sPlayer)
+        Debug.Print(wrow.Cells("Player").Value)
+        Debug.Print(wrow.Cells("Hole1").Value)
+        Debug.Print(wrow.Cells("Out_Gross").Value)
+        Debug.Print(wrow.Cells("Out_Net").Value)
+        Debug.Print(wrow.Cells("Phdcp").Value)
+        Debug.Print(wrow.Cells("Hdcp").Value)
 
-    '    wrow.Cells("Hdcp").Value = wrow.Cells("PHdcp").Value
-    '    For Each cell In wrow.Cells
-    '        If cell.owningcolumn.name = "In_Gross" Or cell.owningcolumn.name = "Out_Gross" Or cell.owningcolumn.name = "In_Net" Or cell.owningcolumn.name = "Out_Net" Then
-    '            cell.Value = DBNull.Value
-    '        End If
-    '    Next
-    '    Debug.Print(wrow.Cells("Phdcp").Value)
+        wrow.Cells("Hdcp").Value = wrow.Cells("PHdcp").Value
+        For Each cell In wrow.Cells
+            If cell.owningcolumn.name = "In_Gross" Or cell.owningcolumn.name = "Out_Gross" Or cell.owningcolumn.name = "In_Net" Or cell.owningcolumn.name = "Out_Net" Then
+                cell.Value = DBNull.Value
+            End If
+        Next
+        Debug.Print(wrow.Cells("Phdcp").Value)
 
-    '    oHelper.bAllHolesEntered = False
-    'End Sub
+        oHelper.bAllHolesEntered = False
+    End Sub
     Private Sub dgScores_RowEnter(sender As Object, e As DataGridViewCellEventArgs) Handles dgScores.RowEnter
         oHelper.LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name & " row - " & e.RowIndex)
 
@@ -1215,11 +1309,13 @@ Public Class frmScoreCard
 
     Private Sub btnShowScores_Click(sender As Object, e As EventArgs) Handles btnShowScores.Click
 
+        lbStatus.Text = "Getting scores for this screen..."
+        lbStatus.BackColor = Color.Red
         oHelper.LOGIT("--------------------------------------------------------------")
         oHelper.LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
 
-        lbStatus.Text = "Getting scores for this screen..."
-        oHelper.status_Msg(lbStatus, Me)
+        Me.Cursor = Cursors.WaitCursor
+        Application.DoEvents()
 
         SaveScores()
         oHelper.bNoRowLeave = True
@@ -1252,12 +1348,14 @@ Public Class frmScoreCard
         End If
 
         BldScoreCardDataGridFromFile()
-
+        
         oHelper.bNoRowLeave = False
 
-        lbStatus.Text = "Finished Reading Scores"
-        oHelper.status_Msg(lbStatus, Me)
+        lbStatus.Text = "All Scores read"
+        lbStatus.BackColor = Color.LightGreen
 
+        Me.Cursor = Cursors.Default
+        Application.DoEvents()
         sOldCellValue = ""
     End Sub
     Sub cleanupScores()
@@ -1269,7 +1367,6 @@ Public Class frmScoreCard
     End Sub
 
     Private Sub dgScores_CellBeginEdit(sender As Object, e As DataGridViewCellCancelEventArgs) Handles dgScores.CellBeginEdit
-        oHelper.LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
         sOldCellValue = ""
         If sender.currentcell.value IsNot DBNull.Value Then
             If sender.currentcell.value IsNot Nothing Then sOldCellValue = sender.currentcell.value
@@ -1282,20 +1379,25 @@ Public Class frmScoreCard
     'End Sub
 
     Private Sub dgScores_ColumnHeaderMouseClick(sender As Object, e As DataGridViewCellMouseEventArgs) Handles dgScores.ColumnHeaderMouseClick
-        oHelper.LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
 
         MsgBox(String.Format("Resorting not allowed on scorecard"))
         Exit Sub
 
+        oHelper.LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
         Dim newColumn As DataGridViewColumn = sender.Columns(e.ColumnIndex)
         lbStatus.Text = String.Format("Resorting Columns by {0}", newColumn.HeaderText)
-        oHelper.status_Msg(lbStatus, Me)
+        lbStatus.BackColor = Color.Red
+        Me.Cursor = Cursors.WaitCursor
+        Application.DoEvents()
         Dim dgv = sender
         For Each row As DataGridViewRow In dgv.rows
+            'row.Height = 30
             oHelper.ChangeColorsForStrokes(row)
         Next
-        lbStatus.Text = String.Format("Finished Resorting Column {0}", newColumn.HeaderText)
-        oHelper.status_Msg(lbStatus, Me)
+        lbStatus.Text = String.Format("Resorting of Column {0} done", newColumn.HeaderText)
+        lbStatus.BackColor = Color.LightGreen
+        Me.Cursor = Cursors.Default
+        Application.DoEvents()
     End Sub
 
     Private Sub rbDots_CheckedChanged(sender As Object, e As EventArgs) Handles rbDots.CheckedChanged
@@ -1310,7 +1412,16 @@ Public Class frmScoreCard
         End If
 
         For Each row As DataGridViewRow In dgScores.Rows
+            'oHelper.displayStrokes(row)
             oHelper.ChangeColorsForStrokes(row)
+            '    Dim bvalid = False
+            '    If Not row.IsNewRow Then
+            '        For i = 1 To 9
+            '            If oHelper.RemoveSpcChar(row.Cells("Hole" & i).Value) = "" Then Exit For
+            '            bvalid = True
+            '        Next
+            '    End If
+            '    If bvalid Then oHelper.ChangeColorsForStrokes(row)
         Next
     End Sub
 
@@ -1345,6 +1456,12 @@ Public Class frmScoreCard
                     ElseIf sCurrColName.StartsWith("Hole") Then
                         editHoles(R, sCurrColName)
                         editrest(R, sCurrColName)
+                        'ElseIf sCurrColName = "Skins" Then
+                        '    editSkins(R, sCurrColName)
+                        'ElseIf sCurrColName = "Closest" Then
+                        '    editCTP(R, sCurrColName)
+                        'ElseIf sCurrColName = "#Closest" Then
+                        '    editnumCTP(R, sCurrColName)
                     ElseIf sCurrColName = "Team" Then
                         editTeam(R, sCurrColName)
                     End If
@@ -1378,6 +1495,21 @@ Public Class frmScoreCard
     End Sub
 
     Private Sub dgScores_UserDeletingRow(sender As Object, e As DataGridViewRowCancelEventArgs) Handles dgScores.UserDeletingRow
+        'For Each row As DataGridViewRow In dgScores.Rows
+        '    If row.Selected Then
+        '        Dim mbr = MsgBox(String.Format("You sure you want to delete this row for {0}", row.Cells("Player").Value), MsgBoxStyle.YesNo)
+        '        If mbr = MsgBoxResult.Yes Then
+        '            Dim sKeys() As Object = {row.Cells("Player").Value, oHelper.dDate.ToString("yyyyMMdd", Globalization.CultureInfo.InvariantCulture)} 'cbDatesPlayers.SelectedItem}
+        '            Dim arow As DataRow = oHelper.dsLeague.Tables("dtScores").Rows.Find(sKeys)
+        '            oHelper.dsLeague.Tables("dtScores").Rows.Remove(arow)
+        '            dgScores.Rows.Remove(row)
+        '            Exit Sub
+        '        Else
+        '            e.Cancel = True
+        '        End If
+        '        Exit For
+        '    End If
+        'Next
         '20180127 - not allow to delete rows in scorecard
         e.Cancel = True
     End Sub
@@ -1399,6 +1531,28 @@ Public Class frmScoreCard
     End Sub
 
     Private Sub dgScores_CellMouseClick(sender As Object, e As DataGridViewCellMouseEventArgs) Handles dgScores.CellMouseClick
+
+        'Try
+        '    If e.RowIndex < 0 Then Exit Sub
+        '    'if this is a checkbox, check for read only
+        '    Dim cell As DataGridViewCell = sender.currentcell
+
+        '    If cell.FormattedValueType.Name = "Boolean" Then
+        '        sOldCellValue = cell.EditedFormattedValue
+        '        If dgScores.ReadOnly Then
+        '            lbStatus.Text = "Scores are locked, unlock to change"
+        '            lbStatus.BackColor = Color.Yellow
+        '        Else
+        '            'Debug.Print(cell.Value & "-Value Before" & cell.EditedFormattedValue)
+        '            calcSkinsCTP(cell)
+        '        End If
+        '    Else
+        '        lbStatus.Text = ""
+        '        lbStatus.BackColor = Color.White
+        '    End If
+        'Catch ex As Exception
+
+        'End Try
 
     End Sub
     Private Sub dgScores_CellMouseDoubleClick(sender As Object, e As DataGridViewCellMouseEventArgs) Handles dgScores.CellMouseDoubleClick
@@ -1433,7 +1587,9 @@ Public Class frmScoreCard
     End Function
     Private Sub cbScoresLocked_CheckedChanged(sender As Object, e As EventArgs) Handles cbScoresLocked.CheckedChanged
         lbStatus.Text = String.Format("Start Locking Scores")
-        oHelper.status_Msg(lbStatus, Me)
+        lbStatus.BackColor = Color.Red
+        Me.Cursor = Cursors.WaitCursor
+        Application.DoEvents()
         cbScoresLocked.AutoCheck = False
         If cbScoresLocked.Checked Then
             btnSave.Visible = False
@@ -1463,9 +1619,34 @@ Public Class frmScoreCard
             btnSave.Visible = True
         End If
         lbStatus.Text = String.Format("Finished Locking Scores")
-        oHelper.status_Msg(lbStatus, Me)
+        lbStatus.BackColor = Color.LightGreen
+        Me.Cursor = Cursors.Default
+        Application.DoEvents()
         cbScoresLocked.AutoCheck = True
     End Sub
+
+    'Private Sub Hdcp_ShowLabel(ByVal sender As Object, ByVal e As System.EventArgs) Handles dgScores.CellMouseEnter
+    '    'If sender.currentcell IsNot Nothing Then
+    '    '    lbStatus.Text = sender.tooltip.text
+    '    'End If
+
+    'End Sub
+
+    'Private Sub Button_ClearLabel(ByVal sender As Object, ByVal _
+    'e As System.EventArgs) Handles Button7.MouseLeave,
+    'Button8.MouseLeave, Button9.MouseLeave
+    '    If lblTip.Text <> "" Then lblTip.Text = ""
+    'End Sub
+
+    'Private Sub dgScores_CellMouseClick(sender As Object, e As DataGridViewCellMouseEventArgs) Handles dgScores.CellMouseClick
+    '    Dim x = ""
+    'End Sub
+
+    'Private Sub dgScores_MouseClick(sender As Object, e As MouseEventArgs) Handles dgScores.MouseClick
+    '    Dim xx = sender.currentcell.owningcolumn.name
+
+    '    Dim x = ""
+    'End Sub
 
     Private Sub dgScores_RowValidating(sender As Object, e As DataGridViewCellCancelEventArgs) Handles dgScores.RowValidating
         oHelper.LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name & " row - " & e.RowIndex)
@@ -1474,139 +1655,125 @@ Public Class frmScoreCard
             'dgScores.Rows.RemoveAt(e.RowIndex)
             'dgScores.CancelEdit()
         End If
-        If oHelper.bDGSError Then e.Cancel = True
+        If oHelper.bDGSError Then
+            e.Cancel = True
+        End If
+
+        'If oHelper.bexit Then Exit Sub
+        'Dim sRoField = New List(Of String)("Method, Player".Split(", "))
+        'For Each fld In sRoField
+        '    If sender.currentrow.cells(fld).value Is DBNull.Value Then
+        '        sender.currentrow.cells(fld).style.backcolor = Color.Red
+        '        e.Cancel = True
+        '    End If
+        'Next
+        'For i = oHelper.iHoleMarker To oHelper.iHoleMarker + 8
+        '    If sender.currentrow.cells("Hole" & i).value IsNot DBNull.Value Then
+        '        sender.currentrow.cells("Hole" & i).style.backcolor = Color.Red
+        '        e.Cancel = True
+        '    End If
+        'Next
+        'If e.Cancel Then
+        '    MsgBox("fix red fields before updating a row")
+        'End If
 
     End Sub
 
     Private Sub cbMarkPaid_CheckedChanged(sender As Object, e As EventArgs) Handles cbMarkPaid.CheckedChanged
         For Each row In dgScores.Rows
-            ResetCTPSkins(row.cells("Skins"))
-            ResetCTPSkins(row.cells("Closest"))
+            calcCTPSkins(row.cells("Skins"))
+            calcCTPSkins(row.cells("Closest"))
         Next
     End Sub
-    'Sub uncheckClear(cell As DataGridViewCheckBoxCell)
-    '    cell.Value = False
-    'End Sub
-    Sub ResetCTPSkins(cell As DataGridViewCheckBoxCell)
-
-        'if checkbox was on, turn it off, subtract $$ from amt
+    Sub uncheckClear(cell As DataGridViewCheckBoxCell)
+        cell.Value = False
+    End Sub
+    Sub calcCTPSkins(cell As DataGridViewCheckBoxCell)
         If cell.OwningColumn.Name = "Clear" Then
-            '20181022 - work to be done here for clearing scores, then recalcing skins if skins/ctp checkboxes were on
             cell.Value = False
             dgScores.EndEdit()
             Exit Sub
         End If
+        Dim iPurse As Integer = tbPurse.Text
+        Dim iTotSkins As Integer = tbSkins.Text
+        Dim iTotCTP As Integer = tbCP1.Text + tbPCP2.Text
+        Dim iamt As Integer = 0
+        If cell.OwningColumn.Name = "Skins" Then
+            iamt = oHelper.rLeagueParmrow(cell.OwningColumn.Name)
+        ElseIf cell.OwningColumn.Name = "Closest" Then
+            iamt = 1
+        End If
 
         If cell.Value = True Then
-            recalcCTPSkins(cell)
             cell.Value = False
+            If cell.OwningColumn.Name <> "Clear" Then iamt = iamt * -1
         Else
-            recalcCTPSkins(cell, False)
             cell.Value = True
         End If
-    End Sub
-    Sub recalcCTPSkins(cell As DataGridViewCheckBoxCell)
-        recalcCTPSkins(cell, False)
-    End Sub
-    Sub recalcCTPSkins(cell As DataGridViewCheckBoxCell, bSubAmount As Boolean)
-
-        Dim iPurse As Integer = tbPurse.Text
-        Dim iTotSkins As Integer = tbPSkins.Text
-        Dim iTotCTP As Integer = CInt(tbPCP1.Text) + CInt(tbPCP2.Text) + CInt(tbCP1.Text) + CInt(tbCP2.Text)
-        Dim iamt As Integer = 0
-
         If cell.OwningColumn.Name = "Skins" Then
-            If oHelper.bCCLeague Then
-                iamt = 7
-            Else
-                iamt = oHelper.rLeagueParmrow(cell.OwningColumn.Name)
-            End If
+            tbSkins.Text = iTotSkins + iamt
         ElseIf cell.OwningColumn.Name = "Closest" Then
-            If oHelper.bCCLeague Then
-                iamt = 3
-            Else
-                iamt = 1
-            End If
+            tbCP1.Text = iTotCTP + iamt
         End If
-
-        If bSubAmount And cell.Value = False Then
-            iamt = iamt * -1
-        End If
-
-        If cell.Value = True Then
-            If cell.OwningColumn.Name = "Skins" Then
-                tbSkins.Text += iTotSkins + iamt
-            ElseIf cell.OwningColumn.Name = "Closest" Then
-                tbCP1.Text += iamt / 2
-                tbCP2.Text += iamt / 2
-            End If
-            iPurse += iamt
-            tbPurse.Text = iPurse
-            tbSkinTot.Text = CInt(tbPSkins.Text) + CInt(tbSkins.Text)
-            tbCP1Tot.Text = CInt(tbPCP1.Text) + CInt(tbCP1.Text)
-            tbCP2Tot.Text = CInt(tbPCP2.Text) + CInt(tbCP2.Text)
-        End If
+        iPurse += iamt
+        tbPurse.Text = iPurse
 
         dgScores.EndEdit()
     End Sub
+
     Private Sub cbMatches_CheckedChanged(sender As Object, e As EventArgs) Handles cbMatches.CheckedChanged
         If cbMatches.Checked Then
-            If Not oHelper.bCCLeague Then
-                Dim mbr = MsgBox(String.Format("Are you doing Club Championship and league matches combined?"), MsgBoxStyle.YesNo)
-                If mbr = MsgBoxResult.No Then
-                    oHelper.bCCLeague = False
-                    cbMatches.Checked = False
-                    Exit Sub
-                End If
+            Dim mbr = MsgBox(String.Format("Are you doing Club Championship and league matches combined?"), MsgBoxStyle.YesNo)
+            If mbr = MsgBoxResult.Yes Then
                 oHelper.bCCLeague = True
+            Else
+                oHelper.bCCLeague = True
+                cbMatches.Checked = False
             End If
-            tbSkins.Text = 0
-            tbCP1.Text = 0
-            tbCP2.Text = 0
-            tbPurse.Text = 0
-            For Each row As DataGridViewRow In dgScores.Rows
-                oHelper.sPlayer = row.Cells("Player").Value
-                recalcCTPSkins(row.Cells("Skins"))
-                recalcCTPSkins(row.Cells("Closest"))
-            Next
-
+        Else
+            oHelper.bCCLeague = False
         End If
 
     End Sub
 
     Private Sub rbFront_CheckedChanged(sender As Object, e As EventArgs) Handles rbFront.CheckedChanged
-        Dim sFrom = "Out_"
-        Dim sTo = "In_"
-        If rbFront.Checked Then
-            lbStatus.Text = String.Format("Swapping Back 9 to Front 9")
-            oHelper.status_Msg(lbStatus, Me)
+
+        If bFormLoad And rbFront.Checked Then
             oHelper.iHoleMarker = 1
-            sFrom = "In_"
-            sTo = "Out_"
-        Else
-            lbStatus.Text = String.Format("Swapping Front 9 to Back 9")
-            oHelper.status_Msg(lbStatus, Me)
-            oHelper.iHoleMarker = 10
-            sFrom = "Out_"
-            sTo = "In_"
+            Dim i = oHelper.iHoleMarker
+            For Each col As DataGridViewColumn In dgScores.Columns
+                If col.Name.StartsWith("Hole") Then
+                    col.Name = "Hole" & i
+                    col.HeaderText = i
+                    i += 1
+                ElseIf col.Name.StartsWith("In_") Then
+                    col.Name = col.Name.Replace("In_", "Out_")
+                End If
+            Next
+            For Each row As DataGridViewRow In dgScores.Rows
+                oHelper.ChangeColorsForStrokes(row)
+            Next
         End If
 
-        Dim i = oHelper.iHoleMarker
-        For Each col As DataGridViewColumn In dgScores.Columns
-            Dim scol = col.Name
-            If scol.StartsWith("Hole") Then
-                col.Name = "Hole" & i
-                col.HeaderText = i
-                i += 1
-            ElseIf scol.StartsWith(sFrom) Then
-                col.Name = col.Name.Replace(sFrom, sTo)
-            End If
-        Next
-        For Each row As DataGridViewRow In dgScores.Rows
-            oHelper.ChangeColorsForStrokes(row)
-        Next
-        lbStatus.Text = String.Format("Finished Swapping nines")
-        oHelper.status_Msg(lbStatus, Me)
+    End Sub
+
+    Private Sub rbBack_CheckedChanged(sender As Object, e As EventArgs) Handles rbBack.CheckedChanged
+        If bFormLoad And rbBack.Checked Then
+            oHelper.iHoleMarker = 10
+            Dim i = oHelper.iHoleMarker
+            For Each col As DataGridViewColumn In dgScores.Columns
+                If col.Name.StartsWith("Hole") Then
+                    col.Name = "Hole" & i
+                    col.HeaderText = i
+                    i += 1
+                ElseIf col.Name.StartsWith("Out_") Then
+                    col.Name = col.Name.Replace("Out_", "In_")
+                End If
+            Next
+            For Each row As DataGridViewRow In dgScores.Rows
+                oHelper.ChangeColorsForStrokes(row)
+            Next
+        End If
 
     End Sub
 
@@ -1697,6 +1864,7 @@ Public Class frmScoreCard
         Try
             SaveScores()
             If lbStatus.BackColor = Color.Red Then
+                bCloseScreen = False
                 e.Cancel = True
                 Exit Sub
             End If
@@ -1704,7 +1872,14 @@ Public Class frmScoreCard
         Catch ex As Exception
             MsgBox("Error saving scores, scores not saved")
         End Try
-
+        'If Not bCloseScreen Then
+        '    MsgBox("Press Exit to close this form")
+        '    e.Cancel = True
+        'Else
+        '    e.Cancel = False
+        'End If
+        ''e.Cancel = True
+        'btnExit_Click(sender, e)
     End Sub
 
     'Private Sub dgScores_CellValidating(sender As Object, e As DataGridViewCellValidatingEventArgs) Handles dgScores.CellValidating
@@ -1721,6 +1896,26 @@ Public Class frmScoreCard
     'End Sub
     Private Sub frmScoreCard_Resize(sender As Object, e As EventArgs) Handles MyBase.Resize
         Try
+            'width
+            'If gvSsizeW <> 0 Then
+            '    dgScores.Width = gvSsizeW + (Me.Size.Width - fromsizeW)
+            'End If
+            'If gvSCsizeW <> 0 Then
+            '    dgScoreCard.Width = gvSCsizeW + (Me.Size.Width - fromsizeW)
+            'End If
+            'If gbSCsizeW <> 0 Then
+            '    gbScoring.Width = gbSCsizeW + (Me.Size.Width - fromsizeW)
+            'End If
+            'height-not working
+            'If gvSsizeH <> 0 Then
+            '    dgScores.Height = gvSsizeH + (Me.Size.Height - fromsizeH)
+            'End If
+            'If gvSCsizeH <> 0 Then
+            '    dgScoreCard.Height = gvSCsizeH + (Me.Size.Height - fromsizeH)
+            'End If
+            'If gbSCsizeH <> 0 Then
+            '    gbScoring.Height = gbSCsizeH + (Me.Size.Height - fromsizeH)
+            'End If
             rs.ResizeAllControls(Me)
 
         Catch ex As Exception
@@ -1734,7 +1929,7 @@ Public Class frmScoreCard
     Private Sub dgScores_CellContentClick(sender As Object, e As DataGridViewCellEventArgs) Handles dgScores.CellContentClick
         'calcSkinsCTP(sender.currentcell)
         '20180220-disable checkbox when readonly
-        If dgScores.ReadOnly Or e.RowIndex < 0 Then Exit Sub
+        If dgScores.ReadOnly Or e.RowIndex <0 Then Exit Sub
 
         Dim R As DataGridViewRow = sender.CurrentRow
 
@@ -1742,11 +1937,12 @@ Public Class frmScoreCard
         Dim dgc As DataGridViewCell = sender.currentcell
         '20180810 added Clear column
         If dgc.OwningColumn.Name = "Clear" Or dgc.OwningColumn.Name = "Skins" Or dgc.OwningColumn.Name.StartsWith("Closest") Then
-            'recalc skins 
-            ResetCTPSkins(sender.currentcell)
+            calcCTPSkins(sender.currentcell)
             If dgc.OwningColumn.Name = "Clear" Then
                 Dim mbr = MsgBox(String.Format("Do you want to clear scores for {0}", oHelper.sPlayer), MsgBoxStyle.YesNo)
-                If mbr = MsgBoxResult.No Then Exit Sub
+                If mbr = MsgBoxResult.No Then
+                    Exit Sub
+                End If
                 R.Cells("Hdcp").Value = R.Cells("PHdcp").Value
                 For i = oHelper.iHoleMarker To oHelper.iHoleMarker + 8
                     R.Cells("Hole" & i).Value = DBNull.Value
@@ -1763,6 +1959,37 @@ Public Class frmScoreCard
             Exit Sub
         End If
 
+        '20180512 - use calcskinsctp subroutine instead of code below
+
+        'Dim cell As DataGridViewCheckBoxCell = sender.currentcell
+        'Dim iPurse As Integer = tbPurse.Text
+        'Dim iTotSkins As Integer = tbSkins.Text
+        'Dim iTotCTP As Integer = tbCP1.Text + tbPCP2.Text
+        'Dim iamt As Integer = 0
+        'If cell.OwningColumn.Name = "Skins" Then
+        '    iamt = oHelper.rLeagueParmrow(cell.OwningColumn.Name)
+        'Else
+        '    iamt = 1
+        'End If
+        ''this checks what it was before you got in here
+        ''20180219-fix ckbox and amount on click		[ReadOnly]	True	Boolean
+
+        ''If CBool(sender.currentcell.value) = True Then
+        'If cell.Value = True Then
+        '    cell.Value = False
+        '    iamt = iamt * -1
+        'Else
+        '    cell.Value = True
+        'End If
+        'If cell.OwningColumn.Name = "Skins" Then
+        '    tbSkins.Text = iTotSkins + iamt
+        'ElseIf cell.OwningColumn.Name = "Closest" Then
+        '    tbCP1.Text = iTotCTP + iamt
+        'End If
+        'iPurse += iamt
+        'tbPurse.Text = iPurse
+
+        'dgScores.EndEdit()
     End Sub
     Public Function GetCheckedRows1(
         ByVal GridView As DataGridView,
@@ -1782,27 +2009,56 @@ Public Class frmScoreCard
         '20180224-check for locked scores
         If cbScoresLocked.Checked = True Then
             MsgBox("You must unlock scores to edit this field" & vbCrLf & "NOTE: certain fields arent allowed to be edited")
-            '20181014 -this logic will replace above
-            'Dim mbr = MsgBox("You must unlock scores to edit this field" & vbCrLf & "Do you want to unlock them?", MsgBoxStyle.YesNo)
-            'If mbr = MsgBoxResult.No Then
-            '    Exit Sub
-            'Else
-            '    cbScoresLocked.Checked = False
-            '    btnSave.Visible = False
-            '    sender.currentcell.value = e.KeyChar
-            'End If
-
         Else
             If sender.readonly Then MsgBox("This is a calculated field, not editable")
         End If
     End Sub
+
+    'Private Sub dgScores_CellClick(sender As Object, e As DataGridViewCellEventArgs) Handles dgScores.CellClick
+    '    Dim x = ""
+
+    '    'Dim rowsCheckedList As List(Of DataGridViewRow) = GetCheckedRows1(dgScores, "Skins")
+    '    'Dim xx = ""
+    'End Sub
+
+    'Sub gvGraphics(poDG As DataGridView)
+    '    ' Code for printing DataGridView
+    '    Dim leftMargin As Integer = 30
+    '    Dim position As Integer = leftMargin
+    '    Dim yPosition As Integer = 329  ' Change value to change the y-position of the DataGridView
+    '    Dim height As Integer = poDG.ColumnHeadersHeight / 2
+
+    '    position = leftMargin
+    '    yPosition = yPosition + poDG.ColumnHeadersHeight / 2
+    '    For Each dr As DataGridViewColumn In poDG.Columns
+    '        Dim totalWidth As Double = dr.Width
+    '        e.Graphics.FillRectangle(New SolidBrush(Color.White), New Rectangle(position, yPosition, totalWidth, height))
+    '        e.Graphics.DrawRectangle(Pens.Black, New Rectangle(position, yPosition, totalWidth, height))
+    '        e.Graphics.DrawString(dr.HeaderText, New Font("Times New Roman", 10, FontStyle.Bold Or FontStyle.Italic), Brushes.Black, position, yPosition, fmt)
+    '        position = position + totalWidth
+    '    Next
+
+    '    For Each dr As DataGridViewRow In poDG.Rows
+    '        position = leftMargin
+    '        yPosition = yPosition + poDG.ColumnHeadersHeight / 2
+    '        For Each dc As DataGridViewCell In dr.Cells
+    '            Dim totalWidth As Double = dc.OwningColumn.Width
+    '            e.Graphics.FillRectangle(New SolidBrush(Color.White), New Rectangle(position, yPosition, totalWidth, height))
+    '            e.Graphics.DrawRectangle(Pens.White, New Rectangle(position, yPosition, dc.OwningColumn.Width, height))
+    '            e.Graphics.DrawString(dc.Value, New Font("Verdana", 8, FontStyle.Regular), Brushes.Black, position, yPosition)
+    '            position = position + totalWidth
+    '        Next
+    '    Next
+    'End Sub
+    ' Assumes you have created a ToolTip object named ToolTip1
+    ' This event fired when the tooltip needs to draw its surface.
 
 End Class
 Public Class TeamDuplicate
     Inherits Exception
     Public Overrides ReadOnly Property Message() As String
         Get
-            Return "2 Scores have already been entered"
+            Return "2 Scores for that team have already been entered"
         End Get
     End Property
 End Class

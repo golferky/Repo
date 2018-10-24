@@ -93,6 +93,8 @@ Public Class Main
         End If
 
         For Each row In dvLeagues
+            '20181017  put in due to incomplete scores < 2018 and player lookup needs to change for those scores also
+            If row("Startdate").year < "2018" Then Continue For
             cbLeagues.Items.Add(row("Name") & " (" & row("StartDate").year & ")")
         Next
 
@@ -101,16 +103,6 @@ Public Class Main
         bLoad = False
         GetLeague()
 
-        '20180930 -setup dates
-        dtScore.Text = oHelper.dDate
-        dtRSStart.Text = oHelper.rLeagueParmrow("StartDate")
-        dtRSEnd.Text = oHelper.rLeagueParmrow("EndDate")
-        'dvscores(0)("Date").ToString.Substring(6, 2)).AddDays(7).ToString("yyyyMMdd")
-        'dtPSStart.Text = oHelper.rLeagueParmrow("EndDate").AddDays(-7)
-        'dtPSEnd.Text = oHelper.rLeagueParmrow("EndDate")
-        dtPSStart.Text = DateTime.ParseExact(oHelper.rLeagueParmrow("PostSeasonDt"), "yyyyMMdd", Nothing).ToString("MM\/dd\/yyyy").Trim("0")
-        'oHelper.rLeagueParmrow("PostSeasonDt")
-        dtPSEnd.Text = DateTime.ParseExact(oHelper.rLeagueParmrow("PostSeasonDt"), "yyyyMMdd", Nothing).AddDays(7).ToString("MM\/dd\/yyyy").Trim("0")
         'setup email function
         oHelper.GGmail = New GGSMTP_GMAIL(oHelper.rLeagueParmrow("Email"), oHelper.rLeagueParmrow("EmailPassword"))
         'GetXSDNameByFileName(oHelper.dsLeague.Tables("dtScores"),
@@ -118,69 +110,14 @@ Public Class Main
         ''get the date of the schedule for this week
         ''just use the Column names which have dates of the schedule table
         ''this loop will compare the league start date and flip the hole marker based on front/back
-        '20180126-only build dates for the last date of completed scores
-        Dim dvscores As New DataView(oHelper.dsLeague.Tables("dtScores"))
-        dvscores.Sort = "Date desc"
-        dvscores.RowFilter = String.Format("Date = {0}", dvscores(0)("Date"))
-        oHelper.sDateLastScore = dvscores(0)("Date")
-
-        lblProcessMsg.Text = "Done-Loading League Tables"
-        Me.Cursor = Cursors.Default
-        Application.DoEvents()
+        lblProcessMsg.Text = "Finished Loading League Tables"
+        oHelper.status_Msg(lblProcessMsg, Me)
         oHelper.bloghelper = False
+
         'debugging playerstats, uncomment below
         'PlayerStats_Click(sender, e)
     End Sub
-    Sub CreateSch()
-        '20180115 - latest attempt to build a schedule
-        Dim iTotTeams As Integer = oHelper.rLeagueParmrow("Teams")
-        Dim iTotHTeams As Integer = iTotTeams / 2
-        Dim iTotATeams As Integer = iTotTeams - iTotHTeams
 
-        Dim sWeeks As New ArrayList
-        'Dim Rndm As New Random(System.DateTime.Now.Millisecond)
-        For idx = 0 To iTotTeams - 1
-            Dim sAllTeams As New List(Of String), sHteams As New List(Of String), sAteams As New List(Of String), iextra As Integer
-            Dim J As Integer, AL As New List(Of String)
-            'create a string list of A players based on lowest half being A players
-            'AL is the list of all players
-            For i = 0 To iTotTeams - 1
-                AL.Add(i.ToString)
-            Next
-            'loop and create an A players list from the lowest half
-            'For i = 0 To iTotHTeams - 1
-            '    If i < iTotHTeams Then
-            '        sHteams.Add(i)
-            '        AL.Remove(i)
-            '    End If
-            'Next
-            For i = 0 To iTotHTeams - 1
-                J = oHelper.GetRandomNumber(0, iTotHTeams - 1)
-                sHteams.Add(AL(J) & " ")
-                AL.RemoveAt(J)
-            Next
-            'create a random extra b player if uneven(Bye)
-            If iTotHTeams <> iTotATeams Then
-                J = oHelper.GetRandomNumber(1, AL.Count)
-                sAteams.Add(AL(J) & " ")
-                iextra = AL(J)
-            End If
-
-            'make B players random
-            For i = 0 To AL.Count - 1
-                J = oHelper.GetRandomNumber(0, AL.Count - 1)
-                sAteams.Add(AL(J) & " ")
-                AL.RemoveAt(J)
-            Next
-            'now collect pairings
-            For i = 0 To sHteams.Count - 1
-                sAllTeams.Add(sHteams(i) + 1 & "v" & sAteams(i) + 1)
-            Next
-
-            sWeeks.Add(sAllTeams)
-
-        Next
-    End Sub
     Sub BuildTablesForLeague()
         'this subroutine will load the files related to the league/year that resides in the dropdown selected item 
         Dim sLeagueName = cbLeagues.SelectedItem
@@ -255,14 +192,25 @@ Public Class Main
             'oHelper.DataTable2CSV(oHelper.dsLeague.Tables(sfile), oFile.FullName.Replace(".xml", ".csv"))
         Next
 
-        If oHelper.dsLeague.Tables.Contains("dtScores") Then
-            oHelper.dsLeague.Tables("dtScores").PrimaryKey = New DataColumn() {oHelper.dsLeague.Tables("dtScores").Columns("Player"), oHelper.dsLeague.Tables("dtScores").Columns("Date")}
-        End If
+        If oHelper.dsLeague.Tables.Contains("dtScores") Then oHelper.dsLeague.Tables("dtScores").PrimaryKey = New DataColumn() {oHelper.dsLeague.Tables("dtScores").Columns("Player"), oHelper.dsLeague.Tables("dtScores").Columns("Date")}
         'Dim x = oHelper.dsLeague.Tables("dtPlayers").Select name from Table A Group By name having count(*) > 1"
+        '20180126-only build dates for the last date of completed scores
+        Dim dvscores As New DataView(oHelper.dsLeague.Tables("dtScores"))
+        dvscores.Sort = "Date desc"
+        'change mm/dd/yyyy to yyyymmdd
+        'Dim wkdate As Date = oHelper.dDate
+        'Dim reformatted1 As String = wkdate.ToString("yyyyMMdd", Globalization.CultureInfo.InvariantCulture)
+        Dim sdate = cbLeagues.SelectedItem.ToString.Substring(cbLeagues.SelectedItem.ToString.IndexOf("(") + 1, 4) + 1 & "0101"
+        dvscores.RowFilter = String.Format("Date < {0}", sdate)
 
-        If oHelper.dsLeague.Tables.Contains("dtPlayers") Then
-            oHelper.dsLeague.Tables("dtPlayers").PrimaryKey = New DataColumn() {oHelper.dsLeague.Tables("dtPlayers").Columns("Name")}
+        If cbLeagues.SelectedItem.ToString.Substring(cbLeagues.SelectedItem.ToString.IndexOf("(") + 1, 4) & "0101" > dvscores(0)("Date") Then
+            oHelper.sDateLastScore = CDate(oHelper.rLeagueParmrow("StartDate")).ToString("yyyyMMdd", Globalization.CultureInfo.InvariantCulture)
+        Else
+            oHelper.sDateLastScore = dvscores(0)("Date")
         End If
+
+
+        If oHelper.dsLeague.Tables.Contains("dtPlayers") Then oHelper.dsLeague.Tables("dtPlayers").PrimaryKey = New DataColumn() {oHelper.dsLeague.Tables("dtPlayers").Columns("Name")}
 
     End Sub
     Sub GetLeague()
@@ -276,260 +224,35 @@ Public Class Main
 
         For Each row In dvLeagues
             Dim wkdate As Date = row("startDate")
-            Dim reformatted As String = wkdate.ToString("mm/dd/yyyy", Globalization.CultureInfo.InvariantCulture)
+            Dim reformatted As String = wkdate.ToString("MM/dd/yyyy", Globalization.CultureInfo.InvariantCulture)
             Dim sLeagueName = row("Name") & " (" & row("Startdate").year & ")"
             If sLeagueName = cbLeagues.SelectedItem Then
                 'save row of league so all routines can use
-                oHelper.rLeagueParmrow = row
-                oHelper.sLeagueName = oHelper.rLeagueParmrow("Name")
-                BuildTablesForLeague()
+                With oHelper
+                    .rLeagueParmrow = row
+                    .sLeagueName = .rLeagueParmrow("Name")
+                    If .rLeagueParmrow("ScoresLocked") Is DBNull.Value Then .rLeagueParmrow("ScoresLocked") = "N"
+                    BuildTablesForLeague()
+                    '20180930 -setup dates
+                    dtScore.Text = DateTime.ParseExact(.sDateLastScore, "yyyyMMdd", Nothing).ToString("MM\/dd\/yyyy").Trim("0")
+                    Dim iweeks As Integer = (((.rLeagueParmrow("Teams") - 1) * 2) - 1)
+                    dtRSStart.Text = .rLeagueParmrow("StartDate")
+                    dtRSEnd.Text = CDate(.rLeagueParmrow("StartDate")).AddDays(iweeks * 7)
+                    dtPSStart.Text = CDate(dtRSEnd.Text).AddDays(7)
+                    tbPSEnd.Text = CDate(dtPSStart.Text).AddDays(7)
+                    .rLeagueParmrow("EndDate") = dtRSEnd.Text
+                    .rLeagueParmrow("PostSeasonDt") = dtPSStart.Text
+                    If dtPSStart.Text = "01/01/1900" Then
+                        gbPS.Visible = False
+                    Else
+                        gbPS.Visible = True
+                    End If
+                End With
             End If
         Next
 
     End Sub
 
-    'Public Sub CreateTables(sTables As List(Of String))
-    '	For Each sTable In sTables
-    '		dsLeague.Tables.Add(sTable).TableName = sTable
-    '		Dim sFile = oHelper.sFilePath & "\" & sTable.Substring(2) & ".xml"
-    '		If File.Exists(sFile) Then
-    '			dsLeague.Tables(sTable).ReadXml(sFile)
-    '		End If
-    '	Next
-    'End Sub
-    'Sub Genschedule()
-    '    Dim sHolidays = oHelper.getHolidayList(Now.Year)
-    '    Dim sTuesHol As New List(Of Date)
-    '    For Each sholiday In sHolidays
-    '        If sholiday.DayOfWeek = DayOfWeek.Tuesday Then
-    '            sTuesHol.Add(sholiday)
-    '        End If
-    '    Next
-    '    'Dim xx = GenerateRoundRobinEven(12)
-    '    'For Each x In xx
-    '    '    Dim zz = x
-
-    '    'Next
-    '    Dim iteams As Integer = oHelper.dsLeague.Tables("dtLeagueParms").Rows(0)("Teams")
-    '    Dim iNumWeeks = DateDiff("w", oHelper.dsLeague.Tables("dtLeagueParms").Rows(0)("EndDate"), oHelper.dsLeague.Tables("dtLeagueParms").Rows(0)("StartDate"))
-    '    Dim dt As New DataTable
-    '    Dim istartdate As Date = oHelper.dsLeague.Tables("dtLeagueParms").Rows(0)("StartDate")
-    '    Dim iweeks As Integer = ((oHelper.dsLeague.Tables("dtLeagueParms").Rows(0)("Teams") - 1) * 2) + sTuesHol.Count - 1
-    '    For i = 1 To iweeks
-    '        Dim bitstues = False
-    '        For Each stdate In sTuesHol
-    '            If stdate = istartdate Then
-    '                bitstues = True
-    '                Exit For
-    '            End If
-    '        Next
-    '        If Not bitstues Then
-    '            dt.Columns.Add(istartdate)
-    '        End If
-    '        istartdate = istartdate.AddDays(7)
-    '    Next
-
-    '    'build a table for each team for each week (12 teams x 11 weeks)
-    '    'Dim allteams As New List(Of String)
-    '    'For ii = 1 To iteams
-    '    '    allteams.Add(ii)
-    '    'Next
-
-    '    '-----
-    '    Dim aAllTeams As New List(Of ArrayList)
-    '    For icurrteam = 0 To iteams - 1
-    '        'Teams.Clear() if this is declared above
-    '        Dim Teams As ArrayList = New ArrayList
-    '        Teams2.Clear()
-
-    '        Dim delimStr As String = vbCrLf
-    '        Dim delimiter As Char() = delimStr.ToCharArray()
-
-    '        For s = 0 To iteams - 1
-    '            Teams.Add(New Team(s))
-    '        Next
-
-    '        If Teams.Count Mod 2 <> 0 Then
-    '            Teams.Add(New Team("Bye"))
-    '        End If
-
-    '        Teams.Sort()
-    '        'at this point, teams has all 12 teams in it at random
-    '        'find team 1 and remove it
-
-    '        Dim iteam2delete = 0
-    '        For Each team As Team In Teams
-    '            If team.TeamName = icurrteam Then
-    '                Teams.RemoveAt(iteam2delete)
-    '                Exit For
-    '            End If
-    '            iteam2delete += 1
-    '        Next
-    '        'at this point we have all of a teams opponents in teams array
-    '        aAllTeams.Add(Teams)
-    '    Next
-
-    '    Dim iteam = 1
-    '    oHelper.bloghelper = True
-    '    For Each team In aAllTeams
-    '        Dim xxxxxxxxxxxxxxxxxxxxxxxxx = ""
-    '        Dim steams = ""
-    '        For Each steam In team
-    '            steams = steams & (steam.teamname + 1) & "-"
-    '        Next
-    '        oHelper.LOGIT("Team #" & iteam & "-" & steams)
-    '        iteam += 1
-
-    '    Next
-
-    '    oHelper.bloghelper = False
-
-    '    ' Teams2 = New ArrayList(Teams.ToArray())
-    '    'For Each team In Teams
-    '    '    Dim x = ""
-    '    '    Dim j = oHelper.GetRandomNumber(0, Teams2.Count - 1)
-    '    'Next
-    '    '-----
-
-    '    'Dim OneTeamSch As New List(Of String)
-    '    'Dim AllTeamsSch As New List(Of String)
-
-    '    'For i = 1 To iteams
-    '    '    AllTeamsSch.Add(i)
-    '    'Next
-
-    '    'For i = 0 To iteams - 1
-    '    '    'generate a number of 0 to 11, - 10, etc
-    '    '    Dim j = oHelper.GetRandomNumber(0, allteams.Count - 1)
-    '    '    'use that number as a subscript into the all teams list for its opponent
-    '    '    AllTeamsSch(i) = AllTeamsSch(i) & "-" & allteams(j)
-    '    '    Dim y = ""
-    '    '    'OneTeamSch.Add(allteams(j))
-
-    '    'Next
-
-    '    'Dim x = ""
-    '    'oHelper.dsLeague = New dsLeague
-    '    'this converts the csvs to xml eliminating the need for microsoft office
-    '    'this replaces csv2datable
-    '    'CreateTables(New List(Of String)("dtLeagueParms,dtCourses,dtPlayers,dtScores".Split(",")))
-
-    '    'oHelper.dsLeague.Tables("dtLeagueParms").PrimaryKey = New DataColumn() {oHelper.dsLeague.Tables("dtLeagueParms").Columns("Name")}
-    '    'oHelper.dsLeague.Tables("dtCourses").PrimaryKey = New DataColumn() {oHelper.dsLeague.Tables("dtCourses").Columns("Name")}
-    '    'oHelper.dsLeague.Tables("dtPlayers").PrimaryKey = New DataColumn() {oHelper.dsLeague.Tables("dtPlayers").Columns("Name")}
-    '    'Helper.dsLeague.Tables("dtScores").PrimaryKey = New DataColumn() {oHelper.dsLeague.Tables("dtScores").Columns("Player"), oHelper.dsLeague.Tables("dtScores").Columns("Date")}
-
-    '    'test loading a new schedule
-
-    '    'If oHelper.sLeagueName <> "" Then
-    '    '    CreateTables(New List(Of String)("dtSchedule".Split(",")))
-    '    '    oHelper.buildSchedule()
-    '    'End If
-    '    'Dim line = File.ReadAllText(oHelper.sFilePath & "\" & "t.csv")
-    '    'Dim x = line.Replace(vbLf, String.Empty).Split(vbCrLf)
-    '    'Dim z = ""
-
-    '    'For Each table As DataTable In oHelper.dsLeague.Tables
-    '    '    Dim sfilename = "\" & table.TableName.Substring(2) & ".csv"
-    '    '    oHelper.DataTable2CSV(table, oHelper.sFilePath & sfilename)
-    '    'Next
-    'End Sub
-    Private Const BYE As Integer = -1
-
-    ' Return an array where results(i, j) gives the opponent of
-    ' team i in round j.
-    ' Note: num_teams must be odd.
-    Private Function GenerateRoundRobinOdd(ByVal num_teams As _
-    Integer) As Integer(,)
-        Dim n2 As Integer
-        Dim results(,) As Integer
-        Dim teams() As Integer
-        Dim i As Integer
-        Dim round As Integer
-        Dim team1 As Integer
-        Dim team2 As Integer
-
-        n2 = num_teams \ 2
-        ReDim results(num_teams - 1, num_teams - 1)
-
-        ' Initialize the list of teams.
-        ReDim teams(num_teams - 1)
-        For i = 0 To num_teams - 1
-            teams(i) = i
-        Next i
-
-        ' Start the rounds.
-        For round = 0 To num_teams - 1
-            For i = 0 To n2 - 1
-                team1 = teams(n2 - i)
-                team2 = teams(n2 + i + 1)
-                results(team1, round) = team2
-                results(team2, round) = team1
-            Next i
-
-            ' Set the team with the bye.
-            team1 = teams(0)
-            results(team1, round) = BYE
-
-            ' Rotate the array.
-            RotateArray(teams)
-        Next round
-
-        Return results
-    End Function
-    ' Rotate the entries one position.
-    Private Sub RotateArray(ByVal teams() As Integer)
-        Dim tmp As Integer
-        Dim i As Integer
-
-        tmp = teams(UBound(teams))
-        For i = UBound(teams) To 1 Step -1
-            teams(i) = teams(i - 1)
-        Next i
-        teams(0) = tmp
-    End Sub
-    ' Return an array where results(i, j) gives the opponent of
-    ' team i in round j.
-    ' Note: num_teams must be even.
-    Private Function GenerateRoundRobinEven(ByVal num_teams As _
-    Integer) As Integer(,)
-        Dim results(,) As Integer
-        Dim results2(,) As Integer
-        Dim round As Integer
-        Dim team As Integer
-
-        ' Generate the result for one fewer teams.
-        results = GenerateRoundRobinOdd(num_teams - 1)
-
-        ' Copy the results into a bigger array,
-        ' replacing the byes with the extra team.
-        ReDim results2(num_teams - 1, num_teams - 2)
-        For team = 0 To num_teams - 2
-            For round = 0 To num_teams - 2
-                If results(team, round) = BYE Then
-                    ' Change the bye to the new team.
-                    results2(team, round) = num_teams - 1
-                    results2(num_teams - 1, round) = team
-                Else
-                    results2(team, round) = results(team, round)
-                End If
-            Next round
-        Next team
-
-        Return results2
-    End Function
-    ' Return an array where results(i, j) gives the opponent of
-    ' team i in round j.
-    Private Function GenerateRoundRobin(ByVal num_teams As _
-    Integer) As Integer(,)
-        If num_teams Mod 2 = 0 Then
-            GenerateRoundRobin =
-            GenerateRoundRobinEven(num_teams)
-        Else
-            GenerateRoundRobin =
-            GenerateRoundRobinOdd(num_teams)
-        End If
-    End Function
     Private Sub LeagueSetup_Click(sender As Object, e As EventArgs) Handles btnLeagueSetup.Click
         frmLeagueSetup.Show()
     End Sub
@@ -559,19 +282,18 @@ Public Class Main
     End Sub
 
     Private Sub ScoreCard_Click(sender As System.Object, e As System.EventArgs) Handles btnScoreCard.Click
-
+        If cbLeagues.SelectedItem.ToString.Substring(cbLeagues.SelectedItem.ToString.IndexOf("(") + 1, 4) < "2018" Then
+            MessageBox.Show("Scores < 2018 are not fully entered, cannot view yet,check with developer")
+            Exit Sub
+        End If
         If oHelper.bsch Then
             lblProcessMsg.Text = String.Format("Loading Scores from {0}", lbScoresFile.Text)
-            lblProcessMsg.BackColor = Color.Red
-            Me.Cursor = Cursors.WaitCursor
-            Application.DoEvents()
+            oHelper.status_Msg(lblProcessMsg, Me)
 
             frmScoreCard.Show()
 
             lblProcessMsg.Text = String.Format("Finished Loading Scores")
-            lblProcessMsg.BackColor = Color.LightGreen
-            Me.Cursor = Cursors.Default
-            Application.DoEvents()
+            oHelper.status_Msg(lblProcessMsg, Me)
 
         Else
             MsgBox("Schedule not available, cant do Scores")
@@ -618,6 +340,10 @@ Public Class Main
     End Sub
 
     Private Sub btnStandings_Click(sender As Object, e As EventArgs) Handles btnStandings.Click
+        If cbLeagues.SelectedItem.ToString.Substring(cbLeagues.SelectedItem.ToString.IndexOf("(") + 1, 4) < "2018" Then
+            MessageBox.Show("Scores < 2018 are not fully entered, cannot view yet,check with developer")
+            Exit Sub
+        End If
         If oHelper.bsch Then
             Standings.Show()
         Else
@@ -632,7 +358,10 @@ Public Class Main
     End Sub
 
     Private Sub btnMatches_Click(sender As Object, e As EventArgs) Handles btnMatches.Click
-
+        If cbLeagues.SelectedItem.ToString.Substring(cbLeagues.SelectedItem.ToString.IndexOf("(") + 1, 4) < "2018" Then
+            MessageBox.Show("Scores < 2018 are not fully entered, cannot view yet,check with developer")
+            Exit Sub
+        End If
         If oHelper.bsch Then
             Matches.Show()
         Else
@@ -640,6 +369,10 @@ Public Class Main
         End If
     End Sub
     Private Sub btnSkins_Click(sender As Object, e As EventArgs) Handles btnSkins.Click
+        If cbLeagues.SelectedItem.ToString.Substring(cbLeagues.SelectedItem.ToString.IndexOf("(") + 1, 4) < "2018" Then
+            MessageBox.Show("Scores < 2018 are not fully entered, cannot view yet,check with developer")
+            Exit Sub
+        End If
         If oHelper.bsch Then
             Skins.Show()
         Else
@@ -709,20 +442,11 @@ Public Class Main
     Private Sub cbLeagues_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cbLeagues.SelectedIndexChanged
         With lblProcessMsg
             .Text = String.Format("Loading League Tables for {0} ...", cbLeagues.SelectedItem)
-            .BackColor = Color.Red
-
-            Me.Cursor = Cursors.WaitCursor
-            Application.DoEvents()
+            oHelper.status_Msg(lblProcessMsg, Me)
             If Not bLoad Then GetLeague()
-            .Text = String.Format("Done Loading League Tables for {0}", cbLeagues.SelectedItem)
-            .BackColor = Color.LightGreen
-            Me.Cursor = Cursors.Default
-            Application.DoEvents()
+            .Text = String.Format("Finished Loading League Tables for {0}", cbLeagues.SelectedItem)
+            oHelper.status_Msg(lblProcessMsg, Me)
         End With
-    End Sub
-
-    Private Sub Button1_Click(sender As Object, e As EventArgs)
-        MsgBox("Hi Scott")
     End Sub
 
     Private Sub btnChangeFolder_Click(sender As Object, e As EventArgs) Handles btnChangeFolder.Click
@@ -809,6 +533,62 @@ Public Class Main
         Finance.Show()
     End Sub
 
+    Private Sub dtPSStart_ValueChanged(ByVal sender As Object, ByVal e As EventArgs) Handles dtPSStart.ValueChanged
+
+        If CheckPSDate() Then
+            oHelper.rLeagueParmrow("PostSeasonDt") = dtPSStart.Text
+            oHelper.DataTable2CSV(oHelper.dsLeague.Tables("dtLeagueParms"), oHelper.sFilePath & "\" & Now.ToString("yyyyMMdd") & "_LeagueParms.csv")
+            tbPSEnd.Text = CDate(dtPSStart.Text).AddDays(7)
+            gbPS.Visible = True
+        Else
+            dtPSStart.Text = "1/1/1900"
+            gbPS.Visible = False
+        End If
+    End Sub
+    '20181016 below remove handlers and add handlers were added because datetime picker changed the date every time we click the arrow keys
+    Private Sub dtPSStart_DropDown(ByVal sender As Object, ByVal e As EventArgs) Handles dtPSStart.DropDown
+        RemoveHandler dtPSStart.ValueChanged, AddressOf dtPSStart_ValueChanged
+    End Sub
+
+    Private Sub dtPSStart_CloseUp(ByVal sender As System.Object, ByVal e As System.EventArgs) Handles dtPSStart.CloseUp
+        AddHandler dtPSStart.ValueChanged, AddressOf dtPSStart_ValueChanged
+        Call dtPSStart_ValueChanged(sender, EventArgs.Empty)
+    End Sub
+    Function CheckPSDate() As Boolean
+        If dtPSStart.Text = "1/1/1900" Then Exit Function
+        'change mm/dd/yyyy to yyyymmdd
+        Dim wkdate As Date = dtRSEnd.Text
+        Dim reformatted1 As String = wkdate.ToString("yyyyMMdd", Globalization.CultureInfo.InvariantCulture)
+        wkdate = dtPSStart.Text
+        Dim reformatted2 As String = wkdate.ToString("yyyyMMdd", Globalization.CultureInfo.InvariantCulture)
+        If reformatted1 >= reformatted2 Then
+            oHelper.bCCLeague = True
+            'If dtRSEnd.Text >= dtPSStart.Text Then
+            Dim smsg = String.Format("Regular Season is played the same time as your League Championship" & vbCrLf & vbCrLf & "Regular Season {0}" & vbCrLf & "League Championship {1}", dtRSEnd.Text, dtPSStart.Text)
+            MessageBox.Show(smsg, "Warning Dates Overlap", MessageBoxButtons.OK)
+            'Dim mbr As DialogResult = MessageBox.Show(smsg, "Warning Dates Overlap", MessageBoxButtons.YesNoCancel) = Windows.Forms.DialogResult.Yes
+            'If mbr = DialogResult.Yes Then
+            '    oHelper.bCCLeague = True
+            '    CheckPSDate = True
+            'ElseIf mbr = DialogResult.No Then
+            '    oHelper.bCCLeague = False
+            '    CheckPSDate = False
+            'Else Exit Function
+            'End If
+        Else
+            oHelper.bCCLeague = False
+            CheckPSDate = True
+        End If
+    End Function
+
+    Private Sub btnPostSeason_Click(sender As Object, e As EventArgs)
+        gbPS.Visible = True
+    End Sub
+
+    Private Sub dtScore_ValueChanged(sender As Object, e As EventArgs) Handles dtScore.ValueChanged
+        oHelper.sDateLastScore = CDate(dtScore.Text).ToString("yyyyMMdd", Globalization.CultureInfo.InvariantCulture)
+        'oHelper.dDate = dtScore.Text
+    End Sub
 End Class
 Public Class Team
     Implements IComparable

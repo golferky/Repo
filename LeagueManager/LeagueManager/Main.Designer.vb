@@ -54,11 +54,11 @@ Partial Class Main
         Me.dtScore = New System.Windows.Forms.DateTimePicker()
         Me.Label2 = New System.Windows.Forms.Label()
         Me.GroupBox4 = New System.Windows.Forms.GroupBox()
-        Me.GroupBox6 = New System.Windows.Forms.GroupBox()
+        Me.gbPS = New System.Windows.Forms.GroupBox()
+        Me.tbPSEnd = New System.Windows.Forms.TextBox()
         Me.dtPSStart = New System.Windows.Forms.DateTimePicker()
         Me.Label5 = New System.Windows.Forms.Label()
         Me.Label6 = New System.Windows.Forms.Label()
-        Me.dtPSEnd = New System.Windows.Forms.DateTimePicker()
         Me.GroupBox5 = New System.Windows.Forms.GroupBox()
         Me.dtRSStart = New System.Windows.Forms.DateTimePicker()
         Me.Label4 = New System.Windows.Forms.Label()
@@ -68,7 +68,7 @@ Partial Class Main
         Me.GroupBox2.SuspendLayout()
         Me.GroupBox3.SuspendLayout()
         Me.GroupBox4.SuspendLayout()
-        Me.GroupBox6.SuspendLayout()
+        Me.gbPS.SuspendLayout()
         Me.GroupBox5.SuspendLayout()
         Me.SuspendLayout()
         '
@@ -84,7 +84,7 @@ Partial Class Main
         '
         'btnCourseSetup
         '
-        Me.btnCourseSetup.Location = New System.Drawing.Point(6, 81)
+        Me.btnCourseSetup.Location = New System.Drawing.Point(176, 31)
         Me.btnCourseSetup.Margin = New System.Windows.Forms.Padding(2)
         Me.btnCourseSetup.Name = "btnCourseSetup"
         Me.btnCourseSetup.Size = New System.Drawing.Size(131, 24)
@@ -94,7 +94,7 @@ Partial Class Main
         '
         'btnPlayerSetup
         '
-        Me.btnPlayerSetup.Location = New System.Drawing.Point(6, 131)
+        Me.btnPlayerSetup.Location = New System.Drawing.Point(176, 81)
         Me.btnPlayerSetup.Margin = New System.Windows.Forms.Padding(2)
         Me.btnPlayerSetup.Name = "btnPlayerSetup"
         Me.btnPlayerSetup.Size = New System.Drawing.Size(131, 24)
@@ -219,7 +219,7 @@ Partial Class Main
         Me.GroupBox2.Margin = New System.Windows.Forms.Padding(2)
         Me.GroupBox2.Name = "GroupBox2"
         Me.GroupBox2.Padding = New System.Windows.Forms.Padding(2)
-        Me.GroupBox2.Size = New System.Drawing.Size(157, 170)
+        Me.GroupBox2.Size = New System.Drawing.Size(325, 133)
         Me.GroupBox2.TabIndex = 10
         Me.GroupBox2.TabStop = False
         Me.GroupBox2.Text = "Setup Functions"
@@ -249,7 +249,7 @@ Partial Class Main
         Me.GroupBox3.Controls.Add(Me.btnZip)
         Me.GroupBox3.Controls.Add(Me.btnSchedule)
         Me.GroupBox3.Controls.Add(Me.btnShowScores)
-        Me.GroupBox3.Location = New System.Drawing.Point(196, 396)
+        Me.GroupBox3.Location = New System.Drawing.Point(379, 527)
         Me.GroupBox3.Margin = New System.Windows.Forms.Padding(2)
         Me.GroupBox3.Name = "GroupBox3"
         Me.GroupBox3.Padding = New System.Windows.Forms.Padding(2)
@@ -363,7 +363,7 @@ Partial Class Main
         '
         'GroupBox4
         '
-        Me.GroupBox4.Controls.Add(Me.GroupBox6)
+        Me.GroupBox4.Controls.Add(Me.gbPS)
         Me.GroupBox4.Controls.Add(Me.GroupBox5)
         Me.GroupBox4.Controls.Add(Me.Label2)
         Me.GroupBox4.Controls.Add(Me.dtScore)
@@ -374,18 +374,26 @@ Partial Class Main
         Me.GroupBox4.TabStop = False
         Me.GroupBox4.Text = "Control Dates"
         '
-        'GroupBox6
+        'gbPS
         '
-        Me.GroupBox6.Controls.Add(Me.dtPSStart)
-        Me.GroupBox6.Controls.Add(Me.Label5)
-        Me.GroupBox6.Controls.Add(Me.Label6)
-        Me.GroupBox6.Controls.Add(Me.dtPSEnd)
-        Me.GroupBox6.Location = New System.Drawing.Point(29, 210)
-        Me.GroupBox6.Name = "GroupBox6"
-        Me.GroupBox6.Size = New System.Drawing.Size(107, 100)
-        Me.GroupBox6.TabIndex = 28
-        Me.GroupBox6.TabStop = False
-        Me.GroupBox6.Text = "Post Season"
+        Me.gbPS.Controls.Add(Me.tbPSEnd)
+        Me.gbPS.Controls.Add(Me.dtPSStart)
+        Me.gbPS.Controls.Add(Me.Label5)
+        Me.gbPS.Controls.Add(Me.Label6)
+        Me.gbPS.Location = New System.Drawing.Point(29, 210)
+        Me.gbPS.Name = "gbPS"
+        Me.gbPS.Size = New System.Drawing.Size(107, 100)
+        Me.gbPS.TabIndex = 28
+        Me.gbPS.TabStop = False
+        Me.gbPS.Text = "Post Season"
+        '
+        'tbPSEnd
+        '
+        Me.tbPSEnd.Location = New System.Drawing.Point(6, 74)
+        Me.tbPSEnd.Name = "tbPSEnd"
+        Me.tbPSEnd.ReadOnly = True
+        Me.tbPSEnd.Size = New System.Drawing.Size(95, 20)
+        Me.tbPSEnd.TabIndex = 29
         '
         'dtPSStart
         '
@@ -412,14 +420,6 @@ Partial Class Main
         Me.Label6.Size = New System.Drawing.Size(29, 13)
         Me.Label6.TabIndex = 24
         Me.Label6.Text = "Start"
-        '
-        'dtPSEnd
-        '
-        Me.dtPSEnd.Format = System.Windows.Forms.DateTimePickerFormat.[Short]
-        Me.dtPSEnd.Location = New System.Drawing.Point(6, 77)
-        Me.dtPSEnd.Name = "dtPSEnd"
-        Me.dtPSEnd.Size = New System.Drawing.Size(95, 20)
-        Me.dtPSEnd.TabIndex = 25
         '
         'GroupBox5
         '
@@ -496,8 +496,8 @@ Partial Class Main
         Me.GroupBox3.ResumeLayout(False)
         Me.GroupBox4.ResumeLayout(False)
         Me.GroupBox4.PerformLayout()
-        Me.GroupBox6.ResumeLayout(False)
-        Me.GroupBox6.PerformLayout()
+        Me.gbPS.ResumeLayout(False)
+        Me.gbPS.PerformLayout()
         Me.GroupBox5.ResumeLayout(False)
         Me.GroupBox5.PerformLayout()
         Me.ResumeLayout(False)
@@ -535,14 +535,14 @@ Partial Class Main
     Friend WithEvents dtScore As DateTimePicker
     Friend WithEvents Label2 As Label
     Friend WithEvents GroupBox4 As GroupBox
-    Friend WithEvents GroupBox6 As GroupBox
+    Friend WithEvents gbPS As GroupBox
     Friend WithEvents dtPSStart As DateTimePicker
     Friend WithEvents Label5 As Label
     Friend WithEvents Label6 As Label
-    Friend WithEvents dtPSEnd As DateTimePicker
     Friend WithEvents GroupBox5 As GroupBox
     Friend WithEvents dtRSStart As DateTimePicker
     Friend WithEvents Label4 As Label
     Friend WithEvents Label3 As Label
     Friend WithEvents dtRSEnd As DateTimePicker
+    Friend WithEvents tbPSEnd As TextBox
 End Class

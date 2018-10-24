@@ -530,7 +530,7 @@ Partial Class frmScoreCard
         Me.dgScores.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
         Me.dgScores.Location = New System.Drawing.Point(28, 166)
         Me.dgScores.Name = "dgScores"
-        Me.dgScores.Size = New System.Drawing.Size(1424, 716)
+        Me.dgScores.Size = New System.Drawing.Size(1424, 586)
         Me.dgScores.TabIndex = 0
         '
         'cbScoresLocked
@@ -794,6 +794,7 @@ Partial Class frmScoreCard
         Me.rbFront.Name = "rbFront"
         Me.rbFront.Size = New System.Drawing.Size(49, 17)
         Me.rbFront.TabIndex = 1
+        Me.rbFront.TabStop = True
         Me.rbFront.Text = "Front"
         Me.rbFront.UseVisualStyleBackColor = True
         '
@@ -811,7 +812,7 @@ Partial Class frmScoreCard
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(1486, 882)
+        Me.ClientSize = New System.Drawing.Size(1486, 752)
         Me.Controls.Add(Me.gbFrontBack)
         Me.Controls.Add(Me.cbMatches)
         Me.Controls.Add(Me.cbMarkPaid)

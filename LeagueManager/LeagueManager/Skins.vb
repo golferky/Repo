@@ -35,6 +35,8 @@ Public Class Skins
             Next
         End If
         cbDatesPlayers.SelectedItem = oHelper.dDate.ToString("yyyyMMdd")
+        cbDatesPlayers.Text = oHelper.sDateLastScore
+
         dgScores.Visible = False
         'oHelper.MyCourse = oHelper.dsLeague.Tables("dtCourses").Select("Name = '" & oHelper.rLeagueParmrow("Course") & "'")
         bsave = False
@@ -61,7 +63,7 @@ Public Class Skins
         For Each field In oHelper.cSkinsFields.Split(",")
             sSkinflds = sSkinflds + field.Substring(0, field.IndexOf("-")) & ","
         Next
-        cbDatesPlayers.Text = oHelper.sDateLastScore
+
         btnSkins_Click(sender, e)
     End Sub
 
@@ -92,25 +94,27 @@ Public Class Skins
         '20181003 - if scores already exist int able, dont use date to determine which 9 were playing, we can swap nines and override schedule
         'oHelper.CalcHoleMarker(sdate)
         Dim dvscores As New DataView(oHelper.dsLeague.Tables("dtScores"))
-        dvscores.RowFilter = String.Format("Date = {0}", oHelper.dDate.ToString("yyyyMMdd", Globalization.CultureInfo.InvariantCulture))
-
+        dvscores.RowFilter = String.Format("Date = {0}", cbDatesPlayers.SelectedItem)
+        If dvscores.Count = 0 Then
+            MsgBox(String.Format("No scores for {0}", cbDatesPlayers.SelectedItem))
+            Exit Sub
+        End If
         For Each srow As DataRowView In dvscores
-            If srow("Hole1") <> "" Then
-                oHelper.iHoleMarker = 1
-            ElseIf srow("Hole10") <> "" Then
-                oHelper.iHoleMarker = 10
+            If srow("Hole1") IsNot DBNull.Value Then
+                If IsNumeric(srow("Hole1")) Then oHelper.iHoleMarker = 1
+            ElseIf srow("Hole10") IsNot DBNull.Value Then
+                If IsNumeric(srow("Hole10")) Then oHelper.iHoleMarker = 10
             End If
             Exit For
         Next
-
         SaveScores()
 
         'build the grid
         BldSkinsDataGridFromCSV()
 
-        For i = 0 To oHelper.iNumClosests
-            sSkinflds = sSkinflds + "CTP_" & (i + 1) & ","
-        Next
+        'For i = 0 To oHelper.iNumClosests
+        '    sSkinflds = sSkinflds + "CTP_" & (i + 1) & ","
+        'Next
 
         CalcSkins()
         'NewCalcSkins()
@@ -130,9 +134,7 @@ Public Class Skins
         Dim newColumn As DataGridViewColumn = sender.Columns(e.ColumnIndex)
 
         lbStatus.Text = String.Format("Resorting Columns by {0}", newColumn.HeaderText)
-        lbStatus.BackColor = Color.Red
-        Me.Cursor = Cursors.WaitCursor
-        Application.DoEvents()
+        oHelper.status_Msg(lbStatus, Me)
         oHelper.LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
         Dim dgv = sender
         oHelper.bReorderCols = True
@@ -158,11 +160,8 @@ Public Class Skins
 
         oHelper.bReorderCols = False
         oHelper.bCalcSkins = False
-        lbStatus.Text = String.Format("Resorting of Column {0} done", newColumn.HeaderText)
-        lbStatus.BackColor = Color.LightGreen
-        Me.Cursor = Cursors.Default
-        Application.DoEvents()
-
+        lbStatus.Text = String.Format("Finished Resorting of Column {0}", newColumn.HeaderText)
+        oHelper.status_Msg(lbStatus, Me)
     End Sub
 
     Private Sub dgScores_CellMouseDoubleClick(sender As Object, e As DataGridViewCellMouseEventArgs) Handles dgScores.CellMouseDoubleClick
@@ -218,16 +217,12 @@ Public Class Skins
         oHelper.LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
 
         lbStatus.Text = String.Format("Calculating Skins")
-        lbStatus.BackColor = Color.Red
-        Me.Cursor = Cursors.WaitCursor
-        Application.DoEvents()
-
+        oHelper.status_Msg(lbStatus, Me)
         'this is for change colors routine and if no scores, no sense calculating anything
         If dgScores.Rows.Count = 1 Then
             oHelper.bCalcSkins = False
-            lbStatus.Text = "No skins or CTP entered, nothing to show"
-            Me.Cursor = Cursors.Default
-            Application.DoEvents()
+            lbStatus.Text = "Finished, No skins or CTP entered, nothing to show"
+            oHelper.status_Msg(lbStatus, Me)
             Exit Sub
         End If
 
@@ -277,16 +272,13 @@ Public Class Skins
         oHelper.LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
 
         lbStatus.Text = String.Format("Calculating Skins")
-        lbStatus.BackColor = Color.Red
-        Me.Cursor = Cursors.WaitCursor
-        Application.DoEvents()
+        oHelper.status_Msg(lbStatus, Me)
 
         'this is for change colors routine and if no scores, no sense calculating anything
         If dgScores.Rows.Count = 1 Then
             oHelper.bCalcSkins = False
-            lbStatus.Text = "No skins or CTP entered, nothing to show"
-            Me.Cursor = Cursors.Default
-            Application.DoEvents()
+            lbStatus.Text = "Finished, No skins or CTP entered, nothing to show"
+            oHelper.status_Msg(lbStatus, Me)
             Exit Sub
         End If
 
@@ -299,8 +291,10 @@ Public Class Skins
         If sSkinsIndexes.Count > 0 Then
             '20180228-Fix extra dollars incorrect, they were missing leftover ctp calc
             iSkinVal = Math.Truncate(iSkinpot / sSkinsIndexes.Count)
-            iExtra = iTotCTPPlayers * 1 - (iEachClosestAmt * oHelper.iNumClosests)
-            iExtra = iExtra + (iSkinpot - (iSkinVal * sSkinsIndexes.Count))
+            If Not oHelper.bCCLeague Then
+                iExtra = iTotCTPPlayers * 1 - (iEachClosestAmt * oHelper.iNumClosests)
+                iExtra = iExtra + (iSkinpot - (iSkinVal * sSkinsIndexes.Count))
+            End If
         Else
             iExtra = 0
             tbLOSkins.Text = iSkinpot
@@ -360,8 +354,8 @@ Public Class Skins
                     iCtpsDol += row.Cells("$Closest").Value
                     row.Cells("$Closest").Style.BackColor = Color.Gold
                     row.Cells("Player").Style.BackColor = Color.Gold
-                    If row.Cells("CTP_1").Value Then tbCP1.Text += CInt(row.Cells("$Closest").Value)
-                    If row.Cells("CTP_2").Value Then tbCP2.Text += CInt(row.Cells("$Closest").Value)
+                    If IsNumeric(row.Cells("CTP_1").Value) Then tbCP1.Text += CInt(row.Cells("$Closest").Value)
+                    If IsNumeric(row.Cells("CTP_2").Value) Then tbCP2.Text += CInt(row.Cells("$Closest").Value)
                 End If
                 row.Cells("$Earn").Value = iEarn
                 iEarnDol += iEarn
@@ -383,10 +377,8 @@ Public Class Skins
         tbSkins.Text = iSkinsDol
         tbPurse.Text = iSkinsDol + iCtpsDol
 
-        lbStatus.Text = String.Format("Done Calculating skins")
-        lbStatus.BackColor = Color.LightGreen
-        Me.Cursor = Cursors.Default
-        Application.DoEvents()
+        lbStatus.Text = String.Format("Finished Calculating skins")
+        oHelper.status_Msg(lbStatus, Me)
         '20180307-commented out for testing
         dgScores.Sort(dgScores.Columns("$Earn"), System.ComponentModel.ListSortDirection.Descending)
         'set color switches for helper routine
@@ -529,7 +521,11 @@ Public Class Skins
                                             If CInt(row("pHdcp")) - 9 >= isi Then
                                                 cell = cell - 2 & ChrW(&H25CF) & ChrW(&H25CF)
                                             ElseIf CInt(row("pHdcp")) >= isi Then
-                                                cell = cell - 1 & ChrW(&H25CF)
+                                                Try
+                                                    cell = cell - 1 & ChrW(&H25CF)
+                                                Catch ex As Exception
+                                                    Dim xz = ""
+                                                End Try
                                             End If
                                         End If
                                         row("Hole" & i - 1 + oHelper.iHoleMarker) = cell
@@ -621,8 +617,8 @@ Public Class Skins
                     If row.Item("Closest") = "Y" Then iTotCTPPlayers += 1
                     If row.Item("Skins") = "Y" Then iTotSkinPlayers += 1
                     Try
-                        If row.Item("CTP_1") IsNot DBNull.Value Then sctps(0) = iwinner
-                        If row.Item("CTP_2") IsNot DBNull.Value Then sctps(1) = iwinner
+                        If IsNumeric(row.Item("CTP_1")) Then sctps(0) = iwinner
+                        If IsNumeric(row.Item("CTP_2")) Then sctps(1) = iwinner
 
                     Catch ex As Exception
 
@@ -640,24 +636,35 @@ Public Class Skins
             Dim ictp1 As Int16 = 0
             Dim ictp2 As Int16 = 0
 
+            'change mm/dd/yyyy to yyyymmdd
+            Dim reformatted1 As String = cbDatesPlayers.SelectedItem
+            Dim wkdate As Date = oHelper.rLeagueParmrow("PostSeasonDt")
+            Dim reformatted2 As String = wkdate.ToString("yyyyMMdd", Globalization.CultureInfo.InvariantCulture)
+            If reformatted1 >= reformatted2 Then
+                oHelper.bCCLeague = True
+            Else
+                oHelper.bCCLeague = False
+            End If
+
             '20180923 - hardcode skins for club championship to be 10
             If oHelper.bCCLeague Then
                 iEachClosestAmt = (iTotCTPPlayers * 3) / 2
                 iSkinpot = iTotSkinPlayers * 7
             Else
-
-                If oHelper.rLeagueParmrow("RolledOverDate") < cbDatesPlayers.SelectedItem Then
-                    iSkinpot = oHelper.convDBNulltoSpaces(oHelper.rLeagueParmrow("RolledOverSkins"))
-                    If IsNumeric(oHelper.rLeagueParmrow("RolledOverCTP1")) Then ictp1 = oHelper.rLeagueParmrow("RolledOverCTP1")
-                    If IsNumeric(oHelper.rLeagueParmrow("RolledOverCTP2")) Then ictp2 = oHelper.rLeagueParmrow("RolledOverCTP2")
+                If oHelper.rLeagueParmrow("RolledOverDate") IsNot DBNull.Value Then
+                    If oHelper.rLeagueParmrow("RolledOverDate") < cbDatesPlayers.SelectedItem Then
+                        iSkinpot = oHelper.convDBNulltoSpaces(oHelper.rLeagueParmrow("RolledOverSkins"))
+                        If IsNumeric(oHelper.rLeagueParmrow("RolledOverCTP1")) Then ictp1 = oHelper.rLeagueParmrow("RolledOverCTP1")
+                        If IsNumeric(oHelper.rLeagueParmrow("RolledOverCTP2")) Then ictp2 = oHelper.rLeagueParmrow("RolledOverCTP2")
+                    End If
                 End If
                 iSkinpot += oHelper.rLeagueParmrow("Skins") * iTotSkinPlayers
             End If
 
-            tbLOCP1.Text = ictp1 + iEachClosestAmt
-            tbLOCP2.Text = ictp2 + iEachClosestAmt
+            tbLOCP1.Text = ictp1
+            tbLOCP2.Text = ictp2
 
-            tbSkins.Text = 0
+            tbSkins.Text = iSkinpot
             tbPurse.Text = 0
             tbLOSkins.Text = 0
             tbCP1.Text = 0
@@ -693,17 +700,20 @@ Public Class Skins
 
             'loop through each row looking for player who won a ctp
             For Each row As DataGridViewRow In dgScores.Rows
-                If row.Cells("Player").Value = "*** Total ***" Then Continue For
-                Dim ictp = 0
-                If row.Index = sctps(0) - 1 Then
-                    row.Cells("CTP_1").Value = True
-                    ictp += iEachClosestAmt
-                    'tbLOCP1.Text -= iEachClosestAmt
-                End If
-                If row.Index = sctps(1) - 1 Then
-                    row.Cells("CTP_2").Value = True
-                    ictp += iEachClosestAmt
-                    'tbLOCP2.Text -= iEachClosestAmt
+                If row.Cells("Player").Value <> "*** Total ***" Then
+                    Dim ictp = 0
+                    If row.Index = sctps(0) - 1 Then
+                        row.Cells("CTP_1").Value = True
+                        ictp += iEachClosestAmt
+                        row.Cells("$Closest").Value = iEachClosestAmt
+                        'tbLOCP1.Text -= iEachClosestAmt
+                    End If
+                    If row.Index = sctps(1) - 1 Then
+                        row.Cells("CTP_2").Value = True
+                        ictp += iEachClosestAmt
+                        row.Cells("$Closest").Value = iEachClosestAmt
+                        'tbLOCP2.Text -= iEachClosestAmt
+                    End If
                 End If
             Next
 
@@ -913,10 +923,6 @@ Public Class Skins
 
         Me.Cursor = Cursors.Default
         Application.DoEvents()
-
-    End Sub
-
-    Private Sub cbSkins_CheckedChanged(sender As Object, e As EventArgs) 
 
     End Sub
 

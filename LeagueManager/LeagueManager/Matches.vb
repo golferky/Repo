@@ -331,21 +331,15 @@ Public Class Matches
             dvscores.RowFilter = String.Format("Date = {0}", oHelper.dDate.ToString("yyyyMMdd", Globalization.CultureInfo.InvariantCulture))
 
             For Each srow As DataRowView In dvscores
-                If srow("Hole1") <> "" Then
-                    oHelper.iHoleMarker = 1
-                ElseIf srow("Hole10") <> "" Then
-                    oHelper.iHoleMarker = 10
+                If srow("Hole1") IsNot DBNull.Value Then
+                    If IsNumeric(srow("Hole1")) Then oHelper.iHoleMarker = 1
+                ElseIf srow("Hole10") IsNot DBNull.Value Then
+                    If IsNumeric(srow("Hole10")) Then oHelper.iHoleMarker = 10
                 End If
                 Exit For
             Next
 
             If oHelper.iHoles = 0 Then oHelper.iHoles = oHelper.rLeagueParmrow("Holes")
-
-            'Dim dvScores As New DataView(oHelper.dsLeague.Tables("dtScores"))
-
-            'dvScores.RowFilter = "Date = '" & sdate & "'"
-
-            'dvScores.Sort = "Date, Partner"
             Dim sMatchFields = cMatchFields
             If oHelper.iHoleMarker = 10 Then sMatchFields = cMatchFields.Replace("Out_", "In_")
             Dim sArray = New List(Of String)(sMatchFields.Split(","))
@@ -390,7 +384,7 @@ Public Class Matches
 
             dgScores.Columns.Clear()
 
-            dgScores.RowTemplate.Height = 40
+            dgScores.RowTemplate.Height = 20
             dgScores.DefaultCellStyle.Font = New Font("Tahoma", 15)
 
             Dim arr As Array = sScoreCardforDGV.Split(",").ToArray
@@ -458,7 +452,7 @@ Public Class Matches
             Dim ishade = 4, bbl = False
 
             For Each row As DataGridViewRow In dgScores.Rows
-                row.Height = 30
+                'row.Height = 30
                 row.HeaderCell.Style.Alignment = DataGridViewContentAlignment.MiddleCenter
 
                 If ishade = 0 Then

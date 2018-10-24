@@ -3,6 +3,7 @@
 *************************************************************************************************
 * yyyymmdd - Priority - Complexity -  Module       Description
 * -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+* 20181017 - ML       - Med to hard - scorecard.vb when going back to prior years looking for partnets, pull player file from the date entered
 * 20181004 - ML       - Med to hard - scores.vb not taking front/back 9 into account for averages
 * 20180930 - ML       - Med to hard - dsleague.xsd change postseason flag to postseasondate
 * 20180925 - ML       - Med to hard - Scorecard.vb when combining league championship and regular league, need to swap front and back for scores
