@@ -1466,11 +1466,12 @@ ByVal sepChar As String)
                     End If
                 End If
                 If convDBNulltoSpaces(R.Cells("Team_Points").Value).Trim <> "" Then
-                    If R.Cells("Team_Points").Value = "1" Then
+                    If R.Cells("Team_Points").Value = "0.5" Then
                         R.Cells("Team_Points").Style.BackColor = Color.LightGreen
-                    ElseIf R.Cells("Team_Points").Value = "0.5" Then
+                    ElseIf R.Cells("Team_Points").Value = "0.25" Then
                         R.Cells("Team_Points").Style.BackColor = Color.Yellow
                     End If
+                    'If R.Cells("Team_Points").Value = "0.5" Then R.Cells("Team_Points").Style.BackColor = Color.LightGreen
                 End If
             End If
 

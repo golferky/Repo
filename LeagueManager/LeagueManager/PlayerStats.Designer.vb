@@ -40,7 +40,7 @@ Partial Class frmPlayerStats
         'dgPlayers
         '
         Me.dgPlayers.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
-        Me.dgPlayers.Location = New System.Drawing.Point(12, 75)
+        Me.dgPlayers.Location = New System.Drawing.Point(23, 64)
         Me.dgPlayers.Name = "dgPlayers"
         Me.dgPlayers.Size = New System.Drawing.Size(186, 745)
         Me.dgPlayers.TabIndex = 11
@@ -49,7 +49,7 @@ Partial Class frmPlayerStats
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(219, 849)
+        Me.ClientSize = New System.Drawing.Size(235, 849)
         Me.Controls.Add(Me.dgPlayers)
         Me.Controls.Add(Me.Label1)
         Me.Margin = New System.Windows.Forms.Padding(2)

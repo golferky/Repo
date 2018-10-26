@@ -166,9 +166,6 @@ Public Class Skins
 
     Private Sub dgScores_CellMouseDoubleClick(sender As Object, e As DataGridViewCellMouseEventArgs) Handles dgScores.CellMouseDoubleClick
         oHelper.LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
-        Me.Cursor = Cursors.WaitCursor
-        Application.DoEvents()
-        oHelper.LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
         If e.ColumnIndex = 0 Then
             Dim cell As DataGridViewTextBoxCell = sender.currentcell
             If cell.OwningColumn.Name = "Player" Then
@@ -183,8 +180,6 @@ Public Class Skins
                 End If
             End If
         End If
-        Me.Cursor = Cursors.Default
-        Application.DoEvents()
     End Sub
     Private Sub dgScores_SortCompare(sender As Object, e As DataGridViewSortCompareEventArgs) Handles dgScores.SortCompare
         oHelper.LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)

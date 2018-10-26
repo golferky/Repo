@@ -67,11 +67,8 @@ Public Class Matches
         oHelper.LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
         With lbStatus
             .Text = "Calculating Matches..."
-            .BackColor = Color.Red
         End With
-
-        Me.Cursor = Cursors.WaitCursor
-        Application.DoEvents()
+        oHelper.status_Msg(lbStatus, Me)
 
         SaveScores()
 
@@ -79,11 +76,8 @@ Public Class Matches
             MsgBox("Please select a date from the dropdown")
             With lbStatus
                 .Text = "Enter a date"
-                .BackColor = Color.LightGreen
             End With
-
-            Me.Cursor = Cursors.Default
-            Application.DoEvents()
+            oHelper.status_Msg(lbStatus, Me)
             Exit Sub
         Else
             oHelper.dDate = Date.ParseExact(cbDatesPlayers.SelectedItem, "yyyyMMdd", System.Globalization.DateTimeFormatInfo.InvariantInfo)
@@ -99,8 +93,7 @@ Public Class Matches
                 .Text = "Error Calculating Matches"
                 .BackColor = Color.Red
             End With
-            Me.Cursor = Cursors.Default
-            Application.DoEvents()
+            oHelper.status_Msg(lbStatus, Me)
             Me.Close()
             Exit Sub
         End If
@@ -189,23 +182,18 @@ Public Class Matches
             oHelper.MakeCellsStrings(row)
         Next
         With lbStatus
-            .Text = "Done Calculating Matches"
-            .BackColor = Color.LightGreen
+            .Text = "Finished Calculating Matches"
         End With
-        Me.Cursor = Cursors.Default
-        Application.DoEvents()
+        oHelper.status_Msg(lbStatus, Me)
     End Sub
 
     Private Sub dgScores_ColumnHeaderMouseClick(sender As Object, e As DataGridViewCellMouseEventArgs) Handles dgScores.ColumnHeaderMouseClick
+        oHelper.LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
         With lbStatus
             .Text = String.Format("Sorting Columns ...")
-            .BackColor = Color.Red
+            '.BackColor = Color.Red
         End With
-        Me.Cursor = Cursors.WaitCursor
-        Application.DoEvents()
-        oHelper.LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
-        Me.Cursor = Cursors.WaitCursor
-        Application.DoEvents()
+        oHelper.status_Msg(lbStatus, Me)
         Dim dgv = sender
         'oHelper.bReorderCols = True
         For Each row As DataGridViewRow In dgv.rows
@@ -213,12 +201,11 @@ Public Class Matches
             oHelper.ChangeColorsForStrokes(row)
         Next
         With lbStatus
-            .Text = String.Format("Done Sorting Columns")
-            .BackColor = Color.LightGreen
+            .Text = String.Format("Finished Sorting Columns")
+            '.BackColor = Color.LightGreen
         End With
         'oHelper.bReorderCols = False
-        Me.Cursor = Cursors.Default
-        Application.DoEvents()
+        oHelper.status_Msg(lbStatus, Me)
     End Sub
     Private Sub dgScores_CellMouseDoubleClick(sender As Object, e As DataGridViewCellMouseEventArgs) Handles dgScores.CellMouseDoubleClick
         Dim cell As DataGridViewTextBoxCell = sender.currentcell

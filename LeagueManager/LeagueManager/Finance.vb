@@ -17,6 +17,7 @@ Public Class Finance
     Dim iecPaidOut1 = 0
     Dim iecPaidOut2 = 0
     Dim iExpenses = 0
+    Dim bfirst As Boolean = False
     Dim oHelper As LeagueManager.Helper
     Private Sub Finance_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         '20180928 to use interop excel for worksheets
@@ -65,7 +66,10 @@ Public Class Finance
 
         dtr.PrimaryKey = New DataColumn() {dtr.Columns("Player")}
         dtr.DefaultView.Sort = "Player Asc"
-        For Each row As DataRow In oHelper.dt.Rows
+        Dim dv As New DataView(oHelper.dt)
+        Dim sdate = Main.cbLeagues.SelectedItem.ToString.Substring(Main.cbLeagues.SelectedItem.ToString.IndexOf("(") + 1, 4) & "0101"
+        dv.RowFilter = String.Format("Date > {0} And Date < {1} ", sdate, sdate.Replace("0101", "1231"))
+        For Each row As DataRowView In dv
             Dim xy = row(1).ToString
             oHelper.sPlayer = row("Player").ToString
             sdesc = row("Desc")
@@ -83,14 +87,14 @@ Public Class Finance
         tbESCollected.Text = iesCollected
         tbESPaidOut.Text = iesPaidOut1 + iesPaidOut2 + iecPaidOut1 + iecPaidOut2
         tbExpenses.Text = iExpenses
-
+        tbTotalPO.Text = iExpenses + irspaidout
         For Each col As DataColumn In dtr.Columns
             Dim dgc As New DataGridViewTextBoxColumn
             dgc.Name = col.ColumnName
             dgc.ValueType = GetType(System.String)
             If dgc.Name = "Player" Then
                 dgc.Width = 100
-                dgc.HeaderText = "Player      (*-no EOY)"
+                dgc.HeaderText = "Player      (Blue <> EOY)"
             ElseIf dgc.Name = "Earned" Then
                 dgc.HeaderText = "Earned (Pays Excl)"
                 dgc.Width = 60
@@ -110,6 +114,7 @@ Public Class Finance
             'create a dataview of just payments
             If row("Player").ToString.Contains("***") Or row("Balance Due") > 0 Then
             Else
+                'this code checks to see if a player participated in EOY skins
                 Dim dvs As New DataView(oHelper.dt)
                 dvs.RowFilter = String.Format("Desc = '{0}' And Detail = '{1}'", "EOY Skins", "Payment")
                 Dim dt = dvs.ToTable
@@ -121,9 +126,20 @@ Public Class Finance
 
             dgFinance.Rows.Add(row.ItemArray)
         Next
+        For Each row As DataGridViewRow In dgFinance.Rows
+            Dim splayer = row.Cells("Player").Value
+            If splayer IsNot Nothing Then
+                If splayer.StartsWith("* ") Then
+                    row.Cells("Player").Value = splayer.Replace("* ", "")
+                    row.Cells("Player").Style.BackColor = Color.LightBlue
+                End If
+            End If
+        Next
         Me.Text = Me.Text & " - " & Main.cbLeagues.SelectedItem
+        lbStatus.Text = ""
+
     End Sub
-    Sub calcAmount(dtr As DataTable, row As DataRow)
+    Sub calcAmount(dtr As DataTable, row As DataRowView)
         Dim sKeys() As Object = {row("Player")}
         Dim dr As DataRow = dtr.Rows.Find(sKeys)
         'build a new row if it doesnt exist
@@ -156,6 +172,7 @@ Public Class Finance
         ElseIf sdesc = "Club Champion" Then
             dr("Club Champ") += row("Earned")
             iccpaidout += row("Earned")
+            '    irspaidout += row("Earned")
         ElseIf sdesc.Contains("EOY Skins") Then
             If row("Detail") = "Payment" Then
                 iesCollected += row("Earned")
@@ -178,7 +195,7 @@ Public Class Finance
                 If sdesc.Substring(Len(sdesc) - 1, 1) = 2 Then iecPaidOut2 += row("Earned")
             End If
         ElseIf row("Detail") = "Charge" Then
-            iexpenses += row("Earned")
+            iExpenses += row("Earned")
             dr("Balance Due") = row("Earned")
             row("Earned") = 0
         End If
@@ -206,19 +223,23 @@ Public Class Finance
         End Try
     End Sub
     Private Sub dgFinance_SortCompare(sender As Object, e As DataGridViewSortCompareEventArgs) Handles dgFinance.SortCompare
-        'If e.Column.Index <> 0 Then
-        '    Return
-        'End If
+
         Try
-            Me.Cursor = Cursors.WaitCursor
-            Application.DoEvents()
-            Main.oHelper.SortCompare(sender, e)
-            'e.SortResult = If(CInt(e.CellValue1) < CInt(e.CellValue2), -1, 1)
-            'e.Handled = True
+            oHelper.SortCompare(sender, e)
         Catch
             Dim x = ""
         End Try
-        Me.Cursor = Cursors.Default
-        Application.DoEvents()
+
     End Sub
+    Private Sub dgFinance_ColumnHeaderMouseClick(sender As Object, e As DataGridViewCellMouseEventArgs) Handles dgFinance.ColumnHeaderMouseClick
+        oHelper.LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
+
+        Dim newColumn As DataGridViewColumn = sender.Columns(e.ColumnIndex)
+        lbStatus.Text = String.Format("Resorting Columns by {0}", newColumn.HeaderText)
+        oHelper.status_Msg(lbStatus, Me)
+
+        lbStatus.Text = String.Format("Finished Resorting Column {0}", newColumn.HeaderText)
+        oHelper.status_Msg(lbStatus, Me)
+    End Sub
+
 End Class

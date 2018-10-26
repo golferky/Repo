@@ -1299,6 +1299,9 @@ Public Class frmScoreCard
     End Sub
 
     Private Sub rbDots_CheckedChanged(sender As Object, e As EventArgs) Handles rbDots.CheckedChanged
+        lbStatus.Text = String.Format("Start Changing Dots/Colors ")
+        oHelper.status_Msg(lbStatus, Me)
+
         If rbColors.Checked Then
             oHelper.bColors = True
             oHelper.bDots = False
@@ -1312,6 +1315,8 @@ Public Class frmScoreCard
         For Each row As DataGridViewRow In dgScores.Rows
             oHelper.ChangeColorsForStrokes(row)
         Next
+        lbStatus.Text = String.Format("Finished Changing Dots/Colors ")
+        oHelper.status_Msg(lbStatus, Me)
     End Sub
 
     Private Sub btnSave_Click(sender As Object, e As EventArgs) Handles btnSave.Click

@@ -74,7 +74,7 @@ Partial Class Main
         '
         'btnLeagueSetup
         '
-        Me.btnLeagueSetup.Location = New System.Drawing.Point(6, 31)
+        Me.btnLeagueSetup.Location = New System.Drawing.Point(20, 31)
         Me.btnLeagueSetup.Margin = New System.Windows.Forms.Padding(2)
         Me.btnLeagueSetup.Name = "btnLeagueSetup"
         Me.btnLeagueSetup.Size = New System.Drawing.Size(131, 24)

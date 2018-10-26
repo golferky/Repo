@@ -1,7 +1,7 @@
 ﻿'*************************************************************************************************
 Imports System.IO.Packaging
 Public Class Main
-    Dim cVersion = "Version : 2018.10.04"
+    Dim cVersion = "Version : 2018.10.26"
     Public oHelper As Helper
     'Public owa As WA
     Dim bLoad = True

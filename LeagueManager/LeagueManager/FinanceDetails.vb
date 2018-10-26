@@ -89,32 +89,10 @@
         Application.DoEvents()
     End Sub
     Private Sub dgFinance_SortCompare(sender As Object, e As DataGridViewSortCompareEventArgs) Handles dgFinance.SortCompare
-        'If e.Column.Index <> 0 Then
-        '    Return
-        'End If
         Try
-            Me.Cursor = Cursors.WaitCursor
-            Application.DoEvents()
             oHelper.SortCompare(sender, e)
-            '    Dim c1 As Integer
-            '    If e.CellValue1 Is DBNull.Value Then
-            '        c1 = 0
-            '    Else
-            '        c1 = e.CellValue1
-            '    End If
-            '    Dim c2 As Integer
-            '    If e.CellValue2 Is DBNull.Value Then
-            '        c2 = 0
-            '    Else
-            '        c2 = e.CellValue2
-            '    End If
-            '    e.SortResult = If(CInt(c1) < CInt(c2), -1, 1)
-
-            '    e.Handled = True
         Catch
             Dim x = ""
         End Try
-        Me.Cursor = Cursors.Default
-        Application.DoEvents()
     End Sub
 End Class

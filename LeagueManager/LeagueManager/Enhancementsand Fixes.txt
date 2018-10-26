@@ -3,6 +3,7 @@
 *************************************************************************************************
 * yyyymmdd - Priority - Complexity -  Module       Description
 * -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+* 20181026 - MH       - Med to hard - allow multiple players for player file(a player for each league)
 * 20180919 - ML       - Med to hard - Playerstats.vb show league average stats for each hole and rank
 * 20180919 - M        - Easy        - Standings.vb Re-sorting numeric columns arent working right (col sort needed)
 * 20180812 - M        - Med         - Scorecard.vb when sub for a player(add the player subbed for in the datagridview cell and remove it on save)
@@ -24,6 +25,7 @@
 * 20180219 - MH       - Med         - tell which players are getting an email and track if email already sent to warn were sending again
 *************************************************************************************************
 *            Future
+* 20181026 - L        - Hard        - only have one screen for everything scores, matches,skins, standings, calculating as you go
 * 20180512 - L        - Med         - Enhance Player Scores, have back 9 as part of grid, do stats on each
 * 20180219 - L        - Med         - Possible sms for standings or facebook feed
 * 20180219 - M        - Med         - Finance $$$ tracking who paid, prize distribution, total $$earned, etc
@@ -37,7 +39,7 @@
 *                                           Change Log-Completed
 *************************************************************************************************
 * yyyymmdd - Priority - Complexity -  Description
-* 20181017 - ML       - Med to hard - scorecard.vb when going back to prior years looking for partnets, pull player file from the date entered
+* 20181017 - ML       - Med to hard - scorecard.vb when going back to prior years looking for partners, pull player file from the date entered
 * 20181004 - ML       - Med to hard - scores.vb not taking front/back 9 into account for averages
 * 20180930 - ML       - Med to hard - dsleague.xsd change postseason flag to postseasondate
 * 20180925 - ML       - Med to hard - Scorecard.vb when combining league championship and regular league, need to swap front and back for scores

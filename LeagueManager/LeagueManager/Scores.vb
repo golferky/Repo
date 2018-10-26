@@ -50,7 +50,7 @@ Public Class Scores
                 End If
             Next
             sArray.Add("Points-40-true-false-ml")
-            sArray.Add("Team_Points-40-true-false-ml")
+            sArray.Add("Team_Points-50-true-false-ml")
             sArray.Add("Opponent-170-true-false-ml")
             'player column not needed, its in the heading 
             If oHelper.bScoresbyPlayer Then
@@ -250,7 +250,7 @@ Public Class Scores
                 oHelper.bColors = True
                 For Each row As DataGridViewRow In dgScores.Rows
                     row.Height = 25
-                    'If row.Cells("Method").Value Is Nothing Then Continue For
+                    If row.Cells("Method").Value Is DBNull.Value Then Continue For
                     Dim sStat As String = row.Cells("Date").Value
                     row.HeaderCell.Style.Alignment = DataGridViewContentAlignment.MiddleCenter
                     'numeric date indicates a score card
@@ -268,20 +268,25 @@ Public Class Scores
                     End If
                     '20181004 - override calcholemarker because of cc and league in same sch
                     oHelper.CalcHoleMarker(row.Cells("Date").Value)
+                    'If row.Cells("Hole1") IsNot DBNull.Value Then
+                    '    If IsNumeric(srow("Hole1")) Then oHelper.iHoleMarker = 1
+                    'ElseIf srow("Hole10") IsNot DBNull.Value Then
+                    '    If IsNumeric(srow("Hole10")) Then oHelper.iHoleMarker = 10
+                    'End If
+
                     If row.Cells("Method").Value = "Gross" Or row.Cells("Method").Value = "Net" Then
-                        If row.Cells("Hole1").Value IsNot DBNull.Value Then
-                            oHelper.iHoleMarker = 1
-                        Else
-                            oHelper.iHoleMarker = 10
+                            If row.Cells("Hole1").Value IsNot DBNull.Value Then
+                                oHelper.iHoleMarker = 1
+                            Else
+                                oHelper.iHoleMarker = 10
+                            End If
                         End If
-                    End If
                     If oHelper.iHoleMarker = 10 Then
                         For i = 0 To 3
                             row.Cells(i).Style.BackColor = Color.LightBlue
                         Next
                     End If
                     oHelper.SBPChangeColorsForStrokes(row)
-
                 Next
                 oHelper.bColors = False
             Catch ex As Exception
