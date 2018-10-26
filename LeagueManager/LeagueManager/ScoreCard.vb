@@ -145,6 +145,7 @@ Public Class frmScoreCard
 
     'this function is called to validate that all holes were entered and to add up scores to net/gross calculations
     Function calcScores(R As DataGridViewRow) As Integer
+        oHelper.LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
         calcScores = 0
         With oHelper
             .bAllHolesEntered = True
@@ -180,20 +181,24 @@ Public Class frmScoreCard
         End With
     End Function
     Function GetPHdcp() As String
-        GetPHdcp = ""
+        Try
+            oHelper.LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
+            GetPHdcp = ""
 
-        Dim dvscores As New DataView(oHelper.dsLeague.Tables("dtScores"))
-        With dvscores
-            '20181014-future try to search internet to find a top row solution
-            .RowFilter = String.Format("Player = '{0}' and Date < '{1}'", oHelper.sPlayer, cbDatesPlayers.SelectedItem)
-            .Sort = "Date DESC"
-            If .Count > 0 Then GetPHdcp = .Item(0).Item("Hdcp")
-        End With
-        
+            Dim dvscores As New DataView(oHelper.dsLeague.Tables("dtScores"))
+            With dvscores
+                '20181014-future try to search internet to find a top row solution
+                .RowFilter = String.Format("Player = '{0}' and Date < '{1}'", oHelper.sPlayer, cbDatesPlayers.SelectedItem)
+                .Sort = "Date DESC"
+                If .Count > 0 Then GetPHdcp = .Item(0).Item("Hdcp")
+            End With
+        Catch ex As Exception
+            MsgBox(oHelper.GetExceptionInfo(ex))
+        End Try
     End Function
     Sub rebuildReadOnly()
+        oHelper.LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
         Try
-
             If cbScoresLocked.Checked = True Then
                 dgScores.ReadOnly = True
                 'Exit Sub
@@ -559,11 +564,12 @@ Public Class frmScoreCard
             'dgScores.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.Fill
             'dgScores.AutoSizeRowsMode = DataGridViewAutoSizeRowsMode.None
         Catch ex As Exception
-            MsgBox("Error " & ex.Message & vbCrLf & ex.StackTrace)
+            MsgBox(oHelper.GetExceptionInfo(ex))
         End Try
         'oHelper.LOGIT(dgScores.Rows(0).Cells("Player").Value & " -" & dgScores.Rows(0).Cells("Player").ReadOnly)
     End Sub
     Sub SaveScores()
+        oHelper.LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
         Try
 
             oHelper.DataTable2CSV(oHelper.dsLeague.Tables("dtLeagueParms"), oHelper.sFilePath & "\" & Now.ToString("yyyyMMdd") & "_LeagueParms.csv")
@@ -675,7 +681,7 @@ Public Class frmScoreCard
             lbStatus.BackColor = Color.LightGreen
 
         Catch ex As Exception
-
+            MsgBox(oHelper.GetExceptionInfo(ex))
         End Try
 
     End Sub
@@ -715,107 +721,90 @@ Public Class frmScoreCard
             If oHelper.bDGSError Then SendKeys.Send("+{TAB}")
 
         Catch ex As Exception
-            MsgBox("Error " & ex.Message & vbCrLf & ex.StackTrace)
+            MsgBox(oHelper.GetExceptionInfo(ex))
         End Try
-
     End Sub
     Sub editPlayer(R As DataGridViewRow, sCurrColName As String)
-        '    '1  Get the player name from the scores view with his handicap
-        '    '2  if scores havent been updated for this player/date, then update the gridview and mark stroke holes
-        '    'try looking for intials if the length is 2 char
-        oHelper.sPlayer = oHelper.RemoveNulls(R.Cells(sCurrColName).Value)
-        If oHelper.sPlayer <> "" Then oHelper.sPlayer = oHelper.fGetPlayer(oHelper.RemoveNulls(R.Cells(sCurrColName).Value), dgScores)
+        oHelper.LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
+        Try
 
-        If Not Len(oHelper.sPlayer) > 2 Then
-            If oHelper.sPlayer = sOldCellValue Then MsgBox("Player not found, Try Again")
-            R.Cells(sCurrColName).Value = sOldCellValue
-            oHelper.bDGSError = True
-            Exit Sub
-        End If
-        '20180116-check to see if player is already entered
-        Dim rptr As Integer = R.Index
-        For Each row As DataGridViewRow In dgScores.Rows
-            If row.Index <> rptr And row.Cells(sCurrColName).Value = oHelper.sPlayer Then
-                MsgBox(String.Format("You've already entered this player {0}, Try Again", oHelper.sPlayer))
+            '    '1  Get the player name from the scores view with his handicap
+            '    '2  if scores havent been updated for this player/date, then update the gridview and mark stroke holes
+            '    'try looking for intials if the length is 2 char
+            oHelper.sPlayer = oHelper.RemoveNulls(R.Cells(sCurrColName).Value)
+            If oHelper.sPlayer <> "" Then oHelper.sPlayer = oHelper.fGetPlayer(oHelper.RemoveNulls(R.Cells(sCurrColName).Value), dgScores)
+
+            If Not Len(oHelper.sPlayer) > 2 Then
+                If oHelper.sPlayer = sOldCellValue Then MsgBox("Player not found, Try Again")
                 R.Cells(sCurrColName).Value = sOldCellValue
                 oHelper.bDGSError = True
                 Exit Sub
             End If
-        Next
-
-        Try
-            oHelper.iHdcp = GetPHdcp()
-        Catch ex As Exception
-            oHelper.iHdcp = 99
-        End Try
-
-        R.Cells("PHdcp").Value = oHelper.iHdcp
-        R.Cells(sCurrColName).Value = oHelper.sPlayer
-        Dim MyPlayer As DataRow = oHelper.dsLeague.Tables("dtPlayers").Rows.Find(oHelper.sPlayer)
-        If R.Cells("Team").Value = "" Then R.Cells("Team").Value = MyPlayer("Team")
-
-        If rbColors.Checked Then oHelper.bColors = True Else oHelper.bColors = False
-        If rbDots.Checked Then oHelper.bDots = True Else oHelper.bDots = False
-        oHelper.displayStrokes(R)
-        '20180121 fix color blue on subs
-        Dim dvplayers As New DataView(oHelper.dsLeague.Tables("dtPlayers"))
-        R.Cells(sCurrColName).Style.BackColor = Color.White
-        dvplayers.RowFilter = "Name = '" & R.Cells(sCurrColName).Value & "'"
-        oHelper.sPlayer = R.Cells(sCurrColName).Value.ToString
-        If dvplayers.Count = 0 Then
-            Exit Sub
-        End If
-
-        'if no team, they are a sub
-        If dvplayers(0).Item("Team") Is DBNull.Value Then
-            R.Cells(sCurrColName).Style.BackColor = Color.Aqua
-        ElseIf dvplayers(0).Item("Team") <> R.Cells("Team").Value Then
-            R.Cells(sCurrColName).Style.BackColor = Color.Aqua
-        Else
-            R.Cells(sCurrColName).Style.BackColor = Color.White
-        End If
-    End Sub
-    Sub editMethod(R As DataGridViewRow, sCurrColName As String)
-
-        Dim sMethod = ""
-
-        If Not R.Cells(sCurrColName).Value Is DBNull.Value Then
-            sMethod = oHelper.convDBNulltoSpaces(R.Cells(sCurrColName).Value.ToString.ToUpper).Trim
-        End If
-
-        If Not R.IsNewRow Then
-
-            If sMethod = "Score".ToUpper Then
-                '20180219-clear gross / net score 
-                If oHelper.iHoleMarker = 1 Then
-                    R.Cells("Out_Gross").Value = ""
-                    R.Cells("Out_Net").Value = ""
-                    '20180510-turn off read only for method=score
-                    R.Cells("Out_Gross").ReadOnly = False
-                Else
-                    R.Cells("In_Gross").Value = ""
-                    R.Cells("In_Net").Value = ""
-                    '20180510-turn off read only for method=score
-                    R.Cells("In_Gross").ReadOnly = False
-                End If
-                R.Cells("Hdcp").Value = ""
-                Dim mbr = MsgBox("Score method is being used, hole scores will be cleared", MsgBoxStyle.OkCancel)
-                If mbr = MsgBoxResult.Cancel Then
+            '20180116-check to see if player is already entered
+            Dim rptr As Integer = R.Index
+            For Each row As DataGridViewRow In dgScores.Rows
+                If row.Index <> rptr And row.Cells(sCurrColName).Value = oHelper.sPlayer Then
+                    MsgBox(String.Format("You've already entered this player {0}, Try Again", oHelper.sPlayer))
                     R.Cells(sCurrColName).Value = sOldCellValue
                     oHelper.bDGSError = True
                     Exit Sub
                 End If
-                For i = oHelper.iHoleMarker To oHelper.iHoleMarker + 8
-                    R.Cells("Hole" & i).Value = ""
-                Next
-            ElseIf sMethod = "Gross".ToUpper Then
-                '20180219-clear out scores from score method
-                If sOldCellValue = "Score" Then
+            Next
+
+            Try
+                oHelper.iHdcp = GetPHdcp()
+            Catch ex As Exception
+                oHelper.iHdcp = 99
+            End Try
+
+            R.Cells("PHdcp").Value = oHelper.iHdcp
+            R.Cells(sCurrColName).Value = oHelper.sPlayer
+            Dim MyPlayer As DataRow = oHelper.dsLeague.Tables("dtPlayers").Rows.Find(oHelper.sPlayer)
+            If R.Cells("Team").Value = "" Then R.Cells("Team").Value = MyPlayer("Team")
+
+            If rbColors.Checked Then oHelper.bColors = True Else oHelper.bColors = False
+            If rbDots.Checked Then oHelper.bDots = True Else oHelper.bDots = False
+            oHelper.displayStrokes(R)
+            '20180121 fix color blue on subs
+            Dim dvplayers As New DataView(oHelper.dsLeague.Tables("dtPlayers"))
+            R.Cells(sCurrColName).Style.BackColor = Color.White
+            dvplayers.RowFilter = "Name = '" & R.Cells(sCurrColName).Value & "'"
+            oHelper.sPlayer = R.Cells(sCurrColName).Value.ToString
+            If dvplayers.Count = 0 Then
+                Exit Sub
+            End If
+
+            'if no team, they are a sub
+            If dvplayers(0).Item("Team") Is DBNull.Value Then
+                R.Cells(sCurrColName).Style.BackColor = Color.Aqua
+            ElseIf dvplayers(0).Item("Team") <> R.Cells("Team").Value Then
+                R.Cells(sCurrColName).Style.BackColor = Color.Aqua
+            Else
+                R.Cells(sCurrColName).Style.BackColor = Color.White
+            End If
+        Catch ex As Exception
+            MsgBox(oHelper.GetExceptionInfo(ex))
+        End Try
+    End Sub
+    Sub editMethod(R As DataGridViewRow, sCurrColName As String)
+        oHelper.LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
+
+        Try
+            Dim sMethod = ""
+
+            If Not R.Cells(sCurrColName).Value Is DBNull.Value Then
+                sMethod = oHelper.convDBNulltoSpaces(R.Cells(sCurrColName).Value.ToString.ToUpper).Trim
+            End If
+
+            If Not R.IsNewRow Then
+
+                If sMethod = "Score".ToUpper Then
+                    '20180219-clear gross / net score 
                     If oHelper.iHoleMarker = 1 Then
                         R.Cells("Out_Gross").Value = ""
                         R.Cells("Out_Net").Value = ""
-                        '20180219-turn off read only for method=score
-                        R.Cells("Out_Gross").ReadOnly = True
+                        '20180510-turn off read only for method=score
+                        R.Cells("Out_Gross").ReadOnly = False
                     Else
                         R.Cells("In_Gross").Value = ""
                         R.Cells("In_Net").Value = ""
@@ -823,68 +812,96 @@ Public Class frmScoreCard
                         R.Cells("In_Gross").ReadOnly = False
                     End If
                     R.Cells("Hdcp").Value = ""
-                End If
-                '20180219-clear gross / net score 
-                If oHelper.iHoleMarker = 1 Then
-                    R.Cells("Out_Gross").Value = R.Cells("Out_Net").Value
-                    If oHelper.convDBNulltoSpaces(R.Cells("Out_Gross").Value).Trim <> "" Then
-                        R.Cells("Out_Net").Value = CInt(R.Cells("Out_Gross").Value) - CInt(R.Cells("Phdcp").Value)
+                    Dim mbr = MsgBox("Score method is being used, hole scores will be cleared", MsgBoxStyle.OkCancel)
+                    If mbr = MsgBoxResult.Cancel Then
+                        R.Cells(sCurrColName).Value = sOldCellValue
+                        oHelper.bDGSError = True
+                        Exit Sub
+                    End If
+                    For i = oHelper.iHoleMarker To oHelper.iHoleMarker + 8
+                        R.Cells("Hole" & i).Value = ""
+                    Next
+                ElseIf sMethod = "Gross".ToUpper Then
+                    '20180219-clear out scores from score method
+                    If sOldCellValue = "Score" Then
+                        If oHelper.iHoleMarker = 1 Then
+                            R.Cells("Out_Gross").Value = ""
+                            R.Cells("Out_Net").Value = ""
+                            '20180219-turn off read only for method=score
+                            R.Cells("Out_Gross").ReadOnly = True
+                        Else
+                            R.Cells("In_Gross").Value = ""
+                            R.Cells("In_Net").Value = ""
+                            '20180510-turn off read only for method=score
+                            R.Cells("In_Gross").ReadOnly = False
+                        End If
+                        R.Cells("Hdcp").Value = ""
+                    End If
+                    '20180219-clear gross / net score 
+                    If oHelper.iHoleMarker = 1 Then
+                        R.Cells("Out_Gross").Value = R.Cells("Out_Net").Value
+                        If oHelper.convDBNulltoSpaces(R.Cells("Out_Gross").Value).Trim <> "" Then
+                            R.Cells("Out_Net").Value = CInt(R.Cells("Out_Gross").Value) - CInt(R.Cells("Phdcp").Value)
+                        End If
+                    Else
+                        R.Cells("In_Gross").Value = R.Cells("In_Net").Value
+                        If oHelper.convDBNulltoSpaces(R.Cells("In_Gross").Value).Trim <> "" Then R.Cells("In_Net").Value = CInt(R.Cells("In_Gross").Value) - CInt(R.Cells("Phdcp").Value)
+                        R.Cells("In_Net").Value = CInt(R.Cells("In_Gross").Value) - CInt(R.Cells("Phdcp").Value)
+                    End If
+
+                ElseIf sMethod = "Net".ToUpper Then
+                    '20180219-clear out scores from score method
+                    If sOldCellValue = "Score" Then
+                        If oHelper.iHoleMarker = 1 Then
+                            R.Cells("Out_Gross").Value = ""
+                            R.Cells("Out_Net").Value = ""
+                            '20180219-turn off read only for method=score
+                            R.Cells("Out_Gross").ReadOnly = True
+                        Else
+                            R.Cells("In_Gross").Value = ""
+                            R.Cells("In_Net").Value = ""
+                            '20180510-turn off read only for method=score
+                            R.Cells("In_Gross").ReadOnly = False
+                        End If
+                        R.Cells("Hdcp").Value = ""
+                    End If
+                    '20180219-turn off read only for method=score
+                    R.Cells("Out_Gross").ReadOnly = True
+                    'if the old method was gross, then recalc net/gross
+                    If sOldCellValue.StartsWith("G") Then
+                        If oHelper.iHoleMarker = 1 Then
+                            R.Cells("Out_Net").Value = R.Cells("Out_Gross").Value
+                            If oHelper.convDBNulltoSpaces(R.Cells("Out_Gross").Value).Trim <> "" Then
+                                R.Cells("Out_Gross").Value = +CInt(R.Cells("Out_Net").Value) + CInt(R.Cells("Phdcp").Value)
+                            End If
+                        Else
+                            R.Cells("In_Net").Value = R.Cells("In_Gross").Value
+                            If oHelper.convDBNulltoSpaces(R.Cells("In_Gross").Value).Trim <> "" Then
+                                R.Cells("In_Gross").Value = CInt(R.Cells("In_Net").Value) + CInt(R.Cells("Phdcp").Value)
+                            End If
+                        End If
                     End If
                 Else
-                    R.Cells("In_Gross").Value = R.Cells("In_Net").Value
-                    If oHelper.convDBNulltoSpaces(R.Cells("In_Gross").Value).Trim <> "" Then R.Cells("In_Net").Value = CInt(R.Cells("In_Gross").Value) - CInt(R.Cells("Phdcp").Value)
-                    R.Cells("In_Net").Value = CInt(R.Cells("In_Gross").Value) - CInt(R.Cells("Phdcp").Value)
-                End If
-
-            ElseIf sMethod = "Net".ToUpper Then
-                '20180219-clear out scores from score method
-                If sOldCellValue = "Score" Then
-                    If oHelper.iHoleMarker = 1 Then
-                        R.Cells("Out_Gross").Value = ""
-                        R.Cells("Out_Net").Value = ""
-                        '20180219-turn off read only for method=score
-                        R.Cells("Out_Gross").ReadOnly = True
-                    Else
-                        R.Cells("In_Gross").Value = ""
-                        R.Cells("In_Net").Value = ""
-                        '20180510-turn off read only for method=score
-                        R.Cells("In_Gross").ReadOnly = False
+                    lbStatus.BackColor = Color.Yellow
+                    lbStatus.Text = (String.Format("Score method {0} invalid, changing to default scoring", R.Cells(sCurrColName).Value))
+                    oHelper.bDGSError = True
+                    If rbGross.Checked Then
+                        sMethod = "Gross"
+                    ElseIf rbNet.Checked Then
+                        sMethod = "Net"
                     End If
-                    R.Cells("Hdcp").Value = ""
-                End If
-                '20180219-turn off read only for method=score
-                R.Cells("Out_Gross").ReadOnly = True
-                'if the old method was gross, then recalc net/gross
-                If sOldCellValue.StartsWith("G") Then
-                    If oHelper.iHoleMarker = 1 Then
-                        R.Cells("Out_Net").Value = R.Cells("Out_Gross").Value
-                        If oHelper.convDBNulltoSpaces(R.Cells("Out_Gross").Value).Trim <> "" Then
-                            R.Cells("Out_Gross").Value = +CInt(R.Cells("Out_Net").Value) + CInt(R.Cells("Phdcp").Value)
-                        End If
-                    Else
-                        R.Cells("In_Net").Value = R.Cells("In_Gross").Value
-                        If oHelper.convDBNulltoSpaces(R.Cells("In_Gross").Value).Trim <> "" Then
-                            R.Cells("In_Gross").Value = CInt(R.Cells("In_Net").Value) + CInt(R.Cells("Phdcp").Value)
-                        End If
-                    End If
-                End If
-            Else
-                lbStatus.BackColor = Color.Yellow
-                lbStatus.Text = (String.Format("Score method {0} invalid, changing to default scoring", R.Cells(sCurrColName).Value))
-                oHelper.bDGSError = True
-                If rbGross.Checked Then
-                    sMethod = "Gross"
-                ElseIf rbNet.Checked Then
-                    sMethod = "Net"
                 End If
             End If
-        End If
-        R.Cells(sCurrColName).Value = Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(sMethod.ToLower)
+            R.Cells(sCurrColName).Value = Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(sMethod.ToLower)
 
-        oHelper.ChangeColorsForStrokes(R)
+            oHelper.ChangeColorsForStrokes(R)
+        Catch ex As Exception
+            MsgBox(oHelper.GetExceptionInfo(ex))
+        End Try
     End Sub
 
     Sub editHoles(R As DataGridViewRow, sCurrColName As String)
+        oHelper.LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
         Try
             Dim sScore = oHelper.RemoveSpcChar(oHelper.convDBNulltoSpaces(R.Cells(sCurrColName).Value))
             If R.Cells("Method").Value Is DBNull.Value Then
@@ -955,15 +972,16 @@ Public Class frmScoreCard
             oHelper.ValidateCell(R.Cells(sCurrColName))
 
         Catch ex As Exception
-
+            MsgBox(oHelper.GetExceptionInfo(ex))
         End Try
-
     End Sub
 
     Sub editTeam(R As DataGridViewRow, sCurrColName As String)
-        'check the team number before leaving a row
-        Dim steam As Integer
+        oHelper.LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
+
         Try
+            'check the team number before leaving a row
+            Dim steam As Integer
             steam = Convert.ToInt16(R.Cells("Team").Value)
 
             If IsNumeric(steam) Then
@@ -1001,33 +1019,39 @@ Public Class frmScoreCard
 
     End Sub
     Sub editrest(R As DataGridViewRow, sCurrColName As String)
-        If oHelper.bAllHolesEntered Then
-            If oHelper.bAllHolesEntered Then R.Cells("Hdcp").Value = oHelper.GetNewHdcp(R, cbDatesPlayers.SelectedItem)
+        oHelper.LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
+        Try
+            If oHelper.bAllHolesEntered Then
+                If oHelper.bAllHolesEntered Then R.Cells("Hdcp").Value = oHelper.GetNewHdcp(R, cbDatesPlayers.SelectedItem)
 
-            ' Dim cell As DataGridViewCell
-            '' Set up the ToolTip text for the datagridviewcell.
-            'toolTipHdcp.SetToolTip(cell, "My button1")
+                ' Dim cell As DataGridViewCell
+                '' Set up the ToolTip text for the datagridviewcell.
+                'toolTipHdcp.SetToolTip(cell, "My button1")
 
-            Dim sScore = ""
-            Dim sPHdcp = GetPHdcp()
-            Try
-                If sPHdcp = "" Then R.Cells("PHdcp").Value = R.Cells("Hdcp").Value
-            Catch ex As Exception
-            End Try
-            If dgScores.Columns.Contains("Out_Gross") And oHelper.bAllHolesEntered Then
-                sScore = R.Cells("Out_Gross").Value
-                R.Cells("Out_Net").Value = sScore - R.Cells("PHdcp").Value
+                Dim sScore = ""
+                Dim sPHdcp = GetPHdcp()
+                Try
+                    If sPHdcp = "" Then R.Cells("PHdcp").Value = R.Cells("Hdcp").Value
+                Catch ex As Exception
+                End Try
+                If dgScores.Columns.Contains("Out_Gross") And oHelper.bAllHolesEntered Then
+                    sScore = R.Cells("Out_Gross").Value
+                    R.Cells("Out_Net").Value = sScore - R.Cells("PHdcp").Value
+                End If
+
+                If dgScores.Columns.Contains("In_Gross") And oHelper.bAllHolesEntered Then
+                    sScore = R.Cells("In_Gross").Value
+                    R.Cells("In_Net").Value = sScore - R.Cells("PHdcp").Value
+                End If
+                oHelper.ChangeColorsForStrokes(R)
             End If
-
-            If dgScores.Columns.Contains("In_Gross") And oHelper.bAllHolesEntered Then
-                sScore = R.Cells("In_Gross").Value
-                R.Cells("In_Net").Value = sScore - R.Cells("PHdcp").Value
-            End If
-            oHelper.ChangeColorsForStrokes(R)
-        End If
+        Catch ex As Exception
+            MsgBox(oHelper.GetExceptionInfo(ex))
+        End Try
 
     End Sub
     Sub editGross(R As DataGridViewRow, sCurrColName As String)
+        oHelper.LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
         Dim sScore = ""
         Try
             If dgScores.Columns.Contains("Out_Gross") Then
@@ -1076,6 +1100,7 @@ Public Class frmScoreCard
         'If e.Column.Index <> 0 Then
         '    Return
         'End If
+        oHelper.LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
         Try
             oHelper.bNoRowLeave = True
             Dim sc1 = oHelper.RemoveSpcChar(e.CellValue1)
@@ -1088,6 +1113,7 @@ Public Class frmScoreCard
 
             e.Handled = True
         Catch ex As Exception
+            MsgBox(oHelper.GetExceptionInfo(ex))
         End Try
     End Sub
     'Private Sub dgScores_RowLeave(sender As Object, e As DataGridViewCellEventArgs) Handles dgScores.RowLeave
@@ -1096,90 +1122,95 @@ Public Class frmScoreCard
     Private Sub dgScores_RowLeave(sender As Object, e As DataGridViewCellEventArgs) 'Handles dgScores.RowLeave
         oHelper.LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name & " row - " & e.RowIndex)
 
-        Dim sSkinsIndexes = oHelper.FCalcSkins(dgScores)
-        Dim iSkinpot As Integer = 0
-        sSkinsIndexes.Sort()
-        Dim iSkinVal As Integer = 0
-        Dim iExtra As Integer = 0
+        Try
+            Dim sSkinsIndexes = oHelper.FCalcSkins(dgScores)
+            Dim iSkinpot As Integer = 0
+            sSkinsIndexes.Sort()
+            Dim iSkinVal As Integer = 0
+            Dim iExtra As Integer = 0
 
-        If sSkinsIndexes.Count > 0 Then
-            '20180228-Fix extra dollars incorrect, they were missing leftover ctp calc
-            iSkinVal = Math.Truncate(iSkinpot / sSkinsIndexes.Count)
-        End If
+            If sSkinsIndexes.Count > 0 Then
+                '20180228-Fix extra dollars incorrect, they were missing leftover ctp calc
+                iSkinVal = Math.Truncate(iSkinpot / sSkinsIndexes.Count)
+            End If
 
-        If sSkinsIndexes.Count > 0 Then
-            Dim iprevplayer = 99, iTot = 0.0, iSkins = 0
-            Dim bfirst = True
-            For Each iplayer As Integer In sSkinsIndexes
-                If iplayer = iprevplayer Then
-                    iTot += iSkinVal
-                    iSkins += 1
-                Else
-                    If bfirst Then
-                        bfirst = False
+            If sSkinsIndexes.Count > 0 Then
+                Dim iprevplayer = 99, iTot = 0.0, iSkins = 0
+                Dim bfirst = True
+                For Each iplayer As Integer In sSkinsIndexes
+                    If iplayer = iprevplayer Then
+                        iTot += iSkinVal
+                        iSkins += 1
                     Else
-                        'dgScores.Rows(iprevplayer).Cells("$Skins").Value = iTot.ToString("$.00")
-                        dgScores.Rows(iprevplayer).Cells("$Skins").Value = iTot
-                        dgScores.Rows(iprevplayer).Cells("#Skins").Value = iSkins
+                        If bfirst Then
+                            bfirst = False
+                        Else
+                            'dgScores.Rows(iprevplayer).Cells("$Skins").Value = iTot.ToString("$.00")
+                            dgScores.Rows(iprevplayer).Cells("$Skins").Value = iTot
+                            dgScores.Rows(iprevplayer).Cells("#Skins").Value = iSkins
+                        End If
+                        iTot = iSkinVal
+                        iSkins = 1
+                        iprevplayer = iplayer
                     End If
-                    iTot = iSkinVal
-                    iSkins = 1
-                    iprevplayer = iplayer
+                Next
+                dgScores.Rows(iprevplayer).Cells("$Skins").Value = iTot
+                dgScores.Rows(iprevplayer).Cells("#Skins").Value = iSkins
+
+            End If
+
+            'put the total players out
+            dgScores.Rows(dgScores.Rows.Count - 1).Cells("Group").Value = dgScores.Rows.Count - 1
+
+            Dim iSkinsNum = 0
+            Dim iSkinsDol = 0.0
+            Dim iCtpsDol = 0.0
+            Dim iEarnDol = 0.00
+            Dim inumCTP = 0
+            tbCP1.Text = 0
+            tbCP2.Text = 0
+            'Loop through each row and check to see if check box checked for ctp 1/2
+            For Each row As DataGridViewRow In dgScores.Rows
+                If row.Cells("Player").Value <> "*** Total ***" Then
+                    Dim iEarn = 0.0
+                    Dim ithisctp = 0.0
+                    If IsNumeric(row.Cells("#Skins").Value) Then iSkinsNum += Val(row.Cells("#Skins").Value)
+                    If IsNumeric(oHelper.convDBNulltoSpaces(row.Cells("$Skins").Value)) Then
+                        iEarn += Val(row.Cells("$Skins").Value)
+                        iSkinsDol += Val(row.Cells("$Skins").Value)
+                    End If
+
+                    If IsNumeric(row.Cells("$Closest").Value) Then
+                        iEarn += row.Cells("$Closest").Value
+                        iCtpsDol += row.Cells("$Closest").Value
+                        row.Cells("$Closest").Style.BackColor = Color.Gold
+                        row.Cells("Player").Style.BackColor = Color.Gold
+                        tbCP1.Text += CInt(row.Cells("$Closest").Value)
+                        tbCP2.Text += CInt(row.Cells("$Closest").Value)
+                    End If
+                    row.Cells("$Earn").Value = iEarn
+                    iEarnDol += iEarn
                 End If
             Next
-            dgScores.Rows(iprevplayer).Cells("$Skins").Value = iTot
-            dgScores.Rows(iprevplayer).Cells("#Skins").Value = iSkins
 
-        End If
-
-        'put the total players out
-        dgScores.Rows(dgScores.Rows.Count - 1).Cells("Group").Value = dgScores.Rows.Count - 1
-
-        Dim iSkinsNum = 0
-        Dim iSkinsDol = 0.0
-        Dim iCtpsDol = 0.0
-        Dim iEarnDol = 0.00
-        Dim inumCTP = 0
-        tbCP1.Text = 0
-        tbCP2.Text = 0
-        'Loop through each row and check to see if check box checked for ctp 1/2
-        For Each row As DataGridViewRow In dgScores.Rows
-            If row.Cells("Player").Value <> "*** Total ***" Then
-                Dim iEarn = 0.0
-                Dim ithisctp = 0.0
-                If IsNumeric(row.Cells("#Skins").Value) Then iSkinsNum += Val(row.Cells("#Skins").Value)
-                If IsNumeric(oHelper.convDBNulltoSpaces(row.Cells("$Skins").Value)) Then
-                    iEarn += Val(row.Cells("$Skins").Value)
-                    iSkinsDol += Val(row.Cells("$Skins").Value)
+            'update the total row now
+            For Each row In dgScores.Rows
+                If row.Cells("Player").Value = "*** Total ***" Then
+                    row.Cells("#Skins").Value = iSkinsNum
+                    row.Cells("$Skins").Value = iSkinsDol
+                    row.Cells("$Earn").Value = iEarnDol
+                    row.Cells("$Closest").Value = iCtpsDol
+                    row.DefaultCellStyle.BackColor = Color.LightGoldenrodYellow
                 End If
+            Next
+            oHelper.bCalcSkins = False
+            dgScores.Visible = True
+            tbSkins.Text = iSkinsDol
+            tbPurse.Text = iSkinsDol + iCtpsDol
 
-                If IsNumeric(row.Cells("$Closest").Value) Then
-                    iEarn += row.Cells("$Closest").Value
-                    iCtpsDol += row.Cells("$Closest").Value
-                    row.Cells("$Closest").Style.BackColor = Color.Gold
-                    row.Cells("Player").Style.BackColor = Color.Gold
-                    tbCP1.Text += CInt(row.Cells("$Closest").Value)
-                    tbCP2.Text += CInt(row.Cells("$Closest").Value)
-                End If
-                row.Cells("$Earn").Value = iEarn
-                iEarnDol += iEarn
-            End If
-        Next
-
-        'update the total row now
-        For Each row In dgScores.Rows
-            If row.Cells("Player").Value = "*** Total ***" Then
-                row.Cells("#Skins").Value = iSkinsNum
-                row.Cells("$Skins").Value = iSkinsDol
-                row.Cells("$Earn").Value = iEarnDol
-                row.Cells("$Closest").Value = iCtpsDol
-                row.DefaultCellStyle.BackColor = Color.LightGoldenrodYellow
-            End If
-        Next
-        oHelper.bCalcSkins = False
-        dgScores.Visible = True
-        tbSkins.Text = iSkinsDol
-        tbPurse.Text = iSkinsDol + iCtpsDol
+        Catch ex As Exception
+            MsgBox(oHelper.GetExceptionInfo(ex))
+        End Try
 
     End Sub
     'Sub resetGross_Net_Hdcp(wrow As DataGridViewRow)
@@ -1202,66 +1233,74 @@ Public Class frmScoreCard
     '    oHelper.bAllHolesEntered = False
     'End Sub
     Private Sub dgScores_RowEnter(sender As Object, e As DataGridViewCellEventArgs) Handles dgScores.RowEnter
-        oHelper.LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name & " row - " & e.RowIndex)
+        oHelper.LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
+        Try
+            'If dgScores.Rows(e.RowIndex).Cells("Method").Value = "" Then dgScores.Rows(e.RowIndex).Cells("Method") = oHelper.BuildScoreCardMethods()
 
-        'If dgScores.Rows(e.RowIndex).Cells("Method").Value = "" Then dgScores.Rows(e.RowIndex).Cells("Method") = oHelper.BuildScoreCardMethods()
+            If dgScores.Rows(e.RowIndex).IsNewRow Then
+                dgScores.Rows(e.RowIndex).Cells("Method").Value = oHelper.BuildScoreCardMethods(gbDefMeth)
+                If cbSkins.Checked Then dgScores.Rows(e.RowIndex).Cells("Skins").Value = "Y"
+                If cbClosest.Checked Then dgScores.Rows(e.RowIndex).Cells("Closest").Value = "Y"
+            End If
+        Catch ex As Exception
+            MsgBox(oHelper.GetExceptionInfo(ex))
+        End Try
 
-        If dgScores.Rows(e.RowIndex).IsNewRow Then
-            dgScores.Rows(e.RowIndex).Cells("Method").Value = oHelper.BuildScoreCardMethods(gbDefMeth)
-            If cbSkins.Checked Then dgScores.Rows(e.RowIndex).Cells("Skins").Value = "Y"
-            If cbClosest.Checked Then dgScores.Rows(e.RowIndex).Cells("Closest").Value = "Y"
-        End If
     End Sub
 
     Private Sub btnShowScores_Click(sender As Object, e As EventArgs) Handles btnShowScores.Click
 
         oHelper.LOGIT("--------------------------------------------------------------")
         oHelper.LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
-
-        lbStatus.Text = "Getting scores for this screen..."
-        oHelper.status_Msg(lbStatus, Me)
-
-        SaveScores()
-        oHelper.bNoRowLeave = True
-        oHelper.bScoresbyPlayer = False
-        bSaveBtn = False
         Try
-            If cbDatesPlayers.SelectedItem Is Nothing Then
-                oHelper.dDate = Date.ParseExact(cbDatesPlayers.Text, "yyyyMMdd", System.Globalization.DateTimeFormatInfo.InvariantInfo)
-            Else
-                oHelper.dDate = Date.ParseExact(cbDatesPlayers.SelectedItem, "yyyyMMdd", System.Globalization.DateTimeFormatInfo.InvariantInfo)
+            lbStatus.Text = "Getting scores for this screen..."
+            oHelper.status_Msg(lbStatus, Me)
+
+            SaveScores()
+            oHelper.bNoRowLeave = True
+            oHelper.bScoresbyPlayer = False
+            bSaveBtn = False
+            Try
+                If cbDatesPlayers.SelectedItem Is Nothing Then
+                    oHelper.dDate = Date.ParseExact(cbDatesPlayers.Text, "yyyyMMdd", System.Globalization.DateTimeFormatInfo.InvariantInfo)
+                Else
+                    oHelper.dDate = Date.ParseExact(cbDatesPlayers.SelectedItem, "yyyyMMdd", System.Globalization.DateTimeFormatInfo.InvariantInfo)
+                End If
+            Catch ex As Exception
+                Dim x = ""
+                MsgBox("Bad Date entered, must be yyyymmdd format")
+                Me.Cursor = Cursors.Default
+                Application.DoEvents()
+                Exit Sub
+            End Try
+
+            ' getVoiceScores()
+            oHelper.iHoles = oHelper.rLeagueParmrow("Holes")
+
+            If rbColors.Checked Then
+                oHelper.bColors = True
+                oHelper.bDots = False
             End If
+            If rbDots.Checked Then
+                oHelper.bDots = True
+                oHelper.bColors = False
+            End If
+
+            BldScoreCardDataGridFromFile()
+
+            oHelper.bNoRowLeave = False
+
+            lbStatus.Text = "Finished Reading Scores"
+            oHelper.status_Msg(lbStatus, Me)
+
+            sOldCellValue = ""
         Catch ex As Exception
-            Dim x = ""
-            MsgBox("Bad Date entered, must be yyyymmdd format")
-            Me.Cursor = Cursors.Default
-            Application.DoEvents()
-            Exit Sub
+            MsgBox(oHelper.GetExceptionInfo(ex))
         End Try
-
-        ' getVoiceScores()
-        oHelper.iHoles = oHelper.rLeagueParmrow("Holes")
-
-        If rbColors.Checked Then
-            oHelper.bColors = True
-            oHelper.bDots = False
-        End If
-        If rbDots.Checked Then
-            oHelper.bDots = True
-            oHelper.bColors = False
-        End If
-
-        BldScoreCardDataGridFromFile()
-
-        oHelper.bNoRowLeave = False
-
-        lbStatus.Text = "Finished Reading Scores"
-        oHelper.status_Msg(lbStatus, Me)
-
-        sOldCellValue = ""
     End Sub
     Sub cleanupScores()
         '20180126-reload scores from csv when not saved
+        oHelper.LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
         oHelper.ReloadScores()
     End Sub
     Private Sub btnSkins_Click(sender As Object, e As EventArgs)
@@ -1283,102 +1322,121 @@ Public Class frmScoreCard
 
     Private Sub dgScores_ColumnHeaderMouseClick(sender As Object, e As DataGridViewCellMouseEventArgs) Handles dgScores.ColumnHeaderMouseClick
         oHelper.LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
+        Try
+            MsgBox(String.Format("Resorting not allowed on scorecard"))
+            Exit Sub
 
-        MsgBox(String.Format("Resorting not allowed on scorecard"))
-        Exit Sub
-
-        Dim newColumn As DataGridViewColumn = sender.Columns(e.ColumnIndex)
-        lbStatus.Text = String.Format("Resorting Columns by {0}", newColumn.HeaderText)
-        oHelper.status_Msg(lbStatus, Me)
-        Dim dgv = sender
-        For Each row As DataGridViewRow In dgv.rows
-            oHelper.ChangeColorsForStrokes(row)
-        Next
-        lbStatus.Text = String.Format("Finished Resorting Column {0}", newColumn.HeaderText)
-        oHelper.status_Msg(lbStatus, Me)
+            Dim newColumn As DataGridViewColumn = sender.Columns(e.ColumnIndex)
+            lbStatus.Text = String.Format("Resorting Columns by {0}", newColumn.HeaderText)
+            oHelper.status_Msg(lbStatus, Me)
+            Dim dgv = sender
+            For Each row As DataGridViewRow In dgv.rows
+                oHelper.ChangeColorsForStrokes(row)
+            Next
+            lbStatus.Text = String.Format("Finished Resorting Column {0}", newColumn.HeaderText)
+            oHelper.status_Msg(lbStatus, Me)
+        Catch ex As Exception
+            MsgBox(oHelper.GetExceptionInfo(ex))
+        End Try
     End Sub
 
     Private Sub rbDots_CheckedChanged(sender As Object, e As EventArgs) Handles rbDots.CheckedChanged
-        lbStatus.Text = String.Format("Start Changing Dots/Colors ")
-        oHelper.status_Msg(lbStatus, Me)
+        oHelper.LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
+        Try
+            lbStatus.Text = String.Format("Start Changing Dots/Colors ")
+            oHelper.status_Msg(lbStatus, Me)
 
-        If rbColors.Checked Then
-            oHelper.bColors = True
-            oHelper.bDots = False
-            gbHoleLegend.Visible = True
-        Else
-            oHelper.bColors = False
-            oHelper.bDots = True
-            gbHoleLegend.Visible = False
-        End If
+            If rbColors.Checked Then
+                oHelper.bColors = True
+                oHelper.bDots = False
+                gbHoleLegend.Visible = True
+            Else
+                oHelper.bColors = False
+                oHelper.bDots = True
+                gbHoleLegend.Visible = False
+            End If
 
-        For Each row As DataGridViewRow In dgScores.Rows
-            oHelper.ChangeColorsForStrokes(row)
-        Next
-        lbStatus.Text = String.Format("Finished Changing Dots/Colors ")
-        oHelper.status_Msg(lbStatus, Me)
+            For Each row As DataGridViewRow In dgScores.Rows
+                oHelper.ChangeColorsForStrokes(row)
+            Next
+            lbStatus.Text = String.Format("Finished Changing Dots/Colors ")
+            oHelper.status_Msg(lbStatus, Me)
+        Catch ex As Exception
+            MsgBox(oHelper.GetExceptionInfo(ex))
+        End Try
     End Sub
 
     Private Sub btnSave_Click(sender As Object, e As EventArgs) Handles btnSave.Click
-        bSaveBtn = True
-        SaveScores()
+        oHelper.LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
+        Try
+            bSaveBtn = True
+            SaveScores()
+        Catch ex As Exception
+            MsgBox(oHelper.GetExceptionInfo(ex))
+        End Try
+
     End Sub
     Private Sub dgScores_KeyDown(sender As Object, e As KeyEventArgs) Handles dgScores.KeyDown
-        For Each row As DataGridViewRow In dgScores.Rows
-            If row.Selected Then Exit Sub
-        Next
-        Dim dgr As DataGridView = sender
-        'If dgr.CurrentCell.Value = sOldCellValue Then Exit Sub
-        Dim sCurrColName = dgr.CurrentCell.OwningColumn.Name
-        Dim R As DataGridViewRow = dgr.CurrentRow
-        Dim dgc As DataGridViewCell = sender.currentcell
-        If e.KeyCode = Keys.Delete Then
-            If Not dgc.ReadOnly Then
-                Try
-                    'save old value in case we fail an edit
-                    sOldCellValue = dgc.Value
-                    dgc.Value = ""
-                    oHelper.bDGSError = False
-                    oHelper.bAllHolesEntered = False
-                    If R.Cells("Phdcp").Value Is Nothing Then oHelper.iHdcp = 99
-                    If sCurrColName = "Player" Then
-                        MsgBox("Cant Delete a player, try entering a player")
-                        'editPlayer(R, sCurrColName)
-                        R.Cells(sCurrColName).Value = sOldCellValue
-                    ElseIf sCurrColName = "Method" Then
-                        editMethod(R, sCurrColName)
-                    ElseIf sCurrColName.StartsWith("Hole") Then
-                        editHoles(R, sCurrColName)
-                        editrest(R, sCurrColName)
-                    ElseIf sCurrColName = "Team" Then
-                        editTeam(R, sCurrColName)
-                    End If
-                    If oHelper.bDGSError Then oHelper.bDGSError = False
-                Catch ex As Exception
-                    MsgBox("Error " & ex.Message & vbCrLf & ex.StackTrace)
-                End Try
+        oHelper.LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
+        Try
+            For Each row As DataGridViewRow In dgScores.Rows
+                If row.Selected Then Exit Sub
+            Next
+            Dim dgr As DataGridView = sender
+            'If dgr.CurrentCell.Value = sOldCellValue Then Exit Sub
+            Dim sCurrColName = dgr.CurrentCell.OwningColumn.Name
+            Dim R As DataGridViewRow = dgr.CurrentRow
+            Dim dgc As DataGridViewCell = sender.currentcell
+            If e.KeyCode = Keys.Delete Then
+                If Not dgc.ReadOnly Then
+                    Try
+                        'save old value in case we fail an edit
+                        sOldCellValue = dgc.Value
+                        dgc.Value = ""
+                        oHelper.bDGSError = False
+                        oHelper.bAllHolesEntered = False
+                        If R.Cells("Phdcp").Value Is Nothing Then oHelper.iHdcp = 99
+                        If sCurrColName = "Player" Then
+                            MsgBox("Cant Delete a player, try entering a player")
+                            'editPlayer(R, sCurrColName)
+                            R.Cells(sCurrColName).Value = sOldCellValue
+                        ElseIf sCurrColName = "Method" Then
+                            editMethod(R, sCurrColName)
+                        ElseIf sCurrColName.StartsWith("Hole") Then
+                            editHoles(R, sCurrColName)
+                            editrest(R, sCurrColName)
+                        ElseIf sCurrColName = "Team" Then
+                            editTeam(R, sCurrColName)
+                        End If
+                        If oHelper.bDGSError Then oHelper.bDGSError = False
+                    Catch ex As Exception
+                        MsgBox("Error " & ex.Message & vbCrLf & ex.StackTrace)
+                    End Try
+                End If
             End If
-        End If
-        Select Case e.KeyCode
-            Case Keys.Left
-                SelectNextControl(ActiveControl, False, True, False, True)
-            Case Keys.Right
-                SelectNextControl(ActiveControl, True, True, False, True)
-            Case Keys.Up, Keys.Down
-                'Case Keys.ControlKey + Keys.Z
-                '    dgc.Value = sOldCellValue
-            Case Else
-                'lbStatus.Text = String.Format("This cell {0} is read only, maybe unlocking scores will allow edit", sCurrColName)
-                'lbStatus.BackColor = Color.Yellow
-        End Select
-        'dgScores.Focus()
-        'MyBase.OnKeyDown(e)
-        'If e.KeyCode = Keys.Right Then
-        '    SendKeys.Send("{TAB}")
-        'ElseIf e.KeyCode = Keys.Left Then
-        '    SendKeys.Send("+{TAB}")
-        'End If
-        'if e.KeyCode = Keys.Left Then SendKeys.Send("+{TAB}")
+            Select Case e.KeyCode
+                Case Keys.Left
+                    SelectNextControl(ActiveControl, False, True, False, True)
+                Case Keys.Right
+                    SelectNextControl(ActiveControl, True, True, False, True)
+                Case Keys.Up, Keys.Down
+                    'Case Keys.ControlKey + Keys.Z
+                    '    dgc.Value = sOldCellValue
+                Case Else
+                    'lbStatus.Text = String.Format("This cell {0} is read only, maybe unlocking scores will allow edit", sCurrColName)
+                    'lbStatus.BackColor = Color.Yellow
+            End Select
+            'dgScores.Focus()
+            'MyBase.OnKeyDown(e)
+            'If e.KeyCode = Keys.Right Then
+            '    SendKeys.Send("{TAB}")
+            'ElseIf e.KeyCode = Keys.Left Then
+            '    SendKeys.Send("+{TAB}")
+            'End If
+            'if e.KeyCode = Keys.Left Then SendKeys.Send("+{TAB}")
+        Catch ex As Exception
+            MsgBox(oHelper.GetExceptionInfo(ex))
+        End Try
 
     End Sub
 
@@ -1389,18 +1447,24 @@ Public Class frmScoreCard
     Private Sub cbDates_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cbDatesPlayers.SelectedIndexChanged
         oHelper.LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
         '20180220-turn off lock box if last dropdown
-        If cbDatesPlayers.SelectedIndex = cbDatesPlayers.Items.Count - 1 Then
-            cbScoresLocked.Checked = False
-        End If
+        Try
+            If cbDatesPlayers.SelectedIndex = cbDatesPlayers.Items.Count - 1 Then cbScoresLocked.Checked = False
+        Catch ex As Exception
+            MsgBox(oHelper.GetExceptionInfo(ex))
+        End Try
     End Sub
     Private Sub dgScores_ColumnDividerDoubleClick(sender As Object, e As DataGridViewColumnDividerDoubleClickEventArgs) Handles dgScores.ColumnDividerDoubleClick
         '20180220-fix auto size cols
-        Dim x = ""
-        For Each col As DataGridViewColumn In dgScores.Columns
-            Dim icolw = col.Width
-            col.AutoSizeMode = DataGridViewAutoSizeColumnMode.None
-            col.Width = icolw
-        Next
+        oHelper.LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
+        Try
+            For Each col As DataGridViewColumn In dgScores.Columns
+                Dim icolw = col.Width
+                col.AutoSizeMode = DataGridViewAutoSizeColumnMode.None
+                col.Width = icolw
+            Next
+        Catch ex As Exception
+            MsgBox(oHelper.GetExceptionInfo(ex))
+        End Try
     End Sub
 
     Private Sub dgScores_CellMouseClick(sender As Object, e As DataGridViewCellMouseEventArgs) Handles dgScores.CellMouseClick
@@ -1425,51 +1489,62 @@ Public Class frmScoreCard
             End If
             'End If
         Catch ex As Exception
-
+            MsgBox(oHelper.GetExceptionInfo(ex))
         End Try
     End Sub
     Function sf(str As String, flist As String) As String
-        Dim sfl As String
-        For Each fld In flist.Split(",")
-            sfl = fld
-        Next
+        oHelper.LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
+        Try
+            Dim sfl As String
+            For Each fld In flist.Split(",")
+                sfl = fld
+            Next
 
-        sf = String.Format(str, "")
+            sf = String.Format(str, "")
+        Catch ex As Exception
+            MsgBox(oHelper.GetExceptionInfo(ex))
+        End Try
     End Function
     Private Sub cbScoresLocked_CheckedChanged(sender As Object, e As EventArgs) Handles cbScoresLocked.CheckedChanged
-        lbStatus.Text = String.Format("Start Locking Scores")
-        oHelper.status_Msg(lbStatus, Me)
-        cbScoresLocked.AutoCheck = False
-        If cbScoresLocked.Checked Then
-            btnSave.Visible = False
-            dgScores.ReadOnly = True
-            If oHelper.rLeagueParmrow("ScoresLocked") <> "Y" Then
-                oHelper.rLeagueParmrow("ScoresLocked") = "Y"
-                '20180516 - save scores when locking
-                SaveScores()
-            End If
-        Else
-            oHelper.rLeagueParmrow("ScoresLocked") = "N"
-            '20180228-rebuild read only fields
-            Dim sNotROFlds = "Player,Method,Team,Group,Skins,Closest"
-            dgScores.ReadOnly = False
-            Dim sb As New System.Text.StringBuilder
-            For Each row As DataGridViewRow In dgScores.Rows
-                For Each cell As DataGridViewCell In row.Cells
-                    If TypeOf (cell.Value) Is Boolean Then Continue For
-                    If Not sNotROFlds.Contains(cell.OwningColumn.Name) And Not cell.OwningColumn.Name.Contains("Hole") Then
-                        sb.Append(String.Format("Field was False, setting to True for {0}", cell.OwningColumn.Name) & vbCrLf)
-                        cell.ReadOnly = True
-                        sb.Append(String.Format("Value {0} in grid for {1}", cell.ReadOnly, cell.OwningColumn.Name) & vbCrLf)
-                    End If
+        oHelper.LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
+        Try
+            lbStatus.Text = String.Format("Start Locking Scores")
+            oHelper.status_Msg(lbStatus, Me)
+            cbScoresLocked.AutoCheck = False
+            If cbScoresLocked.Checked Then
+                btnSave.Visible = False
+                dgScores.ReadOnly = True
+                If oHelper.rLeagueParmrow("ScoresLocked") <> "Y" Then
+                    oHelper.rLeagueParmrow("ScoresLocked") = "Y"
+                    '20180516 - save scores when locking
+                    SaveScores()
+                End If
+            Else
+                oHelper.rLeagueParmrow("ScoresLocked") = "N"
+                '20180228-rebuild read only fields
+                Dim sNotROFlds = "Player,Method,Team,Group,Skins,Closest"
+                dgScores.ReadOnly = False
+                Dim sb As New System.Text.StringBuilder
+                For Each row As DataGridViewRow In dgScores.Rows
+                    For Each cell As DataGridViewCell In row.Cells
+                        If TypeOf (cell.Value) Is Boolean Then Continue For
+                        If Not sNotROFlds.Contains(cell.OwningColumn.Name) And Not cell.OwningColumn.Name.Contains("Hole") Then
+                            sb.Append(String.Format("Field was False, setting to True for {0}", cell.OwningColumn.Name) & vbCrLf)
+                            cell.ReadOnly = True
+                            sb.Append(String.Format("Value {0} in grid for {1}", cell.ReadOnly, cell.OwningColumn.Name) & vbCrLf)
+                        End If
+                    Next
                 Next
-            Next
-            oHelper.LOGIT(sb.ToString)
-            btnSave.Visible = True
-        End If
-        lbStatus.Text = String.Format("Finished Locking Scores")
-        oHelper.status_Msg(lbStatus, Me)
-        cbScoresLocked.AutoCheck = True
+                oHelper.LOGIT(sb.ToString)
+                btnSave.Visible = True
+            End If
+            lbStatus.Text = String.Format("Finished Locking Scores")
+            oHelper.status_Msg(lbStatus, Me)
+            cbScoresLocked.AutoCheck = True
+        Catch ex As Exception
+            MsgBox(oHelper.GetExceptionInfo(ex))
+        End Try
+
     End Sub
 
     Private Sub dgScores_RowValidating(sender As Object, e As DataGridViewCellCancelEventArgs) Handles dgScores.RowValidating
@@ -1484,221 +1559,266 @@ Public Class frmScoreCard
     End Sub
 
     Private Sub cbMarkPaid_CheckedChanged(sender As Object, e As EventArgs) Handles cbMarkPaid.CheckedChanged
-        For Each row In dgScores.Rows
-            ResetCTPSkins(row.cells("Skins"))
-            ResetCTPSkins(row.cells("Closest"))
-        Next
+        oHelper.LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
+        Try
+            For Each row In dgScores.Rows
+                ResetCTPSkins(row.cells("Skins"))
+                ResetCTPSkins(row.cells("Closest"))
+            Next
+        Catch ex As Exception
+            MsgBox(oHelper.GetExceptionInfo(ex))
+        End Try
     End Sub
     'Sub uncheckClear(cell As DataGridViewCheckBoxCell)
     '    cell.Value = False
     'End Sub
     Sub ResetCTPSkins(cell As DataGridViewCheckBoxCell)
+        oHelper.LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
+        Try
+            'if checkbox was on, turn it off, subtract $$ from amt
+            If cell.OwningColumn.Name = "Clear" Then
+                '20181022 - work to be done here for clearing scores, then recalcing skins if skins/ctp checkboxes were on
+                cell.Value = False
+                dgScores.EndEdit()
+                Exit Sub
+            End If
 
-        'if checkbox was on, turn it off, subtract $$ from amt
-        If cell.OwningColumn.Name = "Clear" Then
-            '20181022 - work to be done here for clearing scores, then recalcing skins if skins/ctp checkboxes were on
-            cell.Value = False
-            dgScores.EndEdit()
-            Exit Sub
-        End If
-
-        If cell.Value = True Then
-            recalcCTPSkins(cell)
-            cell.Value = False
-        Else
-            recalcCTPSkins(cell, False)
-            cell.Value = True
-        End If
+            If cell.Value = True Then
+                recalcCTPSkins(cell)
+                cell.Value = False
+            Else
+                recalcCTPSkins(cell, False)
+                cell.Value = True
+            End If
+        Catch ex As Exception
+            MsgBox(oHelper.GetExceptionInfo(ex))
+        End Try
     End Sub
     Sub recalcCTPSkins(cell As DataGridViewCheckBoxCell)
+        oHelper.LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
         recalcCTPSkins(cell, False)
     End Sub
     Sub recalcCTPSkins(cell As DataGridViewCheckBoxCell, bSubAmount As Boolean)
+        oHelper.LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
+        Try
+            Dim iPurse As Integer = tbPurse.Text
+            If Not IsNumeric(tbPSkins.Text) Then tbPSkins.Text = 0
+            Dim iTotSkins As Integer = tbPSkins.Text
+            Dim iTotCTP As Integer = CInt(tbPCP1.Text) + CInt(tbPCP2.Text) + CInt(tbCP1.Text) + CInt(tbCP2.Text)
+            Dim iamt As Integer = 0
 
-        Dim iPurse As Integer = tbPurse.Text
-        Dim iTotSkins As Integer = tbPSkins.Text
-        Dim iTotCTP As Integer = CInt(tbPCP1.Text) + CInt(tbPCP2.Text) + CInt(tbCP1.Text) + CInt(tbCP2.Text)
-        Dim iamt As Integer = 0
-
-        If cell.OwningColumn.Name = "Skins" Then
-            If oHelper.bCCLeague Then
-                iamt = 7
-            Else
-                iamt = oHelper.rLeagueParmrow(cell.OwningColumn.Name)
-            End If
-        ElseIf cell.OwningColumn.Name = "Closest" Then
-            If oHelper.bCCLeague Then
-                iamt = 3
-            Else
-                iamt = 1
-            End If
-        End If
-
-        If bSubAmount And cell.Value = False Then
-            iamt = iamt * -1
-        End If
-
-        If cell.Value = True Then
             If cell.OwningColumn.Name = "Skins" Then
-                tbSkins.Text += iTotSkins + iamt
+                If oHelper.bCCLeague Then
+                    iamt = 7
+                Else
+                    iamt = oHelper.rLeagueParmrow(cell.OwningColumn.Name)
+                End If
             ElseIf cell.OwningColumn.Name = "Closest" Then
-                tbCP1.Text += iamt / 2
-                tbCP2.Text += iamt / 2
+                If oHelper.bCCLeague Then
+                    iamt = 3
+                Else
+                    iamt = 1
+                End If
             End If
-            iPurse += iamt
-            tbPurse.Text = iPurse
-            tbSkinTot.Text = CInt(tbPSkins.Text) + CInt(tbSkins.Text)
-            tbCP1Tot.Text = CInt(tbPCP1.Text) + CInt(tbCP1.Text)
-            tbCP2Tot.Text = CInt(tbPCP2.Text) + CInt(tbCP2.Text)
-        End If
 
-        dgScores.EndEdit()
+            If bSubAmount And cell.Value = False Then
+                iamt = iamt * -1
+            End If
+
+            If cell.Value = True Then
+                If cell.OwningColumn.Name = "Skins" Then
+                    tbSkins.Text += iTotSkins + iamt
+                ElseIf cell.OwningColumn.Name = "Closest" Then
+                    tbCP1.Text += iamt / 2
+                    tbCP2.Text += iamt / 2
+                End If
+                iPurse += iamt
+                tbPurse.Text = iPurse
+                tbSkinTot.Text = CInt(tbPSkins.Text) + CInt(tbSkins.Text)
+                tbCP1Tot.Text = CInt(tbPCP1.Text) + CInt(tbCP1.Text)
+                tbCP2Tot.Text = CInt(tbPCP2.Text) + CInt(tbCP2.Text)
+            End If
+
+            dgScores.EndEdit()
+        Catch ex As Exception
+            MsgBox(oHelper.GetExceptionInfo(ex))
+        End Try
+
     End Sub
     Private Sub cbMatches_CheckedChanged(sender As Object, e As EventArgs) Handles cbMatches.CheckedChanged
-        If cbMatches.Checked Then
-            If Not oHelper.bCCLeague Then
-                Dim mbr = MsgBox(String.Format("Are you doing Club Championship and league matches combined?"), MsgBoxStyle.YesNo)
-                If mbr = MsgBoxResult.No Then
-                    oHelper.bCCLeague = False
-                    cbMatches.Checked = False
-                    Exit Sub
+        oHelper.LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
+        Try
+            If cbMatches.Checked Then
+                If Not oHelper.bCCLeague Then
+                    Dim mbr = MsgBox(String.Format("Are you doing Club Championship and league matches combined?"), MsgBoxStyle.YesNo)
+                    If mbr = MsgBoxResult.No Then
+                        oHelper.bCCLeague = False
+                        cbMatches.Checked = False
+                        Exit Sub
+                    End If
+                    oHelper.bCCLeague = True
                 End If
-                oHelper.bCCLeague = True
-            End If
-            tbSkins.Text = 0
-            tbCP1.Text = 0
-            tbCP2.Text = 0
-            tbPurse.Text = 0
-            For Each row As DataGridViewRow In dgScores.Rows
-                oHelper.sPlayer = row.Cells("Player").Value
-                recalcCTPSkins(row.Cells("Skins"))
-                recalcCTPSkins(row.Cells("Closest"))
-            Next
+                tbSkins.Text = 0
+                tbCP1.Text = 0
+                tbCP2.Text = 0
+                tbPurse.Text = 0
+                For Each row As DataGridViewRow In dgScores.Rows
+                    oHelper.sPlayer = row.Cells("Player").Value
+                    recalcCTPSkins(row.Cells("Skins"))
+                    recalcCTPSkins(row.Cells("Closest"))
+                Next
 
-        End If
+            End If
+        Catch ex As Exception
+            MsgBox(oHelper.GetExceptionInfo(ex))
+        End Try
 
     End Sub
 
     Private Sub rbFront_CheckedChanged(sender As Object, e As EventArgs) Handles rbFront.CheckedChanged
-        Dim sFrom = "Out_"
-        Dim sTo = "In_"
-        If rbFront.Checked Then
-            lbStatus.Text = String.Format("Swapping Back 9 to Front 9")
-            oHelper.status_Msg(lbStatus, Me)
-            oHelper.iHoleMarker = 1
-            sFrom = "In_"
-            sTo = "Out_"
-        Else
-            lbStatus.Text = String.Format("Swapping Front 9 to Back 9")
-            oHelper.status_Msg(lbStatus, Me)
-            oHelper.iHoleMarker = 10
-            sFrom = "Out_"
-            sTo = "In_"
-        End If
-
-        Dim i = oHelper.iHoleMarker
-        For Each col As DataGridViewColumn In dgScores.Columns
-            Dim scol = col.Name
-            If scol.StartsWith("Hole") Then
-                col.Name = "Hole" & i
-                col.HeaderText = i
-                i += 1
-            ElseIf scol.StartsWith(sFrom) Then
-                col.Name = col.Name.Replace(sFrom, sTo)
+        oHelper.LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
+        Try
+            Dim sFrom = "Out_"
+            Dim sTo = "In_"
+            If rbFront.Checked Then
+                lbStatus.Text = String.Format("Swapping Back 9 to Front 9")
+                oHelper.status_Msg(lbStatus, Me)
+                oHelper.iHoleMarker = 1
+                sFrom = "In_"
+                sTo = "Out_"
+            Else
+                lbStatus.Text = String.Format("Swapping Front 9 to Back 9")
+                oHelper.status_Msg(lbStatus, Me)
+                oHelper.iHoleMarker = 10
+                sFrom = "Out_"
+                sTo = "In_"
             End If
-        Next
-        For Each row As DataGridViewRow In dgScores.Rows
-            oHelper.ChangeColorsForStrokes(row)
-        Next
-        lbStatus.Text = String.Format("Finished Swapping nines")
-        oHelper.status_Msg(lbStatus, Me)
+
+            Dim i = oHelper.iHoleMarker
+            For Each col As DataGridViewColumn In dgScores.Columns
+                Dim scol = col.Name
+                If scol.StartsWith("Hole") Then
+                    col.Name = "Hole" & i
+                    col.HeaderText = i
+                    i += 1
+                ElseIf scol.StartsWith(sFrom) Then
+                    col.Name = col.Name.Replace(sFrom, sTo)
+                End If
+            Next
+            For Each row As DataGridViewRow In dgScores.Rows
+                oHelper.ChangeColorsForStrokes(row)
+            Next
+            lbStatus.Text = String.Format("Finished Swapping nines")
+            oHelper.status_Msg(lbStatus, Me)
+        Catch ex As Exception
+            MsgBox(oHelper.GetExceptionInfo(ex))
+        End Try
 
     End Sub
 
     Private Sub tbPSkins_TextChanged(sender As Object, e As EventArgs) Handles tbPSkins.TextChanged
-        Dim tb As TextBox = sender
-        If Not IsNumeric(tb.Text) Then
-            If tb.Text <> "" Then
-                tb.BackColor = Color.Red
-                MsgBox(String.Format("Must be a number, try again"))
-                Exit Sub
-            Else
-                tb.BackColor = Color.White
-                If sOldPSkins = "" Then Exit Sub
+        oHelper.LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
+        Try
+            Dim tb As TextBox = sender
+            If Not IsNumeric(tb.Text) Then
+                If tb.Text <> "" Then
+                    tb.BackColor = Color.Red
+                    MsgBox(String.Format("Must be a number, try again"))
+                    Exit Sub
+                Else
+                    tb.BackColor = Color.White
+                    If sOldPSkins = "" Then Exit Sub
+                End If
             End If
-        End If
-        tb.BackColor = Color.White
+            tb.BackColor = Color.White
 
-        Dim ctp1 As Integer = 0
-        Dim ctp2 As Integer = 0
-        If IsNumeric(tbCP1Tot.Text) Then ctp1 = tbCP1Tot.Text
-        If IsNumeric(tbCP2Tot.Text) Then ctp2 = tbCP2Tot.Text
-        If tbPSkins.Text <> "" Then
-            tbSkinTot.Text = CInt(tbPSkins.Text) + CInt(tbSkins.Text)
-        Else
-            tbSkinTot.Text = CInt(tbSkinTot.Text) - sOldPSkins
-        End If
-        tbPurse.Text = CInt(tbSkinTot.Text) + ctp1 + ctp2
-        sOldPSkins = tbPSkins.Text
+            Dim ctp1 As Integer = 0
+            Dim ctp2 As Integer = 0
+            If IsNumeric(tbCP1Tot.Text) Then ctp1 = tbCP1Tot.Text
+            If IsNumeric(tbCP2Tot.Text) Then ctp2 = tbCP2Tot.Text
+            If tbPSkins.Text <> "" Then
+                tbSkinTot.Text = CInt(tbPSkins.Text) + CInt(tbSkins.Text)
+            Else
+                tbSkinTot.Text = CInt(tbSkinTot.Text) - sOldPSkins
+            End If
+            tbPurse.Text = CInt(tbSkinTot.Text) + ctp1 + ctp2
+            sOldPSkins = tbPSkins.Text
+        Catch ex As Exception
+            MsgBox(oHelper.GetExceptionInfo(ex))
+        End Try
+
     End Sub
 
     Private Sub tbPCP1_TextChanged(sender As Object, e As EventArgs) Handles tbPCP1.TextChanged
-        Dim tb As TextBox = sender
-        If Not IsNumeric(tb.Text) Then
-            If tb.Text <> "" Then
-                tb.BackColor = Color.Red
-                MsgBox(String.Format("Must be a number, try again"))
-                Exit Sub
-            Else
-                tb.BackColor = Color.White
-                If sOldPCP1 = "" Then Exit Sub
+        oHelper.LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
+        Try
+            Dim tb As TextBox = sender
+            If Not IsNumeric(tb.Text) Then
+                If tb.Text <> "" Then
+                    tb.BackColor = Color.Red
+                    MsgBox(String.Format("Must be a number, try again"))
+                    Exit Sub
+                Else
+                    tb.BackColor = Color.White
+                    If sOldPCP1 = "" Then Exit Sub
+                End If
             End If
-        End If
-        tb.BackColor = Color.White
+            tb.BackColor = Color.White
 
-        Dim fld1 As Integer = 0
-        Dim fld2 As Integer = 0
+            Dim fld1 As Integer = 0
+            Dim fld2 As Integer = 0
 
-        If IsNumeric(tbSkinTot.Text) Then fld1 = tbSkinTot.Text
-        If IsNumeric(tbCP2Tot.Text) Then fld2 = tbCP2Tot.Text
-        If tbPCP1.Text <> "" Then
-            tbCP1Tot.Text = CInt(tbPCP1.Text) + CInt(tbCP1.Text)
-        Else
-            tbCP1Tot.Text = CInt(tbCP1Tot.Text) - sOldPCP1
-        End If
-        tbPurse.Text = CInt(tbCP1Tot.Text) + fld1 + fld2
-        sOldPCP1 = tbPCP1.Text
+            If IsNumeric(tbSkinTot.Text) Then fld1 = tbSkinTot.Text
+            If IsNumeric(tbCP2Tot.Text) Then fld2 = tbCP2Tot.Text
+            If tbPCP1.Text <> "" Then
+                tbCP1Tot.Text = CInt(tbPCP1.Text) + CInt(tbCP1.Text)
+            Else
+                tbCP1Tot.Text = CInt(tbCP1Tot.Text) - sOldPCP1
+            End If
+            tbPurse.Text = CInt(tbCP1Tot.Text) + fld1 + fld2
+            sOldPCP1 = tbPCP1.Text
+        Catch ex As Exception
+            MsgBox(oHelper.GetExceptionInfo(ex))
+        End Try
+
     End Sub
 
     Private Sub tbPCP2_TextChanged(sender As Object, e As EventArgs) Handles tbPCP2.TextChanged
-        Dim tb As TextBox = sender
-        If Not IsNumeric(tb.Text) Then
-            If tb.Text <> "" Then
-                tb.BackColor = Color.Red
-                MsgBox(String.Format("Must be a number, try again"))
-                Exit Sub
-            Else
-                tb.BackColor = Color.White
-                If sOldPCP2 = "" Then Exit Sub
+        oHelper.LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
+        Try
+            Dim tb As TextBox = sender
+            If Not IsNumeric(tb.Text) Then
+                If tb.Text <> "" Then
+                    tb.BackColor = Color.Red
+                    MsgBox(String.Format("Must be a number, try again"))
+                    Exit Sub
+                Else
+                    tb.BackColor = Color.White
+                    If sOldPCP2 = "" Then Exit Sub
+                End If
             End If
-        End If
-        tb.BackColor = Color.White
+            tb.BackColor = Color.White
 
-        Dim fld1 As Integer = 0
-        Dim fld2 As Integer = 0
+            Dim fld1 As Integer = 0
+            Dim fld2 As Integer = 0
 
-        If IsNumeric(tbSkinTot.Text) Then fld1 = tbSkinTot.Text
-        If IsNumeric(tbCP1Tot.Text) Then fld2 = tbCP1Tot.Text
-        If tbPCP2.Text <> "" Then
-            tbCP2Tot.Text = CInt(tbPCP2.Text) + CInt(tbCP2.Text)
-        Else
-            tbCP2Tot.Text = CInt(tbCP2Tot.Text) - sOldPCP2
-        End If
-        tbPurse.Text = CInt(tbCP2Tot.Text) + fld1 + fld2
-        sOldPCP2 = tbPCP2.Text
+            If IsNumeric(tbSkinTot.Text) Then fld1 = tbSkinTot.Text
+            If IsNumeric(tbCP1Tot.Text) Then fld2 = tbCP1Tot.Text
+            If tbPCP2.Text <> "" Then
+                tbCP2Tot.Text = CInt(tbPCP2.Text) + CInt(tbCP2.Text)
+            Else
+                tbCP2Tot.Text = CInt(tbCP2Tot.Text) - sOldPCP2
+            End If
+            tbPurse.Text = CInt(tbCP2Tot.Text) + fld1 + fld2
+            sOldPCP2 = tbPCP2.Text
+        Catch ex As Exception
+            MsgBox(oHelper.GetExceptionInfo(ex))
+        End Try
+
     End Sub
 
     Private Sub frmScoreCard_FormClosing(sender As Object, e As FormClosingEventArgs) Handles MyBase.FormClosing
+        oHelper.LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
         Try
             SaveScores()
             If lbStatus.BackColor = Color.Red Then
@@ -1707,7 +1827,7 @@ Public Class frmScoreCard
             End If
             oHelper.Common_Exit()
         Catch ex As Exception
-            MsgBox("Error saving scores, scores not saved")
+            MsgBox(oHelper.GetExceptionInfo(ex))
         End Try
 
     End Sub
@@ -1725,6 +1845,7 @@ Public Class frmScoreCard
     '    End If
     'End Sub
     Private Sub frmScoreCard_Resize(sender As Object, e As EventArgs) Handles MyBase.Resize
+        oHelper.LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
         Try
             rs.ResizeAllControls(Me)
 
@@ -1737,36 +1858,41 @@ Public Class frmScoreCard
 
     End Sub
     Private Sub dgScores_CellContentClick(sender As Object, e As DataGridViewCellEventArgs) Handles dgScores.CellContentClick
-        'calcSkinsCTP(sender.currentcell)
-        '20180220-disable checkbox when readonly
-        If dgScores.ReadOnly Or e.RowIndex < 0 Then Exit Sub
+        oHelper.LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name & " row - " & e.RowIndex)
+        Try
+            'calcSkinsCTP(sender.currentcell)
+            '20180220-disable checkbox when readonly
+            If dgScores.ReadOnly Or e.RowIndex < 0 Then Exit Sub
 
-        Dim R As DataGridViewRow = sender.CurrentRow
+            Dim R As DataGridViewRow = sender.CurrentRow
 
-        oHelper.sPlayer = R.Cells("Player").Value
-        Dim dgc As DataGridViewCell = sender.currentcell
-        '20180810 added Clear column
-        If dgc.OwningColumn.Name = "Clear" Or dgc.OwningColumn.Name = "Skins" Or dgc.OwningColumn.Name.StartsWith("Closest") Then
-            'recalc skins 
-            ResetCTPSkins(sender.currentcell)
-            If dgc.OwningColumn.Name = "Clear" Then
-                Dim mbr = MsgBox(String.Format("Do you want to clear scores for {0}", oHelper.sPlayer), MsgBoxStyle.YesNo)
-                If mbr = MsgBoxResult.No Then Exit Sub
-                R.Cells("Hdcp").Value = R.Cells("PHdcp").Value
-                For i = oHelper.iHoleMarker To oHelper.iHoleMarker + 8
-                    R.Cells("Hole" & i).Value = DBNull.Value
-                Next
-                If oHelper.iHoleMarker = "1" Then
-                    R.Cells("Out_Gross").Value = DBNull.Value
-                    R.Cells("Out_Net").Value = DBNull.Value
-                Else
-                    R.Cells("In_Gross").Value = DBNull.Value
-                    R.Cells("In_Net").Value = DBNull.Value
+            oHelper.sPlayer = R.Cells("Player").Value
+            Dim dgc As DataGridViewCell = sender.currentcell
+            '20180810 added Clear column
+            If dgc.OwningColumn.Name = "Clear" Or dgc.OwningColumn.Name = "Skins" Or dgc.OwningColumn.Name.StartsWith("Closest") Then
+                'recalc skins 
+                ResetCTPSkins(sender.currentcell)
+                If dgc.OwningColumn.Name = "Clear" Then
+                    Dim mbr = MsgBox(String.Format("Do you want to clear scores for {0}", oHelper.sPlayer), MsgBoxStyle.YesNo)
+                    If mbr = MsgBoxResult.No Then Exit Sub
+                    R.Cells("Hdcp").Value = R.Cells("PHdcp").Value
+                    For i = oHelper.iHoleMarker To oHelper.iHoleMarker + 8
+                        R.Cells("Hole" & i).Value = DBNull.Value
+                    Next
+                    If oHelper.iHoleMarker = "1" Then
+                        R.Cells("Out_Gross").Value = DBNull.Value
+                        R.Cells("Out_Net").Value = DBNull.Value
+                    Else
+                        R.Cells("In_Gross").Value = DBNull.Value
+                        R.Cells("In_Net").Value = DBNull.Value
+                    End If
                 End If
+            Else
+                Exit Sub
             End If
-        Else
-            Exit Sub
-        End If
+        Catch ex As Exception
+            MsgBox(oHelper.GetExceptionInfo(ex))
+        End Try
 
     End Sub
     Public Function GetCheckedRows1(
