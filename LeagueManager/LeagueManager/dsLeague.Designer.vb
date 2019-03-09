@@ -1599,7 +1599,7 @@ Partial Public Class dsLeague
         
         Private columnSplitSeason As Global.System.Data.DataColumn
         
-        Private columnPostSeason As Global.System.Data.DataColumn
+        Private columnPostSeasonDt As Global.System.Data.DataColumn
         
         Private columnSkinFmt As Global.System.Data.DataColumn
         
@@ -1842,9 +1842,9 @@ Partial Public Class dsLeague
         
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "15.0.0.0")>  _
-        Public ReadOnly Property PostSeasonColumn() As Global.System.Data.DataColumn
+        Public ReadOnly Property PostSeasonDtColumn() As Global.System.Data.DataColumn
             Get
-                Return Me.columnPostSeason
+                Return Me.columnPostSeasonDt
             End Get
         End Property
         
@@ -2020,7 +2020,7 @@ Partial Public Class dsLeague
                     ByVal Skins As String,  _
                     ByVal Closest As String,  _
                     ByVal SplitSeason As String,  _
-                    ByVal PostSeason As String,  _
+                    ByVal PostSeasonDt As String,  _
                     ByVal SkinFmt As String,  _
                     ByVal Email As String,  _
                     ByVal EmailPassword As String,  _
@@ -2036,7 +2036,7 @@ Partial Public Class dsLeague
                     ByVal RolledOverCTP5 As String,  _
                     ByVal Byes As String) As dtLeagueParmsRow
             Dim rowdtLeagueParmsRow As dtLeagueParmsRow = CType(Me.NewRow,dtLeagueParmsRow)
-            Dim columnValuesArray() As Object = New Object() {Name, Secretary, Format, Cost, Teams, PayPlaces, StartDate, EndDate, HdcpScores, HdcpFormat, CarryLastYears, MaxHdcp, Par3Max, Par4Max, Par5Max, Course, Holes, Start9, Method, Skins, Closest, SplitSeason, PostSeason, SkinFmt, Email, EmailPassword, RolledOverSkins, RolledOverCTP, RolledOverDate, ExtraMoney, ScoresLocked, RolledOverCTP1, RolledOverCTP2, RolledOverCTP3, RolledOverCTP4, RolledOverCTP5, Byes}
+            Dim columnValuesArray() As Object = New Object() {Name, Secretary, Format, Cost, Teams, PayPlaces, StartDate, EndDate, HdcpScores, HdcpFormat, CarryLastYears, MaxHdcp, Par3Max, Par4Max, Par5Max, Course, Holes, Start9, Method, Skins, Closest, SplitSeason, PostSeasonDt, SkinFmt, Email, EmailPassword, RolledOverSkins, RolledOverCTP, RolledOverDate, ExtraMoney, ScoresLocked, RolledOverCTP1, RolledOverCTP2, RolledOverCTP3, RolledOverCTP4, RolledOverCTP5, Byes}
             rowdtLeagueParmsRow.ItemArray = columnValuesArray
             Me.Rows.Add(rowdtLeagueParmsRow)
             Return rowdtLeagueParmsRow
@@ -2081,7 +2081,7 @@ Partial Public Class dsLeague
             Me.columnSkins = MyBase.Columns("Skins")
             Me.columnClosest = MyBase.Columns("Closest")
             Me.columnSplitSeason = MyBase.Columns("SplitSeason")
-            Me.columnPostSeason = MyBase.Columns("PostSeason")
+            Me.columnPostSeasonDt = MyBase.Columns("PostSeasonDt")
             Me.columnSkinFmt = MyBase.Columns("SkinFmt")
             Me.columnEmail = MyBase.Columns("Email")
             Me.columnEmailPassword = MyBase.Columns("EmailPassword")
@@ -2145,8 +2145,8 @@ Partial Public Class dsLeague
             MyBase.Columns.Add(Me.columnClosest)
             Me.columnSplitSeason = New Global.System.Data.DataColumn("SplitSeason", GetType(String), Nothing, Global.System.Data.MappingType.Element)
             MyBase.Columns.Add(Me.columnSplitSeason)
-            Me.columnPostSeason = New Global.System.Data.DataColumn("PostSeason", GetType(String), Nothing, Global.System.Data.MappingType.Element)
-            MyBase.Columns.Add(Me.columnPostSeason)
+            Me.columnPostSeasonDt = New Global.System.Data.DataColumn("PostSeasonDt", GetType(String), Nothing, Global.System.Data.MappingType.Element)
+            MyBase.Columns.Add(Me.columnPostSeasonDt)
             Me.columnSkinFmt = New Global.System.Data.DataColumn("SkinFmt", GetType(String), Nothing, Global.System.Data.MappingType.Element)
             MyBase.Columns.Add(Me.columnSkinFmt)
             Me.columnEmail = New Global.System.Data.DataColumn("Email", GetType(String), Nothing, Global.System.Data.MappingType.Element)
@@ -4018,16 +4018,16 @@ Partial Public Class dsLeague
         
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "15.0.0.0")>  _
-        Public Property PostSeason() As String
+        Public Property PostSeasonDt() As String
             Get
                 Try 
-                    Return CType(Me(Me.tabledtLeagueParms.PostSeasonColumn),String)
+                    Return CType(Me(Me.tabledtLeagueParms.PostSeasonDtColumn),String)
                 Catch e As Global.System.InvalidCastException
-                    Throw New Global.System.Data.StrongTypingException("The value for column 'PostSeason' in table 'dtLeagueParms' is DBNull.", e)
+                    Throw New Global.System.Data.StrongTypingException("The value for column 'PostSeasonDt' in table 'dtLeagueParms' is DBNull.", e)
                 End Try
             End Get
             Set
-                Me(Me.tabledtLeagueParms.PostSeasonColumn) = value
+                Me(Me.tabledtLeagueParms.PostSeasonDtColumn) = value
             End Set
         End Property
         
@@ -4507,14 +4507,14 @@ Partial Public Class dsLeague
         
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "15.0.0.0")>  _
-        Public Function IsPostSeasonNull() As Boolean
-            Return Me.IsNull(Me.tabledtLeagueParms.PostSeasonColumn)
+        Public Function IsPostSeasonDtNull() As Boolean
+            Return Me.IsNull(Me.tabledtLeagueParms.PostSeasonDtColumn)
         End Function
         
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "15.0.0.0")>  _
-        Public Sub SetPostSeasonNull()
-            Me(Me.tabledtLeagueParms.PostSeasonColumn) = Global.System.Convert.DBNull
+        Public Sub SetPostSeasonDtNull()
+            Me(Me.tabledtLeagueParms.PostSeasonDtColumn) = Global.System.Convert.DBNull
         End Sub
         
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _

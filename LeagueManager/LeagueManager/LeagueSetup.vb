@@ -1,5 +1,5 @@
 ﻿Public Class frmLeagueSetup
-    Dim oHelper As Helper.Controls.Helper
+    Dim oHelper As Helper
     Dim stable = "dtLeagueParms"
     Private Sub frmLeagueSetup_Load(sender As System.Object, e As System.EventArgs) Handles MyBase.Load
         oHelper = Main.oHelper
@@ -34,4 +34,5 @@
         oHelper.DataTable2CSV(DsLeague.Tables(stable), oHelper.sFilePath & "\" & Now.ToString("yyyyMMdd") & "_LeagueParms.csv")
         'DsLeague.WriteXml(oHelper.sFilePath & "\" & DateTime.Now.ToString("yyyyMMdd_") & "LeagueParms.xml", XmlWriteMode.WriteSchema)
     End Sub
+
 End Class

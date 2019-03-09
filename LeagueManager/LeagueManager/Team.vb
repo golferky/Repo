@@ -1,5 +1,5 @@
 ﻿Public Class frmTeam
-    Dim oHelper As Helper.Controls.Helper
+    Dim oHelper As Helper
     Dim sPlayer As String
     Private Sub frmTeam_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         oHelper = Main.oHelper

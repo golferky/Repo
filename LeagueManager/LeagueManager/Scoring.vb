@@ -8,7 +8,7 @@ Public Class frmScoring
     Dim sScore = 0
     Dim sFrontBack = "Front"
     Dim TextBoxes As New Dictionary(Of String, TextBox)
-    Dim oHelper As Helper.Controls.Helper
+    Dim oHelper As Helper
     Dim dvScores As DataView
     Dim dtSchedule As DataTable
 

@@ -2,7 +2,7 @@
 Public Class frmHandicap
     Dim strConnString = String.Empty
     Dim rLeagueParmrow As DataRow
-    Dim oHelper As Helper.Controls.Helper
+    Dim oHelper As Helper
     Private Sub frmHandicap_Load(sender As System.Object, e As System.EventArgs) Handles MyBase.Load
         Try
             oHelper = Main.oHelper

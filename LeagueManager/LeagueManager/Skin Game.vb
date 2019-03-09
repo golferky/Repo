@@ -23,7 +23,7 @@ Public Class frmSkins
     Dim imaxHoles = cMaxHoles
     Dim iSkins = 0
     Dim sAvgScore As New List(Of Decimal)
-    Dim oHelper As New Helper.Controls.Helper
+    Dim oHelper As New Helper
     Dim lv1 As New ListView
     'this accounts for the extra B player if needed
     Dim iextra As Integer

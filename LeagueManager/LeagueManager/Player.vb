@@ -1,6 +1,6 @@
 ﻿Imports System.IO
 Public Class frmPlayer
-    Dim oHelper As Helper.Controls.Helper
+    Dim oHelper As Helper
     Dim stable = "dtPlayers"
     Private Sub frmPlayer_Load(sender As System.Object, e As System.EventArgs) Handles MyBase.Load
         oHelper = Main.oHelper

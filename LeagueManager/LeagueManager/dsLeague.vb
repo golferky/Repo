@@ -1,6 +1,5 @@
 ﻿Partial Class dsLeague
     Partial Public Class dtLeagueParmsDataTable
-
     End Class
 
     Partial Public Class dtPlayersDataTable
