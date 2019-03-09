@@ -32,16 +32,18 @@ Partial Class Scores
         Me.dgScores.Cursor = System.Windows.Forms.Cursors.Default
         Me.dgScores.Dock = System.Windows.Forms.DockStyle.Fill
         Me.dgScores.Location = New System.Drawing.Point(0, 0)
+        Me.dgScores.Margin = New System.Windows.Forms.Padding(6, 6, 6, 6)
         Me.dgScores.Name = "dgScores"
-        Me.dgScores.Size = New System.Drawing.Size(1924, 949)
+        Me.dgScores.Size = New System.Drawing.Size(3848, 1868)
         Me.dgScores.TabIndex = 0
         '
         'Scores
         '
-        Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
+        Me.AutoScaleDimensions = New System.Drawing.SizeF(12.0!, 25.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(1924, 949)
+        Me.ClientSize = New System.Drawing.Size(3848, 1868)
         Me.Controls.Add(Me.dgScores)
+        Me.Margin = New System.Windows.Forms.Padding(6, 6, 6, 6)
         Me.Name = "Scores"
         Me.Text = "Scores"
         CType(Me.dgScores, System.ComponentModel.ISupportInitialize).EndInit()

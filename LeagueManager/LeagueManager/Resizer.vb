@@ -48,7 +48,7 @@ Public Class Resizer
     '----------------------------------------------------------------------------------------
     Public Sub FindAllControls(thisCtrl As Control)
         '20180123 - bypass for now
-        Exit Sub
+        'Exit Sub
         '-- If the current control has a parent, store all original relative position
         '-- and size information in the dictionary.
         '-- Recursively call FindAllControls for each control contained in the

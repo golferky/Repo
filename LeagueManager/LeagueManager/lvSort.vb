@@ -165,9 +165,14 @@ Namespace SI.Controls
             Const WM_HSCROLL = &H114
             Const WM_VSCROLL = &H115
             Const WM_PAINT = &HF
-            Private Ctrl As Control
-            Public Sub New(ByVal Ctrl As Control)
+            Private ReadOnly Ctrl As Control
+            Public Sub New()
+                If Ctrl Is Nothing Then
+                    Throw New ArgumentNullException(NameOf(Ctrl))
+                End If
+
                 AssignHandle(Ctrl.Handle)
+                Me.Ctrl = Ctrl
             End Sub
             Protected Overrides Sub WndProc(ByRef m As Message)
                 MyBase.WndProc(m)
@@ -215,7 +220,7 @@ Namespace SI.Controls
             '
             MyBase.OnHandleCreated(e)
             If Not Me.DesignMode Then
-                LvlListener = New LvlListenerClass(Me)
+                LvlListener = New LvlListenerClass()
                 LvwColumnSorter.GetHeaderHandle()
                 HdrListener = New HdrListenerClass(Me, LvwColumnSorter.HeaderHandle)
             End If

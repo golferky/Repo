@@ -1,8 +1,14 @@
 ﻿*************************************************************************************************
 *                                           Change Log
 *************************************************************************************************
-* yyyymmdd - Priority - Complexity -  Module       Description
+* yyyymmdd - Priority - Complexity -  Module        Description
 * -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
+* 20190309 - EM       - Easy to Med - dgv2csv       added ability to create a csv file from a datagridview
+* 20190309 - EM       - Easy to Med - Main			when determining getleagues, only load scores files if they end with _Scores.csv, used to say contains Scores
+* 20190309 - EM       - Easy to Med - LastFive		Fix Last5 change to use gridview instead of listview
+* 20181211 - EM       - Easy to Med - Add post season skin/ctp percent to league parameters table, change code to use instead of hardcode
+* 20181204 - EM       - Easy to Med - Add logging to Main to help troubleshoot issues on loading tables
+* 20181102 - MH       - Med to Hard - only allow tuesdays for Dates, add parm to league parm
 * 20181026 - MH       - Med to hard - allow multiple players for player file(a player for each league)
 * 20180919 - ML       - Med to hard - Playerstats.vb show league average stats for each hole and rank
 * 20180919 - M        - Easy        - Standings.vb Re-sorting numeric columns arent working right (col sort needed)
@@ -38,7 +44,14 @@
 *************************************************************************************************
 *                                           Change Log-Completed
 *************************************************************************************************
-* yyyymmdd - Priority - Complexity -  Description
+* yyyymmdd - Priority - Complexity -  Module        Description
+* --------   --------	-----------	  -------------	--------------------------------------------------------------------------------------------------------------	
+* 20190309 - EM       - Easy to Med - dgv2csv       added ability to create a csv file from a datagridview
+* 20190309 - EM       - Easy to Med - Main			when determining getleagues, only load scores files if they end with _Scores.csv, used to say contains Scores
+* 20190309 - EM       - Easy to Med - LastFive		Fix Last5 change to use gridview instead of listview
+* 20181210 - E        - Easy        - Add logic account for players fist round (new player)
+* 20181210 - E        - Easy        - Add logic to default to year in ini file and allow chance to ignore warning about overlap
+* 20181130 - MH       - Med to Hard - Fix issue with helper.getsubstring not using lastindex when looking for "_"
 * 20181017 - ML       - Med to hard - scorecard.vb when going back to prior years looking for partners, pull player file from the date entered
 * 20181004 - ML       - Med to hard - scores.vb not taking front/back 9 into account for averages
 * 20180930 - ML       - Med to hard - dsleague.xsd change postseason flag to postseasondate

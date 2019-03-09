@@ -43,12 +43,12 @@ Public Class Finance
         '        oXL.Quit()
 
         oHelper = Main.oHelper
-        oHelper.dt = New DataTable
-        Dim safile = "\\wdmycloud\Gary\LeagueManager\Files\20180917_Payments.csv"
-        If Not oHelper.CSV2DataTable(oHelper.dt, safile) Then
-            MsgBox(String.Format("File in use - {1} {0} close file and restart", vbCrLf, safile))
-            End
-        End If
+        'oHelper.dt = New DataTable
+        'Dim safile = "\\wdmycloud\Gary\LeagueManager\Files\20180917_Payments.csv"
+        'If Not oHelper.CSV2DataTable(oHelper.dt, safile) Then
+        '    MsgBox(String.Format("File in use - {1} {0} close file and restart", vbCrLf, safile))
+        '    End
+        'End If
         Dim dtr As New DataTable
         dtr.Columns.Add("Player")
         dtr.Columns.Add("Balance Due", GetType(Decimal))
@@ -66,7 +66,7 @@ Public Class Finance
 
         dtr.PrimaryKey = New DataColumn() {dtr.Columns("Player")}
         dtr.DefaultView.Sort = "Player Asc"
-        Dim dv As New DataView(oHelper.dt)
+        Dim dv As New DataView(oHelper.dsLeague.Tables("dtPayments"))
         Dim sdate = Main.cbLeagues.SelectedItem.ToString.Substring(Main.cbLeagues.SelectedItem.ToString.IndexOf("(") + 1, 4) & "0101"
         dv.RowFilter = String.Format("Date > {0} And Date < {1} ", sdate, sdate.Replace("0101", "1231"))
         For Each row As DataRowView In dv
@@ -115,7 +115,7 @@ Public Class Finance
             If row("Player").ToString.Contains("***") Or row("Balance Due") > 0 Then
             Else
                 'this code checks to see if a player participated in EOY skins
-                Dim dvs As New DataView(oHelper.dt)
+                Dim dvs As New DataView(oHelper.dsLeague.Tables("dtPayments"))
                 dvs.RowFilter = String.Format("Desc = '{0}' And Detail = '{1}'", "EOY Skins", "Payment")
                 Dim dt = dvs.ToTable
                 dt.PrimaryKey = New DataColumn() {dt.Columns("Player")}
@@ -139,7 +139,7 @@ Public Class Finance
         lbStatus.Text = ""
 
     End Sub
-    Sub calcAmount(dtr As DataTable, row As DataRowView)
+    Sub CalcAmount(dtr As DataTable, row As DataRowView)
         Dim sKeys() As Object = {row("Player")}
         Dim dr As DataRow = dtr.Rows.Find(sKeys)
         'build a new row if it doesnt exist

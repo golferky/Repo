@@ -13,11 +13,11 @@
             Application.DoEvents()
             oHelper.LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
             Dim sDetails = ""
-            Dim dv As New DataView(oHelper.dt)
+            Dim dv As New DataView(oHelper.dsLeague.Tables("dtPayments"))
             dv.Sort = "Date"
             dv.RowFilter = "Player = " & "'" & oHelper.sPlayer & "'"
 
-            For Each col As DataColumn In oHelper.dt.Columns
+            For Each col As DataColumn In oHelper.dsLeague.Tables("dtPayments").Columns
                 Dim scol As String = col.ColumnName
                 Dim dgc As New DataGridViewTextBoxColumn
                 dgc.Name = scol

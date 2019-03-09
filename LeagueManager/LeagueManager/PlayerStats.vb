@@ -1,37 +1,39 @@
 ﻿Public Class frmPlayerStats
     Dim oHelper As Helper
     Dim fromsizeW As Integer, lvsizeW As Integer
-    Dim lv1 As New SI.Controls.LvSort
 
     Private Sub frmPlayerStats_Load(sender As System.Object, e As System.EventArgs) Handles MyBase.Load
+        Me.Cursor = Cursors.WaitCursor
+        Application.DoEvents()
         oHelper = Main.oHelper
         'testing only
         'oHelper.sPlayer = "Gary Scudder"
         oHelper.bScoresbyPlayer = True
         'oHelper.iHdcp = row.Cells("Phdcp").Value
         'end testing only
-        Dim dtPlayers As DataTable
+        Dim dtPlayers As DataTable = Nothing
         Try
             Dim dvScores As New DataView(oHelper.dsLeague.Tables("dtScores"))
             dvScores.Sort = "Player"
             dtPlayers = dvScores.ToTable(True, "Player")
+            'dtPlayers = dvPlayers.ToTable(True, "Name".Split(",").ToArray)
+            For Each col As DataColumn In dtPlayers.Columns
+                Dim dgc As New DataGridViewTextBoxColumn
+                dgc.Name = col.ColumnName
+                dgc.ValueType = GetType(System.String)
+                dgPlayers.Columns.Add(dgc)
+            Next
 
+            For Each row As DataRow In dtPlayers.Rows
+                dgPlayers.Rows.Add(row.ItemArray)
+            Next
         Catch ex As Exception
             MsgBox(ex.Message)
         Finally
         End Try
 
-        'dtPlayers = dvPlayers.ToTable(True, "Name".Split(",").ToArray)
-        For Each col As DataColumn In dtPlayers.Columns
-            Dim dgc As New DataGridViewTextBoxColumn
-            dgc.Name = col.ColumnName
-            dgc.ValueType = GetType(System.String)
-            dgPlayers.Columns.Add(dgc)
-        Next
-
-        For Each row As DataRow In dtPlayers.Rows
-            dgPlayers.Rows.Add(row.ItemArray)
-        Next
+        Me.Cursor = Cursors.Default
+        Application.DoEvents()
         'Me.Controls.Add(lv1)
         'lv1.Top = 129
         'lv1.Left = 15

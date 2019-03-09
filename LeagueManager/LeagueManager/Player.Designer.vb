@@ -24,10 +24,10 @@ Partial Class frmPlayer
     Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmPlayer))
-        Me.DsLeague = New LeagueManager.dsLeague()
-        Me.DtPlayersBindingSource = New System.Windows.Forms.BindingSource(Me.components)
         Me.DtPlayersBindingNavigator = New System.Windows.Forms.BindingNavigator(Me.components)
         Me.BindingNavigatorAddNewItem = New System.Windows.Forms.ToolStripButton()
+        Me.DtPlayersBindingSource = New System.Windows.Forms.BindingSource(Me.components)
+        Me.DsLeague = New LeagueManager.dsLeague()
         Me.BindingNavigatorCountItem = New System.Windows.Forms.ToolStripLabel()
         Me.BindingNavigatorDeleteItem = New System.Windows.Forms.ToolStripButton()
         Me.BindingNavigatorMoveFirstItem = New System.Windows.Forms.ToolStripButton()
@@ -57,22 +57,17 @@ Partial Class frmPlayer
         Me.DataGridViewTextBoxColumn7 = New System.Windows.Forms.DataGridViewTextBoxColumn()
         Me.DataGridViewTextBoxColumn8 = New System.Windows.Forms.DataGridViewTextBoxColumn()
         Me.DataGridViewTextBoxColumn9 = New System.Windows.Forms.DataGridViewTextBoxColumn()
-        CType(Me.DsLeague, System.ComponentModel.ISupportInitialize).BeginInit()
-        CType(Me.DtPlayersBindingSource, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.GroupBox1 = New System.Windows.Forms.GroupBox()
+        Me.rbRegulars = New System.Windows.Forms.RadioButton()
+        Me.rbAll = New System.Windows.Forms.RadioButton()
+        Me.ToolStripButton1 = New System.Windows.Forms.ToolStripButton()
         CType(Me.DtPlayersBindingNavigator, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.DtPlayersBindingNavigator.SuspendLayout()
+        CType(Me.DtPlayersBindingSource, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.DsLeague, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.DtPlayersDataGridView, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.GroupBox1.SuspendLayout()
         Me.SuspendLayout()
-        '
-        'DsLeague
-        '
-        Me.DsLeague.DataSetName = "dsLeague"
-        Me.DsLeague.SchemaSerializationMode = System.Data.SchemaSerializationMode.IncludeSchema
-        '
-        'DtPlayersBindingSource
-        '
-        Me.DtPlayersBindingSource.DataMember = "dtPlayers"
-        Me.DtPlayersBindingSource.DataSource = Me.DsLeague
         '
         'DtPlayersBindingNavigator
         '
@@ -81,7 +76,7 @@ Partial Class frmPlayer
         Me.DtPlayersBindingNavigator.CountItem = Me.BindingNavigatorCountItem
         Me.DtPlayersBindingNavigator.DeleteItem = Me.BindingNavigatorDeleteItem
         Me.DtPlayersBindingNavigator.ImageScalingSize = New System.Drawing.Size(40, 40)
-        Me.DtPlayersBindingNavigator.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.BindingNavigatorMoveFirstItem, Me.BindingNavigatorMovePreviousItem, Me.BindingNavigatorSeparator, Me.BindingNavigatorPositionItem, Me.BindingNavigatorCountItem, Me.BindingNavigatorSeparator1, Me.BindingNavigatorMoveNextItem, Me.BindingNavigatorMoveLastItem, Me.BindingNavigatorSeparator2, Me.BindingNavigatorAddNewItem, Me.BindingNavigatorDeleteItem, Me.DtPlayersBindingNavigatorSaveItem})
+        Me.DtPlayersBindingNavigator.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.BindingNavigatorMoveFirstItem, Me.BindingNavigatorMovePreviousItem, Me.BindingNavigatorSeparator, Me.BindingNavigatorPositionItem, Me.BindingNavigatorCountItem, Me.BindingNavigatorSeparator1, Me.BindingNavigatorMoveNextItem, Me.BindingNavigatorMoveLastItem, Me.BindingNavigatorSeparator2, Me.BindingNavigatorAddNewItem, Me.BindingNavigatorDeleteItem, Me.DtPlayersBindingNavigatorSaveItem, Me.ToolStripButton1})
         Me.DtPlayersBindingNavigator.Location = New System.Drawing.Point(0, 0)
         Me.DtPlayersBindingNavigator.MoveFirstItem = Me.BindingNavigatorMoveFirstItem
         Me.DtPlayersBindingNavigator.MoveLastItem = Me.BindingNavigatorMoveLastItem
@@ -89,18 +84,27 @@ Partial Class frmPlayer
         Me.DtPlayersBindingNavigator.MovePreviousItem = Me.BindingNavigatorMovePreviousItem
         Me.DtPlayersBindingNavigator.Name = "DtPlayersBindingNavigator"
         Me.DtPlayersBindingNavigator.PositionItem = Me.BindingNavigatorPositionItem
-        Me.DtPlayersBindingNavigator.Size = New System.Drawing.Size(1083, 47)
+        Me.DtPlayersBindingNavigator.Size = New System.Drawing.Size(1056, 47)
         Me.DtPlayersBindingNavigator.TabIndex = 0
         Me.DtPlayersBindingNavigator.Text = "BindingNavigator1"
         '
         'BindingNavigatorAddNewItem
         '
-        Me.BindingNavigatorAddNewItem.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
         Me.BindingNavigatorAddNewItem.Image = CType(resources.GetObject("BindingNavigatorAddNewItem.Image"), System.Drawing.Image)
         Me.BindingNavigatorAddNewItem.Name = "BindingNavigatorAddNewItem"
         Me.BindingNavigatorAddNewItem.RightToLeftAutoMirrorImage = True
-        Me.BindingNavigatorAddNewItem.Size = New System.Drawing.Size(44, 44)
+        Me.BindingNavigatorAddNewItem.Size = New System.Drawing.Size(98, 44)
         Me.BindingNavigatorAddNewItem.Text = "Add new"
+        '
+        'DtPlayersBindingSource
+        '
+        Me.DtPlayersBindingSource.DataMember = "dtPlayers"
+        Me.DtPlayersBindingSource.DataSource = Me.DsLeague
+        '
+        'DsLeague
+        '
+        Me.DsLeague.DataSetName = "dsLeague"
+        Me.DsLeague.SchemaSerializationMode = System.Data.SchemaSerializationMode.IncludeSchema
         '
         'BindingNavigatorCountItem
         '
@@ -111,29 +115,26 @@ Partial Class frmPlayer
         '
         'BindingNavigatorDeleteItem
         '
-        Me.BindingNavigatorDeleteItem.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
         Me.BindingNavigatorDeleteItem.Image = CType(resources.GetObject("BindingNavigatorDeleteItem.Image"), System.Drawing.Image)
         Me.BindingNavigatorDeleteItem.Name = "BindingNavigatorDeleteItem"
         Me.BindingNavigatorDeleteItem.RightToLeftAutoMirrorImage = True
-        Me.BindingNavigatorDeleteItem.Size = New System.Drawing.Size(44, 44)
+        Me.BindingNavigatorDeleteItem.Size = New System.Drawing.Size(84, 44)
         Me.BindingNavigatorDeleteItem.Text = "Delete"
         '
         'BindingNavigatorMoveFirstItem
         '
-        Me.BindingNavigatorMoveFirstItem.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
         Me.BindingNavigatorMoveFirstItem.Image = CType(resources.GetObject("BindingNavigatorMoveFirstItem.Image"), System.Drawing.Image)
         Me.BindingNavigatorMoveFirstItem.Name = "BindingNavigatorMoveFirstItem"
         Me.BindingNavigatorMoveFirstItem.RightToLeftAutoMirrorImage = True
-        Me.BindingNavigatorMoveFirstItem.Size = New System.Drawing.Size(44, 44)
+        Me.BindingNavigatorMoveFirstItem.Size = New System.Drawing.Size(104, 44)
         Me.BindingNavigatorMoveFirstItem.Text = "Move first"
         '
         'BindingNavigatorMovePreviousItem
         '
-        Me.BindingNavigatorMovePreviousItem.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
         Me.BindingNavigatorMovePreviousItem.Image = CType(resources.GetObject("BindingNavigatorMovePreviousItem.Image"), System.Drawing.Image)
         Me.BindingNavigatorMovePreviousItem.Name = "BindingNavigatorMovePreviousItem"
         Me.BindingNavigatorMovePreviousItem.RightToLeftAutoMirrorImage = True
-        Me.BindingNavigatorMovePreviousItem.Size = New System.Drawing.Size(44, 44)
+        Me.BindingNavigatorMovePreviousItem.Size = New System.Drawing.Size(129, 44)
         Me.BindingNavigatorMovePreviousItem.Text = "Move previous"
         '
         'BindingNavigatorSeparator
@@ -157,20 +158,18 @@ Partial Class frmPlayer
         '
         'BindingNavigatorMoveNextItem
         '
-        Me.BindingNavigatorMoveNextItem.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
         Me.BindingNavigatorMoveNextItem.Image = CType(resources.GetObject("BindingNavigatorMoveNextItem.Image"), System.Drawing.Image)
         Me.BindingNavigatorMoveNextItem.Name = "BindingNavigatorMoveNextItem"
         Me.BindingNavigatorMoveNextItem.RightToLeftAutoMirrorImage = True
-        Me.BindingNavigatorMoveNextItem.Size = New System.Drawing.Size(44, 44)
+        Me.BindingNavigatorMoveNextItem.Size = New System.Drawing.Size(106, 44)
         Me.BindingNavigatorMoveNextItem.Text = "Move next"
         '
         'BindingNavigatorMoveLastItem
         '
-        Me.BindingNavigatorMoveLastItem.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
         Me.BindingNavigatorMoveLastItem.Image = CType(resources.GetObject("BindingNavigatorMoveLastItem.Image"), System.Drawing.Image)
         Me.BindingNavigatorMoveLastItem.Name = "BindingNavigatorMoveLastItem"
         Me.BindingNavigatorMoveLastItem.RightToLeftAutoMirrorImage = True
-        Me.BindingNavigatorMoveLastItem.Size = New System.Drawing.Size(44, 44)
+        Me.BindingNavigatorMoveLastItem.Size = New System.Drawing.Size(102, 44)
         Me.BindingNavigatorMoveLastItem.Text = "Move last"
         '
         'BindingNavigatorSeparator2
@@ -180,10 +179,9 @@ Partial Class frmPlayer
         '
         'DtPlayersBindingNavigatorSaveItem
         '
-        Me.DtPlayersBindingNavigatorSaveItem.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
         Me.DtPlayersBindingNavigatorSaveItem.Image = CType(resources.GetObject("DtPlayersBindingNavigatorSaveItem.Image"), System.Drawing.Image)
         Me.DtPlayersBindingNavigatorSaveItem.Name = "DtPlayersBindingNavigatorSaveItem"
-        Me.DtPlayersBindingNavigatorSaveItem.Size = New System.Drawing.Size(44, 44)
+        Me.DtPlayersBindingNavigatorSaveItem.Size = New System.Drawing.Size(102, 44)
         Me.DtPlayersBindingNavigatorSaveItem.Text = "Save Data"
         '
         'DtPlayersDataGridView
@@ -192,7 +190,7 @@ Partial Class frmPlayer
         Me.DtPlayersDataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
         Me.DtPlayersDataGridView.Columns.AddRange(New System.Windows.Forms.DataGridViewColumn() {Me.NameDataGridViewTextBoxColumn, Me.TeamDataGridViewTextBoxColumn, Me.GradeDataGridViewTextBoxColumn, Me.PaidDataGridViewTextBoxColumn, Me.EmailDataGridViewTextBoxColumn, Me.PhoneDataGridViewTextBoxColumn, Me.NickNameDataGridViewTextBoxColumn, Me.DateLeftDataGridViewTextBoxColumn, Me.DateJoinedDataGridViewTextBoxColumn})
         Me.DtPlayersDataGridView.DataSource = Me.DtPlayersBindingSource
-        Me.DtPlayersDataGridView.Location = New System.Drawing.Point(33, 81)
+        Me.DtPlayersDataGridView.Location = New System.Drawing.Point(33, 78)
         Me.DtPlayersDataGridView.Name = "DtPlayersDataGridView"
         Me.DtPlayersDataGridView.Size = New System.Drawing.Size(987, 657)
         Me.DtPlayersDataGridView.TabIndex = 1
@@ -299,23 +297,68 @@ Partial Class frmPlayer
         Me.DataGridViewTextBoxColumn9.HeaderText = "DateJoined"
         Me.DataGridViewTextBoxColumn9.Name = "DataGridViewTextBoxColumn9"
         '
+        'GroupBox1
+        '
+        Me.GroupBox1.Controls.Add(Me.rbRegulars)
+        Me.GroupBox1.Controls.Add(Me.rbAll)
+        Me.GroupBox1.Location = New System.Drawing.Point(914, 12)
+        Me.GroupBox1.Name = "GroupBox1"
+        Me.GroupBox1.Size = New System.Drawing.Size(106, 63)
+        Me.GroupBox1.TabIndex = 3
+        Me.GroupBox1.TabStop = False
+        Me.GroupBox1.Text = "View Filter"
+        '
+        'rbRegulars
+        '
+        Me.rbRegulars.AutoSize = True
+        Me.rbRegulars.Location = New System.Drawing.Point(7, 43)
+        Me.rbRegulars.Name = "rbRegulars"
+        Me.rbRegulars.Size = New System.Drawing.Size(67, 17)
+        Me.rbRegulars.TabIndex = 1
+        Me.rbRegulars.TabStop = True
+        Me.rbRegulars.Text = "Regulars"
+        Me.rbRegulars.UseVisualStyleBackColor = True
+        '
+        'rbAll
+        '
+        Me.rbAll.AutoSize = True
+        Me.rbAll.Location = New System.Drawing.Point(7, 20)
+        Me.rbAll.Name = "rbAll"
+        Me.rbAll.Size = New System.Drawing.Size(73, 17)
+        Me.rbAll.TabIndex = 0
+        Me.rbAll.TabStop = True
+        Me.rbAll.Text = "All Players"
+        Me.rbAll.UseVisualStyleBackColor = True
+        '
+        'ToolStripButton1
+        '
+        Me.ToolStripButton1.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
+        Me.ToolStripButton1.Image = CType(resources.GetObject("ToolStripButton1.Image"), System.Drawing.Image)
+        Me.ToolStripButton1.ImageTransparentColor = System.Drawing.Color.Magenta
+        Me.ToolStripButton1.Name = "ToolStripButton1"
+        Me.ToolStripButton1.Size = New System.Drawing.Size(44, 44)
+        Me.ToolStripButton1.Text = "ToolStripButton1"
+        '
         'frmPlayer
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.AutoScroll = True
-        Me.ClientSize = New System.Drawing.Size(1083, 784)
+        Me.ClientSize = New System.Drawing.Size(1056, 784)
+        Me.Controls.Add(Me.GroupBox1)
         Me.Controls.Add(Me.DtPlayersDataGridView)
         Me.Controls.Add(Me.DtPlayersBindingNavigator)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.Name = "frmPlayer"
         Me.Text = "Player"
-        CType(Me.DsLeague, System.ComponentModel.ISupportInitialize).EndInit()
-        CType(Me.DtPlayersBindingSource, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.DtPlayersBindingNavigator, System.ComponentModel.ISupportInitialize).EndInit()
         Me.DtPlayersBindingNavigator.ResumeLayout(False)
         Me.DtPlayersBindingNavigator.PerformLayout()
+        CType(Me.DtPlayersBindingSource, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.DsLeague, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.DtPlayersDataGridView, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.GroupBox1.ResumeLayout(False)
+        Me.GroupBox1.PerformLayout()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -355,4 +398,8 @@ Partial Class frmPlayer
     Friend WithEvents NickNameDataGridViewTextBoxColumn As DataGridViewTextBoxColumn
     Friend WithEvents DateLeftDataGridViewTextBoxColumn As DataGridViewTextBoxColumn
     Friend WithEvents DateJoinedDataGridViewTextBoxColumn As DataGridViewTextBoxColumn
+    Friend WithEvents GroupBox1 As GroupBox
+    Friend WithEvents rbRegulars As RadioButton
+    Friend WithEvents rbAll As RadioButton
+    Friend WithEvents ToolStripButton1 As ToolStripButton
 End Class

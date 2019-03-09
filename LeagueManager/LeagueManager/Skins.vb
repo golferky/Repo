@@ -1,5 +1,7 @@
 ﻿Imports System.IO
 Public Class Skins
+    Private Const Hole1 As String = "Hole1"
+    Private Const Hole10 As String = "Hole10"
     Dim oHelper As New Helper
     'Dim oHelper = Main.oHelper
     Dim fromsizeW As Integer, gvSsizeW As Integer, gvSCsizeW As Integer, gbSCsizeW As Integer
@@ -52,15 +54,15 @@ Public Class Skins
         lbStatus.Text = ""
         '20180130-check for locked scores
         If oHelper.convDBNulltoSpaces(oHelper.rLeagueParmrow("ScoresLocked")) = "Y" Then
-            btnSave.Visible = True
-        Else
             btnSave.Visible = False
+        Else
+            btnSave.Visible = True
         End If
         oHelper.bScreenChanged = False
         '20180318-add handler for checking dots
         'AddHandler rbDots.CheckedChanged, AddressOf checkDotsColors
         'Handles rbDots.CheckedChanged
-        For Each field In oHelper.cSkinsFields.Split(",")
+        For Each field In Helper.cSkinsFields.Split(",")
             sSkinflds = sSkinflds + field.Substring(0, field.IndexOf("-")) & ","
         Next
 
@@ -100,10 +102,10 @@ Public Class Skins
             Exit Sub
         End If
         For Each srow As DataRowView In dvscores
-            If srow("Hole1") IsNot DBNull.Value Then
-                If IsNumeric(srow("Hole1")) Then oHelper.iHoleMarker = 1
-            ElseIf srow("Hole10") IsNot DBNull.Value Then
-                If IsNumeric(srow("Hole10")) Then oHelper.iHoleMarker = 10
+            If srow(Hole1) IsNot DBNull.Value Then
+                If IsNumeric(srow(Hole1)) Then oHelper.iHoleMarker = 1
+            ElseIf srow(Hole10) IsNot DBNull.Value Then
+                If IsNumeric(srow(Hole10)) Then oHelper.iHoleMarker = 10
             End If
             Exit For
         Next
@@ -146,7 +148,7 @@ Public Class Skins
         End If
 
         '20180222-expand #closests to track each individual hole for carry overs
-        For Each field In oHelper.cSkinsFields.Split(",")
+        For Each field In Helper.cSkinsFields.Split(",")
             sSkinflds = sSkinflds + field.Substring(0, field.IndexOf("-")) & ","
         Next
 
@@ -384,40 +386,41 @@ Public Class Skins
         oHelper.LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
         Try
             If Not oHelper.bScreenChanged Then Exit Sub
-            If oHelper.convDBNulltoSpaces(oHelper.rLeagueParmrow("ScoresLocked")) = "Y" Then
-                If dgScores.RowCount > 1 Then
-                    If Not bsave Then
-                        Dim mbr = MsgBox("Do you want to save skin results before you exit this screen", MsgBoxStyle.YesNo)
-                        If mbr = MsgBoxResult.Yes Then bsave = True
-                    End If
-                    If bsave Then
-                        lbStatus.Text = "Saving scores from this screen..."
-                        lbStatus.BackColor = Color.Red
-                        For Each row In dgScores.Rows
-                            UpdateScoresFromDataGrid(row)
-                        Next
-                        oHelper.DataTable2CSV(oHelper.dsLeague.Tables("dtScores"), oHelper.sFilePath & "\" & Now.ToString("yyyyMMdd") & "_Scores.csv")
-                        'save extra amounts to league parm table
-                        Dim sKeys() As Object = {oHelper.rLeagueParmrow("Name"), oHelper.rLeagueParmrow("StartDate")}
-                        oHelper.dsLeague.Tables("dtLeagueParms").PrimaryKey = New DataColumn() {oHelper.dsLeague.Tables("dtLeagueParms").Columns("Name"), oHelper.dsLeague.Tables("dtLeagueParms").Columns("StartDate")}
-                        Dim dr As DataRow = oHelper.dsLeague.Tables("dtLeagueParms").Rows.Find(sKeys)
-                        dr("RolledOverSkins") = tbLOSkins.Text
-                        dr("RolledOverCTP1") = tbLOCP1.Text
-                        dr("RolledOverCTP2") = tbLOCP2.Text
-                        dr("RolledOverDate") = cbDatesPlayers.Text
-                        dr("ExtraMoney") = tbExtra.Text
-                        oHelper.DataTable2CSV(oHelper.dsLeague.Tables("dtLeagueParms"), oHelper.sFilePath & "\" & Now.ToString("yyyyMMdd") & "_LeagueParms.csv")
-                        lbStatus.Text = "Done saving scores from this screen"
-                        lbStatus.BackColor = Color.LightGreen
-                        bsave = False
-                    End If
+            'If oHelper.convDBNulltoSpaces(oHelper.rLeagueParmrow("ScoresLocked")) = "N" Then
+            If dgScores.RowCount > 1 Then
+                If Not bsave Then
+                    Dim mbr = MsgBox("Do you want to save skin results before you exit this screen", MsgBoxStyle.YesNo)
+                    If mbr = MsgBoxResult.Yes Then bsave = True
                 End If
-                Try
-                    oHelper.dDate = Date.ParseExact(cbDatesPlayers.SelectedItem, "yyyyMMdd", System.Globalization.DateTimeFormatInfo.InvariantInfo)
-                Catch ex As Exception
-
-                End Try
+                If bsave Then
+                    lbStatus.Text = "Saving scores from this screen..."
+                    lbStatus.BackColor = Color.Red
+                    For Each row In dgScores.Rows
+                        UpdateScoresFromDataGrid(row)
+                    Next
+                    oHelper.DataTable2CSV(oHelper.dsLeague.Tables("dtScores"), oHelper.sFilePath & "\" & Now.ToString("yyyyMMdd") & "_Scores.csv")
+                    'save extra amounts to league parm table
+                    Dim sKeys() As Object = {oHelper.rLeagueParmrow("Name"), oHelper.rLeagueParmrow("StartDate")}
+                    oHelper.dsLeague.Tables("dtLeagueParms").PrimaryKey = New DataColumn() {oHelper.dsLeague.Tables("dtLeagueParms").Columns("Name"), oHelper.dsLeague.Tables("dtLeagueParms").Columns("StartDate")}
+                    Dim dr As DataRow = oHelper.dsLeague.Tables("dtLeagueParms").Rows.Find(sKeys)
+                    dr("RolledOverSkins") = tbLOSkins.Text
+                    dr("RolledOverCTP1") = tbLOCP1.Text
+                    dr("RolledOverCTP2") = tbLOCP2.Text
+                    dr("RolledOverDate") = cbDatesPlayers.Text
+                    dr("ExtraMoney") = tbExtra.Text
+                    oHelper.DataTable2CSV(oHelper.dsLeague.Tables("dtLeagueParms"), oHelper.sFilePath & "\" & Now.ToString("yyyyMMdd") & "_LeagueParms.csv")
+                    lbStatus.Text = "Done saving scores from this screen"
+                    lbStatus.BackColor = Color.LightGreen
+                    bsave = False
+                End If
             End If
+
+            Try
+                oHelper.dDate = Date.ParseExact(cbDatesPlayers.SelectedItem, "yyyyMMdd", System.Globalization.DateTimeFormatInfo.InvariantInfo)
+            Catch ex As Exception
+
+            End Try
+            'End If
 
         Catch ex As Exception
             MsgBox("Error updating scores, better check them")
@@ -450,7 +453,7 @@ Public Class Skins
 
             'create array from above defined fields we want out of scorecard
             Dim sArray = New List(Of String)
-            sArray.AddRange(oHelper.cBaseScoreCard.Split(","))
+            sArray.AddRange(Helper.cBaseScoreCard.Split(","))
 
             '20180222-expand #closests to track each individual hole for carry overs
             Dim ictpctr = 1, swctp = ""
@@ -461,7 +464,7 @@ Public Class Skins
                 End If
             Next
 
-            sArray.AddRange(oHelper.cSkinsFields.Replace("#Closests-cPat40nt", swctp.Trim(",")).Split(","))
+            sArray.AddRange(Helper.cSkinsFields.Replace("#Closests-cPat40nt", swctp.Trim(",")).Split(","))
 
             Dim sColFormat = New List(Of String)
             Dim sScoreCardforDGV = ""
@@ -470,7 +473,7 @@ Public Class Skins
 
             For Each parm As String In sArray
                 'set detault pattern
-                Dim sPat = oHelper.cPat40
+                Dim sPat = Helper.cPat40
                 Dim sParm = ""
 
                 'skip hdcp
@@ -523,7 +526,7 @@ Public Class Skins
                                                 End Try
                                             End If
                                         End If
-                                        row("Hole" & i - 1 + oHelper.iHoleMarker) = cell
+                                        row("Hole" & i - 1 + oHelper.iHoleMarker) = oHelper.RemoveSpcChar(cell.ToString)
                                     Next
                                 End If
                             End If
@@ -559,17 +562,17 @@ Public Class Skins
                 Try
                     Select Case sColFormat(col.Index)
                         Case "cPat40nt"
-                            sformat = oHelper.cPat40nt
+                            sformat = Helper.cPat40nt
                         Case "cPat60"
-                            sformat = oHelper.cPat60
+                            sformat = Helper.cPat60
                         Case "cPatMeth"
-                            sformat = oHelper.cPatMeth
+                            sformat = Helper.cPatMeth
                         Case "cPat120"
-                            sformat = oHelper.cPat120
+                            sformat = Helper.cPat120
                         Case "cPat170"
-                            sformat = oHelper.cPat170
+                            sformat = Helper.cPat170
                         Case Else
-                            sformat = oHelper.cPat40
+                            sformat = Helper.cPat40
                     End Select
 
                 Catch ex As Exception
@@ -620,9 +623,9 @@ Public Class Skins
                     End Try
                     iwinner += 1
                 End If
-                row("$Skins") = ""
-                row("$Earn") = ""
-                row("#Skins") = ""
+                row("$Skins") = DBNull.Value
+                row("$Earn") = DBNull.Value
+                row("#Skins") = DBNull.Value
                 dgScores.Rows.Add(row.ItemArray)
             Next
 
@@ -823,7 +826,7 @@ Public Class Skins
             'turn off flag for this ctp
             dgScores.Rows(e.RowIndex).Cells(dgc.OwningColumn.Name).Value = False
             dgScores.Rows(e.RowIndex).Cells("$Closest").Style.BackColor = Color.White
-            If Val(dgScores.Rows(e.RowIndex).Cells("$Skins").Value) = 0 Then dgScores.Rows(e.RowIndex).Cells("Player").Style.BackColor = Color.White
+            If IsNumeric(dgScores.Rows(e.RowIndex).Cells("$Skins").Value) Then dgScores.Rows(e.RowIndex).Cells("Player").Style.BackColor = Color.White
         Else
             dgScores.Rows(e.RowIndex).Cells(dgc.OwningColumn.Name).Value = True
             dgScores.Rows(e.RowIndex).Cells("$Closest").Style.BackColor = Color.Gold
@@ -904,7 +907,7 @@ Public Class Skins
                 If Val(oHelper.convDBNulltoSpaces(row.Cells("$Closest").Value)) = 0 Then
                     row.Cells("$Closest").Style.BackColor = Color.White
                     row.Cells("$Earn").Style.BackColor = Color.White
-                    If Val(row.Cells("$Skins").Value) = 0 Then row.Cells("Player").Style.BackColor = Color.White
+                    If isnumeric(row.Cells("$Skins").Value)  Then row.Cells("Player").Style.BackColor = Color.White
                 End If
             Next
         End If

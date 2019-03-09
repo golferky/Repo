@@ -74,10 +74,10 @@ Public Class Standings
                 End If
 
                 If cb2ndHalf.Checked Then
-                    Debug.Print(String.Format("--before--team {3} 2nd half {0} team 2nd half {1} team points {2}", row("2nd Half"), row("Team 2nd Half"), drow("Team Points"), row("Team")))
+                    oHelper.LOGIT(String.Format("--before--team {3} 2nd half {0} team 2nd half {1} team points {2}", row("2nd Half"), row("Team 2nd Half"), drow("Team Points"), row("Team")))
                     drow("Team 2nd Half") += CDec(row("2nd Half")) + CDec(row("Team 2nd Half"))
                     drow("Team Points") += CDec(row("2nd Half")) + CDec(row("Team 2nd Half"))
-                    Debug.Print(String.Format("--after--2nd half {0} team 2nd half {1} team points {2}", row("2nd Half"), row("Team 2nd Half"), drow("Team Points")))
+                    oHelper.LOGIT(String.Format("--after--2nd half {0} team 2nd half {1} team points {2}", row("2nd Half"), row("Team 2nd Half"), drow("Team Points")))
                 End If
             Next
 
@@ -487,6 +487,7 @@ Public Class Standings
 #Region "Future Changes"
 
     Public Function ConvertDataGridViewToHTMLWithFormatting(ByVal dgv As DataGridView) As String
+        ConvertDataGridViewToHTMLWithFormatting = ""
         Try
 
             Dim sb As StringBuilder = New StringBuilder()
@@ -695,7 +696,8 @@ Public Class Standings
             Dim dvScores As New DataView(oHelper.dsLeague.Tables("dtScores"))
             'dvScores.RowFilter = "Date >= " & sEndDate.ToString("yyyyMMdd").Substring(0, 4) & "0101"
             'this gets a whole years worth of scores
-            dvScores.RowFilter += String.Format("date >= {0} and date < {1}", sEndDate.ToString("yyyyMMdd").Substring(0, 4) & "0101", sEndDate.ToString("yyyMMdd").Substring(0, 4) + 1) & "0101"
+            'dvScores.RowFilter += String.Format("date >= {0} and date <= {1}", sEndDate.ToString("yyyyMMdd").Substring(0, 4) & "0101", sEndDate.ToString("yyyMMdd").Substring(0, 4) + 1) & "0101"
+            dvScores.RowFilter += String.Format("date >= {0} and date <= {1}", sEndDate.ToString("yyyyMMdd").Substring(0, 4) & "0101", sEndDate.ToString("yyyMMdd"))
             'dvScores.Sort = "Team,Date,Grade"
             Dim sPoints = "", sTeamPoints = ""
             Try

@@ -338,7 +338,7 @@ Public Class Matches
 
             For Each parm As String In sArray
                 'set detault pattern
-                Dim sPat = oHelper.cPat40
+                Dim sPat = Helper.cPat40
                 Dim sParm = ""
 
                 If UBound(parm.Split("-")) = 0 Then
@@ -387,19 +387,19 @@ Public Class Matches
                 Try
                     Select Case sColFormat(col.Index)
                         Case "cPat40nt"
-                            sformat = oHelper.cPat40nt
+                            sformat = Helper.cPat40nt
                         Case "cPat60"
-                            sformat = oHelper.cPat60
+                            sformat = Helper.cPat60
                         Case "cPatMeth"
-                            sformat = oHelper.cPatMeth
+                            sformat = Helper.cPatMeth
                         Case "cPat120"
-                            sformat = oHelper.cPat120
+                            sformat = Helper.cPat120
                         Case "cPat170"
-                            sformat = oHelper.cPat170
+                            sformat = Helper.cPat170
                         Case "cPat170nt"
-                            sformat = oHelper.cPat170nt
+                            sformat = Helper.cPat170nt
                         Case Else
-                            sformat = oHelper.cPat40
+                            sformat = Helper.cPat40
                     End Select
 
                 Catch ex As Exception

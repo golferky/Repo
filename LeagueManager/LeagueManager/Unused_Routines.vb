@@ -1039,7 +1039,7 @@
             End If
 
             'cell.Style.Font = New Font(sFont, iFontSize, FontStyle.Regular)
-            If .iHdcp = 99 Then Exit Sub
+            If .IHdcp = 99 Then Exit Sub
             'check scores against handicap
             'is this a stroke hole?
             If .iHoles = 0 Then
@@ -1051,11 +1051,11 @@
             isi = .CalcStrokeIndex(cell.OwningColumn.Name)
             'LOGIT(sPlayer & "-" & iHdcp & "-" & iStrokeIndex & "-" & isi & "-" & cell.OwningColumn.Name & "-")
             'if the handicap > stroke index make color beige
-            If .iHdcp >= isi Then
+            If .IHdcp >= isi Then
                 If .bColors Then cell.Style.BackColor = Color.Beige
                 If .bDots Then cell.Value = cell.Value & ChrW(&H25CF)
                 'if double stroke hole, make color b/a
-                If .iHdcp - .iHoles >= isi Then
+                If .IHdcp - .iHoles >= isi Then
                     If .bColors Then cell.Style.BackColor = Color.BlanchedAlmond
                     If .bDots Then cell.Value = cell.Value & ChrW(&H25CF)
                 End If

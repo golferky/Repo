@@ -20,6 +20,7 @@ Public Class frmScoreCard
     Dim bMatchesSet = False
     Dim bFormLoad = False
     Dim iSkins As Integer = 0, iCTP As Integer = 0, iPCTP As Integer = 0, iPCTP1 As Integer = 0, iPCTP2 As Integer = 0, iPurse As Integer = 0
+    Dim dsLeague As New dsLeague
 
     Private Sub ScoreCard_Load(sender As System.Object, e As System.EventArgs) Handles MyBase.Load
 
@@ -28,8 +29,9 @@ Public Class frmScoreCard
         oHelper.status_Msg(lbStatus, Me)
         'copy main's helper
         oHelper = Main.oHelper
+        dsLeague = oHelper.dsLeague
         oHelper.LOGIT(Reflection.MethodBase.GetCurrentMethod().Name & " -------------------------")
-        oHelper.dsLeague.Tables("dtPlayers").PrimaryKey = New DataColumn() {oHelper.dsLeague.Tables("dtPlayers").Columns("Name")}
+        'dsLeague.Tables("dtPlayers").PrimaryKey = New DataColumn() {dsLeague.Tables("dtPlayers").Columns("Name")}
 
         Dim dtschedule As New DataTable()
         'build a table of schedule with dates in rows instead of columns
@@ -66,8 +68,8 @@ Public Class frmScoreCard
         wkdate2 = wkdate2.AddDays(7)
         cbDatesPlayers.Items.Add(wkdate2.ToString("yyyyMMdd", Globalization.CultureInfo.InvariantCulture))
         'cbDatesPlayers.Items.Add(Date.ParseExact(slastweek, "yyyyMMdd", System.Globalization.DateTimeFormatInfo.InvariantInfo).AddDays(14))
+        cbDatesPlayers.SelectedIndex = cbDatesPlayers.Items.IndexOf(oHelper.sDateLastScore)
         cbDatesPlayers.SelectedItem = oHelper.sDateLastScore
-
         oHelper.dDate = Date.ParseExact(cbDatesPlayers.SelectedItem, "yyyyMMdd", System.Globalization.DateTimeFormatInfo.InvariantInfo)
 
         'oHelper.BuildControls(gbScoringSgboreCard, 1, 18, "Scorecard")
@@ -161,11 +163,11 @@ Public Class frmScoreCard
                         '20180127-decrease for net method
                         If R.Cells("Method").Value.ToString.StartsWith("N") Then
                             Dim isi = .CalcStrokeIndex("Hole" & i)
-                            If .iHdcp >= isi Then
+                            If .IHdcp >= isi Then
                                 'check stroke index 
                                 iScore += 1
                                 'check for 2 strokes
-                                If .iHdcp - .iHoles >= isi Then iScore += 1
+                                If .IHdcp - .iHoles >= isi Then iScore += 1
                             End If
                         End If
                         calcScores += iScore
@@ -181,11 +183,12 @@ Public Class frmScoreCard
         End With
     End Function
     Function GetPHdcp() As String
+        GetPHdcp = ""
         Try
             oHelper.LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
             GetPHdcp = ""
 
-            Dim dvscores As New DataView(oHelper.dsLeague.Tables("dtScores"))
+            Dim dvscores As New DataView(dsLeague.Tables("dtScores"))
             With dvscores
                 '20181014-future try to search internet to find a top row solution
                 .RowFilter = String.Format("Player = '{0}' and Date < '{1}'", oHelper.sPlayer, cbDatesPlayers.SelectedItem)
@@ -208,8 +211,8 @@ Public Class frmScoreCard
 
             'create array from above defined fields we want out of scorecard
             Dim sArray = New List(Of String)
-            sArray.AddRange(oHelper.cBaseScoreCard.Replace("Holes", "Date(2)-cPat120,Holes").Split(","))
-            sArray.AddRange(oHelper.cSkinsFields.Split(","))
+            sArray.AddRange(Helper.cBaseScoreCard.Replace("Holes", "Date(2)-cPat120,Holes").Split(","))
+            sArray.AddRange(Helper.cSkinsFields.Split(","))
             '20180222-expand #closests to track each individual hle for carry overs
             Dim ictpctr = 1
             For Each fld In sArray
@@ -266,7 +269,7 @@ Public Class frmScoreCard
 
             'replace spaces with underscores for csv column matchups
             sScoreCardforDGV = sScoreCardforDGV.Substring(0, Len(sScoreCardforDGV) - 1).Replace(" ", "_")
-            Dim dvScores As New DataView(oHelper.dsLeague.Tables("dtScores"))
+            Dim dvScores As New DataView(dsLeague.Tables("dtScores"))
             dvScores.RowFilter = "Date = '" & cbDatesPlayers.SelectedItem & "'"
             'added sort by match(partner)
             dvScores.Sort = "Partner"
@@ -296,21 +299,21 @@ Public Class frmScoreCard
                     Try
                         Select Case sColFormat(.Index)
                             Case "cPat40nt"
-                                sformat = oHelper.cPat40nt
+                                sformat = Helper.cPat40nt
                             Case "cPatHole"
-                                sformat = oHelper.cPathole
+                                sformat = Helper.cPathole
                             Case "cPat60"
-                                sformat = oHelper.cPat60
+                                sformat = Helper.cPat60
                             Case "cPat120"
-                                sformat = oHelper.cPat120
+                                sformat = Helper.cPat120
                             Case "cPatMeth"
-                                sformat = oHelper.cPatMeth
+                                sformat = Helper.cPatMeth
                             Case "cPat170"
-                                sformat = oHelper.cPat170
+                                sformat = Helper.cPat170
                             Case "cPat170nt"
-                                sformat = oHelper.cPat170nt
+                                sformat = Helper.cPat170nt
                             Case Else
-                                sformat = oHelper.cPat40
+                                sformat = Helper.cPat40
                         End Select
 
                     Catch ex As Exception
@@ -408,7 +411,7 @@ Public Class frmScoreCard
             'oHelper.CalcHoleMarker(cbDatesPlayers.SelectedItem)
             '20181003 - if scores already exist int able, dont use date to determine which 9 were playing, we can swap nines and override schedule
             'oHelper.CalcHoleMarker(sdate)
-            Dim dvscores As New DataView(oHelper.dsLeague.Tables("dtScores"))
+            Dim dvscores As New DataView(dsLeague.Tables("dtScores"))
             dvscores.RowFilter = String.Format("Date = {0}", oHelper.dDate.ToString("yyyyMMdd", Globalization.CultureInfo.InvariantCulture))
 
             For Each srow As DataRowView In dvscores
@@ -522,7 +525,7 @@ Public Class frmScoreCard
                 End If
                 oHelper.ChangeColorsForStrokes(row)
                 'pull last score before this to get previous handicap
-                Dim dv2Scores As New DataView(oHelper.dsLeague.Tables("dtScores"))
+                Dim dv2Scores As New DataView(dsLeague.Tables("dtScores"))
                 dv2Scores.RowFilter = "Player = '" & row.Cells("Player").Value & "' And Date < '" & cbDatesPlayers.SelectedItem & "'"
                 dv2Scores.Sort = " Date Desc"
                 If dv2Scores.Count > 0 Then row.Cells("Phdcp").Value = dv2Scores(0).Item("Hdcp").ToString
@@ -572,7 +575,7 @@ Public Class frmScoreCard
         oHelper.LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
         Try
 
-            oHelper.DataTable2CSV(oHelper.dsLeague.Tables("dtLeagueParms"), oHelper.sFilePath & "\" & Now.ToString("yyyyMMdd") & "_LeagueParms.csv")
+            oHelper.DataTable2CSV(dsLeague.Tables("dtLeagueParms"), oHelper.sFilePath & "\" & Now.ToString("yyyyMMdd") & "_LeagueParms.csv")
 
             If Not cbScoresLocked.Checked Then
                 If dgScores.RowCount > 1 Then
@@ -582,6 +585,7 @@ Public Class frmScoreCard
                             cleanupScores()
                             lbStatus.Text = " Scores cleaned up and released"
                             lbStatus.BackColor = Color.LightGreen
+                            oHelper.bDGSError = False
                             Exit Sub
                         End If
                     End If
@@ -602,10 +606,10 @@ Public Class frmScoreCard
                 'use ddate because cbdatesplayers.selecteditem has changed the date
                 '20180419 - make key index instead of player name
                 Dim sKeys() As Object = {row.Cells("Player").Value, oHelper.dDate.ToString("yyyyMMdd", Globalization.CultureInfo.InvariantCulture)} 'cbDatesPlayers.SelectedItem}
-                Dim arow As DataRow = oHelper.dsLeague.Tables("dtScores").Rows.Find(sKeys)
+                Dim arow As DataRow = dsLeague.Tables("dtScores").Rows.Find(sKeys)
                 'if not found, this is a sub
                 If arow Is Nothing Then
-                    Dim dvscores As New DataView(oHelper.dsLeague.Tables("dtScores"))
+                    Dim dvscores As New DataView(dsLeague.Tables("dtScores"))
                     dvscores.RowFilter = String.Format("Date = {0}", oHelper.dDate.ToString("yyyyMMdd", Globalization.CultureInfo.InvariantCulture))
                     dvscores.Sort = "Partner"
                     Dim bfound = False
@@ -675,8 +679,8 @@ Public Class frmScoreCard
             Next
             Dim x = ""
             'oHelper.DataTable2XML("dtScores", "Scores")
-            oHelper.DataTable2CSV(oHelper.dsLeague.Tables("dtScores"), oHelper.sFilePath & "\" & Now.ToString("yyyyMMdd") & "_Scores.csv")
-            oHelper.DataTable2CSV(oHelper.dsLeague.Tables("dtPlayers"), oHelper.sFilePath & "\" & Now.ToString("yyyyMMdd") & "_Players.csv")
+            oHelper.DataTable2CSV(dsLeague.Tables("dtScores"), oHelper.sFilePath & "\" & Now.ToString("yyyyMMdd") & "_Scores.csv")
+            oHelper.DataTable2CSV(dsLeague.Tables("dtPlayers"), oHelper.sFilePath & "\" & Now.ToString("yyyyMMdd") & "_Players.csv")
             lbStatus.Text = "Done saving scores from this screen"
             lbStatus.BackColor = Color.LightGreen
 
@@ -702,7 +706,7 @@ Public Class frmScoreCard
             'if no change, then exit 
             If dgr.CurrentCell.Value = sOldCellValue Then Exit Sub
             Dim R As DataGridViewRow = dgr.CurrentRow
-            If R.Cells("Phdcp").Value Is Nothing Then oHelper.iHdcp = 99
+            If R.Cells("Phdcp").Value Is Nothing Then oHelper.IHdcp = 99
 
             If sCurrColName = "Player" Then
                 editPlayer(R, sCurrColName)
@@ -727,7 +731,7 @@ Public Class frmScoreCard
     Sub editPlayer(R As DataGridViewRow, sCurrColName As String)
         oHelper.LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
         Try
-
+            oHelper.bDGSError = False
             '    '1  Get the player name from the scores view with his handicap
             '    '2  if scores havent been updated for this player/date, then update the gridview and mark stroke holes
             '    'try looking for intials if the length is 2 char
@@ -752,21 +756,21 @@ Public Class frmScoreCard
             Next
 
             Try
-                oHelper.iHdcp = GetPHdcp()
+                oHelper.IHdcp = GetPHdcp()
             Catch ex As Exception
-                oHelper.iHdcp = 99
+                oHelper.IHdcp = 99
             End Try
 
-            R.Cells("PHdcp").Value = oHelper.iHdcp
+            R.Cells("PHdcp").Value = oHelper.IHdcp
             R.Cells(sCurrColName).Value = oHelper.sPlayer
-            Dim MyPlayer As DataRow = oHelper.dsLeague.Tables("dtPlayers").Rows.Find(oHelper.sPlayer)
+            Dim MyPlayer As DataRow = dsLeague.Tables("dtPlayers").Rows.Find(oHelper.sPlayer)
             If R.Cells("Team").Value = "" Then R.Cells("Team").Value = MyPlayer("Team")
 
             If rbColors.Checked Then oHelper.bColors = True Else oHelper.bColors = False
             If rbDots.Checked Then oHelper.bDots = True Else oHelper.bDots = False
             oHelper.displayStrokes(R)
             '20180121 fix color blue on subs
-            Dim dvplayers As New DataView(oHelper.dsLeague.Tables("dtPlayers"))
+            Dim dvplayers As New DataView(dsLeague.Tables("dtPlayers"))
             R.Cells(sCurrColName).Style.BackColor = Color.White
             dvplayers.RowFilter = "Name = '" & R.Cells(sCurrColName).Value & "'"
             oHelper.sPlayer = R.Cells(sCurrColName).Value.ToString
@@ -964,9 +968,9 @@ Public Class frmScoreCard
 
                 If dgScores.Columns.Contains("Out_Gross") Then
                     '99 means this is this guys first score
-                    If oHelper.iHdcp <> 99 Then R.Cells("Out_Net").Value = R.Cells("Out_Gross").Value - oHelper.iHdcp
+                    If oHelper.IHdcp <> 99 Then R.Cells("Out_Net").Value = R.Cells("Out_Gross").Value - oHelper.IHdcp
                 Else
-                    If oHelper.iHdcp <> 99 Then R.Cells("In_Net").Value = R.Cells("In_Gross").Value - oHelper.iHdcp
+                    If oHelper.IHdcp <> 99 Then R.Cells("In_Net").Value = R.Cells("In_Gross").Value - oHelper.IHdcp
                 End If
             End If
             oHelper.ValidateCell(R.Cells(sCurrColName))
@@ -1395,7 +1399,7 @@ Public Class frmScoreCard
                         dgc.Value = ""
                         oHelper.bDGSError = False
                         oHelper.bAllHolesEntered = False
-                        If R.Cells("Phdcp").Value Is Nothing Then oHelper.iHdcp = 99
+                        If R.Cells("Phdcp").Value Is Nothing Then oHelper.IHdcp = 99
                         If sCurrColName = "Player" Then
                             MsgBox("Cant Delete a player, try entering a player")
                             'editPlayer(R, sCurrColName)
@@ -1482,7 +1486,7 @@ Public Class frmScoreCard
                 If mbResult = MsgBoxResult.Yes Then
                     oHelper.bScoresbyPlayer = True
                     oHelper.sPlayer = cell.Value
-                    oHelper.iHdcp = row.Cells("Phdcp").Value
+                    oHelper.IHdcp = row.Cells("Phdcp").Value
                     Scores.Show()
                     oHelper.bScoresbyPlayer = False
                 End If
@@ -1494,6 +1498,7 @@ Public Class frmScoreCard
     End Sub
     Function sf(str As String, flist As String) As String
         oHelper.LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
+        sf = ""
         Try
             Dim sfl As String
             For Each fld In flist.Split(",")
