@@ -6,22 +6,28 @@
     Private Sub frmPlayerStats_Load(sender As System.Object, e As System.EventArgs) Handles MyBase.Load
         oHelper = Main.oHelper
         rs.FindAllControls(Me)
+        Dim scbdates As New List(Of String)
         If oHelper.bsch Then
             For Each col As DataColumn In oHelper.dsLeague.Tables("dtSchedule").Columns
                 Dim wkdate As DateTime = col.ColumnName
                 'Dim wkdate As DateTime = DateTime.ParseExact(col.ColumnName, "MM/dd/yy", Globalization.CultureInfo.InvariantCulture)
                 Dim reformatted As String = wkdate.ToString("yyyyMMdd", Globalization.CultureInfo.InvariantCulture)
-                cbDates.Items.Add(reformatted)
+                'cbDates.Items.Add(reformatted)
+                scbdates.Add(reformatted)
             Next
         End If
-        For Each sDate In cbDates.Items
-            If sDate >= Now.ToString("yyyyMMdd") Then
-                cbDates.SelectedItem = sDate
-                Exit For
-            End If
+        scbdates.Reverse()
+        cbDates.Sorted = False
+        'Dim wkdate2 As Date = oHelper.rLeagueParmrow("PostSeasonDt")
+        'Dim reformatted2 As String = wkdate2.ToString("yyyyMMdd", Globalization.CultureInfo.InvariantCulture)
+        For Each sDate In scbdates
+            cbDates.Items.Add(sDate)
         Next
+        cbDates.SelectedIndex = 0
+        
         dgLast5.RowTemplate.Height = 15
         Me.Height = 1500
+        btnDisplayScores_Click(sender, e)
     End Sub
 
     Private Sub btnDisplayScores_Click(sender As Object, e As EventArgs) Handles btnDisplayScores.Click
@@ -80,10 +86,15 @@
             Next
 
             For Each splayer In dvPlayers
-                dvScores.RowFilter = String.Format("Player = '{0}'", splayer(0))
+                If cb2018.Checked Then
+                    dvScores.RowFilter = String.Format("Player = '{0}' and Date <= {1} and Date >= {2}", splayer(0), cbDates.SelectedItem, "20180101")
+                Else
+                    dvScores.RowFilter = String.Format("Player = '{0}' and Date <= {1}", splayer(0), cbDates.SelectedItem)
+                End If
+                If dvScores.Count = 0 Then Continue For
                 Dim newrow As DataRow = dtLast5.NewRow
                 Dim i = 1
-                'this usese its own data table
+                'this uses its own data table
                 Dim dvthisplayer As New DataView(dt)
                 dvthisplayer.RowFilter = String.Format("Player = '{0}'", splayer("Player"))
                 Dim sKey() As Object = {splayer("Player"), dvScores(0)("Date")}
@@ -92,7 +103,7 @@
                 newrow("Last Score") = sKey(1)
                 Dim drow = oHelper.dsLeague.Tables("dtScores").Rows.Find(sKey)
                 If drow Is Nothing Then
-                    Throw New Exception(String.Format("LastFive - Cant fint Score in dtscores for Player {0} Date {1} ", splayer(0), cbDates.SelectedItem))
+                    Throw New Exception(String.Format("LastFive - Cant find a score in dtscores for Player {0} Date {1}{2}Contact Developer ", splayer(0), cbDates.SelectedItem, vbCrLf))
                 Else
                     newrow("Player") = newrow("Player") & "(" & sHdcp & ")"
                 End If
@@ -134,6 +145,12 @@
 
         lbStatus.Text = String.Format("Finished Resorting Column {0}", newColumn.HeaderText)
         oHelper.status_Msg(lbStatus, Me)
+    End Sub
+
+    Private Sub cb2018_CheckedChanged(sender As Object, e As EventArgs) Handles cb2018.CheckedChanged
+        If cb2018.Checked Then
+
+        End If
     End Sub
 
     Private Sub LastFive_Resize(sender As Object, e As EventArgs) Handles MyBase.Resize

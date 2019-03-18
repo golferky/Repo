@@ -27,6 +27,7 @@ Partial Class LastFive
         Me.cbDates = New System.Windows.Forms.ComboBox()
         Me.dgLast5 = New System.Windows.Forms.DataGridView()
         Me.lbStatus = New System.Windows.Forms.Label()
+        Me.cb2018 = New System.Windows.Forms.CheckBox()
         CType(Me.dgLast5, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
@@ -79,11 +80,24 @@ Partial Class LastFive
         Me.lbStatus.TabIndex = 27
         Me.lbStatus.Text = "Status"
         '
+        'cb2018
+        '
+        Me.cb2018.AutoSize = True
+        Me.cb2018.Checked = True
+        Me.cb2018.CheckState = System.Windows.Forms.CheckState.Checked
+        Me.cb2018.Location = New System.Drawing.Point(544, 193)
+        Me.cb2018.Name = "cb2018"
+        Me.cb2018.Size = New System.Drawing.Size(193, 29)
+        Me.cb2018.TabIndex = 28
+        Me.cb2018.Text = "Exclude < 2018"
+        Me.cb2018.UseVisualStyleBackColor = True
+        '
         'LastFive
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(12.0!, 25.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(1195, 1985)
+        Me.Controls.Add(Me.cb2018)
         Me.Controls.Add(Me.lbStatus)
         Me.Controls.Add(Me.dgLast5)
         Me.Controls.Add(Me.btnDisplayScores)
@@ -103,4 +117,5 @@ Partial Class LastFive
     Friend WithEvents cbDates As ComboBox
     Friend WithEvents dgLast5 As DataGridView
     Friend WithEvents lbStatus As Label
+    Friend WithEvents cb2018 As CheckBox
 End Class

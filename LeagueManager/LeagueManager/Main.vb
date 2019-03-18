@@ -1,23 +1,27 @@
 ﻿'*************************************************************************************************
 Imports System.IO.Packaging
 Public Class Main
-    Dim cVersion = "Version : 2019.03.09"
+    Dim cVersion = "Version : 2019.03.18"
     Public oHelper As Helper
     Private dsLeague As New dsLeague
     Dim bload As Boolean = True
     'Private Teams As ArrayList = New ArrayList
     Private Teams2 As ArrayList = New ArrayList
     Dim rs As New Resizer
+    Dim bwait As Boolean
+    Dim sParmFile As String
 
     Private Sub Main_Load(sender As System.Object, e As System.EventArgs) Handles MyBase.Load
-
+        oHelper = New Helper
         'Genschedule()
         Me.Text = Me.Text & " " & cVersion
-        lblProcessMsg.Text = "Loading League Tables..."
         Application.EnableVisualStyles()
-        Me.Cursor = Cursors.WaitCursor
-        Application.DoEvents()
+        lblProcessMsg.Text = "Loading League Tables..."
+        oHelper.status_Msg(lblProcessMsg, Me)
 
+        If Debugger.IsAttached Then
+            Me.Text = Me.Text & " - Debug Mode"
+        End If
         '20180106 remove for now
         btnShowScores.Visible = False
 
@@ -26,7 +30,7 @@ Public Class Main
         'Me.WindowState = FormWindowState.Maximized
         Me.SetStyle(ControlStyles.SupportsTransparentBackColor, True)
         Me.BackColor = Color.Transparent
-        oHelper = New Helper
+
         Dim sDocs = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)
         '12/19/2017 note this is removed for now 
         Me.Icon = New Icon(Me.Icon, New Size(Me.Icon.Width * 5, Me.Icon.Height * 5))
@@ -89,10 +93,22 @@ Public Class Main
 
         'build dropdown list of leagues
         ' DsLeague = New dsLeague
-        If Not oHelper.CSV2DataTable(dsLeague.Tables("dtLeagueParms"), oHelper.getLatestFile("*LeagueParms.csv")) Then
-            MsgBox(String.Format("File in use, close file and restart {0} {1}", vbCrLf, oHelper.getLatestFile("*LeagueParms.csv")))
-            End
-        End If
+        'If Not oHelper.CSV2DataTable(dsLeague.Tables("dtLeagueParms"), oHelper.getLatestFile("*LeagueParms.csv")) Then
+        '    MsgBox(String.Format("File in use, close file and restart {0} {1}", vbCrLf, oHelper.getLatestFile("*LeagueParms.csv")))
+        '    End
+        'End If
+        bwait = True
+        sParmFile = oHelper.getLatestFile("*LeagueParms.csv")
+        Do While bwait
+            If Not oHelper.WaitForFile(dsLeague.Tables("dtLeagueParms"), sParmFile, lblProcessMsg, Me) Then
+                Dim mbr = MessageBox.Show(String.Format("File in use {0}Press <OK> to close file and proceed or <Cancel>", vbCrLf, sParmFile), sParmFile, MessageBoxButtons.OKCancel)
+                If mbr = DialogResult.Cancel Then
+                    End
+                End If
+            Else
+                bwait = False
+            End If
+        Loop
         'oHelper.dsLeague.ReadXml(oHelper.getXMLFile("*LeagueParms.xml"))
         Dim dvLeagues = New DataView(dsLeague.Tables("dtLeagueParms"))
         dvLeagues.Sort = "Name Asc, StartDate Desc"
@@ -157,7 +173,7 @@ Public Class Main
             'build an array list of the most recent files for each table
             For Each sfile In oFiles
                 oHelper.LOGIT(String.Format("Examining File {0}", sfile.FullName.ToString))
-                'league parm file aready read into datatable above
+                'league parm file already read into datatable above
                 If sfile.FullName.Contains("LeagueParm") Or sfile.FullName.Contains("Standings") Then Continue For
                 If sfile.FullName.Contains("Schedule") Then
                     oHelper.LOGIT("Checking Schedule")
@@ -197,6 +213,12 @@ Public Class Main
                         oHelper.LOGIT(String.Format("Set table from {0}", sfile.FullName.ToString))
                         sArrayOfFiles.Add(sfile.FullName)
                     End If
+                ElseIf sfile.FullName.EndsWith("_Payments.csv") Then
+                    If Not oHelper.bpayments Then
+                        oHelper.bpayments = True
+                        oHelper.LOGIT(String.Format("Set table from {0}", sfile.FullName.ToString))
+                        sArrayOfFiles.Add(sfile.FullName)
+                    End If
                 End If
             Next
 
@@ -230,10 +252,23 @@ Public Class Main
                     dsLeague.Tables.Add(sfile)
                 End If
 
-                If Not oHelper.CSV2DataTable(dsLeague.Tables(sfile), saFile) Then
-                    MsgBox(String.Format("File in use - {1} {0} close file And restart", vbCrLf, saFile))
-                    End
-                End If
+                'If Not oHelper.CSV2DataTable(dsLeague.Tables(sfile), saFile) Then
+                '    MsgBox(String.Format("File in use - {1} {0} close file And restart", vbCrLf, saFile))
+                '    End
+                'End If
+                bwait = True
+                sParmFile = saFile
+                Do While bwait
+                    If Not oHelper.WaitForFile(dsLeague.Tables(sfile), sParmFile, lblProcessMsg, Me) Then
+                        Dim mbr = MessageBox.Show(String.Format("File in use {0}Press <OK> to close file and proceed or <Cancel>", vbCrLf, sParmFile), sParmFile, MessageBoxButtons.OKCancel)
+                        If mbr = DialogResult.Cancel Then
+                            End
+                        End If
+                    Else
+                        bwait = False
+                    End If
+                Loop
+
                 If sfile = "dtScores" Then
                     lbScoresFile.Text = saFile
                     'ElseIf sfile = "dtSchedule" Then
@@ -297,6 +332,7 @@ Public Class Main
                     .sLeagueName = .rLeagueParmrow("Name")
                     oHelper.UpdateINI()
                     If .rLeagueParmrow("ScoresLocked") Is DBNull.Value Then .rLeagueParmrow("ScoresLocked") = "N"
+
                     BuildTablesForLeague()
                     '20180930 -setup dates
                     dtScore.Text = DateTime.ParseExact(.sDateLastScore, "yyyyMMdd", Nothing).ToString("MM\/dd\/yyyy").Trim("0")
@@ -561,7 +597,7 @@ Public Class Main
         'oHelper.arraySort(oFiles)
         Dim sArrayOfFiles As New List(Of String)
 
-        Dim sfile = oHelper.sFilePath & "\" & Now.ToString("yyyyMMdd") & "_LeagueFiles.zip"
+        Dim sfile = oHelper.sFilePath & "\" & Now.ToString("yyyyMMdd_hhmmss") & "_LeagueFiles.zip"
         If IO.File.Exists((sfile)) Then IO.File.Delete(sfile)
 
         Dim zipPackage As Package = Package.Open((sfile), IO.FileMode.OpenOrCreate, IO.FileAccess.ReadWrite)
@@ -694,6 +730,30 @@ Public Class Main
         oHelper.rLeagueParmrow("EndDate") = dtRSEnd.Text
     End Sub
 
+    Private Sub btnUndoScores_Click(sender As Object, e As EventArgs) Handles btnUndoScores.Click
+        Dim sfile = oHelper.sFilePath & "\" & Now.ToString("yyyyMMdd_hhmmss") & "_LeagueFiles.zip"
+        With lblProcessMsg
+            .Text = String.Format("Gathering Scores file to Undo")
+            oHelper.status_Msg(lblProcessMsg, Me)
+            Dim oFiles() As IO.FileInfo
+            Dim oDirectory As New IO.DirectoryInfo(oHelper.sFilePath)
+            'oFiles = oDirectory.GetFiles("*.xml")
+            oFiles = oDirectory.GetFiles("*Scores.csv")
+            'sort by date desc
+            Helper.arraySort(oFiles)
+
+            Dim mbr = MsgBox(String.Format("Do you want to delete scores file from {0}?" & vbCrLf & String.Format("Files will be backed up before delete to {0}", sfile), oFiles(0).FullName), MsgBoxStyle.YesNo)
+            If mbr = MsgBoxResult.Yes Then
+                .Text = String.Format("Zipping League Files to {0} ...", sfile)
+                oHelper.status_Msg(lblProcessMsg, Me)
+                Zipit()
+                If IO.File.Exists((oFiles(0).FullName)) Then IO.File.Delete(oFiles(0).FullName)
+                BuildTablesForLeague()
+            End If
+            .Text = String.Format("Finished Undoing Scores")
+            oHelper.status_Msg(lblProcessMsg, Me)
+        End With
+    End Sub
 End Class
 Public Class Team
     Implements IComparable

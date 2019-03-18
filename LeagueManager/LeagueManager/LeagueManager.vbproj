@@ -378,7 +378,6 @@
     <None Include="dsLeague.xsd">
       <SubType>Designer</SubType>
       <Generator>MSDataSetGenerator</Generator>
-      <LastGenOutput>dsLeague.Designer.vb</LastGenOutput>
     </None>
     <None Include="dsLeague.xss">
       <DependentUpon>dsLeague.xsd</DependentUpon>

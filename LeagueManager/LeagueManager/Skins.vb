@@ -65,6 +65,9 @@ Public Class Skins
         For Each field In Helper.cSkinsFields.Split(",")
             sSkinflds = sSkinflds + field.Substring(0, field.IndexOf("-")) & ","
         Next
+        sCTPs = New List(Of String)
+        sCTPs.Add(0)
+        sCTPs.Add(0)
 
         btnSkins_Click(sender, e)
     End Sub
@@ -649,6 +652,7 @@ Public Class Skins
                 iEachClosestAmt = (iTotCTPPlayers * 3) / 2
                 iSkinpot = iTotSkinPlayers * 7
             Else
+                Dim sLP As String = oHelper.getLeagParm(cbDatesPlayers.SelectedItem, lbStatus, Me)
                 If oHelper.rLeagueParmrow("RolledOverDate") IsNot DBNull.Value Then
                     If oHelper.rLeagueParmrow("RolledOverDate") < cbDatesPlayers.SelectedItem Then
                         iSkinpot = oHelper.convDBNulltoSpaces(oHelper.rLeagueParmrow("RolledOverSkins"))
@@ -659,15 +663,15 @@ Public Class Skins
                 iSkinpot += oHelper.rLeagueParmrow("Skins") * iTotSkinPlayers
             End If
 
-            tbLOCP1.Text = ictp1
-            tbLOCP2.Text = ictp2
+            tbLOCP1.Text = iEachClosestAmt
+            tbLOCP2.Text = iEachClosestAmt
 
             tbSkins.Text = iSkinpot
             tbPurse.Text = 0
             tbLOSkins.Text = 0
-            tbCP1.Text = 0
-            tbCP2.Text = 0
-            tbLOPurse.Text = 0
+            tbCP1.Text = ictp1
+            tbCP2.Text = ictp2
+            tbLOPurse.Text = 0 'CInt(tbLOCP1.Text) + CInt(tbLOCP2.Text)
 
             'this loop gets previous handicap
             For Each row As DataGridViewRow In dgScores.Rows
@@ -699,18 +703,17 @@ Public Class Skins
             'loop through each row looking for player who won a ctp
             For Each row As DataGridViewRow In dgScores.Rows
                 If row.Cells("Player").Value <> "*** Total ***" Then
-                    Dim ictp = 0
                     If row.Index = sctps(0) - 1 Then
                         row.Cells("CTP_1").Value = True
-                        ictp += iEachClosestAmt
+                        tbLOCP1.Text -= iEachClosestAmt
+                        'tbCP1.Text += iEachClosestAmt
                         row.Cells("$Closest").Value = iEachClosestAmt
-                        'tbLOCP1.Text -= iEachClosestAmt
                     End If
                     If row.Index = sctps(1) - 1 Then
                         row.Cells("CTP_2").Value = True
-                        ictp += iEachClosestAmt
+                        tbLOCP2.Text -= iEachClosestAmt
+                        'tbCP2.Text += iEachClosestAmt
                         row.Cells("$Closest").Value = iEachClosestAmt
-                        'tbLOCP2.Text -= iEachClosestAmt
                     End If
                 End If
             Next
@@ -762,11 +765,12 @@ Public Class Skins
             Dim dr As DataRow = oHelper.dsLeague.Tables("dtScores").Rows.Find(sKeys)
             For Each cell As DataGridViewCell In row.Cells
                 'If oHelper.cSkinsFields.Contains(cell.OwningColumn.Name) Then
-                If sSkinflds.Contains(cell.OwningColumn.Name) Then
+                If sSkinflds.Contains(cell.OwningColumn.Name) Or cell.OwningColumn.Name.StartsWith("CTP") Then
                     If cell.Value IsNot DBNull.Value Then
                         Try
                             If cell.OwningColumn.Name.StartsWith("CTP") Then
-                                If cell.Value = True Then dr(cell.OwningColumn.Name) = iEachClosestAmt
+                                Dim cb As DataGridViewCheckBoxCell = row.Cells(cell.OwningColumn.Name)
+                                If cb.Value = True Then dr(cell.OwningColumn.Name) = iEachClosestAmt
                             Else
                                 dr(cell.OwningColumn.Name) = oHelper.RemoveSpcChar(cell.Value)
                             End If
@@ -804,6 +808,7 @@ Public Class Skins
         End If
     End Sub
     Private Sub dgScores_CellContentClick(sender As Object, e As DataGridViewCellEventArgs) Handles dgScores.CellContentClick
+        'this subroutine is exclusively for CTPs
         oHelper.LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
         If e.RowIndex < 0 Then Exit Sub
         Dim dgc As DataGridViewCell = sender.currentcell
@@ -815,7 +820,32 @@ Public Class Skins
         Dim iamt As Integer = iEachClosestAmt
 
         'add or subtract the amts from purse
-        If cell.Value = True Then iamt = iamt * -1
+        If cell.Value = True Then
+            iamt = iamt * -1
+            If cell.OwningColumn.Name = "CTP_1" Then
+                tbCP1.Text -= iamt
+                tbLOCP1.Text += iamt
+                tbLOPurse.Text += iamt
+                sCTPs(0) = 0
+            ElseIf cell.OwningColumn.Name = "CTP_2" Then
+                tbCP2.Text -= iamt
+                tbLOCP2.Text += iamt
+                tbLOPurse.Text += iamt
+                sCTPs(1) = 0
+            End If
+        Else
+            If cell.OwningColumn.Name = "CTP_1" Then
+                tbCP1.Text += iamt
+                tbLOCP1.Text -= iamt
+                tbLOPurse.Text -= iamt
+                sCTPs(0) = iamt
+            ElseIf cell.OwningColumn.Name = "CTP_2" Then
+                tbCP2.Text += iamt
+                tbLOCP2.Text -= iamt
+                tbLOPurse.Text -= iamt
+                sCTPs(1) = iamt
+            End If
+        End If
 
         'figure out extra money from uneven amount of players
         'iExtra += iTotCTPPlayers - CInt(tbLOCP1.Text) - (sCTP.Count * iclosests)
@@ -845,15 +875,6 @@ Public Class Skins
             dgScores.Rows(e.RowIndex).Cells("$Earn").Value = iamt
         End If
 
-        If cell.OwningColumn.Name = "CTP_1" Then
-            tbCP1.Text += iamt
-            tbLOCP1.Text -= iamt
-            tbLOPurse.Text -= iamt
-        ElseIf cell.OwningColumn.Name = "CTP_2" Then
-            tbCP2.Text += iamt
-            tbLOCP2.Text -= iamt
-            tbLOPurse.Text -= iamt
-        End If
         tbPurse.Text += iamt
 
         'now loop through and adjust totals for the unchecked

@@ -58,6 +58,7 @@ Public Class Helper
     Public bscores = False
     Public bplayer = False
     Public bcourses = False
+    Public bpayments = False
     Public GGmail As GGSMTP_GMAIL
     Public sFileInUseMessage As String
     ' Create the ToolTip and associate with the Form container.
@@ -449,7 +450,8 @@ ByVal sepChar As String)
         Dim iPHdcp = 0
         Try
             Dim dvScores As New DataView(dsLeague.Tables("dtScores"))
-            dvScores.RowFilter = "Player = '" & row.Cells("Player").Value & "'" & " and Date < '" & sDate & "'"
+            'dvScores.RowFilter = "Player = '" & row.Cells("Player").Value & "'" & " and Date < '" & sDate & "'"
+            dvScores.RowFilter = String.Format("Player = '{0}' and Date < '{1}' and Method <> '' ", row.Cells("Player").Value, sDate)
             dvScores.Sort = "Date desc"
             'this compensates for lost scores after week 1 in 2017, i have hardcoded the prev handicap on 4/11 so we dont have to go back
             'If sDate > "20170411" Then
@@ -459,7 +461,7 @@ ByVal sepChar As String)
             iRoundctr = 0
             Dim sMethod As String = ""
             For Each score As DataRowView In dvScores
-                sMethod = score("Method")
+                sMethod = convDBNulltoSpaces(score("Method"))
                 If sMethod = "" Then Continue For
                 iRoundctr += 1
                 sPlayer = score("Player").ToString
@@ -1957,7 +1959,7 @@ ByVal sepChar As String)
                            Select header.HeaderText).ToArray
             Dim rows = From row As DataGridViewRow In dgv.Rows.Cast(Of DataGridViewRow)()
                        Where Not row.IsNewRow
-                       Select Array.ConvertAll(row.Cells.Cast(Of DataGridViewCell).ToArray, Function(c) If(c.Value IsNot Nothing, c.Value.ToString, ""))
+                       Select Array.ConvertAll(row.Cells.Cast(Of DataGridViewCell).ToArray, Function(c) If(c.Value IsNot Nothing, RemoveSpcChar(c.Value.ToString), ""))
             Using sw As New IO.StreamWriter(filename)
                 sw.WriteLine(String.Join(",", headers))
                 For Each r In rows
@@ -1973,5 +1975,96 @@ ByVal sepChar As String)
         End Try
 
     End Sub
-End Class
 
+    Function WaitForFile(dt As DataTable, sFile As String, lbstatus As Label, frm As Form) As Boolean
+        WaitForFile = False
+        If CSV2DataTable(dt, sFile) Then
+            WaitForFile = True
+            If sFile.Contains("LeagueParm") Then
+                If dDate.ToString("MM/dd/yyyy") < "20190101" Then
+                    If Not dt.Columns.Contains("PostSeasonDt") Then
+                        dt.Columns("PostSeason").ColumnName = "PostSeasonDt"
+                        For Each col In dt.Rows
+                            col("PostSeasonDt") = "09/18/2018"
+                        Next
+                    End If
+                End If
+            End If
+        Else
+            Dim i = 30
+            MsgBox(String.Format("File {0} is in use, will wait up for {1} seconds to free up", sFile, i))
+            Do Until i = 0
+                If CSV2DataTable(dt, sFile) Then
+                    WaitForFile = True
+                    Exit Function
+                End If
+
+                lbstatus.Text = String.Format("Waiting for file {0} for {1} seconds", sFile, i)
+                status_Msg(lbstatus, frm)
+                Threading.Thread.Sleep(1000)
+                i -= 1
+            Loop
+            lbstatus.Text = String.Format("Finished Waiting for file {0}", sFile)
+            status_Msg(lbstatus, frm)
+            Exit Function
+        End If
+    End Function
+    Function getLeagParm(sScoreDate As String, lbstatus As Label, frm As Form) As String 'parmfile,good(got the league file) or roskins:rocp1:rocp2
+        Dim sParmFile As String = ""
+        Dim oFiles() As IO.FileInfo
+        Dim oDirectory As New IO.DirectoryInfo(sFilePath)
+        oFiles = oDirectory.GetFiles("*LeagueParms.csv")
+        For Each sfile In oFiles
+            If sfile.Name.Substring(0, 8) < sScoreDate Then
+                sParmFile = sfile.FullName
+            Else
+                Exit For
+            End If
+        Next
+        getLeagParm = sParmFile
+        Dim dtLeagueParm = New DataTable
+        Dim bwait = True
+        Do While bwait
+            If Not WaitForFile(dtLeagueParm, sParmFile, lbstatus, frm) Then
+                Dim mbr = MessageBox.Show(String.Format("File in use {0}Press <OK> to close file and proceed or <Cancel>", vbCrLf, sParmFile), sParmFile, MessageBoxButtons.OKCancel)
+                If mbr = DialogResult.Cancel Then
+                    getLeagParm = getLeagParm & ",bad"
+                    Exit Function
+                End If
+            Else
+                bwait = False
+            End If
+        Loop
+        If Not IO.Directory.Exists(sFilePath) Then
+            Dim mbr = MessageBox.Show(String.Format("Path not found {0}, pick a folder to pull in files from or Cancel", sFilePath), "Warning", MessageBoxButtons.OKCancel)
+            If mbr = Windows.Forms.DialogResult.Cancel Then End
+            Dim dialog As New FolderBrowserDialog With
+            {
+             .RootFolder = Environment.SpecialFolder.Desktop,
+             .SelectedPath = sFilePath,
+             .Description = "Select League Files Path"
+            }
+            If dialog.ShowDialog() = Windows.Forms.DialogResult.OK Then
+                sFilePath = dialog.SelectedPath
+            Else
+                End
+            End If
+        End If
+        'get this years parm file record
+        Dim foundrows As DataRow()
+        foundrows = dtLeagueParm.Select(String.Format("#{0}# >= StartDate and #{0}# <=EndDate", dDate.ToString("MM/dd/yyyy")))
+        'accumulate rolled over amounts
+        If foundrows.Count = 0 Then
+            Throw New Exception(String.Format("No League Parameter record found for this date {0}", dDate.ToString("MM/dd/yyyy")))
+        Else
+            For Each row In foundrows
+                getLeagParm = getLeagParm & ","
+                getLeagParm = getLeagParm & IIf(convDBNulltoSpaces(row("RolledOverCTP1")) = " ", 0, row("RolledOverCTP1")) & ":"
+                getLeagParm = getLeagParm & IIf(convDBNulltoSpaces(row("RolledOverCTP2")) = " ", 0, row("RolledOverCTP2")) & ":"
+                getLeagParm = getLeagParm & IIf(convDBNulltoSpaces(row("RolledOverSkins")) = " ", 0, row("RolledOverSkins")) & ":"
+                rLeagueParmrow = dtLeagueParm.DefaultView(dtLeagueParm.Rows.IndexOf(row))
+            Next
+        End If
+
+    End Function
+End Class

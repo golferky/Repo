@@ -319,11 +319,16 @@ Public Class Matches
 
             For Each srow As DataRowView In dvscores
                 If srow("Hole1") IsNot DBNull.Value Then
-                    If IsNumeric(srow("Hole1")) Then oHelper.iHoleMarker = 1
+                    If IsNumeric(srow("Hole1")) Then
+                        oHelper.iHoleMarker = 1
+                        Exit For
+                    End If
                 ElseIf srow("Hole10") IsNot DBNull.Value Then
-                    If IsNumeric(srow("Hole10")) Then oHelper.iHoleMarker = 10
+                    If IsNumeric(srow("Hole10")) Then
+                        oHelper.iHoleMarker = 10
+                        Exit For
+                    End If
                 End If
-                Exit For
             Next
 
             If oHelper.iHoles = 0 Then oHelper.iHoles = oHelper.rLeagueParmrow("Holes")
@@ -482,7 +487,7 @@ Public Class Matches
             Dim sKeys() As Object = {row.Cells("Player").Value, oHelper.dDate.ToString("yyyyMMdd", Globalization.CultureInfo.InvariantCulture)} 'cbDatesPlayers.SelectedItem
             Dim dr As DataRow = oHelper.dsLeague.Tables("dtScores").Rows.Find(sKeys)
             For Each cell As DataGridViewCell In row.Cells
-                If cell.Value IsNot DBNull.Value Then dr(cell.OwningColumn.Name) = cell.Value
+                If oHelper.convDBNulltoSpaces(cell.Value) <> "" Then dr(cell.OwningColumn.Name) = cell.Value
             Next
 
         Catch ex As Exception
