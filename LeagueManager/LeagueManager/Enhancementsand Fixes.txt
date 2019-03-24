@@ -1,24 +1,24 @@
 ﻿*************************************************************************************************
 *                                           Change Log
 *************************************************************************************************
-* yyyymmdd - Priority - Complexity -  Module        Description
+* yyyymmdd - Priority - Complexity -  Module        Code Package     Description
 * -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-* 20190318 - MH        - Easy to Med - Skins         dollars are incorrect for every week
-* 20190314 - M        - Med         - Finance       setup Payments Screen, send receipt txt or email
-* 20181211 - EM       - Easy to Med - Add post season skin/ctp percent to league parameters table, change code to use instead of hardcode
-* 20181204 - EM       - Easy to Med - Add logging to Main to help troubleshoot issues on loading tables
-* 20181102 - MH       - Med to Hard - only allow tuesdays for Dates, add parm to league parm
-* 20181026 - MH       - Med to hard - allow multiple players for player file(a player for each league)
-* 20180919 - ML       - Med to hard - Playerstats.vb show league average stats for each hole and rank
-* 20180919 - M        - Easy        - Standings.vb Re-sorting numeric columns arent working right (col sort needed)
-* 20180812 - M        - Med         - Scorecard.vb when sub for a player(add the player subbed for in the datagridview cell and remove it on save)
-* 20180801 - M        - Med         - dont allow standings until matches have been done for that week
-* 20180430 - L        - Hard        - Need to account for Rainouts
-* 20180423 - L        - Easy        - Add Grade to Matches grid
-* 20180423 - M        - Med         - Create HTML file for standings and other sheets
-* 20180324 - M        - Med         - Track finances, payment history, distribution history, payment method
-*									- New table/file(Payment file)
-* 20180403 - L        - Hard        - Create option for league average for opponent noshow
+* 20190321 - M        - Med         - Skins         March 2019 - 2 - add to payments file as when skin/ctp/league champ/eoy skins earned
+* 20190314 - M        - Med         - Finance                        setup Payments Screen, send receipt txt or email
+* 20181211 - EM       - Easy to Med -                                Add post season skin/ctp percent to league parameters table, change code to use instead of hardcode
+* 20181204 - EM       - Easy to Med -                                Add logging to Main to help troubleshoot issues on loading tables
+* 20181102 - MH       - Med to Hard -								 only allow tuesdays for Dates, add parm to league parm
+* 20181026 - MH       - Med to hard - 								 allow multiple players for player file(a player for each league)
+* 20180919 - ML       - Med to hard - 								 Playerstats.vb show league average stats for each hole and rank
+* 20180919 - M        - Easy        - 								 Standings.vb Re-sorting numeric columns arent working right (col sort needed)
+* 20180812 - M        - Med         - 								 Scorecard.vb when sub for a player(add the player subbed for in the datagridview cell and remove it on save)
+* 20180801 - M        - Med         - 								 dont allow standings until matches have been done for that week
+* 20180430 - L        - Hard        - 								 Need to account for Rainouts
+* 20180423 - L        - Easy        - 								 Add Grade to Matches grid
+* 20180423 - M        - Med         - 								 Create HTML file for standings and other sheets
+* 20180324 - M        - Med         - 								 Track finances, payment history, distribution history, payment method
+*									- 								 New table/file(Payment file)
+* 20180403 - L        - Hard        - 								 Create option for league average for opponent noshow
 *************************************************************************************************
 * 20180219 - My Review
 * 20180302 - L        - Hard        - Standings.vb - Create html printable standings, reports
@@ -45,16 +45,20 @@
 *************************************************************************************************
 * yyyymmdd - Priority - Complexity -  Module        Description
 * --------   --------	-----------	  -------------	--------------------------------------------------------------------------------------------------------------	
-* 20190318 - EM       - Easy        - scorecard     account for uneven dollars in CTP1/2
-* 20190317 - EM       - Easy        - Lastfive      allow an option to exclude scores prior to 2018
-* 20190315 - M        - Easy        - Main          put text in form if were debugging
-* 20190314 - M        - Easy        - scorecard     create spreadsheet or each scorecard display
-* 20190313 - EM       - Easy to Med - Main		    Added code to wait when a file is in use
-* 20190313 - EM       - Easy to Med - scorecard     fixed ctp/skins when checkbox clicked, amounts were incorrect
-* 20190311 - EM       - Easy to Med - scorecard     load leagueparm csv from that date for rollovers
-* 20190309 - EM       - Easy to Med - dgv2csv       added ability to create a csv file from a datagridview
-* 20190309 - EM       - Easy to Med - Main			when determining getleagues, only load scores files if they end with _Scores.csv, used to say contains Scores
-* 20190309 - EM       - Easy to Med - LastFive		Fix Last5 change to use gridview instead of listview
+* 20190321 - M        - Med         - Skins         March 2019 - 2 -add to payments file as when skin/ctp/league champ/eoy skins earned
+* 20190319 - ML       - Easy to Med - Finance       March 2019 - 2 -Players flagged as not in EOY Skins from prior year and shouldnt be
+* 20190318 - MH       - Easy to Med - Skins                         dollars are incorrect for every week
+* 20190318 - EM       - Easy        - scorecard                     account for uneven dollars in CTP1/2
+* 20190317 - EM       - Easy        - Lastfive						allow an option to exclude scores prior to 2018
+* 20190315 - M        - Easy        - Main							put text in form if were debugging
+* 20190314 - M        - Easy        - scorecard						create spreadsheet or each scorecard display
+* 20190314 - M        - Med         - Finance                       setup Payments Screen, send receipt txt or email
+* 20190313 - EM       - Easy to Med - Main							Added code to wait when a file is in use
+* 20190313 - EM       - Easy to Med - scorecard						fixed ctp/skins when checkbox clicked, amounts were incorrect
+* 20190311 - EM       - Easy to Med - scorecard						load leagueparm csv from that date for rollovers
+* 20190309 - EM       - Easy to Med - dgv2csv						added ability to create a csv file from a datagridview
+* 20190309 - EM       - Easy to Med - Main							when determining getleagues, only load scores files if they end with _Scores.csv, used to say contains Scores
+* 20190309 - EM       - Easy to Med - LastFive						Fix Last5 change to use gridview instead of listview
 * 20181210 - E        - Easy        - Add logic account for players fist round (new player)
 * 20181210 - E        - Easy        - Add logic to default to year in ini file and allow chance to ignore warning about overlap
 * 20181130 - MH       - Med to Hard - Fix issue with helper.getsubstring not using lastindex when looking for "_"

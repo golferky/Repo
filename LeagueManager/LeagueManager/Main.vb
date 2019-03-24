@@ -1,7 +1,7 @@
 ﻿'*************************************************************************************************
 Imports System.IO.Packaging
 Public Class Main
-    Dim cVersion = "Version : 2019.03.18"
+    Dim cVersion = "Version : 2019.03.24"
     Public oHelper As Helper
     Private dsLeague As New dsLeague
     Dim bload As Boolean = True
@@ -233,6 +233,7 @@ Public Class Main
                 'System.IO.File.Delete(sfilename)
                 If dsLeague.Tables.Contains(sfile) Then
                     If sfile = "dtSchedule" Then
+                        '20190322-this code gets hit when league name changes
                         Debug.Print("removing table dtschedule")
                         If dsLeague.Tables.Contains(sfile) Then
                             Debug.Print("dsleague.tables contains table dtschedule")
@@ -246,9 +247,14 @@ Public Class Main
                         dsLeague.Tables.Add(sfile)
                     Else
                         Dim dt As DataTable = dsLeague.Tables(sfile)
+                        If sfile.contains("Payments") Then
+                            dt.PrimaryKey = New DataColumn() {dt.Columns("Player"), dt.Columns("Date"), dt.Columns("Desc"), dt.Columns("Detail")}
+                            Debug.Print("Payments file " & saFile)
+                        End If
                         dt.Rows.Clear()
                     End If
                 Else
+                    '20190322-this code only executes when were building the schedule
                     dsLeague.Tables.Add(sfile)
                 End If
 
@@ -742,17 +748,27 @@ Public Class Main
             'sort by date desc
             Helper.arraySort(oFiles)
 
+            Dim oFiles2() As IO.FileInfo
+            oFiles2 = oDirectory.GetFiles("*Payments.csv")
+            'sort by date desc
+            Helper.arraySort(oFiles2)
+
             Dim mbr = MsgBox(String.Format("Do you want to delete scores file from {0}?" & vbCrLf & String.Format("Files will be backed up before delete to {0}", sfile), oFiles(0).FullName), MsgBoxStyle.YesNo)
             If mbr = MsgBoxResult.Yes Then
                 .Text = String.Format("Zipping League Files to {0} ...", sfile)
                 oHelper.status_Msg(lblProcessMsg, Me)
                 Zipit()
                 If IO.File.Exists((oFiles(0).FullName)) Then IO.File.Delete(oFiles(0).FullName)
+                If IO.File.Exists((oFiles2(0).FullName)) Then IO.File.Delete(oFiles2(0).FullName)
                 BuildTablesForLeague()
             End If
             .Text = String.Format("Finished Undoing Scores")
             oHelper.status_Msg(lblProcessMsg, Me)
         End With
+    End Sub
+
+    Private Sub btnPayments_Click(sender As Object, e As EventArgs) Handles btnPayments.Click
+        Payments.Show()
     End Sub
 End Class
 Public Class Team

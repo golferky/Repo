@@ -17,12 +17,22 @@ Public Class Skins
     Dim sSkinflds As String = ""
     Dim iSkinpot As Integer
     Dim dvScores As DataView
+    Dim sToday As String
+    Dim dPSEnd As Date
+    Dim dPSStart As Date
+
 
     Private Sub Skins_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         oHelper.LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
+        oHelper.bload = True
         'cant understand why i had to do this because main.helper has all the tables but i get an error
         '-----Unable to cast object of type 'System.Data.DataTable' to type 'dtCoursesDataTable'.
         oHelper = Main.oHelper
+
+        sToday = oHelper.dDate.ToString("yyyyMMdd", Globalization.CultureInfo.InvariantCulture)
+        dPSEnd = Main.tbPSEnd.Text
+        dPSStart = dPSEnd.AddDays(-7)
+
         'get the date of the schedule for this week
         'just use the Column names which have dates of the schedule table
         'this loop will compare the league start date and flip the hole marker based on front/back
@@ -68,8 +78,9 @@ Public Class Skins
         sCTPs = New List(Of String)
         sCTPs.Add(0)
         sCTPs.Add(0)
-
+        'force a recalculate of skins on load
         btnSkins_Click(sender, e)
+        oHelper.bload = False
     End Sub
 
     Private Sub btnExit_Click(sender As Object, e As EventArgs) Handles btnExit.Click
@@ -342,20 +353,31 @@ Public Class Skins
         For Each row As DataGridViewRow In dgScores.Rows
             If row.Cells("Player").Value <> "*** Total ***" Then
                 Dim iEarn = 0.0
-                Dim ithisctp = 0.0
+                Dim ithisClosest = 0.0
                 If IsNumeric(row.Cells("#Skins").Value) Then iSkinsNum += Val(row.Cells("#Skins").Value)
                 If IsNumeric(oHelper.convDBNulltoSpaces(row.Cells("$Skins").Value)) Then
                     iEarn += Val(row.Cells("$Skins").Value)
                     iSkinsDol += Val(row.Cells("$Skins").Value)
+                    row.Cells("Player").Style.BackColor = Color.Gold
                 End If
 
-                If IsNumeric(row.Cells("$Closest").Value) Then
-                    iEarn += row.Cells("$Closest").Value
-                    iCtpsDol += row.Cells("$Closest").Value
-                    row.Cells("$Closest").Style.BackColor = Color.Gold
+
+                If IsNumeric(row.Cells("CTP_1").Value) Then
+                    tbCP1.Text += iEachClosestAmt
+                    iCtpsDol += iEachClosestAmt
+                    iEarn += iEachClosestAmt
+                    ithisClosest += iEachClosestAmt
+                End If
+                If IsNumeric(row.Cells("CTP_2").Value) Then
+                    tbCP2.Text += iEachClosestAmt
+                    iCtpsDol += iEachClosestAmt
+                    iEarn += iEachClosestAmt
+                    ithisClosest += iEachClosestAmt
+                End If
+                If ithisClosest > 0 Then
                     row.Cells("Player").Style.BackColor = Color.Gold
-                    If IsNumeric(row.Cells("CTP_1").Value) Then tbCP1.Text += CInt(row.Cells("$Closest").Value)
-                    If IsNumeric(row.Cells("CTP_2").Value) Then tbCP2.Text += CInt(row.Cells("$Closest").Value)
+                    row.Cells("$Closest").Style.BackColor = Color.Gold
+                    row.Cells("$Closest").Value = ithisClosest
                 End If
                 row.Cells("$Earn").Value = iEarn
                 iEarnDol += iEarn
@@ -377,18 +399,27 @@ Public Class Skins
         tbSkins.Text = iSkinsDol
         tbPurse.Text = iSkinsDol + iCtpsDol
 
+        dgScores.Sort(dgScores.Columns("$Earn"), System.ComponentModel.ListSortDirection.Descending)
+        'lbStatus.Text = String.Format("Updating Payments table with earnings")
+        'oHelper.status_Msg(lbStatus, Me)
+
+
+        'For Each score In dgScores.Rows
+
+        'Next
+
+        'lbStatus.Text = String.Format("Finished Updating Payments table with earnings")
+        'oHelper.status_Msg(lbStatus, Me)
+
         lbStatus.Text = String.Format("Finished Calculating skins")
         oHelper.status_Msg(lbStatus, Me)
-        '20180307-commented out for testing
-        dgScores.Sort(dgScores.Columns("$Earn"), System.ComponentModel.ListSortDirection.Descending)
-        'set color switches for helper routine
-        'checkDotsColors()
 
     End Sub
     Sub SaveScores()
         oHelper.LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
         Try
-            If Not oHelper.bScreenChanged Then Exit Sub
+            'If Not oHelper.bScreenChanged Then Exit Sub
+            If oHelper.bload Then Exit Sub
             'If oHelper.convDBNulltoSpaces(oHelper.rLeagueParmrow("ScoresLocked")) = "N" Then
             If dgScores.RowCount > 1 Then
                 If Not bsave Then
@@ -402,7 +433,18 @@ Public Class Skins
                         UpdateScoresFromDataGrid(row)
                     Next
                     oHelper.DataTable2CSV(oHelper.dsLeague.Tables("dtScores"), oHelper.sFilePath & "\" & Now.ToString("yyyyMMdd") & "_Scores.csv")
+
+                    'save the payment table to csv
+                    Dim sfilename = oHelper.sFilePath & "\" & DateTime.Now.ToString("yyyyMMdd_hhmmss_") & "Pymts.csv"
+                    lbStatus.Text = String.Format("Creating spreadsheet({0}) of payments from this screen...", sfilename)
+                    oHelper.status_Msg(lbStatus, Me)
+                    oHelper.DataTable2CSV(oHelper.dsLeague.Tables("dtPayments"), oHelper.sFilePath & "\" & Now.ToString("yyyyMMdd") & "_Payments.csv")
+                    lbStatus.Text = "Finished saving payments from this screen"
+                    oHelper.status_Msg(lbStatus, Me)
+
                     'save extra amounts to league parm table
+                    lbStatus.Text = String.Format("Saving leagueParameter, updating rollovers / extra money")
+                    oHelper.status_Msg(lbStatus, Me)
                     Dim sKeys() As Object = {oHelper.rLeagueParmrow("Name"), oHelper.rLeagueParmrow("StartDate")}
                     oHelper.dsLeague.Tables("dtLeagueParms").PrimaryKey = New DataColumn() {oHelper.dsLeague.Tables("dtLeagueParms").Columns("Name"), oHelper.dsLeague.Tables("dtLeagueParms").Columns("StartDate")}
                     Dim dr As DataRow = oHelper.dsLeague.Tables("dtLeagueParms").Rows.Find(sKeys)
@@ -412,8 +454,8 @@ Public Class Skins
                     dr("RolledOverDate") = cbDatesPlayers.Text
                     dr("ExtraMoney") = tbExtra.Text
                     oHelper.DataTable2CSV(oHelper.dsLeague.Tables("dtLeagueParms"), oHelper.sFilePath & "\" & Now.ToString("yyyyMMdd") & "_LeagueParms.csv")
-                    lbStatus.Text = "Done saving scores from this screen"
-                    lbStatus.BackColor = Color.LightGreen
+                    lbStatus.Text = "Finished saving league parameter"
+                    oHelper.status_Msg(lbStatus, Me)
                     bsave = False
                 End If
             End If
@@ -482,7 +524,7 @@ Public Class Skins
                 'skip hdcp
                 If parm.StartsWith("Hdcp") Then Continue For
 
-                If UBound(parm.Split("-")) = 0 Then 
+                If UBound(parm.Split("-")) = 0 Then
                     sParm = parm
                 Else
                     sParm = parm.Split("-")(0)
@@ -611,6 +653,7 @@ Public Class Skins
             Dim iwinner As Int16 = 1 ' dont make relative to 0
             iTotCTPPlayers = 0
             iTotSkinPlayers = 0
+            iSkinpot = 0
 
             'this moves the rows into the grid
             For Each row As DataRow In dtScorecard.Rows
@@ -702,6 +745,7 @@ Public Class Skins
 
             'loop through each row looking for player who won a ctp
             For Each row As DataGridViewRow In dgScores.Rows
+                Dim x As String = row.Cells("Player").Value
                 If row.Cells("Player").Value <> "*** Total ***" Then
                     If row.Index = sctps(0) - 1 Then
                         row.Cells("CTP_1").Value = True
@@ -756,31 +800,115 @@ Public Class Skins
         oHelper.LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
         Try
             If row.Cells("Player").Value Is Nothing Or
-             row.Cells("Player").Value.contains("*** Total") Then
-                Exit Sub
-            End If
+             row.Cells("Player").Value.contains("*** Total") Then Exit Sub
 
             'find the score for this player / date
             Dim sKeys() As Object = {row.Cells("Player").Value, oHelper.dDate.ToString("yyyyMMdd", Globalization.CultureInfo.InvariantCulture)} 'cbDatesPlayers.SelectedItem}
             Dim dr As DataRow = oHelper.dsLeague.Tables("dtScores").Rows.Find(sKeys)
+            ''20190322 - unique errors cant figure this out, this finds it
+            'Dim dv As New DataView(oHelper.dsLeague.Tables("dtPayments"))
+            'dv.Sort = "Player, Date, Desc, Detail"
+            'Dim psk = ""
+            'For Each r As DataRowView In dv
+            '    Dim sk = r("Player") & "," & r("Date") & "," & r("Desc") & "," & r("Detail")
+            '    If sk = psk Then
+            '        Dim x = ""
+            '    Else
+            '        psk = sk
+            '    End If
+            'Next
+
+
+            '20190321-Update dtpayments wth skins/ctp
+            'dt.PrimaryKey = New DataColumn() {dt.Columns("Player"), dt.Columns("Date"), dt.Columns("Desc"), dt.Columns("Detail")}
+            Dim sdesc = "", sDetail = ""
+
+            Try
+                'if this is a CTP, then check the payments table to see if we need to update it or create a new one
+                If sToday = dPSStart.ToString("yyyyMMdd", Globalization.CultureInfo.InvariantCulture) Then
+                    sdesc = "EOY CTP 1"
+                ElseIf sToday = dPSEnd.ToString("yyyyMMdd", Globalization.CultureInfo.InvariantCulture) Then
+                    sdesc = "EOY CTP 2"
+                Else
+                    sdesc = "CTP"
+                End If
+
+                Dim iclosest = 0
+                For i = 1 To oHelper.iNumClosests
+                    Dim cb As DataGridViewCheckBoxCell = row.Cells("CTP_" & i)
+                    If cb.Value = True Then
+                        Dim ictpctr = 1
+                        For idx = oHelper.iHoleMarker To (oHelper.iHoleMarker - 1) + 9
+                            If oHelper.MyCourse(0)("Hole" & idx) = 3 Then
+                                If ictpctr = i Then
+                                    sDetail = "#" & idx
+                                    dr("CTP_" & i) = iEachClosestAmt
+                                    Exit For
+                                End If
+                                ictpctr += 1
+                            End If
+                        Next
+
+                        Dim sPKeys() As Object = {row.Cells("Player").Value, oHelper.dDate.ToString("yyyyMMdd", Globalization.CultureInfo.InvariantCulture), sdesc, sDetail}
+                        Dim arow As DataRow = oHelper.dsLeague.Tables("dtPayments").Rows.Find(sPKeys)
+                        Dim bfound = False
+                        If arow Is Nothing Then
+                            arow = oHelper.dsLeague.Tables("dtPayments").NewRow
+                        Else
+                            bfound = True
+                        End If
+                        arow("Date") = oHelper.dDate.ToString("yyyyMMdd")
+                        arow("Player") = row.Cells("Player").Value
+                        arow("Desc") = sdesc
+                        'arow("DatePaid") = Now.ToString("yyyyMMdd")
+                        arow("Detail") = sDetail
+                        arow("Earned") = String.Format("{0}", iEachClosestAmt)
+                        arow("Comment") = ""
+                        If Not bfound Then oHelper.dsLeague.Tables("dtPayments").Rows.Add(arow)
+                        iclosest += iEachClosestAmt
+                    End If
+                Next
+                If iclosest > 0 Then dr("$Closest") = iclosest
+
+            Catch ex As Exception
+
+            End Try
+
+            'skins
+            sdesc = ""
+            sDetail = ""
+
             For Each cell As DataGridViewCell In row.Cells
                 'If oHelper.cSkinsFields.Contains(cell.OwningColumn.Name) Then
-                If sSkinflds.Contains(cell.OwningColumn.Name) Or cell.OwningColumn.Name.StartsWith("CTP") Then
-                    If cell.Value IsNot DBNull.Value Then
-                        Try
-                            If cell.OwningColumn.Name.StartsWith("CTP") Then
-                                Dim cb As DataGridViewCheckBoxCell = row.Cells(cell.OwningColumn.Name)
-                                If cb.Value = True Then dr(cell.OwningColumn.Name) = iEachClosestAmt
-                            Else
-                                dr(cell.OwningColumn.Name) = oHelper.RemoveSpcChar(cell.Value)
-                            End If
-
-                        Catch ex As Exception
-
-                        End Try
+                If cell.OwningColumn.Name.Contains("Hole") And cell.Style.BackColor = Color.Gold Then
+                    'if this is a skin, then check the payments table to see if we need to update it or create a new one
+                    If sToday = dPSStart.ToString("yyyyMMdd", Globalization.CultureInfo.InvariantCulture) Then
+                        sdesc = "EOY Skins 1"
+                    ElseIf sToday = dPSEnd.ToString("yyyyMMdd", Globalization.CultureInfo.InvariantCulture) Then
+                        sdesc = "EOY Skins 2"
+                    Else
+                        sdesc = "Skin"
                     End If
+                    sDetail = String.Format("#{0}", cell.OwningColumn.Name.Substring(cell.OwningColumn.Name.Length - 1))
+                    Dim sPKeys() As Object = {row.Cells("Player").Value, oHelper.dDate.ToString("yyyyMMdd", Globalization.CultureInfo.InvariantCulture), sdesc, sDetail}
+                    Dim arow As DataRow = oHelper.dsLeague.Tables("dtPayments").Rows.Find(sPKeys)
+                    Dim bfound = False
+                    If arow Is Nothing Then
+                        arow = oHelper.dsLeague.Tables("dtPayments").NewRow
+                    Else
+                        bfound = True
+                    End If
+                    arow("Date") = oHelper.dDate.ToString("yyyyMMdd")
+                    arow("Player") = row.Cells("Player").Value
+                    arow("Desc") = sdesc
+                    'arow("DatePaid") = Now.ToString("yyyyMMdd")
+                    arow("Detail") = sDetail
+                    arow("Earned") = String.Format("{0}", dgScores.Rows(0).Cells("$Skins").Value / dgScores.Rows(0).Cells("#Skins").Value)
+                    arow("Comment") = String.Format("Score={0}", row.Cells(cell.OwningColumn.Name).Value)
+                    If Not bfound Then oHelper.dsLeague.Tables("dtPayments").Rows.Add(arow)
                 End If
             Next
+            If row.Cells("$Skins").Value IsNot DBNull.Value Then dr("$Skins") = oHelper.RemoveSpcChar(row.Cells("$Skins").Value)
 
         Catch ex As Exception
             MsgBox(oHelper.GetExceptionInfo(ex))
@@ -823,14 +951,14 @@ Public Class Skins
         If cell.Value = True Then
             iamt = iamt * -1
             If cell.OwningColumn.Name = "CTP_1" Then
-                tbCP1.Text -= iamt
-                tbLOCP1.Text += iamt
-                tbLOPurse.Text += iamt
+                tbCP1.Text += iamt
+                tbLOCP1.Text -= iamt
+                tbLOPurse.Text -= iamt
                 sCTPs(0) = 0
             ElseIf cell.OwningColumn.Name = "CTP_2" Then
-                tbCP2.Text -= iamt
-                tbLOCP2.Text += iamt
-                tbLOPurse.Text += iamt
+                tbCP2.Text += iamt
+                tbLOCP2.Text -= iamt
+                tbLOPurse.Text -= iamt
                 sCTPs(1) = 0
             End If
         Else

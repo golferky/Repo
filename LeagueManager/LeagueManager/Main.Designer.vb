@@ -28,14 +28,15 @@ Partial Class Main
         Me.btnPlayerSetup = New System.Windows.Forms.Button()
         Me.btnExit = New System.Windows.Forms.Button()
         Me.GroupBox1 = New System.Windows.Forms.GroupBox()
+        Me.btnPayments = New System.Windows.Forms.Button()
+        Me.btnMatches = New System.Windows.Forms.Button()
+        Me.btnSkins = New System.Windows.Forms.Button()
+        Me.btnScoreCard = New System.Windows.Forms.Button()
         Me.btnSkinsRpt = New System.Windows.Forms.Button()
         Me.Button1 = New System.Windows.Forms.Button()
         Me.btnLast5 = New System.Windows.Forms.Button()
         Me.btnPlayerStats = New System.Windows.Forms.Button()
-        Me.btnMatches = New System.Windows.Forms.Button()
-        Me.btnSkins = New System.Windows.Forms.Button()
         Me.btnStandings = New System.Windows.Forms.Button()
-        Me.btnScoreCard = New System.Windows.Forms.Button()
         Me.btnShowScores = New System.Windows.Forms.Button()
         Me.GroupBox2 = New System.Windows.Forms.GroupBox()
         Me.btnUndoScores = New System.Windows.Forms.Button()
@@ -67,7 +68,6 @@ Partial Class Main
         Me.lblProcessMsg = New System.Windows.Forms.Label()
         Me.gbControls = New System.Windows.Forms.GroupBox()
         Me.GroupBox6 = New System.Windows.Forms.GroupBox()
-        Me.btnPayments = New System.Windows.Forms.Button()
         Me.GroupBox1.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
         Me.GroupBox3.SuspendLayout()
@@ -133,6 +133,46 @@ Partial Class Main
         Me.GroupBox1.TabStop = False
         Me.GroupBox1.Text = "Scoring and Games"
         '
+        'btnPayments
+        '
+        Me.btnPayments.Location = New System.Drawing.Point(40, 140)
+        Me.btnPayments.Margin = New System.Windows.Forms.Padding(4)
+        Me.btnPayments.Name = "btnPayments"
+        Me.btnPayments.Size = New System.Drawing.Size(262, 46)
+        Me.btnPayments.TabIndex = 13
+        Me.btnPayments.Text = "Payments"
+        Me.btnPayments.UseVisualStyleBackColor = True
+        '
+        'btnMatches
+        '
+        Me.btnMatches.Location = New System.Drawing.Point(352, 50)
+        Me.btnMatches.Margin = New System.Windows.Forms.Padding(4)
+        Me.btnMatches.Name = "btnMatches"
+        Me.btnMatches.Size = New System.Drawing.Size(262, 46)
+        Me.btnMatches.TabIndex = 8
+        Me.btnMatches.Text = "Matches"
+        Me.btnMatches.UseVisualStyleBackColor = True
+        '
+        'btnSkins
+        '
+        Me.btnSkins.Location = New System.Drawing.Point(352, 140)
+        Me.btnSkins.Margin = New System.Windows.Forms.Padding(4)
+        Me.btnSkins.Name = "btnSkins"
+        Me.btnSkins.Size = New System.Drawing.Size(262, 46)
+        Me.btnSkins.TabIndex = 7
+        Me.btnSkins.Text = "Skins"
+        Me.btnSkins.UseVisualStyleBackColor = True
+        '
+        'btnScoreCard
+        '
+        Me.btnScoreCard.Location = New System.Drawing.Point(40, 50)
+        Me.btnScoreCard.Margin = New System.Windows.Forms.Padding(4)
+        Me.btnScoreCard.Name = "btnScoreCard"
+        Me.btnScoreCard.Size = New System.Drawing.Size(262, 46)
+        Me.btnScoreCard.TabIndex = 4
+        Me.btnScoreCard.Text = "Enter Scores"
+        Me.btnScoreCard.UseVisualStyleBackColor = True
+        '
         'btnSkinsRpt
         '
         Me.btnSkinsRpt.Location = New System.Drawing.Point(352, 187)
@@ -173,26 +213,6 @@ Partial Class Main
         Me.btnPlayerStats.Text = " Player Stats"
         Me.btnPlayerStats.UseVisualStyleBackColor = True
         '
-        'btnMatches
-        '
-        Me.btnMatches.Location = New System.Drawing.Point(352, 50)
-        Me.btnMatches.Margin = New System.Windows.Forms.Padding(4)
-        Me.btnMatches.Name = "btnMatches"
-        Me.btnMatches.Size = New System.Drawing.Size(262, 46)
-        Me.btnMatches.TabIndex = 8
-        Me.btnMatches.Text = "Matches"
-        Me.btnMatches.UseVisualStyleBackColor = True
-        '
-        'btnSkins
-        '
-        Me.btnSkins.Location = New System.Drawing.Point(352, 140)
-        Me.btnSkins.Margin = New System.Windows.Forms.Padding(4)
-        Me.btnSkins.Name = "btnSkins"
-        Me.btnSkins.Size = New System.Drawing.Size(262, 46)
-        Me.btnSkins.TabIndex = 7
-        Me.btnSkins.Text = "Skins"
-        Me.btnSkins.UseVisualStyleBackColor = True
-        '
         'btnStandings
         '
         Me.btnStandings.Location = New System.Drawing.Point(40, 45)
@@ -202,16 +222,6 @@ Partial Class Main
         Me.btnStandings.TabIndex = 5
         Me.btnStandings.Text = "Standings"
         Me.btnStandings.UseVisualStyleBackColor = True
-        '
-        'btnScoreCard
-        '
-        Me.btnScoreCard.Location = New System.Drawing.Point(40, 50)
-        Me.btnScoreCard.Margin = New System.Windows.Forms.Padding(4)
-        Me.btnScoreCard.Name = "btnScoreCard"
-        Me.btnScoreCard.Size = New System.Drawing.Size(262, 46)
-        Me.btnScoreCard.TabIndex = 4
-        Me.btnScoreCard.Text = "Enter Scores"
-        Me.btnScoreCard.UseVisualStyleBackColor = True
         '
         'btnShowScores
         '
@@ -533,16 +543,6 @@ Partial Class Main
         Me.GroupBox6.TabIndex = 9
         Me.GroupBox6.TabStop = False
         Me.GroupBox6.Text = "Finance and Reports"
-        '
-        'btnPayments
-        '
-        Me.btnPayments.Location = New System.Drawing.Point(40, 140)
-        Me.btnPayments.Margin = New System.Windows.Forms.Padding(4)
-        Me.btnPayments.Name = "btnPayments"
-        Me.btnPayments.Size = New System.Drawing.Size(262, 46)
-        Me.btnPayments.TabIndex = 13
-        Me.btnPayments.Text = "Payments"
-        Me.btnPayments.UseVisualStyleBackColor = True
         '
         'Main
         '

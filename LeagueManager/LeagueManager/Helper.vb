@@ -69,6 +69,7 @@ Public Class Helper
     Public bCCLeague As Boolean = False
     Public bSwap9 As Boolean
     Public sDateLastScore As String
+    Public bload As Boolean
 
     Public Property IHdcp As Integer
         Get

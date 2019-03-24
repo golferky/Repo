@@ -40,6 +40,8 @@ Partial Class frmScoreCard
         Me.lbStatus = New System.Windows.Forms.Label()
         Me.btnSave = New System.Windows.Forms.Button()
         Me.GroupBox1 = New System.Windows.Forms.GroupBox()
+        Me.tbExtra = New System.Windows.Forms.TextBox()
+        Me.Label25 = New System.Windows.Forms.Label()
         Me.GroupBox7 = New System.Windows.Forms.GroupBox()
         Me.Label22 = New System.Windows.Forms.Label()
         Me.tbCP2Tot = New System.Windows.Forms.TextBox()
@@ -88,8 +90,6 @@ Partial Class frmScoreCard
         Me.rbFront = New System.Windows.Forms.RadioButton()
         Me.rbBack = New System.Windows.Forms.RadioButton()
         Me.lbParmFile = New System.Windows.Forms.Label()
-        Me.tbExtra = New System.Windows.Forms.TextBox()
-        Me.Label25 = New System.Windows.Forms.Label()
         Me.gbDefMeth.SuspendLayout()
         Me.gbDefGames.SuspendLayout()
         Me.GroupBox3.SuspendLayout()
@@ -308,6 +308,26 @@ Partial Class frmScoreCard
         Me.GroupBox1.TabIndex = 78
         Me.GroupBox1.TabStop = False
         Me.GroupBox1.Text = "Prize Money"
+        '
+        'tbExtra
+        '
+        Me.tbExtra.Location = New System.Drawing.Point(680, 227)
+        Me.tbExtra.Margin = New System.Windows.Forms.Padding(6)
+        Me.tbExtra.Name = "tbExtra"
+        Me.tbExtra.ReadOnly = True
+        Me.tbExtra.Size = New System.Drawing.Size(78, 31)
+        Me.tbExtra.TabIndex = 77
+        Me.tbExtra.TabStop = False
+        '
+        'Label25
+        '
+        Me.Label25.AutoSize = True
+        Me.Label25.Location = New System.Drawing.Point(675, 167)
+        Me.Label25.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
+        Me.Label25.Name = "Label25"
+        Me.Label25.Size = New System.Drawing.Size(62, 25)
+        Me.Label25.TabIndex = 78
+        Me.Label25.Text = "Extra"
         '
         'GroupBox7
         '
@@ -567,7 +587,7 @@ Partial Class frmScoreCard
         Me.dgScores.Location = New System.Drawing.Point(56, 319)
         Me.dgScores.Margin = New System.Windows.Forms.Padding(6)
         Me.dgScores.Name = "dgScores"
-        Me.dgScores.Size = New System.Drawing.Size(2848, 1127)
+        Me.dgScores.Size = New System.Drawing.Size(2848, 1381)
         Me.dgScores.TabIndex = 0
         '
         'cbScoresLocked
@@ -868,31 +888,11 @@ Partial Class frmScoreCard
         Me.lbParmFile.TabIndex = 93
         Me.lbParmFile.Text = "Parm File"
         '
-        'tbExtra
-        '
-        Me.tbExtra.Location = New System.Drawing.Point(680, 227)
-        Me.tbExtra.Margin = New System.Windows.Forms.Padding(6)
-        Me.tbExtra.Name = "tbExtra"
-        Me.tbExtra.ReadOnly = True
-        Me.tbExtra.Size = New System.Drawing.Size(78, 31)
-        Me.tbExtra.TabIndex = 77
-        Me.tbExtra.TabStop = False
-        '
-        'Label25
-        '
-        Me.Label25.AutoSize = True
-        Me.Label25.Location = New System.Drawing.Point(675, 167)
-        Me.Label25.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
-        Me.Label25.Name = "Label25"
-        Me.Label25.Size = New System.Drawing.Size(62, 25)
-        Me.Label25.TabIndex = 78
-        Me.Label25.Text = "Extra"
-        '
         'frmScoreCard
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(12.0!, 25.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(2972, 1446)
+        Me.ClientSize = New System.Drawing.Size(2972, 1700)
         Me.Controls.Add(Me.lbParmFile)
         Me.Controls.Add(Me.gbFrontBack)
         Me.Controls.Add(Me.cbMatches)

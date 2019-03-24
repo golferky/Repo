@@ -148,6 +148,12 @@
     <Compile Include="Matches.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Payments.Designer.vb">
+      <DependentUpon>Payments.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Payments.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Player.Designer.vb">
       <DependentUpon>Player.vb</DependentUpon>
     </Compile>
@@ -311,6 +317,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Matches.resx">
       <DependentUpon>Matches.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Payments.resx">
+      <DependentUpon>Payments.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Player.resx">
       <DependentUpon>Player.vb</DependentUpon>

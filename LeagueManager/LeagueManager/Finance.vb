@@ -78,7 +78,7 @@ Public Class Finance
         Next
 
         Dim iEarned = iSkinspaidout + iCTPpaidout + irspaidout + iccpaidout + iesPaidOut1 + iesPaidOut2 + iecPaidOut1 + iecPaidOut2
-        dtr.Rows.Add("*** Totals ***", 0, iEarned, iSkins, iCTP, iSkinspaidout, iCTPpaidout, irspaidout, iccpaidout,
+        dtr.Rows.Add("*** Totals ***", idue, iEarned, iSkins, iCTP, iSkinspaidout, iCTPpaidout, irspaidout, iccpaidout,
                      iesPaidOut1, iesPaidOut2, iecPaidOut1, iecPaidOut2)
 
         tbDue.Text = idue
@@ -116,7 +116,7 @@ Public Class Finance
             Else
                 'this code checks to see if a player participated in EOY skins
                 Dim dvs As New DataView(oHelper.dsLeague.Tables("dtPayments"))
-                dvs.RowFilter = String.Format("Desc = '{0}' And Detail = '{1}'", "EOY Skins", "Payment")
+                dvs.RowFilter = String.Format("Desc = '{0}' And Detail = '{1}' And Date >= '{2}'", "EOY Skins", "Payment", sdate)
                 Dim dt = dvs.ToTable
                 dt.PrimaryKey = New DataColumn() {dt.Columns("Player")}
                 Dim sKeys() As Object = {row("Player")}
@@ -148,7 +148,7 @@ Public Class Finance
             dr = dtr.Rows.Find(sKeys)
         End If
 
-        If row("Desc") = "Skin " Then
+        If row("Desc") = "Skin" Then
             dr("#Skins") += 1
             dr("$Skins") += row("Earned")
             iSkins += 1
@@ -160,7 +160,10 @@ Public Class Finance
             iCTPpaidout += row("Earned")
         ElseIf sdesc = "League Dues" Then
             If row("Detail") = "Invoice" Then
-                If row("DatePaid") Is DBNull.Value Then idue += row("Earned") * -1
+                If row("DatePaid") Is DBNull.Value Then
+                    idue += row("Earned") * -1
+                    dr("Balance Due") = row("Earned") * -1
+                End If
             ElseIf row("Detail") = "Payment" Then
                 'add to total collected
                 irscollected += row("Earned")
