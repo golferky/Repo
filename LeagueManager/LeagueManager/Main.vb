@@ -1,7 +1,7 @@
 ﻿'*************************************************************************************************
 Imports System.IO.Packaging
 Public Class Main
-    Dim cVersion = "Version : 2019.03.24"
+    Dim cVersion = "Version : 2019.03.27"
     Public oHelper As Helper
     Private dsLeague As New dsLeague
     Dim bload As Boolean = True
@@ -222,6 +222,22 @@ Public Class Main
                 End If
             Next
 
+            If Not oHelper.bsch Then
+                MsgBox("Cant find a Schedule file...exiting")
+                End
+            ElseIf Not oHelper.bscores Then
+                MsgBox("Cant find a Scores file...exiting")
+                End
+            ElseIf Not oHelper.bcourses Then
+                MsgBox("Cant find a Course file...exiting")
+                End
+            ElseIf Not oHelper.bplayer Then
+                MsgBox("Cant find a Player file...exiting")
+                End
+            ElseIf Not oHelper.bpayments Then
+                MsgBox("Cant find a Payments file...exiting")
+                End
+            End If
             'save this in helper so other subroutines can use
             oHelper.sArrayOfFiles = sArrayOfFiles
             For Each saFile In sArrayOfFiles

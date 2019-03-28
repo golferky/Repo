@@ -32,7 +32,7 @@ Public Class Scores
             Me.Text = "Scores for Player-" & oHelper.sPlayer
             oHelper.iHoles = oHelper.dsLeague.Tables("dtLeagueParms").Rows(0).Item("Holes")
             oHelper.iHoleMarker = 1
-            dvScores.Sort = "Date"
+            dvScores.Sort = "Date Desc"
 
             'create array from above defined fields we want out of scorecard
             Dim sArray = New List(Of String)

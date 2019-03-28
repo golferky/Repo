@@ -3,8 +3,7 @@
 *************************************************************************************************
 * yyyymmdd - Priority - Complexity -  Module        Code Package     Description
 * -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-* 20190321 - M        - Med         - Skins         March 2019 - 2 - add to payments file as when skin/ctp/league champ/eoy skins earned
-* 20190314 - M        - Med         - Finance                        setup Payments Screen, send receipt txt or email
+* 20190314 - M        - Med         - Finance                        send receipt txt or email when making payment
 * 20181211 - EM       - Easy to Med -                                Add post season skin/ctp percent to league parameters table, change code to use instead of hardcode
 * 20181204 - EM       - Easy to Med -                                Add logging to Main to help troubleshoot issues on loading tables
 * 20181102 - MH       - Med to Hard -								 only allow tuesdays for Dates, add parm to league parm
@@ -43,8 +42,12 @@
 *************************************************************************************************
 *                                           Change Log-Completed
 *************************************************************************************************
-* yyyymmdd - Priority - Complexity -  Module        Description
-* --------   --------	-----------	  -------------	--------------------------------------------------------------------------------------------------------------	
+* yyyymmdd - Priority - Complexity -  Module        Release         Description
+* --------   --------	-----------	  -------------	--------------- ----------------------------------------------------------------------------------------------	
+* 20190327 - M        - Easy        - PlayerStat                    Sort Newest to oldest
+* 20190327 - H        - Easy        - scorecard                     call calcholemarker to set starting hole 
+* 20190326 - M        - Easy        - Main                          make sure all files are present before loading subroutines
+* 20190325 - ML       - Easy        - Skins,scorecard March 2019 - 2 - add date of scores to file name when saving dgv2csv
 * 20190321 - M        - Med         - Skins         March 2019 - 2 -add to payments file as when skin/ctp/league champ/eoy skins earned
 * 20190319 - ML       - Easy to Med - Finance       March 2019 - 2 -Players flagged as not in EOY Skins from prior year and shouldnt be
 * 20190318 - MH       - Easy to Med - Skins                         dollars are incorrect for every week

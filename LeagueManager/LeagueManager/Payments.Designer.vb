@@ -37,6 +37,7 @@ Partial Class Payments
         Me.Detail = New System.Windows.Forms.DataGridViewTextBoxColumn()
         Me.Amount = New System.Windows.Forms.DataGridViewTextBoxColumn()
         Me.PayMethod = New System.Windows.Forms.DataGridViewComboBoxColumn()
+        Me.EmailText = New System.Windows.Forms.DataGridViewComboBoxColumn()
         Me.Comment = New System.Windows.Forms.DataGridViewTextBoxColumn()
         CType(Me.dgPayments, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
@@ -44,7 +45,7 @@ Partial Class Payments
         'dgPayments
         '
         Me.dgPayments.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
-        Me.dgPayments.Columns.AddRange(New System.Windows.Forms.DataGridViewColumn() {Me.Player, Me.PayDate, Me.Description, Me.Detail, Me.Amount, Me.PayMethod, Me.Comment})
+        Me.dgPayments.Columns.AddRange(New System.Windows.Forms.DataGridViewColumn() {Me.Player, Me.PayDate, Me.Description, Me.Detail, Me.Amount, Me.PayMethod, Me.EmailText, Me.Comment})
         Me.dgPayments.Location = New System.Drawing.Point(52, 352)
         Me.dgPayments.Name = "dgPayments"
         Me.dgPayments.RowHeadersWidth = 30
@@ -155,11 +156,16 @@ Partial Class Payments
         Me.PayMethod.Items.AddRange(New Object() {"Cash", "Check", "Rollover"})
         Me.PayMethod.Name = "PayMethod"
         '
+        'EmailText
+        '
+        Me.EmailText.HeaderText = "Email-Text"
+        Me.EmailText.Name = "EmailText"
+        '
         'Comment
         '
         Me.Comment.HeaderText = "Comment"
         Me.Comment.Name = "Comment"
-        Me.Comment.Width = 150
+        Me.Comment.Width = 250
         '
         'Payments
         '
@@ -198,5 +204,6 @@ Partial Class Payments
     Friend WithEvents Detail As DataGridViewTextBoxColumn
     Friend WithEvents Amount As DataGridViewTextBoxColumn
     Friend WithEvents PayMethod As DataGridViewComboBoxColumn
+    Friend WithEvents EmailText As DataGridViewComboBoxColumn
     Friend WithEvents Comment As DataGridViewTextBoxColumn
 End Class

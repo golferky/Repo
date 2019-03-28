@@ -2,6 +2,8 @@
     Dim oHelper As New Helper
     Dim dsLeague As New dsLeague
     Dim sOldCellValue As String
+    Dim semail As String = ""
+    Dim sphone As String = ""
     Private Sub Payments_Load(sender As Object, e As EventArgs) Handles MyBase.Load
 
         Try
@@ -92,6 +94,47 @@
             End If
         End If
 
+        For Each R As DataGridViewRow In dgPayments.Rows
+            If R.Cells("Comment").Value <> "No Receipt sent" Then
+                'Dim mbr = MsgBox(String.Format("are you ready to sent emails to {0} players?", ToAddresses.Count), MsgBoxStyle.YesNo)
+                'If mbr <> MsgBoxResult.Yes Then Exit Sub
+
+                'Dim attachs() As String = {"d:\temp_Excell226.xlsx", "d:\temp_Excell224.xlsx", "d:\temp_Excell225.xlsx"}
+                Dim sKeys() As Object = {R.Cells("Player").Value}
+                Dim arow As DataRow = dsLeague.Tables("dtPlayers").Rows.Find(sKeys)
+                Dim semail As String = ""
+                If R.Cells("EmailText").Value = "Text" Then
+                    If arow("Phone") IsNot DBNull.Value Then
+                        semail = arow("Phone").ToString.Replace("-", "")
+                        If semail.StartsWith("859962") Or
+                       semail.StartsWith("859620") Then
+                            semail = semail & "@txt.att.net"
+                        ElseIf semail.StartsWith("859750") Then
+                            'semail = semail & "@sms.myboostmobile.com"
+                            semail = semail & "@myboostmobile.com"
+                        ElseIf semail.StartsWith("859609") Then
+                            semail = semail & "@vtext.com"
+                        End If
+                    End If
+                ElseIf R.Cells("EmailText").Value = "Email" Then
+                    semail = arow("Email").ToString
+                End If
+                If semail <> "" Then
+                    Dim ToAddresses As New List(Of String)({semail}) '({"8599628088@txt.att.net", "‭8596200465@txt.att.net"}) '{"garyrscudder@gmail.com", "glemker@fuse.net"}
+                    Dim attachs() As String = Nothing '{semailfile}
+                    Dim subject As String = String.Format("***Test*** Receipt of Payment, reply to Gary Scudder if you get this message")
+                    Dim body As String = String.Format("For {0} - ${1}", R.Cells("Description").Value, R.Cells("Amount").Value)
+                    Dim bresult = False
+                    bresult = oHelper.GGmail.SendMail(ToAddresses, subject, body, attachs)
+                    If bresult Then
+                        oHelper.LOGIT(String.Format("payment text/email sent to {0}", R.Cells("Player").Value))
+                    Else
+                        oHelper.LOGIT(String.Format("payment text/email failed {0}", R.Cells("Player").Value))
+                    End If
+                End If
+            End If
+        Next
+
         Me.Close()
     End Sub
 
@@ -107,7 +150,7 @@
             '20190319 - columns build in designer
             Dim dv As New DataView(dsLeague.dtPayments)
             dv.RowFilter = "Detail in('Payment','Charge') "
-            If cbPlayers.SelectedItem <> "All Players" Then dv.RowFilter = dv.RowFilter & String.Format("AND Player = '{0}'", cbPlayers.SelectedItem)
+                    If cbPlayers.SelectedItem <> "All Players" Then dv.RowFilter = dv.RowFilter & String.Format("AND Player = '{0}'", cbPlayers.SelectedItem)
             If cbDate.SelectedItem <> "All Dates" Then
                 dv.RowFilter = dv.RowFilter & String.Format("AND Date = '{0}'", cbDate.SelectedItem)
             Else
@@ -147,7 +190,7 @@
         End Try
 
     End Sub
-#Region "Not_Used"
+
     Sub SavePayments()
         oHelper.LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
         Try
@@ -197,7 +240,6 @@
         End Try
 
     End Sub
-#End Region
     Private Sub dgPayments_DataError(sender As System.Object, e As System.Windows.Forms.DataGridViewDataErrorEventArgs) Handles dgPayments.DataError
         'MsgBox(e.Exception.Message)
 
@@ -218,8 +260,7 @@
         oHelper.sPlayer = R.Cells("Player").Value
         Dim dgc As DataGridViewCell = sender.currentcell
         '20180810 added Clear column
-        If dgc.OwningColumn.Name = "Clear" Or dgc.OwningColumn.Name = "Skins" Or dgc.OwningColumn.Name.StartsWith("Closest") Then
-        End If
+
     End Sub
     Private Sub dgPayments_CellBeginEdit(sender As Object, e As DataGridViewCellCancelEventArgs) Handles dgPayments.CellBeginEdit
         oHelper.LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
@@ -227,7 +268,6 @@
         If sender.currentcell.value IsNot DBNull.Value Then
             If sender.currentcell.value IsNot Nothing Then sOldCellValue = sender.currentcell.value
         End If
-
     End Sub
     Private Sub dgPayments_CellEndEdit(sender As System.Object, e As System.Windows.Forms.DataGridViewCellEventArgs) Handles dgPayments.CellEndEdit
         oHelper.LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
@@ -235,6 +275,7 @@
             oHelper.bDGSError = False
             Dim dgr As DataGridView = sender
             Dim sCurrColName = dgr.CurrentCell.OwningColumn.Name
+
             If sCurrColName = "Clear" Then
                 dgr.CurrentCell.Value = sOldCellValue
                 Exit Sub
@@ -245,14 +286,43 @@
                 dgPayments.CurrentRow.Cells("Description").Value = "League Dues"
                 dgPayments.CurrentRow.Cells("Amount").Value = "35"
                 dgPayments.CurrentRow.Cells("PayMethod").Value = "Cash"
-            End If
-            If sCurrColName = "Description" Then
+                Dim sKeys() As Object = {dgr.CurrentCell.Value}
+                Dim arow As DataRow = dsLeague.Tables("dtPlayers").Rows.Find(sKeys)
+                '20190327-this should never happen
+                If arow Is Nothing Then
+                    MsgBox(String.Format("Player doesnt exist {0}.  contact developer", sKeys(0)))
+                Else
+                    Dim dcb As New DataGridViewComboBoxCell
+                    dcb = dgPayments.CurrentRow.Cells("EmailText")
+                    dcb.Items.Clear()
+                    dcb.Items.Add("None")
+                    If arow("Email") IsNot DBNull.Value Then
+                        dcb.Items.Add("Email")
+                        semail = arow("Email")
+                    End If
+                    If arow("Phone") IsNot DBNull.Value Then
+                        dcb.Items.Add("Text")
+                        sphone = arow("Phone")
+                    End If
+                End If
+
+            ElseIf sCurrColName = "Description" Then
                 If dgr.CurrentCell.Value = "League Dues" Then
                     dgPayments.CurrentRow.Cells("Amount").Value = "35"
                     dgPayments.CurrentRow.Cells("PayMethod").Value = "Cash"
                 ElseIf dgr.CurrentCell.Value = "EOY Skins" Then
                     dgPayments.CurrentRow.Cells("Amount").Value = "20"
                     dgPayments.CurrentRow.Cells("PayMethod").Value = "Cash"
+                End If
+                'if no change, then exit 
+                If dgr.CurrentCell.Value = sOldCellValue Then Exit Sub
+            ElseIf sCurrColName = "EmailText" Then
+                If dgr.CurrentCell.Value = "Email" Then
+                    dgPayments.CurrentRow.Cells("Comment").Value = String.Format("Emailed Receipt to {0}", semail)
+                ElseIf dgr.CurrentCell.Value = "Text" Then
+                    dgPayments.CurrentRow.Cells("Comment").Value = String.Format("Texted Receipt to {0}", sphone)
+                Else
+                    dgPayments.CurrentRow.Cells("Comment").Value = String.Format("No Receipt sent")
                 End If
                 'if no change, then exit 
                 If dgr.CurrentCell.Value = sOldCellValue Then Exit Sub
@@ -285,4 +355,12 @@
     Private Sub btnSave_Click(sender As Object, e As EventArgs) Handles btnSave.Click
         SavePayments()
     End Sub
+
+    Private Sub dgPayments_RowEnter(sender As Object, e As DataGridViewCellEventArgs) Handles dgPayments.RowEnter
+        semail = ""
+        sphone = ""
+    End Sub
+#Region "Not_Used"
+#End Region
+
 End Class

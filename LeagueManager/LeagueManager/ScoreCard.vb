@@ -615,14 +615,6 @@ Public Class frmScoreCard
                     arow("Grade") = "B"
                 End If
 
-                ''20181003-clear out holes and gross/net
-                'arow("Out_Gross") = ""
-                'arow("Out_Net") = ""
-                'arow("In_Gross") = ""
-                'arow("In_Net") = ""
-                'For i = 1 To 18
-                '    arow("Hole" & i) = ""
-                'Next
                 '20181003 clear scores in table before saving from gridview
                 For Each cell As DataGridViewCell In row.Cells
 
@@ -632,11 +624,6 @@ Public Class frmScoreCard
                             lbStatus.BackColor = Color.Red
                             Exit Sub
                         End If
-                        'ElseIf cell.OwningColumn.Name = "Group" Then
-                        '    If oHelper.convDBNulltoSpaces(cell.Value).Trim = "" Then
-                        '        lbStatus.Text = String.Format("Invalid Group {0} for Player {1}{2} defaulting to 0", cell.Value, row.Cells("Player").Value, vbCrLf)
-                        '        Exit Sub
-                        '    End If
                         '  20180201 - reformat checkboxes into y/n
                     ElseIf cell.OwningColumn.Name = "Skins" Or cell.OwningColumn.Name = "Closest" Then
                         If cell.Value = True Then
@@ -672,16 +659,11 @@ Public Class frmScoreCard
             Next
 
             'oHelper.CopyDataGridViewToClipboard(dgLast5)
-            Dim sfilename = oHelper.sFilePath & "\" & DateTime.Now.ToString("yyyyMMdd_hhmmss_") & "Scorecard.csv"
+            Dim sfilename = oHelper.sFilePath & "\" & DateTime.Now.ToString("yyyyMMdd_hhmmss_") & oHelper.dDate.ToString("yyyyMMdd", Globalization.CultureInfo.InvariantCulture) & "_Scorecard.csv"
             lbStatus.Text = String.Format("Creating spreadsheet({0}) of scores from this screen...", sfilename)
             oHelper.status_Msg(lbStatus, Me)
-            '20190314 - this forces change to colors which we need to prevent spc char in spreadsheet
-            'rbColors.Checked = True
             oHelper.dgv2csv(dgScores, sfilename)
-            'rbDots.Checked = True
 
-            Dim x = ""
-            'oHelper.DataTable2XML("dtScores", "Scores")
             oHelper.DataTable2CSV(dsLeague.Tables("dtScores"), oHelper.sFilePath & "\" & Now.ToString("yyyyMMdd") & "_Scores.csv")
             oHelper.DataTable2CSV(dsLeague.Tables("dtPlayers"), oHelper.sFilePath & "\" & Now.ToString("yyyyMMdd") & "_Players.csv")
             lbStatus.Text = "Finished saving scores from this screen"
@@ -1292,7 +1274,7 @@ Public Class frmScoreCard
 
             ' getVoiceScores()
             oHelper.iHoles = oHelper.rLeagueParmrow("Holes")
-
+            oHelper.CalcHoleMarker(oHelper.dDate)
             oHelper.LOGIT(String.Format("Changing dots/colors"))
             If rbColors.Checked Then
                 oHelper.bColors = True
