@@ -93,7 +93,7 @@ Public Class Resizer
     '----------------------------------------------------------------------------------------
     Public Sub ResizeAllControls(thisCtrl As Control)
         '20180123 - bypass for now
-        Exit Sub
+        'Exit Sub
         Dim fontRatioW As Single
         Dim fontRatioH As Single
         Dim fontRatio As Single

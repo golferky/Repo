@@ -23,14 +23,6 @@ Partial Class Payments
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
         Me.dgPayments = New System.Windows.Forms.DataGridView()
-        Me.cbPlayers = New System.Windows.Forms.ComboBox()
-        Me.Label1 = New System.Windows.Forms.Label()
-        Me.Label2 = New System.Windows.Forms.Label()
-        Me.cbDate = New System.Windows.Forms.ComboBox()
-        Me.lbStatus = New System.Windows.Forms.Label()
-        Me.btnLoad = New System.Windows.Forms.Button()
-        Me.btnExit = New System.Windows.Forms.Button()
-        Me.btnSave = New System.Windows.Forms.Button()
         Me.Player = New System.Windows.Forms.DataGridViewComboBoxColumn()
         Me.PayDate = New System.Windows.Forms.DataGridViewTextBoxColumn()
         Me.Description = New System.Windows.Forms.DataGridViewComboBoxColumn()
@@ -39,6 +31,14 @@ Partial Class Payments
         Me.PayMethod = New System.Windows.Forms.DataGridViewComboBoxColumn()
         Me.EmailText = New System.Windows.Forms.DataGridViewComboBoxColumn()
         Me.Comment = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.cbPlayers = New System.Windows.Forms.ComboBox()
+        Me.Label1 = New System.Windows.Forms.Label()
+        Me.Label2 = New System.Windows.Forms.Label()
+        Me.cbDate = New System.Windows.Forms.ComboBox()
+        Me.lbStatus = New System.Windows.Forms.Label()
+        Me.btnLoad = New System.Windows.Forms.Button()
+        Me.btnExit = New System.Windows.Forms.Button()
+        Me.btnSave = New System.Windows.Forms.Button()
         CType(Me.dgPayments, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
@@ -52,6 +52,51 @@ Partial Class Payments
         Me.dgPayments.RowTemplate.Height = 23
         Me.dgPayments.Size = New System.Drawing.Size(1287, 1412)
         Me.dgPayments.TabIndex = 0
+        '
+        'Player
+        '
+        Me.Player.HeaderText = "Player"
+        Me.Player.Name = "Player"
+        Me.Player.Width = 130
+        '
+        'PayDate
+        '
+        Me.PayDate.HeaderText = "Date"
+        Me.PayDate.Name = "PayDate"
+        '
+        'Description
+        '
+        Me.Description.HeaderText = "Description"
+        Me.Description.Items.AddRange(New Object() {"League Dues", "EOY Skins", "EOY Skins Wk1", "EOY Skins Wk2", "Food", "Drinks"})
+        Me.Description.Name = "Description"
+        Me.Description.Width = 150
+        '
+        'Detail
+        '
+        Me.Detail.HeaderText = "Detail"
+        Me.Detail.Name = "Detail"
+        '
+        'Amount
+        '
+        Me.Amount.HeaderText = "Amount"
+        Me.Amount.Name = "Amount"
+        '
+        'PayMethod
+        '
+        Me.PayMethod.HeaderText = "Payment Method"
+        Me.PayMethod.Items.AddRange(New Object() {"Cash", "Check", "Rollover"})
+        Me.PayMethod.Name = "PayMethod"
+        '
+        'EmailText
+        '
+        Me.EmailText.HeaderText = "Email-Text"
+        Me.EmailText.Name = "EmailText"
+        '
+        'Comment
+        '
+        Me.Comment.HeaderText = "Comment"
+        Me.Comment.Name = "Comment"
+        Me.Comment.Width = 250
         '
         'cbPlayers
         '
@@ -121,51 +166,6 @@ Partial Class Payments
         Me.btnSave.TabIndex = 8
         Me.btnSave.Text = "Save "
         Me.btnSave.UseVisualStyleBackColor = True
-        '
-        'Player
-        '
-        Me.Player.HeaderText = "Player"
-        Me.Player.Name = "Player"
-        Me.Player.Width = 130
-        '
-        'PayDate
-        '
-        Me.PayDate.HeaderText = "Date"
-        Me.PayDate.Name = "PayDate"
-        '
-        'Description
-        '
-        Me.Description.HeaderText = "Description"
-        Me.Description.Items.AddRange(New Object() {"League Dues", "EOY Skins", "EOY Skins Wk1", "EOY Skins Wk2", "Food", "Drinks"})
-        Me.Description.Name = "Description"
-        Me.Description.Width = 150
-        '
-        'Detail
-        '
-        Me.Detail.HeaderText = "Detail"
-        Me.Detail.Name = "Detail"
-        '
-        'Amount
-        '
-        Me.Amount.HeaderText = "Amount"
-        Me.Amount.Name = "Amount"
-        '
-        'PayMethod
-        '
-        Me.PayMethod.HeaderText = "Payment Method"
-        Me.PayMethod.Items.AddRange(New Object() {"Cash", "Check", "Rollover"})
-        Me.PayMethod.Name = "PayMethod"
-        '
-        'EmailText
-        '
-        Me.EmailText.HeaderText = "Email-Text"
-        Me.EmailText.Name = "EmailText"
-        '
-        'Comment
-        '
-        Me.Comment.HeaderText = "Comment"
-        Me.Comment.Name = "Comment"
-        Me.Comment.Width = 250
         '
         'Payments
         '

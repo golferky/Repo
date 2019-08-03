@@ -1,6 +1,6 @@
 ﻿Imports System.IO
 Public Class frmPlayer
-    Dim oHelper As Helper
+    Dim oHelper As New Helper
     Dim stable = "dtPlayers"
     Dim sOldCellValue = ""
     Dim bError = False

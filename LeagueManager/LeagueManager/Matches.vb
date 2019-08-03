@@ -34,6 +34,10 @@ Public Class Matches
         Else
             btnSave.Visible = False
         End If
+        If oHelper.bLockScores Then
+            btnMatches_Click(sender, e)
+            'Me.Close()
+        End If
     End Sub
 
     Private Sub Matches_Resize(sender As Object, e As EventArgs) Handles MyBase.Resize
@@ -48,7 +52,7 @@ Public Class Matches
     End Sub
 
     Private Sub Matches_FormClosing(sender As Object, e As FormClosingEventArgs) Handles MyBase.FormClosing
-        SaveScores()
+        If Not oHelper.bLockScores Then SaveScores()
         'If Not bCloseScreen Then
         '    MsgBox("Press Exit to close this form")
         '    e.Cancel = True
@@ -181,6 +185,14 @@ Public Class Matches
         For Each row In dgScores.Rows
             oHelper.MakeCellsStrings(row)
         Next
+
+        Dim sfn = oHelper.sFilePath & "\" & DateTime.Now.ToString("yyyyMMdd_hhmmss_") & oHelper.dDate.ToString("yyyyMMdd", Globalization.CultureInfo.InvariantCulture) & "_Matches.csv"
+        lbStatus.Text = String.Format("Creating spreadsheet({0}) of Matches from this screen...", sfn)
+        oHelper.status_Msg(lbStatus, Me)
+        oHelper.dgv2csv(dgScores, sfn)
+        lbStatus.Text = "Finished creating Matches spreadsheet from this screen"
+        oHelper.status_Msg(lbStatus, Me)
+
         With lbStatus
             .Text = "Finished Calculating Matches"
         End With
@@ -269,7 +281,7 @@ Public Class Matches
                 If dgScores.RowCount > 0 Then
                     If Not bsave Then
                         Dim mbr = MsgBox("Do you want to save Match Results before you exit?", MsgBoxStyle.YesNo)
-                        If mbr = MsgBoxResult.No Then bsave = True
+                        If mbr = MsgBoxResult.Yes Then bsave = True
                     End If
                 End If
             End If
@@ -372,7 +384,7 @@ Public Class Matches
             Next
 
             dvScores.Sort = "Partner"
-            Dim dtScorecard As DataTable = dvScores.ToTable(True, sScoreCardforDGV.Split(",").ToArray)
+            Dim dtScorecard As DataTable = dvscores.ToTable(False, sScoreCardforDGV.Split(",").ToArray)
 
             dgScores.Columns.Clear()
 
@@ -487,7 +499,13 @@ Public Class Matches
             Dim sKeys() As Object = {row.Cells("Player").Value, oHelper.dDate.ToString("yyyyMMdd", Globalization.CultureInfo.InvariantCulture)} 'cbDatesPlayers.SelectedItem
             Dim dr As DataRow = oHelper.dsLeague.Tables("dtScores").Rows.Find(sKeys)
             For Each cell As DataGridViewCell In row.Cells
-                If oHelper.convDBNulltoSpaces(cell.Value) <> "" Then dr(cell.OwningColumn.Name) = cell.Value
+                If oHelper.convDBNulltoSpaces(cell.Value) = "" Then
+                    dr(cell.OwningColumn.Name) = DBNull.Value
+                Else
+                    dr(cell.OwningColumn.Name) = cell.Value
+                End If
+
+                'End If
             Next
 
         Catch ex As Exception

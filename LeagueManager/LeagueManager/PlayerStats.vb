@@ -1,11 +1,11 @@
 ﻿Public Class frmPlayerStats
-    Dim oHelper As Helper
+    Dim oHelper As New Helper
     Dim fromsizeW As Integer, lvsizeW As Integer
+    Dim rs As New Resizer
 
     Private Sub frmPlayerStats_Load(sender As System.Object, e As System.EventArgs) Handles MyBase.Load
         Me.Cursor = Cursors.WaitCursor
         Application.DoEvents()
-        oHelper = Main.oHelper
         'testing only
         'oHelper.sPlayer = "Gary Scudder"
         oHelper.bScoresbyPlayer = True
@@ -13,6 +13,8 @@
         'end testing only
         Dim dtPlayers As DataTable = Nothing
         Try
+            '20190408-this makes a copy of tables
+            oHelper = Main.oHelper
             Dim dvScores As New DataView(oHelper.dsLeague.Tables("dtScores"))
             dvScores.Sort = "Player"
             dtPlayers = dvScores.ToTable(True, "Player")
@@ -56,5 +58,13 @@
 
         End Try
     End Sub
+    Private Sub frmPlayerStats_Resize(sender As Object, e As EventArgs) Handles MyBase.Resize
+        oHelper.LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
+        Try
+            rs.ResizeAllControls(Me)
+            oHelper.LOGIT(String.Format("Form Height {0} Width {1}", Me.Height, Me.Width))
+        Catch ex As Exception
 
+        End Try
+    End Sub
 End Class

@@ -1,158 +1,272 @@
 ﻿'*************************************************************************************************
 Imports System.IO.Packaging
 Public Class Main
-    Dim cVersion = "Version : 2019.03.27"
+    Dim cVersion = "Version : 2019.08.03"
     Public oHelper As Helper
     Private dsLeague As New dsLeague
     Dim bload As Boolean = True
     'Private Teams As ArrayList = New ArrayList
-    Private Teams2 As ArrayList = New ArrayList
+    'Private Teams2 As ArrayList = New ArrayList
     Dim rs As New Resizer
     Dim bwait As Boolean
     Dim sParmFile As String
+    Public iScreenWidth As Integer
+    Public iScreenHeight As Integer
+    Public sWorkingYear As String
 
     Private Sub Main_Load(sender As System.Object, e As System.EventArgs) Handles MyBase.Load
-        oHelper = New Helper
-        'Genschedule()
-        Me.Text = Me.Text & " " & cVersion
-        Application.EnableVisualStyles()
-        lblProcessMsg.Text = "Loading League Tables..."
-        oHelper.status_Msg(lblProcessMsg, Me)
+        Try
+            Me.Show()
+            oHelper = New Helper
+            'Genschedule()
 
-        If Debugger.IsAttached Then
-            Me.Text = Me.Text & " - Debug Mode"
-        End If
-        '20180106 remove for now
-        btnShowScores.Visible = False
+            Application.EnableVisualStyles()
+            lblProcessMsg.Text = "Loading League Tables..."
+            oHelper.status_Msg(lblProcessMsg, Me)
 
-        rs.FindAllControls(Me)
-        'Me.Size = My.Computer.Screen.WorkingArea.Size
-        'Me.WindowState = FormWindowState.Maximized
-        Me.SetStyle(ControlStyles.SupportsTransparentBackColor, True)
-        Me.BackColor = Color.Transparent
+            iScreenWidth = Screen.PrimaryScreen.Bounds.Width
+            'greg test
+            'iScreenWidth = 1368
+            iScreenHeight = Screen.PrimaryScreen.Bounds.Height
+            If Debugger.IsAttached Then Me.Text &= " - Debug Mode"
 
-        Dim sDocs = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)
-        '12/19/2017 note this is removed for now 
-        Me.Icon = New Icon(Me.Icon, New Size(Me.Icon.Width * 5, Me.Icon.Height * 5))
-        'oHelper.bloghelper = True
-        Dim sWorkingYear As String = ""
-        'load cookie settings
-        If IO.File.Exists(sDocs & "\Leaguemanager.ini") Then
-            Using sr As New IO.StreamReader(sDocs & "\Leaguemanager.ini", False)
-                Do
-                    Dim sline = sr.ReadLine
-                    If sline = Nothing Then Exit Do
-                    Dim slineparts = sline.Split("=")
-                    Select Case slineparts(0)
-                        Case "LeagueName"
-                            oHelper.sLeagueName = slineparts(1)
-                        Case "GroupNumber"
-                            oHelper.sGroupNumber = slineparts(1)
-                        Case "Date"
-                            oHelper.dDate = Date.ParseExact(slineparts(1), "MM-dd-yyyy", System.Globalization.DateTimeFormatInfo.InvariantInfo)
-                            sWorkingYear = slineparts(1).Substring(6, 4)
-                        Case "FilePath"
-                            oHelper.sFilePath = slineparts(1)
-                        Case "Logging"
-                            If slineparts(1).ToUpper = "Y" Then
-                                oHelper.LOGIT("Logging On")
-                                cbLogging.Checked = True
-                            Else
-                                cbLogging.Checked = False
-                            End If
-                        Case "DateOverlapReminder"
-                            If slineparts(1).ToUpper = "Y" Then
-                                oHelper.bDateOverlap = True
-                            Else
-                                oHelper.bDateOverlap = False
-                            End If
-                    End Select
-                Loop
-            End Using
-        End If
+            '20180106 remove for now
+            btnShowScores.Visible = False
 
-        'oHelper.sFilePath = "" '"\\wdmycloud\Gary\LeagueManager\Files"
-        If oHelper.sFilePath = "" Then
-            Dim dialog As New FolderBrowserDialog With
-            {
-            .RootFolder = Environment.SpecialFolder.Desktop,
-            .SelectedPath = "G:\LeagueManager\Files",
-            .Description = "Select League Files Path"
-            }
-            If dialog.ShowDialog() = Windows.Forms.DialogResult.OK Then
-                oHelper.sFilePath = dialog.SelectedPath
-            Else
-                End
+            'rs.FindAllControls(Me)
+            'Me.Size = My.Computer.Screen.WorkingArea.Size
+            'Me.WindowState = FormWindowState.Maximized
+            Me.SetStyle(ControlStyles.SupportsTransparentBackColor, True)
+            Me.BackColor = Color.Transparent
+
+            Dim sDocs = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments)
+            '12/19/2017 note this is removed for now 
+            Me.Icon = New Icon(Me.Icon, New Size(Me.Icon.Width * 5, Me.Icon.Height * 5))
+            'oHelper.bloghelper = True
+            lblProcessMsg.Text = String.Format("Loading League Cookie from {0},", sDocs)
+            oHelper.status_Msg(lblProcessMsg, Me)
+
+            'load cookie settings
+            If IO.File.Exists(sDocs & "\Leaguemanager.ini") Then
+                Using sr As New IO.StreamReader(sDocs & "\Leaguemanager.ini", False)
+                    Do
+                        Dim sline = sr.ReadLine
+                        If sline = Nothing Then Exit Do
+                        Dim slineparts = sline.Split("=")
+                        Select Case slineparts(0)
+                            Case "LeagueName"
+                                oHelper.sLeagueName = slineparts(1)
+                            Case "GroupNumber"
+                                oHelper.sGroupNumber = slineparts(1)
+                            Case "Date"
+                                oHelper.dDate = Date.ParseExact(slineparts(1), "MM-dd-yyyy", System.Globalization.DateTimeFormatInfo.InvariantInfo)
+                                sWorkingYear = slineparts(1).Substring(6, 4)
+                            Case "FilePath"
+                                If IO.Directory.Exists(slineparts(1)) Then
+                                    oHelper.sFilePath = slineparts(1)
+                                Else
+                                    oHelper.sFilePath = ""
+                                End If
+                            Case "Logging"
+                                If slineparts(1).ToUpper = "Y" Then
+                                    oHelper.LOGIT("Logging On")
+                                    cbLogging.Checked = True
+                                Else
+                                    cbLogging.Checked = False
+                                End If
+                            Case "DateOverlapReminder"
+                                If slineparts(1).ToUpper = "Y" Then
+                                    oHelper.bDateOverlap = True
+                                Else
+                                    oHelper.bDateOverlap = False
+                                End If
+                        End Select
+                    Loop
+                End Using
             End If
-        End If
 
-        'save ini file if league present
-        'If oHelper.sLeagueName <> "" Then oHelper.UpdateINI()
-
-        txtFolder.Text = oHelper.sFilePath
-
-        'build dropdown list of leagues
-        ' DsLeague = New dsLeague
-        'If Not oHelper.CSV2DataTable(dsLeague.Tables("dtLeagueParms"), oHelper.getLatestFile("*LeagueParms.csv")) Then
-        '    MsgBox(String.Format("File in use, close file and restart {0} {1}", vbCrLf, oHelper.getLatestFile("*LeagueParms.csv")))
-        '    End
-        'End If
-        bwait = True
-        sParmFile = oHelper.getLatestFile("*LeagueParms.csv")
-        Do While bwait
-            If Not oHelper.WaitForFile(dsLeague.Tables("dtLeagueParms"), sParmFile, lblProcessMsg, Me) Then
-                Dim mbr = MessageBox.Show(String.Format("File in use {0}Press <OK> to close file and proceed or <Cancel>", vbCrLf, sParmFile), sParmFile, MessageBoxButtons.OKCancel)
-                If mbr = DialogResult.Cancel Then
+            'oHelper.sFilePath = "" '"\\wdmycloud\Gary\LeagueManager\Files"
+            If oHelper.sFilePath = "" Then
+                Dim dialog As New FolderBrowserDialog With
+                {
+                .RootFolder = Environment.SpecialFolder.Desktop,
+                .SelectedPath = "G:\LeagueManager\Files",
+                .Description = "Select League Files Path"
+                }
+                If dialog.ShowDialog() = Windows.Forms.DialogResult.OK Then
+                    oHelper.sFilePath = dialog.SelectedPath
+                Else
                     End
                 End If
-            Else
-                bwait = False
             End If
-        Loop
-        'oHelper.dsLeague.ReadXml(oHelper.getXMLFile("*LeagueParms.xml"))
-        Dim dvLeagues = New DataView(dsLeague.Tables("dtLeagueParms"))
-        dvLeagues.Sort = "Name Asc, StartDate Desc"
 
-        If dvLeagues.Count = 0 Then
-            Dim mbr = MsgBox("League parm file not found, want to create one?", MsgBoxStyle.YesNo)
-            If mbr = MsgBoxResult.Yes Then
-                frmLeagueSetup.ShowDialog()
-                End
+            lblProcessMsg.Text = String.Format("Finished Loading League Cookie from {0},", sDocs)
+            oHelper.status_Msg(lblProcessMsg, Me)
+
+            'save ini file if league present
+            'If oHelper.sLeagueName <> "" Then oHelper.UpdateINI()
+            Me.Text = Me.Text & " " & String.Format("{0} - {1}, Resolution {2} x {3}", cVersion, My.Computer.Name, iScreenWidth, iScreenHeight)
+            oHelper.LOGIT(Me.Text)
+
+            txtFolder.Text = oHelper.sFilePath
+
+            'build dropdown list of leagues
+            ' DsLeague = New dsLeague
+            'If Not oHelper.CSV2DataTable(dsLeague.Tables("dtLeagueParms"), oHelper.getLatestFile("*LeagueParms.csv")) Then
+            '    MsgBox(String.Format("File in use, close file and restart {0} {1}", vbCrLf, oHelper.getLatestFile("*LeagueParms.csv")))
+            '    End
+            'End If
+            bwait = True
+            sParmFile = oHelper.getLatestFile(sWorkingYear, "*LeagueParms.csv")
+            Do While bwait
+                If Not oHelper.WaitForFile(dsLeague.Tables("dtLeagueParms"), sParmFile, lblProcessMsg, Me) Then
+                    Dim mbr = MessageBox.Show(String.Format("File in use {0}Press <OK> to close file and proceed or <Cancel>", vbCrLf, sParmFile), sParmFile, MessageBoxButtons.OKCancel)
+                    If mbr = DialogResult.Cancel Then
+                        End
+                    End If
+                Else
+                    bwait = False
+                End If
+            Loop
+            'oHelper.dsLeague.ReadXml(oHelper.getXMLFile("*LeagueParms.xml"))
+            Dim dvLeagues = New DataView(dsLeague.Tables("dtLeagueParms"))
+            dvLeagues.Sort = "Name Asc, StartDate Desc"
+
+            If dvLeagues.Count = 0 Then
+                Dim mbr = MsgBox("League parm file not found, want to create one?", MsgBoxStyle.YesNo)
+                If mbr = MsgBoxResult.Yes Then
+                    frmLeagueSetup.ShowDialog()
+                    End
+                End If
             End If
+
+            For Each row In dvLeagues
+                '20181017  put in due to incomplete scores < 2018 and player lookup needs to change for those scores also
+                If row("Startdate").year < "2018" Then Continue For
+                cbLeagues.Items.Add(row("Name") & " (" & row("StartDate").year & ")")
+            Next
+
+            cbLeagues.SelectedIndex = 0
+            For i = 0 To cbLeagues.Items.Count - 1
+                Dim sitem As String = cbLeagues.Items(i)
+                Dim sYear As String = sitem.Substring(sitem.IndexOf("(") + 1, 4)
+                If sYear = sWorkingYear Then
+                    cbLeagues.SelectedIndex = i
+                    Exit For
+                End If
+            Next
+
+            GetLeague()
+
+            'setup email function
+            oHelper.GGmail = New GGSMTP_GMAIL(oHelper.rLeagueParmrow("Email"), oHelper.rLeagueParmrow("EmailPassword"))
+            'GetXSDNameByFileName(oHelper.dsLeague.Tables("dtScores"),
+            oHelper.dsLeague = dsLeague
+            ''get the date of the schedule for this week
+            ''just use the Column names which have dates of the schedule table
+            ''this loop will compare the league start date and flip the hole marker based on front/back
+            bload = False
+            lblProcessMsg.Text = "Finished Loading League Tables"
+            oHelper.status_Msg(lblProcessMsg, Me)
+            'oHelper.bloghelper = False
+
+            'debugging playerstats, uncomment below
+            'PlayerStats_Click(sender, e)
+
+        Catch ex As InvalidCastException
+            Dim iexc = ""
+        End Try
+    End Sub
+    Sub newBuildTablesForLeague()
+
+        'Scores
+        Dim ofiles As String = "Schedule,Scores,Payments,Players,Courses"
+        '20190724-progress bar
+        tspb.ProgressBar.Value = 0
+        tspb.ProgressBar.Minimum = 0
+        tspb.ProgressBar.Maximum = ofiles.Split(",").Count
+        tssl.Text = String.Format("Loading {0} files", tspb.ProgressBar.Maximum)
+        Dim et As TimeSpan
+        Dim sStartTime As DateTime = Now
+
+        For Each file As String In ofiles.Split(",")
+            Dim sLatestFile As String = ""
+            If file = "Schedule" Then
+                sLatestFile = oHelper.getLatestFile(sWorkingYear, String.Format("*{0}.csv", file))
+            Else
+                sLatestFile = oHelper.getLatestFile("9999", String.Format("*{0}.csv", file))
+            End If
+            Dim sfileparts = sLatestFile.ToString.Split("\")
+            Dim sfilename = sfileparts(UBound(sfileparts))
+            Dim sFileLeagueName = sfilename.Split("_")(1)
+            Dim sfile = "dt" & oHelper.getSubstring(sLatestFile, "_", ".")
+
+            oHelper.LOGIT(String.Format("Checking {0}", file))
+            oHelper.LOGIT(String.Format("Keeping File {0}", sLatestFile.ToString))
+            oHelper.LOGIT(String.Format("File name {0}", sLatestFile))
+            Debug.Print(String.Format("Removing table {0}", sfile))
+            If file = "Schedule" Then
+                'match year
+                ''match league name
+                oHelper.LOGIT(String.Format("Matching League Name and Year {0} - {1}", sWorkingYear, sFileLeagueName))
+                If sWorkingYear.Contains(sWorkingYear) And cbLeagues.SelectedItem.ToString.Contains(sFileLeagueName) Then oHelper.LOGIT(String.Format("Matched League Name and Year"))
+                oHelper.bsch = True
+                If dsLeague.Tables.Contains(sfile) Then
+                    Debug.Print(String.Format("dsleague.tables contains table dtschedule {0}", sfile))
+                    Try
+                        dsLeague.Tables.Remove(sfile)
+                    Catch ex As Exception
+
+                    End Try
+                End If
+                dsLeague.Tables.Add(sfile)
+            Else
+                If file = "Scores" Then lbScoresFile.Text = sfilename
+                Dim dt As DataTable = dsLeague.Tables(sfile)
+                If sfile.contains("Payments") Then
+                    dt.PrimaryKey = New DataColumn() {dt.Columns("Player"), dt.Columns("Date"), dt.Columns("Desc"), dt.Columns("Detail")}
+                    Debug.Print("Payments file " & sfile)
+                End If
+                dt.Rows.Clear()
+            End If
+
+            bwait = True
+            Do While bwait
+                If Not oHelper.WaitForFile(dsLeague.Tables(sfile), sLatestFile, lblProcessMsg, Me) Then
+                    Dim mbr = MessageBox.Show(String.Format("File in use {0}Press <OK> to close file and proceed or <Cancel>", vbCrLf, sParmFile), sParmFile, MessageBoxButtons.OKCancel)
+                    If mbr = DialogResult.Cancel Then
+                        End
+                    End If
+                Else
+                    bwait = False
+                End If
+            Loop
+            tspb.ProgressBar.Value += 1
+            tssl.Text = String.Format("Loading file {0} of {1}", tspb.ProgressBar.Value, ofiles.Count)
+            'tspb.ProgressBar.Refresh()
+            Application.DoEvents()
+        Next
+
+        et = Now - sStartTime
+        If et.TotalMinutes >= 1 Then
+            tssl.Text = String.Format("Loaded {0} files {1} elapsed time", ofiles.Count, CInt(et.TotalMinutes) Mod 60 & " Min :" & CInt(et.TotalSeconds) Mod 60 & " Secs")
+        Else
+            tssl.Text = String.Format("Loaded {0} files {1} elapsed time", ofiles.Count, CInt(et.TotalSeconds) Mod 60 & " Secs")
         End If
 
-        For Each row In dvLeagues
-            '20181017  put in due to incomplete scores < 2018 and player lookup needs to change for those scores also
-            If row("Startdate").year < "2018" Then Continue For
-            cbLeagues.Items.Add(row("Name") & " (" & row("StartDate").year & ")")
-        Next
+        Dim dvscores As New DataView(dsLeague.Tables("dtScores"))
+        dvscores.Sort = "Date desc"
+        'change mm/dd/yyyy to yyyymmdd
+        Dim sdate = cbLeagues.SelectedItem.ToString.Substring(cbLeagues.SelectedItem.ToString.IndexOf("(") + 1, 4) + 1 & "0101"
+        dvscores.RowFilter = String.Format("Date < {0}", sdate)
 
-        cbLeagues.SelectedIndex = 0
-        For i = 0 To cbLeagues.Items.Count - 1
-            Dim sitem As String = cbLeagues.Items(i)
-            Dim sYear As String = sitem.Substring(sitem.IndexOf("(") + 1, 4)
-            If sYear = sWorkingYear Then
-                cbLeagues.SelectedIndex = i
-                Exit For
-            End If
-        Next
+        If cbLeagues.SelectedItem.ToString.Substring(cbLeagues.SelectedItem.ToString.IndexOf("(") + 1, 4) & "0101" > dvscores(0)("Date") Then
+            oHelper.sDateLastScore = CDate(oHelper.rLeagueParmrow("StartDate")).ToString("yyyyMMdd", Globalization.CultureInfo.InvariantCulture)
+        Else
+            oHelper.sDateLastScore = dvscores(0)("Date")
+        End If
+        oHelper.MyCourse = dsLeague.Tables("dtCourses").Select("Name = '" & oHelper.rLeagueParmrow("Course") & "'")
 
-        GetLeague()
-
-        'setup email function
-        oHelper.GGmail = New GGSMTP_GMAIL(oHelper.rLeagueParmrow("Email"), oHelper.rLeagueParmrow("EmailPassword"))
-        'GetXSDNameByFileName(oHelper.dsLeague.Tables("dtScores"),
-        oHelper.dsLeague = dsLeague
-        ''get the date of the schedule for this week
-        ''just use the Column names which have dates of the schedule table
-        ''this loop will compare the league start date and flip the hole marker based on front/back
-        bload = False
-        lblProcessMsg.Text = "Finished Loading League Tables"
-        oHelper.status_Msg(lblProcessMsg, Me)
-        'oHelper.bloghelper = False
-
-        'debugging playerstats, uncomment below
-        'PlayerStats_Click(sender, e)
     End Sub
 
     Sub BuildTablesForLeague()
@@ -165,16 +279,31 @@ Public Class Main
             Dim oDirectory As New IO.DirectoryInfo(oHelper.sFilePath)
             'oFiles = oDirectory.GetFiles("*.xml")
             oFiles = oDirectory.GetFiles("*.csv")
+
             'sort by date desc
             Helper.arraySort(oFiles)
             'oHelper.arraySort(oFiles)
             Dim sArrayOfFiles As New List(Of String)
 
+            '20190724-progress bar
+            tspb.ProgressBar.Value = 0
+            tspb.ProgressBar.Minimum = 0
+            tspb.ProgressBar.Maximum = oFiles.Count
+            tssl.Text = String.Format("Loading {0} files", tspb.ProgressBar.Maximum)
+            Dim et As TimeSpan
+            Dim sStartTime As DateTime = Now
+
             'build an array list of the most recent files for each table
             For Each sfile In oFiles
                 oHelper.LOGIT(String.Format("Examining File {0}", sfile.FullName.ToString))
                 'league parm file already read into datatable above
-                If sfile.FullName.Contains("LeagueParm") Or sfile.FullName.Contains("Standings") Then Continue For
+                If sfile.FullName.Contains("LeagueParm") Or sfile.FullName.Contains("Standings") Then
+                    tspb.ProgressBar.Value += 1
+                    tssl.Text = String.Format("Loading file {0} of {1}", tspb.ProgressBar.Value, oFiles.Count)
+                    'tspb.ProgressBar.Refresh()
+                    Application.DoEvents()
+                    Continue For
+                End If
                 If sfile.FullName.Contains("Schedule") Then
                     oHelper.LOGIT("Checking Schedule")
                     Dim sfileparts = sfile.FullName.ToString.Split("\")
@@ -193,6 +322,10 @@ Public Class Main
                             sArrayOfFiles.Add(sfile.FullName)
                         End If
                     Else
+                        tspb.ProgressBar.Value += 1
+                        tssl.Text = String.Format("Loading file {0} of {1}", tspb.ProgressBar.Value, oFiles.Count)
+                        'tspb.ProgressBar.Refresh()
+                        Application.DoEvents()
                         Continue For
                     End If
                 ElseIf sfile.FullName.Contains("Courses") Then
@@ -220,22 +353,34 @@ Public Class Main
                         sArrayOfFiles.Add(sfile.FullName)
                     End If
                 End If
+                tspb.ProgressBar.Value += 1
+                tssl.Text = String.Format("Loading file {0} of {1}", tspb.ProgressBar.Value, oFiles.Count)
+                'tspb.ProgressBar.Refresh()
+                Application.DoEvents()
             Next
 
+
+            et = Now - sStartTime
+            If et.TotalMinutes >= 1 Then
+                tssl.Text = String.Format("Loaded {0} files {1} elapsed time", oFiles.Count, CInt(et.TotalMinutes) Mod 60 & " Min :" & CInt(et.TotalSeconds) Mod 60 & " Secs")
+            Else
+                tssl.Text = String.Format("Loaded {0} files {1} elapsed time", oFiles.Count, CInt(et.TotalSeconds) Mod 60 & " Secs")
+            End If
+
             If Not oHelper.bsch Then
-                MsgBox("Cant find a Schedule file...exiting")
+                MsgBox(String.Format("Cant find a Schedule file {0}...exiting", oHelper.sFilePath))
                 End
             ElseIf Not oHelper.bscores Then
-                MsgBox("Cant find a Scores file...exiting")
+                MsgBox(String.Format("Cant find a Scores file {0}...exiting", oHelper.sFilePath))
                 End
             ElseIf Not oHelper.bcourses Then
-                MsgBox("Cant find a Course file...exiting")
+                MsgBox(String.Format("Cant find a Course file {0}...exiting", oHelper.sFilePath))
                 End
             ElseIf Not oHelper.bplayer Then
-                MsgBox("Cant find a Player file...exiting")
+                MsgBox(String.Format("Cant find a Player file {0}...exiting", oHelper.sFilePath))
                 End
             ElseIf Not oHelper.bpayments Then
-                MsgBox("Cant find a Payments file...exiting")
+                MsgBox(String.Format("Cant find a Payments file {0}...exiting", oHelper.sFilePath))
                 End
             End If
             'save this in helper so other subroutines can use
@@ -313,7 +458,7 @@ Public Class Main
             'If DsLeague.Tables.Contains("dtScores") Then DsLeague.Tables("dtScores").PrimaryKey = New DataColumn() {DsLeague.Tables("dtScores").Columns("Player"), DsLeague.Tables("dtScores").Columns("Date")}
             'Dim x = oHelper.dsLeague.Tables("dtPlayers").Select name from Table A Group By name having count(*) > 1"
             '20180126-only build dates for the last date of completed scores
-            Dim dvscores As New DataView(DsLeague.Tables("dtScores"))
+            Dim dvscores As New DataView(dsLeague.Tables("dtScores"))
             dvscores.Sort = "Date desc"
             'change mm/dd/yyyy to yyyymmdd
             'Dim wkdate As Date = oHelper.dDate
@@ -355,7 +500,7 @@ Public Class Main
                     oHelper.UpdateINI()
                     If .rLeagueParmrow("ScoresLocked") Is DBNull.Value Then .rLeagueParmrow("ScoresLocked") = "N"
 
-                    BuildTablesForLeague()
+                    newBuildTablesForLeague()
                     '20180930 -setup dates
                     dtScore.Text = DateTime.ParseExact(.sDateLastScore, "yyyyMMdd", Nothing).ToString("MM\/dd\/yyyy").Trim("0")
                     Dim iweeks As Integer = (((.rLeagueParmrow("Teams") - 1) * 2) - 1)
@@ -409,6 +554,7 @@ Public Class Main
             MessageBox.Show("Scores < 2018 are not fully entered, cannot view yet,check with developer")
             Exit Sub
         End If
+
         If oHelper.bsch Then
             lblProcessMsg.Text = String.Format("Loading Scores from {0}", lbScoresFile.Text)
             oHelper.status_Msg(lblProcessMsg, Me)
@@ -519,7 +665,7 @@ Public Class Main
     End Sub
 
     Private Sub Main_Resize(sender As Object, e As EventArgs) Handles MyBase.Resize
-        rs.ResizeAllControls(Me)
+        'rs.ResizeAllControls(Me)
     End Sub
 
     Private Sub btnXML_Click(sender As Object, e As EventArgs)
@@ -581,11 +727,13 @@ Public Class Main
             .Text = String.Format("Finished Saving League Tables for {0} ...", cbLeagues.SelectedItem)
             oHelper.status_Msg(lblProcessMsg, Me)
             .Text = String.Format("Loading League Tables for {0} ...", cbLeagues.SelectedItem)
+            sWorkingYear = cbLeagues.SelectedItem.ToString.Split("(")(1).Substring(0, 4)
             oHelper.status_Msg(lblProcessMsg, Me)
             If Not bload Then GetLeague()
             .Text = String.Format("Finished Loading League Tables for {0}", cbLeagues.SelectedItem)
             oHelper.status_Msg(lblProcessMsg, Me)
         End With
+
     End Sub
 
     Private Sub btnChangeFolder_Click(sender As Object, e As EventArgs) Handles btnChangeFolder.Click
@@ -687,7 +835,7 @@ Public Class Main
             oHelper.bCCLeague = True
             If oHelper.bDateOverlap Then
                 Dim smsg = String.Format("Regular Season is played the same time as your League Championship" & vbCrLf & vbCrLf & "Regular Season {0}" & vbCrLf & "League Championship {1}", dtRSEnd.Text, dtPSStart.Text)
-                smsg = smsg & String.Format(vbCrLf & "Keep being Reminded?" & vbCrLf & "Press Yes or No")
+                smsg &= String.Format(vbCrLf & "Keep being Reminded?" & vbCrLf & "Press Yes or No")
 
                 Dim result As Integer = MessageBox.Show(smsg, "Warning Dates Overlap", MessageBoxButtons.YesNo)
                 If result = DialogResult.Yes Then
@@ -743,10 +891,6 @@ Public Class Main
         gbPS.Visible = True
     End Sub
 
-    Private Sub dtScore_ValueChanged(sender As Object, e As EventArgs) Handles dtScore.ValueChanged
-        oHelper.sDateLastScore = CDate(dtScore.Text).ToString("yyyyMMdd", Globalization.CultureInfo.InvariantCulture)
-        'oHelper.dDate = dtScore.Text
-    End Sub
 
     Private Sub dtRSEnd_ValueChanged(sender As Object, e As EventArgs) Handles dtRSEnd.ValueChanged
         oHelper.rLeagueParmrow("EndDate") = dtRSEnd.Text
@@ -776,7 +920,7 @@ Public Class Main
                 Zipit()
                 If IO.File.Exists((oFiles(0).FullName)) Then IO.File.Delete(oFiles(0).FullName)
                 If IO.File.Exists((oFiles2(0).FullName)) Then IO.File.Delete(oFiles2(0).FullName)
-                BuildTablesForLeague()
+                newBuildTablesForLeague()
             End If
             .Text = String.Format("Finished Undoing Scores")
             oHelper.status_Msg(lblProcessMsg, Me)
@@ -785,6 +929,105 @@ Public Class Main
 
     Private Sub btnPayments_Click(sender As Object, e As EventArgs) Handles btnPayments.Click
         Payments.Show()
+    End Sub
+
+    Private Sub btnSchedule_Click(sender As Object, e As EventArgs) Handles btnSchedule.Click
+        ScheduleBuilder.Show()
+    End Sub
+    Dim currVal As DateTime
+    Dim newVal As DateTime
+    Dim valCheck As Boolean
+    Dim currSelected As Selection = Selection.None
+
+    Public Enum Selection
+        None = 0
+        Year = 1
+        Month = 2
+        Day = 3
+    End Enum
+
+    Private Sub CheckDTPSelection(dtp As DateTimePicker)
+        valCheck = True
+        currVal = dtp.Value
+        SendKeys.Send("{UP}")
+    End Sub
+
+    Sub RefreshSelection(dtp As DateTimePicker)
+        If valCheck Then
+            newVal = dtp.Value
+
+            If currVal.Year <> newVal.Year Then
+                currSelected = Selection.Year
+            ElseIf currVal.Month <> newVal.Month Then
+                currSelected = Selection.Month
+            ElseIf currVal.Day <> newVal.Day Then
+                currSelected = Selection.Day
+            End If
+
+            dtp.Value = currVal
+            valCheck = False
+            fixdate()
+        End If
+    End Sub
+
+    Private Sub dtScore_DropDown(sender As Object, e As EventArgs) Handles dtScore.DropDown
+        RemoveHandler dtScore.MouseUp, AddressOf dtScore_MouseUp
+    End Sub
+
+    Private Sub dtScore_CloseUp(sender As Object, e As EventArgs) Handles dtScore.CloseUp
+        AddHandler dtScore.MouseUp, AddressOf dtScore_MouseUp
+        CheckDTPSelection(dtScore)
+    End Sub
+
+    Private Sub dtScore_KeyUp(sender As Object, e As KeyEventArgs) Handles dtScore.KeyUp
+        If e.KeyValue = Keys.Left OrElse e.KeyValue = Keys.Right Then
+            CheckDTPSelection(dtScore)
+        End If
+    End Sub
+    Private Sub dtScore_MouseUp(sender As Object, e As MouseEventArgs) Handles dtScore.MouseUp
+        CheckDTPSelection(dtScore)
+    End Sub
+
+    Private Sub dtScore_ValueChanged(sender As Object, e As EventArgs) Handles dtScore.ValueChanged
+        Dim dtp As DateTimePicker = DirectCast(sender, DateTimePicker)
+
+        RefreshSelection(dtp)
+
+    End Sub
+
+    'Private Sub Btn_WhatsSelected_Click(sender As Object, e As EventArgs) Handles Btn_WhatsSelected.Click
+    '    'Show the current selected value in a MessageBox
+    '    MessageBox.Show(currSelected.ToString())
+    'End Sub
+    'Private Sub dtScore_ValueChanged(sender As Object, e As EventArgs) Handles dtScore.ValueChanged
+    Sub fixdate()
+        If bload Then Exit Sub
+        Dim dtschedule As New DataTable()
+        'build a table of schedule with dates in rows instead of columns
+        dtschedule = oHelper.buildSchedule()
+        'reformat dates into yyyymmdd format
+        For Each row In dtschedule.Rows
+            If row(1) Is DBNull.Value Then
+                dtschedule.Rows.Remove(row)
+                Continue For
+            End If
+            Dim wkdate As Date = row("Date")
+            Dim reformatted As String = wkdate.ToString("yyyyMMdd", Globalization.CultureInfo.InvariantCulture)
+            row("Date") = reformatted
+        Next
+        Dim solddate = oHelper.sDateLastScore
+        oHelper.sDateLastScore = ""
+        For Each row In dtschedule.Rows
+            If CDate(dtScore.Text).ToString("yyyyMMdd", Globalization.CultureInfo.InvariantCulture) = row("Date") Then
+                oHelper.sDateLastScore = CDate(dtScore.Text).ToString("yyyyMMdd", Globalization.CultureInfo.InvariantCulture)
+                Exit For
+            End If
+        Next
+        If oHelper.sDateLastScore = "" Then
+            MsgBox("this date is not on the schedule, pick another")
+            oHelper.sDateLastScore = solddate
+        End If
+        'oHelper.dDate = dtScore.Text
     End Sub
 End Class
 Public Class Team

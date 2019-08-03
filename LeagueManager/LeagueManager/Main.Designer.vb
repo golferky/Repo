@@ -67,7 +67,11 @@ Partial Class Main
         Me.dtRSEnd = New System.Windows.Forms.DateTimePicker()
         Me.lblProcessMsg = New System.Windows.Forms.Label()
         Me.gbControls = New System.Windows.Forms.GroupBox()
+        Me.cbDebug = New System.Windows.Forms.CheckBox()
         Me.GroupBox6 = New System.Windows.Forms.GroupBox()
+        Me.StatusStrip1 = New System.Windows.Forms.StatusStrip()
+        Me.tspb = New System.Windows.Forms.ToolStripProgressBar()
+        Me.tssl = New System.Windows.Forms.ToolStripStatusLabel()
         Me.GroupBox1.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
         Me.GroupBox3.SuspendLayout()
@@ -76,6 +80,7 @@ Partial Class Main
         Me.GroupBox5.SuspendLayout()
         Me.gbControls.SuspendLayout()
         Me.GroupBox6.SuspendLayout()
+        Me.StatusStrip1.SuspendLayout()
         Me.SuspendLayout()
         '
         'btnLeagueSetup
@@ -110,7 +115,7 @@ Partial Class Main
         '
         'btnExit
         '
-        Me.btnExit.Location = New System.Drawing.Point(367, 155)
+        Me.btnExit.Location = New System.Drawing.Point(368, 156)
         Me.btnExit.Margin = New System.Windows.Forms.Padding(4)
         Me.btnExit.Name = "btnExit"
         Me.btnExit.Size = New System.Drawing.Size(262, 46)
@@ -124,7 +129,7 @@ Partial Class Main
         Me.GroupBox1.Controls.Add(Me.btnMatches)
         Me.GroupBox1.Controls.Add(Me.btnSkins)
         Me.GroupBox1.Controls.Add(Me.btnScoreCard)
-        Me.GroupBox1.Location = New System.Drawing.Point(83, 188)
+        Me.GroupBox1.Location = New System.Drawing.Point(84, 188)
         Me.GroupBox1.Margin = New System.Windows.Forms.Padding(4)
         Me.GroupBox1.Name = "GroupBox1"
         Me.GroupBox1.Padding = New System.Windows.Forms.Padding(4)
@@ -185,7 +190,7 @@ Partial Class Main
         '
         'Button1
         '
-        Me.Button1.Location = New System.Drawing.Point(348, 114)
+        Me.Button1.Location = New System.Drawing.Point(348, 113)
         Me.Button1.Margin = New System.Windows.Forms.Padding(4)
         Me.Button1.Name = "Button1"
         Me.Button1.Size = New System.Drawing.Size(262, 46)
@@ -195,7 +200,7 @@ Partial Class Main
         '
         'btnLast5
         '
-        Me.btnLast5.Location = New System.Drawing.Point(40, 114)
+        Me.btnLast5.Location = New System.Drawing.Point(40, 113)
         Me.btnLast5.Margin = New System.Windows.Forms.Padding(4)
         Me.btnLast5.Name = "btnLast5"
         Me.btnLast5.Size = New System.Drawing.Size(262, 46)
@@ -205,7 +210,7 @@ Partial Class Main
         '
         'btnPlayerStats
         '
-        Me.btnPlayerStats.Location = New System.Drawing.Point(348, 45)
+        Me.btnPlayerStats.Location = New System.Drawing.Point(348, 44)
         Me.btnPlayerStats.Margin = New System.Windows.Forms.Padding(4)
         Me.btnPlayerStats.Name = "btnPlayerStats"
         Me.btnPlayerStats.Size = New System.Drawing.Size(262, 46)
@@ -215,7 +220,7 @@ Partial Class Main
         '
         'btnStandings
         '
-        Me.btnStandings.Location = New System.Drawing.Point(40, 45)
+        Me.btnStandings.Location = New System.Drawing.Point(40, 44)
         Me.btnStandings.Margin = New System.Windows.Forms.Padding(4)
         Me.btnStandings.Name = "btnStandings"
         Me.btnStandings.Size = New System.Drawing.Size(262, 46)
@@ -239,7 +244,7 @@ Partial Class Main
         Me.GroupBox2.Controls.Add(Me.btnLeagueSetup)
         Me.GroupBox2.Controls.Add(Me.btnCourseSetup)
         Me.GroupBox2.Controls.Add(Me.btnPlayerSetup)
-        Me.GroupBox2.Location = New System.Drawing.Point(83, 816)
+        Me.GroupBox2.Location = New System.Drawing.Point(84, 815)
         Me.GroupBox2.Margin = New System.Windows.Forms.Padding(4)
         Me.GroupBox2.Name = "GroupBox2"
         Me.GroupBox2.Padding = New System.Windows.Forms.Padding(4)
@@ -264,7 +269,7 @@ Partial Class Main
         '
         'txtFolder
         '
-        Me.txtFolder.Location = New System.Drawing.Point(15, 68)
+        Me.txtFolder.Location = New System.Drawing.Point(16, 67)
         Me.txtFolder.Margin = New System.Windows.Forms.Padding(6)
         Me.txtFolder.Name = "txtFolder"
         Me.txtFolder.Size = New System.Drawing.Size(610, 31)
@@ -273,7 +278,7 @@ Partial Class Main
         'Label1
         '
         Me.Label1.AutoSize = True
-        Me.Label1.Location = New System.Drawing.Point(78, 73)
+        Me.Label1.Location = New System.Drawing.Point(92, 17)
         Me.Label1.Margin = New System.Windows.Forms.Padding(6, 0, 6, 0)
         Me.Label1.Name = "Label1"
         Me.Label1.Size = New System.Drawing.Size(146, 25)
@@ -285,7 +290,7 @@ Partial Class Main
         Me.GroupBox3.Controls.Add(Me.btnZip)
         Me.GroupBox3.Controls.Add(Me.btnSchedule)
         Me.GroupBox3.Controls.Add(Me.btnShowScores)
-        Me.GroupBox3.Location = New System.Drawing.Point(775, 886)
+        Me.GroupBox3.Location = New System.Drawing.Point(780, 1062)
         Me.GroupBox3.Margin = New System.Windows.Forms.Padding(4)
         Me.GroupBox3.Name = "GroupBox3"
         Me.GroupBox3.Padding = New System.Windows.Forms.Padding(4)
@@ -317,7 +322,7 @@ Partial Class Main
         'cbLeagues
         '
         Me.cbLeagues.FormattingEnabled = True
-        Me.cbLeagues.Location = New System.Drawing.Point(84, 123)
+        Me.cbLeagues.Location = New System.Drawing.Point(98, 67)
         Me.cbLeagues.Margin = New System.Windows.Forms.Padding(6)
         Me.cbLeagues.Name = "cbLeagues"
         Me.cbLeagues.Size = New System.Drawing.Size(258, 33)
@@ -326,7 +331,7 @@ Partial Class Main
         'lbScoresFile
         '
         Me.lbScoresFile.AutoSize = True
-        Me.lbScoresFile.Location = New System.Drawing.Point(9, 37)
+        Me.lbScoresFile.Location = New System.Drawing.Point(8, 37)
         Me.lbScoresFile.Margin = New System.Windows.Forms.Padding(6, 0, 6, 0)
         Me.lbScoresFile.Name = "lbScoresFile"
         Me.lbScoresFile.Size = New System.Drawing.Size(179, 25)
@@ -335,7 +340,7 @@ Partial Class Main
         '
         'btnChangeFolder
         '
-        Me.btnChangeFolder.Location = New System.Drawing.Point(15, 155)
+        Me.btnChangeFolder.Location = New System.Drawing.Point(16, 156)
         Me.btnChangeFolder.Margin = New System.Windows.Forms.Padding(4)
         Me.btnChangeFolder.Name = "btnChangeFolder"
         Me.btnChangeFolder.Size = New System.Drawing.Size(262, 46)
@@ -346,7 +351,7 @@ Partial Class Main
         'cbLogging
         '
         Me.cbLogging.AutoSize = True
-        Me.cbLogging.Location = New System.Drawing.Point(15, 235)
+        Me.cbLogging.Location = New System.Drawing.Point(16, 235)
         Me.cbLogging.Margin = New System.Windows.Forms.Padding(6)
         Me.cbLogging.Name = "cbLogging"
         Me.cbLogging.Size = New System.Drawing.Size(121, 29)
@@ -357,7 +362,7 @@ Partial Class Main
         'cbMail
         '
         Me.cbMail.AutoSize = True
-        Me.cbMail.Location = New System.Drawing.Point(223, 235)
+        Me.cbMail.Location = New System.Drawing.Point(138, 235)
         Me.cbMail.Margin = New System.Windows.Forms.Padding(6)
         Me.cbMail.Name = "cbMail"
         Me.cbMail.Size = New System.Drawing.Size(186, 29)
@@ -390,11 +395,11 @@ Partial Class Main
         Me.GroupBox4.Controls.Add(Me.GroupBox5)
         Me.GroupBox4.Controls.Add(Me.Label2)
         Me.GroupBox4.Controls.Add(Me.dtScore)
-        Me.GroupBox4.Location = New System.Drawing.Point(771, 188)
+        Me.GroupBox4.Location = New System.Drawing.Point(776, 31)
         Me.GroupBox4.Margin = New System.Windows.Forms.Padding(6)
         Me.GroupBox4.Name = "GroupBox4"
         Me.GroupBox4.Padding = New System.Windows.Forms.Padding(6)
-        Me.GroupBox4.Size = New System.Drawing.Size(332, 665)
+        Me.GroupBox4.Size = New System.Drawing.Size(332, 1021)
         Me.GroupBox4.TabIndex = 23
         Me.GroupBox4.TabStop = False
         Me.GroupBox4.Text = "Control Dates"
@@ -405,7 +410,7 @@ Partial Class Main
         Me.gbPS.Controls.Add(Me.dtPSStart)
         Me.gbPS.Controls.Add(Me.Label5)
         Me.gbPS.Controls.Add(Me.Label6)
-        Me.gbPS.Location = New System.Drawing.Point(58, 404)
+        Me.gbPS.Location = New System.Drawing.Point(58, 806)
         Me.gbPS.Margin = New System.Windows.Forms.Padding(6)
         Me.gbPS.Name = "gbPS"
         Me.gbPS.Padding = New System.Windows.Forms.Padding(6)
@@ -508,7 +513,7 @@ Partial Class Main
         'lblProcessMsg
         '
         Me.lblProcessMsg.AutoSize = True
-        Me.lblProcessMsg.Location = New System.Drawing.Point(412, 73)
+        Me.lblProcessMsg.Location = New System.Drawing.Point(92, 125)
         Me.lblProcessMsg.Margin = New System.Windows.Forms.Padding(6, 0, 6, 0)
         Me.lblProcessMsg.Name = "lblProcessMsg"
         Me.lblProcessMsg.Size = New System.Drawing.Size(184, 25)
@@ -517,6 +522,7 @@ Partial Class Main
         '
         'gbControls
         '
+        Me.gbControls.Controls.Add(Me.cbDebug)
         Me.gbControls.Controls.Add(Me.lbScoresFile)
         Me.gbControls.Controls.Add(Me.btnExit)
         Me.gbControls.Controls.Add(Me.cbMail)
@@ -524,11 +530,24 @@ Partial Class Main
         Me.gbControls.Controls.Add(Me.btnChangeFolder)
         Me.gbControls.Controls.Add(Me.cbLogging)
         Me.gbControls.Location = New System.Drawing.Point(82, 1110)
+        Me.gbControls.Margin = New System.Windows.Forms.Padding(4)
         Me.gbControls.Name = "gbControls"
-        Me.gbControls.Size = New System.Drawing.Size(651, 279)
+        Me.gbControls.Padding = New System.Windows.Forms.Padding(4)
+        Me.gbControls.Size = New System.Drawing.Size(652, 279)
         Me.gbControls.TabIndex = 24
         Me.gbControls.TabStop = False
         Me.gbControls.Text = "Controls"
+        '
+        'cbDebug
+        '
+        Me.cbDebug.AutoSize = True
+        Me.cbDebug.Location = New System.Drawing.Point(342, 235)
+        Me.cbDebug.Margin = New System.Windows.Forms.Padding(6)
+        Me.cbDebug.Name = "cbDebug"
+        Me.cbDebug.Size = New System.Drawing.Size(167, 29)
+        Me.cbDebug.TabIndex = 21
+        Me.cbDebug.Text = "Debug Mode"
+        Me.cbDebug.UseVisualStyleBackColor = True
         '
         'GroupBox6
         '
@@ -538,17 +557,42 @@ Partial Class Main
         Me.GroupBox6.Controls.Add(Me.btnPlayerStats)
         Me.GroupBox6.Controls.Add(Me.btnStandings)
         Me.GroupBox6.Location = New System.Drawing.Point(82, 462)
+        Me.GroupBox6.Margin = New System.Windows.Forms.Padding(4)
         Me.GroupBox6.Name = "GroupBox6"
-        Me.GroupBox6.Size = New System.Drawing.Size(650, 303)
+        Me.GroupBox6.Padding = New System.Windows.Forms.Padding(4)
+        Me.GroupBox6.Size = New System.Drawing.Size(650, 304)
         Me.GroupBox6.TabIndex = 9
         Me.GroupBox6.TabStop = False
         Me.GroupBox6.Text = "Finance and Reports"
+        '
+        'StatusStrip1
+        '
+        Me.StatusStrip1.ImageScalingSize = New System.Drawing.Size(32, 32)
+        Me.StatusStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.tspb, Me.tssl})
+        Me.StatusStrip1.Location = New System.Drawing.Point(0, 1524)
+        Me.StatusStrip1.Name = "StatusStrip1"
+        Me.StatusStrip1.Size = New System.Drawing.Size(1160, 38)
+        Me.StatusStrip1.TabIndex = 25
+        Me.StatusStrip1.Text = "StatusStrip1"
+        '
+        'tspb
+        '
+        Me.tspb.Name = "tspb"
+        Me.tspb.Size = New System.Drawing.Size(400, 32)
+        Me.tspb.Style = System.Windows.Forms.ProgressBarStyle.Continuous
+        '
+        'tssl
+        '
+        Me.tssl.Name = "tssl"
+        Me.tssl.Size = New System.Drawing.Size(241, 33)
+        Me.tssl.Text = "ToolStripStatusLabel1"
         '
         'Main
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(12.0!, 25.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(1159, 1455)
+        Me.ClientSize = New System.Drawing.Size(1160, 1562)
+        Me.Controls.Add(Me.StatusStrip1)
         Me.Controls.Add(Me.GroupBox6)
         Me.Controls.Add(Me.gbControls)
         Me.Controls.Add(Me.GroupBox4)
@@ -574,6 +618,8 @@ Partial Class Main
         Me.gbControls.ResumeLayout(False)
         Me.gbControls.PerformLayout()
         Me.GroupBox6.ResumeLayout(False)
+        Me.StatusStrip1.ResumeLayout(False)
+        Me.StatusStrip1.PerformLayout()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -623,4 +669,8 @@ Partial Class Main
     Friend WithEvents btnPayments As Button
     Friend WithEvents gbControls As GroupBox
     Friend WithEvents GroupBox6 As GroupBox
+    Friend WithEvents cbDebug As CheckBox
+    Friend WithEvents StatusStrip1 As StatusStrip
+    Friend WithEvents tspb As ToolStripProgressBar
+    Friend WithEvents tssl As ToolStripStatusLabel
 End Class

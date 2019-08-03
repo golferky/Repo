@@ -1,6 +1,7 @@
 ﻿Imports System.IO
 Public Class Scores
-    Dim oHelper As New LeagueManager.Helper
+    'Dim oHelper As New LeagueManager.Helper
+    Dim oHelper As New Helper
     Dim rs As New Resizer
     Dim sColFormat = New List(Of String)
     Dim dtScoreCard As DataTable
@@ -9,6 +10,9 @@ Public Class Scores
     Private Sub Scores_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         oHelper = Main.oHelper
         BldScoresDataGridFromFile()
+        Dim sWH As String = oHelper.ScreenResize()
+        Me.Width = sWH.Split(":")(0)
+        Me.Height = sWH.Split(":")(1)
         Dim sfilename = oHelper.sFilePath & "\" & String.Format(DateTime.Now.ToString("yyyyMMdd_hhmmss_{0}_") & "ScoresAll.csv", oHelper.sPlayer)
         oHelper.dgv2csv(dgScores, sfilename)
 
@@ -115,7 +119,7 @@ Public Class Scores
             'replace spaces with underscores for csv column matchups
             sScoreCardforDGV = sScoreCardforDGV.Substring(0, Len(sScoreCardforDGV) - 1).Replace(" ", "_")
 
-            dtScoreCard = dvScores.ToTable(True, sScoreCardforDGV.Split(",").ToArray)
+            dtScoreCard = dvScores.ToTable(False, sScoreCardforDGV.Split(",").ToArray)
 
             oHelper.CreateColumnsWithFormat("Rnds", dtScoreCard, sColFormat)
             oHelper.CreateColumnsWithFormat("F9", dtScoreCard, sColFormat)
@@ -280,12 +284,12 @@ Public Class Scores
                     'End If
 
                     If row.Cells("Method").Value = "Gross" Or row.Cells("Method").Value = "Net" Then
-                            If row.Cells("Hole1").Value IsNot DBNull.Value Then
-                                oHelper.iHoleMarker = 1
-                            Else
-                                oHelper.iHoleMarker = 10
-                            End If
+                        If row.Cells("Hole1").Value IsNot DBNull.Value Then
+                            oHelper.iHoleMarker = 1
+                        Else
+                            oHelper.iHoleMarker = 10
                         End If
+                    End If
                     If oHelper.iHoleMarker = 10 Then
                         For i = 0 To 3
                             row.Cells(i).Style.BackColor = Color.LightBlue
@@ -494,10 +498,10 @@ Public Class Scores
                     'if the handicap > stroke index adjust net score to gross
                     If score("Method") = "Net" Then
                         Dim isi = oHelper.CalcStrokeIndex("Hole" & i)
-                        If oHelper.IHdcp >= isi Then
+                        If score("pHdcp") >= isi Then
                             'check stroke index
                             iscore += 1
-                            If oHelper.IHdcp - oHelper.iHoles >= isi Then iscore += 1
+                            If score("pHdcp") - oHelper.iHoles >= isi Then iscore += 1
                         End If
                     End If
                     row("Hole" & i) = CInt(row("Hole" & i)) + iscore
@@ -611,7 +615,13 @@ Public Class Scores
 
     End Sub
     Private Sub Scores_Resize(sender As Object, e As EventArgs) Handles MyBase.Resize
-        rs.ResizeAllControls(Me)
+        oHelper.LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
+        Try
+            rs.ResizeAllControls(Me)
+            oHelper.LOGIT(String.Format("Form Height {0} Width {1}", Me.Height, Me.Width))
+        Catch ex As Exception
+
+        End Try
     End Sub
 End Class
 Public Class rank

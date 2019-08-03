@@ -90,6 +90,9 @@ Partial Class frmScoreCard
         Me.rbFront = New System.Windows.Forms.RadioButton()
         Me.rbBack = New System.Windows.Forms.RadioButton()
         Me.lbParmFile = New System.Windows.Forms.Label()
+        Me.StatusStrip1 = New System.Windows.Forms.StatusStrip()
+        Me.tspb = New System.Windows.Forms.ToolStripProgressBar()
+        Me.tssl = New System.Windows.Forms.ToolStripStatusLabel()
         Me.gbDefMeth.SuspendLayout()
         Me.gbDefGames.SuspendLayout()
         Me.GroupBox3.SuspendLayout()
@@ -102,12 +105,13 @@ Partial Class frmScoreCard
         Me.GroupBox4.SuspendLayout()
         Me.GroupBox5.SuspendLayout()
         Me.gbFrontBack.SuspendLayout()
+        Me.StatusStrip1.SuspendLayout()
         Me.SuspendLayout()
         '
         'lbPS
         '
         Me.lbPS.AutoSize = True
-        Me.lbPS.Location = New System.Drawing.Point(2014, 17)
+        Me.lbPS.Location = New System.Drawing.Point(1758, 29)
         Me.lbPS.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.lbPS.Name = "lbPS"
         Me.lbPS.Size = New System.Drawing.Size(57, 25)
@@ -116,7 +120,7 @@ Partial Class frmScoreCard
         '
         'btnExit
         '
-        Me.btnExit.Location = New System.Drawing.Point(2278, 188)
+        Me.btnExit.Location = New System.Drawing.Point(2188, 194)
         Me.btnExit.Margin = New System.Windows.Forms.Padding(4)
         Me.btnExit.Name = "btnExit"
         Me.btnExit.Size = New System.Drawing.Size(212, 71)
@@ -127,7 +131,7 @@ Partial Class frmScoreCard
         '
         'btnShowScores
         '
-        Me.btnShowScores.Location = New System.Drawing.Point(2278, 21)
+        Me.btnShowScores.Location = New System.Drawing.Point(2188, 27)
         Me.btnShowScores.Margin = New System.Windows.Forms.Padding(4)
         Me.btnShowScores.Name = "btnShowScores"
         Me.btnShowScores.Size = New System.Drawing.Size(212, 71)
@@ -140,7 +144,7 @@ Partial Class frmScoreCard
         '
         Me.rbNet.AutoSize = True
         Me.rbNet.Checked = True
-        Me.rbNet.Location = New System.Drawing.Point(60, 37)
+        Me.rbNet.Location = New System.Drawing.Point(12, 77)
         Me.rbNet.Margin = New System.Windows.Forms.Padding(6)
         Me.rbNet.Name = "rbNet"
         Me.rbNet.Size = New System.Drawing.Size(76, 29)
@@ -152,7 +156,7 @@ Partial Class frmScoreCard
         'rbGross
         '
         Me.rbGross.AutoSize = True
-        Me.rbGross.Location = New System.Drawing.Point(60, 81)
+        Me.rbGross.Location = New System.Drawing.Point(12, 121)
         Me.rbGross.Margin = New System.Windows.Forms.Padding(6)
         Me.rbGross.Name = "rbGross"
         Me.rbGross.Size = New System.Drawing.Size(100, 29)
@@ -165,19 +169,19 @@ Partial Class frmScoreCard
         Me.gbDefMeth.Controls.Add(Me.rbScore)
         Me.gbDefMeth.Controls.Add(Me.rbNet)
         Me.gbDefMeth.Controls.Add(Me.rbGross)
-        Me.gbDefMeth.Location = New System.Drawing.Point(82, 17)
+        Me.gbDefMeth.Location = New System.Drawing.Point(24, 17)
         Me.gbDefMeth.Margin = New System.Windows.Forms.Padding(6)
         Me.gbDefMeth.Name = "gbDefMeth"
         Me.gbDefMeth.Padding = New System.Windows.Forms.Padding(6)
-        Me.gbDefMeth.Size = New System.Drawing.Size(262, 192)
+        Me.gbDefMeth.Size = New System.Drawing.Size(160, 231)
         Me.gbDefMeth.TabIndex = 61
         Me.gbDefMeth.TabStop = False
-        Me.gbDefMeth.Text = "Default Score Method"
+        Me.gbDefMeth.Text = "Score Method"
         '
         'rbScore
         '
         Me.rbScore.AutoSize = True
-        Me.rbScore.Location = New System.Drawing.Point(60, 125)
+        Me.rbScore.Location = New System.Drawing.Point(12, 165)
         Me.rbScore.Margin = New System.Windows.Forms.Padding(6)
         Me.rbScore.Name = "rbScore"
         Me.rbScore.Size = New System.Drawing.Size(99, 29)
@@ -188,7 +192,7 @@ Partial Class frmScoreCard
         'cbDatesPlayers
         '
         Me.cbDatesPlayers.FormattingEnabled = True
-        Me.cbDatesPlayers.Location = New System.Drawing.Point(1932, 50)
+        Me.cbDatesPlayers.Location = New System.Drawing.Point(1676, 62)
         Me.cbDatesPlayers.Margin = New System.Windows.Forms.Padding(4)
         Me.cbDatesPlayers.Name = "cbDatesPlayers"
         Me.cbDatesPlayers.Size = New System.Drawing.Size(226, 33)
@@ -199,7 +203,7 @@ Partial Class frmScoreCard
         '
         Me.gbDefGames.Controls.Add(Me.cbClosest)
         Me.gbDefGames.Controls.Add(Me.cbSkins)
-        Me.gbDefGames.Location = New System.Drawing.Point(876, 173)
+        Me.gbDefGames.Location = New System.Drawing.Point(620, 173)
         Me.gbDefGames.Margin = New System.Windows.Forms.Padding(6)
         Me.gbDefGames.Name = "gbDefGames"
         Me.gbDefGames.Padding = New System.Windows.Forms.Padding(6)
@@ -237,7 +241,7 @@ Partial Class frmScoreCard
         '
         Me.GroupBox3.Controls.Add(Me.rbDots)
         Me.GroupBox3.Controls.Add(Me.rbColors)
-        Me.GroupBox3.Location = New System.Drawing.Point(868, 21)
+        Me.GroupBox3.Location = New System.Drawing.Point(612, 21)
         Me.GroupBox3.Margin = New System.Windows.Forms.Padding(6)
         Me.GroupBox3.Name = "GroupBox3"
         Me.GroupBox3.Padding = New System.Windows.Forms.Padding(6)
@@ -273,7 +277,7 @@ Partial Class frmScoreCard
         'lbStatus
         '
         Me.lbStatus.AutoSize = True
-        Me.lbStatus.Location = New System.Drawing.Point(51, 246)
+        Me.lbStatus.Location = New System.Drawing.Point(22, 273)
         Me.lbStatus.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.lbStatus.Name = "lbStatus"
         Me.lbStatus.Size = New System.Drawing.Size(167, 25)
@@ -282,7 +286,7 @@ Partial Class frmScoreCard
         '
         'btnSave
         '
-        Me.btnSave.Location = New System.Drawing.Point(2278, 108)
+        Me.btnSave.Location = New System.Drawing.Point(2188, 113)
         Me.btnSave.Margin = New System.Windows.Forms.Padding(4)
         Me.btnSave.Name = "btnSave"
         Me.btnSave.Size = New System.Drawing.Size(212, 71)
@@ -300,7 +304,7 @@ Partial Class frmScoreCard
         Me.GroupBox1.Controls.Add(Me.tbPurse)
         Me.GroupBox1.Controls.Add(Me.Label3)
         Me.GroupBox1.Controls.Add(Me.GroupBox2)
-        Me.GroupBox1.Location = New System.Drawing.Point(1102, 21)
+        Me.GroupBox1.Location = New System.Drawing.Point(840, 29)
         Me.GroupBox1.Margin = New System.Windows.Forms.Padding(6)
         Me.GroupBox1.Name = "GroupBox1"
         Me.GroupBox1.Padding = New System.Windows.Forms.Padding(6)
@@ -322,7 +326,7 @@ Partial Class frmScoreCard
         'Label25
         '
         Me.Label25.AutoSize = True
-        Me.Label25.Location = New System.Drawing.Point(675, 167)
+        Me.Label25.Location = New System.Drawing.Point(676, 167)
         Me.Label25.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.Label25.Name = "Label25"
         Me.Label25.Size = New System.Drawing.Size(62, 25)
@@ -494,7 +498,7 @@ Partial Class frmScoreCard
         'Label3
         '
         Me.Label3.AutoSize = True
-        Me.Label3.Location = New System.Drawing.Point(675, 39)
+        Me.Label3.Location = New System.Drawing.Point(676, 38)
         Me.Label3.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.Label3.Name = "Label3"
         Me.Label3.Size = New System.Drawing.Size(122, 25)
@@ -587,13 +591,13 @@ Partial Class frmScoreCard
         Me.dgScores.Location = New System.Drawing.Point(56, 319)
         Me.dgScores.Margin = New System.Windows.Forms.Padding(6)
         Me.dgScores.Name = "dgScores"
-        Me.dgScores.Size = New System.Drawing.Size(2848, 1381)
+        Me.dgScores.Size = New System.Drawing.Size(3186, 1322)
         Me.dgScores.TabIndex = 0
         '
         'cbScoresLocked
         '
         Me.cbScoresLocked.AutoSize = True
-        Me.cbScoresLocked.Location = New System.Drawing.Point(1932, 192)
+        Me.cbScoresLocked.Location = New System.Drawing.Point(1676, 204)
         Me.cbScoresLocked.Margin = New System.Windows.Forms.Padding(6)
         Me.cbScoresLocked.Name = "cbScoresLocked"
         Me.cbScoresLocked.Size = New System.Drawing.Size(163, 29)
@@ -611,7 +615,7 @@ Partial Class frmScoreCard
         Me.gbHoleLegend.Controls.Add(Me.Label6)
         Me.gbHoleLegend.Controls.Add(Me.Label5)
         Me.gbHoleLegend.Controls.Add(Me.Label4)
-        Me.gbHoleLegend.Location = New System.Drawing.Point(376, 173)
+        Me.gbHoleLegend.Location = New System.Drawing.Point(192, 173)
         Me.gbHoleLegend.Margin = New System.Windows.Forms.Padding(6)
         Me.gbHoleLegend.Name = "gbHoleLegend"
         Me.gbHoleLegend.Padding = New System.Windows.Forms.Padding(6)
@@ -760,7 +764,7 @@ Partial Class frmScoreCard
         Me.GroupBox5.Controls.Add(Me.Label12)
         Me.GroupBox5.Controls.Add(Me.Label11)
         Me.GroupBox5.Controls.Add(Me.Label10)
-        Me.GroupBox5.Location = New System.Drawing.Point(420, 23)
+        Me.GroupBox5.Location = New System.Drawing.Point(196, 29)
         Me.GroupBox5.Margin = New System.Windows.Forms.Padding(6)
         Me.GroupBox5.Name = "GroupBox5"
         Me.GroupBox5.Padding = New System.Windows.Forms.Padding(6)
@@ -820,7 +824,7 @@ Partial Class frmScoreCard
         'cbMarkPaid
         '
         Me.cbMarkPaid.AutoSize = True
-        Me.cbMarkPaid.Location = New System.Drawing.Point(1932, 104)
+        Me.cbMarkPaid.Location = New System.Drawing.Point(1676, 115)
         Me.cbMarkPaid.Margin = New System.Windows.Forms.Padding(6)
         Me.cbMarkPaid.Name = "cbMarkPaid"
         Me.cbMarkPaid.Size = New System.Drawing.Size(248, 29)
@@ -832,7 +836,7 @@ Partial Class frmScoreCard
         'cbMatches
         '
         Me.cbMatches.AutoSize = True
-        Me.cbMatches.Location = New System.Drawing.Point(1932, 148)
+        Me.cbMatches.Location = New System.Drawing.Point(1676, 160)
         Me.cbMatches.Margin = New System.Windows.Forms.Padding(6)
         Me.cbMatches.Name = "cbMatches"
         Me.cbMatches.Size = New System.Drawing.Size(246, 29)
@@ -845,7 +849,7 @@ Partial Class frmScoreCard
         '
         Me.gbFrontBack.Controls.Add(Me.rbFront)
         Me.gbFrontBack.Controls.Add(Me.rbBack)
-        Me.gbFrontBack.Location = New System.Drawing.Point(2576, 23)
+        Me.gbFrontBack.Location = New System.Drawing.Point(1938, 31)
         Me.gbFrontBack.Margin = New System.Windows.Forms.Padding(6)
         Me.gbFrontBack.Name = "gbFrontBack"
         Me.gbFrontBack.Padding = New System.Windows.Forms.Padding(6)
@@ -881,18 +885,41 @@ Partial Class frmScoreCard
         'lbParmFile
         '
         Me.lbParmFile.AutoSize = True
-        Me.lbParmFile.Location = New System.Drawing.Point(1930, 264)
+        Me.lbParmFile.Location = New System.Drawing.Point(1674, 275)
         Me.lbParmFile.Margin = New System.Windows.Forms.Padding(4, 0, 4, 0)
         Me.lbParmFile.Name = "lbParmFile"
         Me.lbParmFile.Size = New System.Drawing.Size(103, 25)
         Me.lbParmFile.TabIndex = 93
         Me.lbParmFile.Text = "Parm File"
         '
+        'StatusStrip1
+        '
+        Me.StatusStrip1.ImageScalingSize = New System.Drawing.Size(32, 32)
+        Me.StatusStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.tspb, Me.tssl})
+        Me.StatusStrip1.Location = New System.Drawing.Point(0, 1594)
+        Me.StatusStrip1.Name = "StatusStrip1"
+        Me.StatusStrip1.Size = New System.Drawing.Size(3246, 38)
+        Me.StatusStrip1.TabIndex = 94
+        Me.StatusStrip1.Text = "StatusStrip1"
+        '
+        'tspb
+        '
+        Me.tspb.Name = "tspb"
+        Me.tspb.Size = New System.Drawing.Size(100, 32)
+        Me.tspb.Style = System.Windows.Forms.ProgressBarStyle.Continuous
+        '
+        'tssl
+        '
+        Me.tssl.Name = "tssl"
+        Me.tssl.Size = New System.Drawing.Size(241, 33)
+        Me.tssl.Text = "ToolStripStatusLabel1"
+        '
         'frmScoreCard
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(12.0!, 25.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(2972, 1700)
+        Me.ClientSize = New System.Drawing.Size(3246, 1632)
+        Me.Controls.Add(Me.StatusStrip1)
         Me.Controls.Add(Me.lbParmFile)
         Me.Controls.Add(Me.gbFrontBack)
         Me.Controls.Add(Me.cbMatches)
@@ -938,6 +965,8 @@ Partial Class frmScoreCard
         Me.GroupBox5.PerformLayout()
         Me.gbFrontBack.ResumeLayout(False)
         Me.gbFrontBack.PerformLayout()
+        Me.StatusStrip1.ResumeLayout(False)
+        Me.StatusStrip1.PerformLayout()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -1009,4 +1038,7 @@ Partial Class frmScoreCard
     Friend WithEvents lbParmFile As Label
     Friend WithEvents tbExtra As TextBox
     Friend WithEvents Label25 As Label
+    Friend WithEvents StatusStrip1 As StatusStrip
+    Friend WithEvents tspb As ToolStripProgressBar
+    Friend WithEvents tssl As ToolStripStatusLabel
 End Class

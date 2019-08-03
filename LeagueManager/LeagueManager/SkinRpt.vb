@@ -103,8 +103,9 @@ Public Class SkinRpt
 
         Dim sdate = Main.cbLeagues.SelectedItem.ToString.Substring(Main.cbLeagues.SelectedItem.ToString.IndexOf("(") + 1, 4) & "0101"
 
-        Dim dv As New DataView(oHelper.dsLeague.Tables("dtScores"))
-        dv.RowFilter = String.Format("Date > {0} And Date < {1} and $Earn > 0", sdate, sdate.Replace("0101", "1231"))
+        Dim dv As New DataView(oHelper.dsLeague.Tables("dtPayments"))
+        'dv.RowFilter = String.Format("Date > {0} And Date < {1} and $Earn > 0", sdate, sdate.Replace("0101", "1231"))
+        dv.RowFilter = String.Format("Date > {0} And Date < {1} and Earned > 0", sdate, sdate.Replace("0101", "1231"))
 
         For Each row As DataRowView In dv
             calcAmount(dtr, row)
@@ -212,7 +213,7 @@ Public Class SkinRpt
                 '#Skins-cannot refer to row name #Skins because row filter cannot deal with a field named with A # sign
                 dv.RowFilter = String.Format("Date = {0} and $Skins > 0", row(Datecon))
                 For Each drow As DataRowView In dv
-                    dr(NumberOfSkins) += drow("#Skins")
+                    If drow("#Skins") IsNot DBNull.Value Then dr(NumberOfSkins) += drow("#Skins")
                 Next
                 'Earned $$$ is Total Paid out
                 dr(MoneyPaidOut) = SumAmts("$Earn", row(Datecon))

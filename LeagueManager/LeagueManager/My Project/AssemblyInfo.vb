@@ -8,10 +8,10 @@ Imports System.Runtime.InteropServices
 
 ' Review the values of the assembly attributes
 
-<Assembly: AssemblyTitle("WindowsApplication1")> 
+<Assembly: AssemblyTitle("LeagueManager")>
 <Assembly: AssemblyDescription("")> 
-<Assembly: AssemblyCompany("Microsoft")> 
-<Assembly: AssemblyProduct("WindowsApplication1")> 
+<Assembly: AssemblyCompany("Microsoft")>
+<Assembly: AssemblyProduct("League Manager")>
 <Assembly: AssemblyCopyright("Copyright © Microsoft 2012")> 
 <Assembly: AssemblyTrademark("")> 
 

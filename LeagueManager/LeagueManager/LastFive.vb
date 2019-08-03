@@ -24,9 +24,13 @@
             cbDates.Items.Add(sDate)
         Next
         cbDates.SelectedIndex = 0
-        
+
         dgLast5.RowTemplate.Height = 15
-        Me.Height = 1500
+        'Me.Height = 1500
+        Dim sWH As String = oHelper.ScreenResize("614", "1500")
+        Me.Width = sWH.Split(":")(0)
+        Me.Height = sWH.Split(":")(1)
+        oHelper.LOGIT(String.Format("Screen Height {0} Width {1}", Main.iScreenHeight, Main.iScreenWidth))
         btnDisplayScores_Click(sender, e)
     End Sub
 
@@ -44,12 +48,14 @@
             Dim dvScores = New DataView(oHelper.dsLeague.Tables("dtScores"))
 
             dvScores.Sort = "Player, Date desc"
-            dvScores.RowFilter = String.Format("Date <= {0}", cbDates.SelectedItem)
-
+            dvScores.RowFilter = String.Format("Date <= {0}", cbDates.SelectedItem) '& String.Format(" and Player = 'Howard Gorman'")
+            If dvScores(0)("Out_Gross") Is DBNull.Value And dvScores(0)("In_Gross") Is DBNull.Value Then
+                cbDates.SelectedItem = dvScores(1)("Date")
+            End If
             Dim dvPlayers = New DataView(dvScores.ToTable(True, "Player"))
             dvPlayers.Sort = "Player"
 
-            Dim dt As DataTable = dvScores.ToTable(True, "Player,Out_Gross,In_Gross".Split(",").ToArray)
+            Dim dt As DataTable = dvScores.ToTable(False, "Player,Out_Gross,In_Gross".Split(",").ToArray)
             For Each Score In dt.Rows
                 If Score("Out_Gross") Is DBNull.Value And Score("In_Gross") Is DBNull.Value Then Continue For
                 If Score("Out_Gross") Is DBNull.Value Then
@@ -98,6 +104,7 @@
                 Dim dvthisplayer As New DataView(dt)
                 dvthisplayer.RowFilter = String.Format("Player = '{0}'", splayer("Player"))
                 Dim sKey() As Object = {splayer("Player"), dvScores(0)("Date")}
+
                 Dim sHdcp As String = dvScores(0)("Hdcp")
                 newrow("Player") = sKey(0)
                 newrow("Last Score") = sKey(1)
@@ -154,7 +161,7 @@
     End Sub
 
     Private Sub LastFive_Resize(sender As Object, e As EventArgs) Handles MyBase.Resize
-        rs.ResizeAllControls(Me)
+        'rs.ResizeAllControls(Me)
     End Sub
 
     'Clipboard.SetDataObject(dgv.GetClipboardContent())

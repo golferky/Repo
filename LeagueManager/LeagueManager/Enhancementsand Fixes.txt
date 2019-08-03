@@ -1,49 +1,74 @@
 ﻿*************************************************************************************************
 *                                           Change Log
 *************************************************************************************************
-* yyyymmdd - Priority - Complexity -  Module        Code Package     Description
-* -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------
-* 20190314 - M        - Med         - Finance                        send receipt txt or email when making payment
-* 20181211 - EM       - Easy to Med -                                Add post season skin/ctp percent to league parameters table, change code to use instead of hardcode
-* 20181204 - EM       - Easy to Med -                                Add logging to Main to help troubleshoot issues on loading tables
-* 20181102 - MH       - Med to Hard -								 only allow tuesdays for Dates, add parm to league parm
-* 20181026 - MH       - Med to hard - 								 allow multiple players for player file(a player for each league)
-* 20180919 - ML       - Med to hard - 								 Playerstats.vb show league average stats for each hole and rank
-* 20180919 - M        - Easy        - 								 Standings.vb Re-sorting numeric columns arent working right (col sort needed)
-* 20180812 - M        - Med         - 								 Scorecard.vb when sub for a player(add the player subbed for in the datagridview cell and remove it on save)
-* 20180801 - M        - Med         - 								 dont allow standings until matches have been done for that week
-* 20180430 - L        - Hard        - 								 Need to account for Rainouts
-* 20180423 - L        - Easy        - 								 Add Grade to Matches grid
-* 20180423 - M        - Med         - 								 Create HTML file for standings and other sheets
-* 20180324 - M        - Med         - 								 Track finances, payment history, distribution history, payment method
-*									- 								 New table/file(Payment file)
-* 20180403 - L        - Hard        - 								 Create option for league average for opponent noshow
+* yyyymmdd - Priority - Complexity -  Module        Code Package    Description
+* ----------------------------------------------------------------- ------------------------------------------------------------------------------------------------------------
+* 20190725 - L        - Easy        - Main,scorecard				add progress bar to screens so we can tell how long its taking
+* 20190709 - L        - Easy        - Main							remove datepicker and replace with dropdown of dates with schedule dates
+* 20190702 - L        - Easy        - Skins							when loading dates dropdown, dont load dates past current or dates rained out
+* 20190616 - M        - Med         - Several						change start/end parm to be MM/DD MM = month, dd day of month(dd of 1 = first tuesday of month)
+* 20190611 - M        - Med to Hard - ScheduleBuilder				Add additional screen to manage schedule, in progress
+* 20190606 - M        - Med         - Scorecard						Add additional fields to player file(Standings,Matches,Skins,PlayerStats), remove fields also(Nickname,DateLeft,Paid)
+* 20190605 - M        - Med         - Scorecard						Locking scores not working right, when enter scores clicked, make sure the league Parm is also properly updated
+* 20190604 - H        - Easy        - Scorecard						Checkbox off/on isnt working on skins/ctp (intermittent 6/6, working sometime), could be locking scores issue
+* 20190530 - H        - Med         -							    scores.csv $earn not being updated for 2019
+* 20190409 - M        - Med         - Finance					    amounts not showing from skins
+* 20190409 - M        - Med         - SkinsRpt						amounts not showing from skins
+* 20190402 - H        - Med         - Scorecard						account for break weeks or rainouts as blank matches
+* 20190330 - L        - Easy to Med - Payments						use leagueparm "Cost" instead of hardcoded 35
+* 20180430 - L        - Med to Hard - 								Need to account for Rainouts
+* 20190329 - M        - Easy to Med - dsleague.xsd                  Add homephone and cell carrier to player file
+* 20190329 - M        - Easy to Med - player.designer.vb            Add homephone and cell carrier to player file
+* 20181211 - EM       - Easy to Med -                               Add post season skin/ctp percent to league parameters table, change code to use instead of hardcode
+* 20181204 - EM       - Easy to Med -                               Add logging to Main to help troubleshoot issues on loading tables
+* 20181102 - MH       - Med to Hard -								only allow tuesdays for Dates, add parm to league parm
+* 20181026 - MH       - Med to hard - 								allow multiple players for player file(a player for each league)
+* 20180919 - M        - Easy        - 								Standings.vb Re-sorting numeric columns arent working right (col sort needed)
+* 20180801 - M        - Med         - 								dont allow standings until matches have been done for that week
+* 20180423 - L        - Easy        - 								Add Grade to Matches grid
+* 20180423 - M        - Med         - 								Create HTML file for standings and other sheets
+* 20180403 - L        - Hard        - 								Create option for league average for opponent noshow
 *************************************************************************************************
 * 20180219 - My Review
-* 20180302 - L        - Hard        - Standings.vb - Create html printable standings, reports
-* 20180225 - H        - Easy        - Main.vb - email files to league secretary after each change for backup,zip them also
-* 20180225 - MH       - Hard        - Several - make sure league can expand or contract 
-* 20180225 - H        - Med         - Skins.vb - Change CTP1,2 from hardcoded to dynamic, add hole number to screen column hdg
-* 20180219 - Greg Review
-* 20180219 - MH       - Med to Hard - Extra money not correct always, it is always but its not clear
-* 20180219 - MH       - Med         - tell which players are getting an email and track if email already sent to warn were sending again
+* 20180302 - L        - Hard        - Standings.vb					Create html printable standings, reports
+* 20180225 - H        - Easy        - Main.vb						email files to league secretary after each change for backup,zip them also
+* 20180225 - MH       - Hard        - Several						make sure league can expand or contract 
+* 20180225 - H        - Med         - Skins.vb						Change CTP1,2 from hardcoded to dynamic, add hole number to screen column hdg
+* 20180219 - MH       - Med         -							    tell which players are getting an email and track if email already sent to warn were sending again
 *************************************************************************************************
 *            Future
-* 20181026 - L        - Hard        - only have one screen for everything scores, matches,skins, standings, calculating as you go
-* 20180512 - L        - Med         - Enhance Player Scores, have back 9 as part of grid, do stats on each
-* 20180219 - L        - Med         - Possible sms for standings or facebook feed
-* 20180219 - M        - Med         - Finance $$$ tracking who paid, prize distribution, total $$earned, etc
-* 20180202 - L        - Med         - Enhance for 18 holes
-* 20180202 - L        - Med         - Write custom routines for setups-league, courses, players
-* 20180130 - L        - Hard        - Add Schedule changes
-*		     1)  Generate a random schedule based on # teams
-*			 2)  Allow secretary to change the schedule
-*				 a)  rainouts, add/remove weeks
+* 20181026 - L        - Hard        -								only have one screen for everything scores, matches,skins, standings, calculating as you go
+* 20180219 - L        - Med         -								Possible sms for standings or facebook feed
+* 20180202 - L        - Med         -							    Enhance for 18 holes
+* 20180202 - L        - Med         -								Write custom routines for setups-league, courses, players
+* 20180130 - L        - Hard        -								Add Schedule changes
+*																	   1)  Generate a random schedule based on # teams
+*																	   2)  Allow secretary to change the schedule
+*																		   a)  rainouts, add/remove weeks
 *************************************************************************************************
 *                                           Change Log-Completed
 *************************************************************************************************
 * yyyymmdd - Priority - Complexity -  Module        Release         Description
 * --------   --------	-----------	  -------------	--------------- ----------------------------------------------------------------------------------------------	
+* 20190717 - M        - Med         - Standings						when updating standings for the first time with new scores, points arent getting updated, gotta unlock and lock
+* 20190716 - H        - Easy        - Main							when searching for files, include the path in the message, and tell how it happened
+* 20190710 - H        - Easy        - Scorecard						when clicking on skins/ctp box it wsnt updating the checkboxes or amounts
+* 20190705 - L        - Easy        - Skins,scorecard				when loading screens, check monitor size to determine form/grid size
+* 20190630 - M        - Med         - Skins							when skins are tied, strikeout isnt working all the time(just when the tie is a 4, turned out to be a font issue)
+* 20190627 - MH       - Med         - Standings						make first half/2nd half an optional column, default to sam style standings page
+* 20190523 - H        - Easy        - Matches					    scores.csv not correct, showing .25 when there isnt any, set all cells even when null
+* 20190515 - M        - Med         - Skins						    not carrying over ctp
+* 20190515 - M        - Med         - Player					    adding new players on scorecard screen or player screen not working
+* 20190507 - M        - Med         - Playerstats					make all scores gross
+* 20190502 - M        - Med         - Several                       when scores are locked, force matches and standings to run
+* 20180408 - M        - Med         - Several                       adjust from 24 to 20 players, add resize info to logs
+* 20180219 - M        - Med         -								Finance $$$ tracking who paid, prize distribution, total $$earned, etc
+* 20180512 - L        - Med         -								Enhance Player Scores, have back 9 as part of grid, do stats on each
+* 20180219 - MH       - Med to Hard -								Extra money not correct always, it is always but its not clear
+* 20180919 - ML       - Med to hard - 							    Playerstats.vb show league average stats for each hole and rank
+* 20180324 - M        - Med         - 		     					Track finances, payment history, distribution history, payment method
+*									- 								New table/file(Payment file)
+* 20190314 - M        - Med         - Finance                       send receipt txt or email when making payment
 * 20190327 - M        - Easy        - PlayerStat                    Sort Newest to oldest
 * 20190327 - H        - Easy        - scorecard                     call calcholemarker to set starting hole 
 * 20190326 - M        - Easy        - Main                          make sure all files are present before loading subroutines

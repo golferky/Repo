@@ -1,7 +1,7 @@
 ﻿Imports System.Data.OleDb
 Imports System.Net.Mail
 Imports System.IO
-Imports word = Microsoft.Office.Interop.Word
+'Imports Microsoft.Office.Interop.word
 Public Class frmSkins
     Dim dMatchDate As Date = Date.Now
     Dim sMatch = 0

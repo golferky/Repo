@@ -14,6 +14,11 @@
             oHelper = Main.oHelper
             dsLeague = oHelper.dsLeague
             oHelper.LOGIT(Reflection.MethodBase.GetCurrentMethod().Name & " -------------------------")
+
+            Dim sWH As String = oHelper.ScreenResize("1150", "650")
+            Me.Width = sWH.Split(":")(0)
+            Me.Height = sWH.Split(":")(1)
+
             'dsLeague.Tables("dtPayments").PrimaryKey = New DataColumn() {dsLeague.Tables("dtPayments").Columns("Date"), dsLeague.Tables("dtPayments").Columns("Player"), dsLeague.Tables("dtPayments").Columns("Desc")}
 
             Dim dtschedule As New DataTable()
@@ -49,8 +54,13 @@
             cbPlayers.Items.Add("All Players")
 
             For Each row In dsLeague.Tables("dtPlayers").Rows
-                cbPlayers.Items.Add(row("Name"))
-                cbPlayers.Sorted = True
+                Dim dv As New DataView(dsLeague.dtPayments)
+                dv.RowFilter = String.Format("Player in('{0}') and Detail in ('Payment')", row("Name"))
+                dv.RowFilter = dv.RowFilter & String.Format(" AND Date >= '{0}' AND Date <= '{1}'", Main.dtRSStart.Value.ToString("yyyyMMdd"), CDate(Main.tbPSEnd.Text).ToString("yyyyMMdd", Globalization.CultureInfo.InvariantCulture))
+                If dv.Count > 0 Then
+                    cbPlayers.Items.Add(row("Name"))
+                    cbPlayers.Sorted = True
+                End If
             Next
             cbPlayers.SelectedIndex = 0
             Dim cbState As DataGridViewComboBoxColumn
@@ -94,47 +104,6 @@
             End If
         End If
 
-        For Each R As DataGridViewRow In dgPayments.Rows
-            If R.Cells("Comment").Value <> "No Receipt sent" Then
-                'Dim mbr = MsgBox(String.Format("are you ready to sent emails to {0} players?", ToAddresses.Count), MsgBoxStyle.YesNo)
-                'If mbr <> MsgBoxResult.Yes Then Exit Sub
-
-                'Dim attachs() As String = {"d:\temp_Excell226.xlsx", "d:\temp_Excell224.xlsx", "d:\temp_Excell225.xlsx"}
-                Dim sKeys() As Object = {R.Cells("Player").Value}
-                Dim arow As DataRow = dsLeague.Tables("dtPlayers").Rows.Find(sKeys)
-                Dim semail As String = ""
-                If R.Cells("EmailText").Value = "Text" Then
-                    If arow("Phone") IsNot DBNull.Value Then
-                        semail = arow("Phone").ToString.Replace("-", "")
-                        If semail.StartsWith("859962") Or
-                       semail.StartsWith("859620") Then
-                            semail = semail & "@txt.att.net"
-                        ElseIf semail.StartsWith("859750") Then
-                            'semail = semail & "@sms.myboostmobile.com"
-                            semail = semail & "@myboostmobile.com"
-                        ElseIf semail.StartsWith("859609") Then
-                            semail = semail & "@vtext.com"
-                        End If
-                    End If
-                ElseIf R.Cells("EmailText").Value = "Email" Then
-                    semail = arow("Email").ToString
-                End If
-                If semail <> "" Then
-                    Dim ToAddresses As New List(Of String)({semail}) '({"8599628088@txt.att.net", "‭8596200465@txt.att.net"}) '{"garyrscudder@gmail.com", "glemker@fuse.net"}
-                    Dim attachs() As String = Nothing '{semailfile}
-                    Dim subject As String = String.Format("***Test*** Receipt of Payment, reply to Gary Scudder if you get this message")
-                    Dim body As String = String.Format("For {0} - ${1}", R.Cells("Description").Value, R.Cells("Amount").Value)
-                    Dim bresult = False
-                    bresult = oHelper.GGmail.SendMail(ToAddresses, subject, body, attachs)
-                    If bresult Then
-                        oHelper.LOGIT(String.Format("payment text/email sent to {0}", R.Cells("Player").Value))
-                    Else
-                        oHelper.LOGIT(String.Format("payment text/email failed {0}", R.Cells("Player").Value))
-                    End If
-                End If
-            End If
-        Next
-
         Me.Close()
     End Sub
 
@@ -145,6 +114,17 @@
             lbStatus.Text = "Getting Payments for this screen..."
             oHelper.status_Msg(lbStatus, Me)
 
+            If dgPayments.RowCount > 0 Then
+                Dim mbr = MsgBox("Do you want to save Payments below before you reload this screen", MsgBoxStyle.YesNo)
+                If mbr = MsgBoxResult.No Then
+                    lbStatus.Text = " Payments not saved"
+                    lbStatus.BackColor = Color.LightGreen
+                    oHelper.bDGSError = False
+                Else
+                    SavePayments()
+                End If
+
+            End If
             'SavePayments()
 
             '20190319 - columns build in designer
@@ -205,11 +185,13 @@
                     lbStatus.Text = String.Format("Invalid Player {0},  fix before saving", oHelper.sPlayer)
                     Exit Sub
                 End If
+
                 Dim arow As DataRow
                 arow = dsLeague.dtPayments.NewRow
                 '20181003 clear scores in table before saving from gridview
                 For Each cell As DataGridViewCell In row.Cells
                     Dim col = cell.OwningColumn.Name
+                    If col = "EmailText" Then Continue For
                     If col = "PayDate" Then
                         col = "Date"
                     ElseIf col = "Description" Then
@@ -224,6 +206,50 @@
                 arow("Detail") = "Payment"
 
                 dsLeague.dtPayments.Rows.Add(arow)
+
+                If row.Cells("Comment").Value <> "No Receipt sent" Then
+                    Dim sKeys() As Object = {row.Cells("Player").Value}
+                    Dim prow As DataRow = dsLeague.Tables("dtPlayers").Rows.Find(sKeys)
+                    Dim semail As String = ""
+                    If row.Cells("EmailText").Value = "Text" Then
+                        If prow("Phone") IsNot DBNull.Value Then
+                            semail = prow("Phone").ToString.Replace("-", "")
+                            If prow("CellCarrier").ToString.ToUpper = "ATT" Then
+                                semail = semail & "@txt.att.net"
+                            ElseIf prow("CellCarrier").ToString.ToUpper.Contains("BOOST") Then
+                                semail = semail & "@myboostmobile.com"
+                            ElseIf prow("CellCarrier").ToString.ToUpper = "VERIZON" Then
+                                semail = semail & "@vtext.com"
+                            End If
+                            'replaced by carrier column in player file
+                            'If semail.StartsWith("859962") Or
+                            '   semail.StartsWith("859620") Then
+                            '    semail = semail & "@txt.att.net"
+                            'ElseIf semail.StartsWith("859750") Then
+                            '    'semail = semail & "@sms.myboostmobile.com"
+                            '    semail = semail & "@myboostmobile.com"
+                            'ElseIf semail.StartsWith("859609") Then
+                            '    semail = semail & "@vtext.com"
+                            'End If
+                        End If
+                    ElseIf Row.Cells("EmailText").Value = "Email" Then
+                        semail = prow("Email").ToString
+                    End If
+                    If semail <> "" Then
+                        Dim ToAddresses As New List(Of String)({semail}) '({"8599628088@txt.att.net", "‭8596200465@txt.att.net"}) '{"garyrscudder@gmail.com", "glemker@fuse.net"}
+                        Dim attachs() As String = Nothing '{semailfile}
+                        Dim subject As String = String.Format("***Test*** Receipt of Payment, reply to Gary Scudder if you get this message")
+                        Dim body As String = String.Format("For {0} - ${1}", row.Cells("Description").Value, row.Cells("Amount").Value)
+                        Dim bresult = False
+                        bresult = oHelper.GGmail.SendMail(ToAddresses, subject, body, attachs)
+                        If bresult Then
+                            oHelper.LOGIT(String.Format("payment text/email sent to {0}", row.Cells("Player").Value))
+                        Else
+                            oHelper.LOGIT(String.Format("payment text/email failed {0}", row.Cells("Player").Value))
+                        End If
+                    End If
+                End If
+
             Next
 
             'oHelper.CopyDataGridViewToClipboard(dgLast5)
@@ -256,7 +282,7 @@
         If dgPayments.ReadOnly Or e.RowIndex < 0 Then Exit Sub
 
         Dim R As DataGridViewRow = sender.CurrentRow
-
+        If sender.currentcell Is DBNull.Value Then Exit Sub
         oHelper.sPlayer = R.Cells("Player").Value
         Dim dgc As DataGridViewCell = sender.currentcell
         '20180810 added Clear column
@@ -282,15 +308,12 @@
             End If
             '20180201-first time through if boolean changed-skins and ctp get edited in another event
             If sCurrColName = "Player" Then
-                dgPayments.CurrentRow.Cells("PayDate").Value = Now.ToString("yyyyMMdd", Globalization.CultureInfo.InvariantCulture)
-                dgPayments.CurrentRow.Cells("Description").Value = "League Dues"
-                dgPayments.CurrentRow.Cells("Amount").Value = "35"
-                dgPayments.CurrentRow.Cells("PayMethod").Value = "Cash"
                 Dim sKeys() As Object = {dgr.CurrentCell.Value}
                 Dim arow As DataRow = dsLeague.Tables("dtPlayers").Rows.Find(sKeys)
                 '20190327-this should never happen
                 If arow Is Nothing Then
                     MsgBox(String.Format("Player doesnt exist {0}.  contact developer", sKeys(0)))
+                    Exit Sub
                 Else
                     Dim dcb As New DataGridViewComboBoxCell
                     dcb = dgPayments.CurrentRow.Cells("EmailText")
@@ -305,10 +328,31 @@
                         sphone = arow("Phone")
                     End If
                 End If
+                dgPayments.CurrentRow.Cells("PayDate").Value = Now.ToString("yyyyMMdd", Globalization.CultureInfo.InvariantCulture)
+                dgPayments.CurrentRow.Cells("Description").Value = "League Dues"
+                dgPayments.CurrentRow.Cells("Amount").Value = oHelper.rLeagueParmrow("Cost")
+                dgPayments.CurrentRow.Cells("PayMethod").Value = "Cash"
+                dgPayments.CurrentRow.Cells("Detail").Value = "Payment"
+
+                Dim spyKeys() As Object = {dgPayments.CurrentRow.Cells("Player").Value, oHelper.dDate.ToString("yyyyMMdd"), dgPayments.CurrentRow.Cells("Description").Value, If(dgPayments.CurrentRow.Cells("Detail").Value Is Nothing, "", dgPayments.CurrentRow.Cells("Detail").Value)}
+                Dim prow = dsLeague.dtPayments.Rows.Find(spyKeys)
+                If prow IsNot Nothing Then
+                    Dim mbr = MsgBox("this record already exists on the payments file, do you want to replace it?", MsgBoxStyle.YesNo)
+                    If mbr = MsgBoxResult.Yes Then
+                        dsLeague.dtPayments.Rows.Remove(prow)
+                    Else
+                        dgPayments.CurrentRow.Cells("Player").Value = DBNull.Value
+                        dgPayments.CurrentRow.Cells("PayDate").Value = DBNull.Value
+                        dgPayments.CurrentRow.Cells("Description").Value = DBNull.Value
+                        dgPayments.CurrentRow.Cells("Amount").Value = DBNull.Value
+                        dgPayments.CurrentRow.Cells("PayMethod").Value = DBNull.Value
+                        dgPayments.CurrentRow.Cells("Detail").Value = DBNull.Value
+                    End If
+                End If
 
             ElseIf sCurrColName = "Description" Then
                 If dgr.CurrentCell.Value = "League Dues" Then
-                    dgPayments.CurrentRow.Cells("Amount").Value = "35"
+                    dgPayments.CurrentRow.Cells("Amount").Value = oHelper.rLeagueParmrow("Cost")
                     dgPayments.CurrentRow.Cells("PayMethod").Value = "Cash"
                 ElseIf dgr.CurrentCell.Value = "EOY Skins" Then
                     dgPayments.CurrentRow.Cells("Amount").Value = "20"
@@ -359,6 +403,10 @@
     Private Sub dgPayments_RowEnter(sender As Object, e As DataGridViewCellEventArgs) Handles dgPayments.RowEnter
         semail = ""
         sphone = ""
+    End Sub
+
+    Private Sub dgPayments_RowLeave(sender As Object, e As DataGridViewCellEventArgs) Handles dgPayments.RowLeave
+
     End Sub
 #Region "Not_Used"
 #End Region

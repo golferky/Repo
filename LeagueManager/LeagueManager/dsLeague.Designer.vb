@@ -1287,6 +1287,10 @@ Partial Public Class dsLeague
         
         Private columnDateJoined As Global.System.Data.DataColumn
         
+        Private columnHomePhone As Global.System.Data.DataColumn
+        
+        Private columnCellCarrier As Global.System.Data.DataColumn
+        
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "15.0.0.0")>  _
         Public Sub New()
@@ -1395,6 +1399,22 @@ Partial Public Class dsLeague
         End Property
         
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "15.0.0.0")>  _
+        Public ReadOnly Property HomePhoneColumn() As Global.System.Data.DataColumn
+            Get
+                Return Me.columnHomePhone
+            End Get
+        End Property
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "15.0.0.0")>  _
+        Public ReadOnly Property CellCarrierColumn() As Global.System.Data.DataColumn
+            Get
+                Return Me.columnCellCarrier
+            End Get
+        End Property
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "15.0.0.0"),  _
          Global.System.ComponentModel.Browsable(false)>  _
         Public ReadOnly Property Count() As Integer
@@ -1431,9 +1451,9 @@ Partial Public Class dsLeague
         
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "15.0.0.0")>  _
-        Public Overloads Function AdddtPlayersRow(ByVal Name As String, ByVal Team As Short, ByVal Grade As String, ByVal Paid As String, ByVal Email As String, ByVal Phone As String, ByVal NickName As String, ByVal DateLeft As String, ByVal DateJoined As String) As dtPlayersRow
+        Public Overloads Function AdddtPlayersRow(ByVal Name As String, ByVal Team As Short, ByVal Grade As String, ByVal Paid As String, ByVal Email As String, ByVal Phone As String, ByVal NickName As String, ByVal DateLeft As String, ByVal DateJoined As String, ByVal HomePhone As String, ByVal CellCarrier As String) As dtPlayersRow
             Dim rowdtPlayersRow As dtPlayersRow = CType(Me.NewRow,dtPlayersRow)
-            Dim columnValuesArray() As Object = New Object() {Name, Team, Grade, Paid, Email, Phone, NickName, DateLeft, DateJoined}
+            Dim columnValuesArray() As Object = New Object() {Name, Team, Grade, Paid, Email, Phone, NickName, DateLeft, DateJoined, HomePhone, CellCarrier}
             rowdtPlayersRow.ItemArray = columnValuesArray
             Me.Rows.Add(rowdtPlayersRow)
             Return rowdtPlayersRow
@@ -1471,6 +1491,8 @@ Partial Public Class dsLeague
             Me.columnNickName = MyBase.Columns("NickName")
             Me.columnDateLeft = MyBase.Columns("DateLeft")
             Me.columnDateJoined = MyBase.Columns("DateJoined")
+            Me.columnHomePhone = MyBase.Columns("HomePhone")
+            Me.columnCellCarrier = MyBase.Columns("CellCarrier")
         End Sub
         
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
@@ -1494,6 +1516,10 @@ Partial Public Class dsLeague
             MyBase.Columns.Add(Me.columnDateLeft)
             Me.columnDateJoined = New Global.System.Data.DataColumn("DateJoined", GetType(String), Nothing, Global.System.Data.MappingType.Element)
             MyBase.Columns.Add(Me.columnDateJoined)
+            Me.columnHomePhone = New Global.System.Data.DataColumn("HomePhone", GetType(String), Nothing, Global.System.Data.MappingType.Element)
+            MyBase.Columns.Add(Me.columnHomePhone)
+            Me.columnCellCarrier = New Global.System.Data.DataColumn("CellCarrier", GetType(String), Nothing, Global.System.Data.MappingType.Element)
+            MyBase.Columns.Add(Me.columnCellCarrier)
             Me.Constraints.Add(New Global.System.Data.UniqueConstraint("Constraint1", New Global.System.Data.DataColumn() {Me.columnName}, true))
             Me.columnName.AllowDBNull = false
             Me.columnName.Unique = true
@@ -4952,6 +4978,36 @@ Partial Public Class dsLeague
         
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "15.0.0.0")>  _
+        Public Property HomePhone() As String
+            Get
+                Try 
+                    Return CType(Me(Me.tabledtPlayers.HomePhoneColumn),String)
+                Catch e As Global.System.InvalidCastException
+                    Throw New Global.System.Data.StrongTypingException("The value for column 'HomePhone' in table 'dtPlayers' is DBNull.", e)
+                End Try
+            End Get
+            Set
+                Me(Me.tabledtPlayers.HomePhoneColumn) = value
+            End Set
+        End Property
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "15.0.0.0")>  _
+        Public Property CellCarrier() As String
+            Get
+                Try 
+                    Return CType(Me(Me.tabledtPlayers.CellCarrierColumn),String)
+                Catch e As Global.System.InvalidCastException
+                    Throw New Global.System.Data.StrongTypingException("The value for column 'CellCarrier' in table 'dtPlayers' is DBNull.", e)
+                End Try
+            End Get
+            Set
+                Me(Me.tabledtPlayers.CellCarrierColumn) = value
+            End Set
+        End Property
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "15.0.0.0")>  _
         Public Function IsTeamNull() As Boolean
             Return Me.IsNull(Me.tabledtPlayers.TeamColumn)
         End Function
@@ -5044,6 +5100,30 @@ Partial Public Class dsLeague
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "15.0.0.0")>  _
         Public Sub SetDateJoinedNull()
             Me(Me.tabledtPlayers.DateJoinedColumn) = Global.System.Convert.DBNull
+        End Sub
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "15.0.0.0")>  _
+        Public Function IsHomePhoneNull() As Boolean
+            Return Me.IsNull(Me.tabledtPlayers.HomePhoneColumn)
+        End Function
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "15.0.0.0")>  _
+        Public Sub SetHomePhoneNull()
+            Me(Me.tabledtPlayers.HomePhoneColumn) = Global.System.Convert.DBNull
+        End Sub
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "15.0.0.0")>  _
+        Public Function IsCellCarrierNull() As Boolean
+            Return Me.IsNull(Me.tabledtPlayers.CellCarrierColumn)
+        End Function
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "15.0.0.0")>  _
+        Public Sub SetCellCarrierNull()
+            Me(Me.tabledtPlayers.CellCarrierColumn) = Global.System.Convert.DBNull
         End Sub
     End Class
     

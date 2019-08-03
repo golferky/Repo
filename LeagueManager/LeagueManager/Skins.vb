@@ -6,6 +6,7 @@ Public Class Skins
     'Dim oHelper = Main.oHelper
     Dim fromsizeW As Integer, gvSsizeW As Integer, gvSCsizeW As Integer, gbSCsizeW As Integer
     Dim bsave As Boolean = False
+    Dim bcancel As Boolean = False
     Dim rs As New Resizer
     Dim iTotSkinPlayers As Integer = 0
     Dim iTotCTPPlayers As Integer = 0
@@ -28,6 +29,23 @@ Public Class Skins
         'cant understand why i had to do this because main.helper has all the tables but i get an error
         '-----Unable to cast object of type 'System.Data.DataTable' to type 'dtCoursesDataTable'.
         oHelper = Main.oHelper
+
+        '700 X 1550
+        'If Main.iScreenWidth = 1920 Then
+        '    Me.Width = 1150
+        'ElseIf Main.iScreenWidth = 1366 Then
+        '    Me.Width = 1150
+        'ElseIf Main.iScreenWidth = 2560 Then
+        '    Me.Width = 1150
+        'End If
+        'If Main.iScreenHeight = 1200 Or Main.iScreenHeight = 1400 Then Me.Height = 650
+        'test for Greg 1366 x 768
+        'Me.Width = 1200
+        'Me.Height = 650
+        'rs.ResizeAllControls(Me)
+        Dim sWH As String = oHelper.ScreenResize("1150", "650")
+        Me.Width = sWH.Split(":")(0)
+        Me.Height = sWH.Split(":")(1)
 
         sToday = oHelper.dDate.ToString("yyyyMMdd", Globalization.CultureInfo.InvariantCulture)
         dPSEnd = Main.tbPSEnd.Text
@@ -98,6 +116,11 @@ Public Class Skins
     Dim fromsizeH As Integer, gvSsizeH As Integer, gvSCsizeH As Integer, gbSCsizeH As Integer
     Private Sub Skins_FormClosing(sender As Object, e As FormClosingEventArgs) Handles MyBase.FormClosing
         SaveScores()
+        If bcancel Then
+            e.Cancel = True
+        Else
+            e.Cancel = False
+        End If
     End Sub
     Private Sub btnSkins_Click(sender As Object, e As EventArgs) Handles btnSkins.Click
         If oHelper.iHoles = 0 Then oHelper.iHoles = oHelper.dsLeague.Tables("dtLeagueParms").Rows(0).Item("Holes")
@@ -295,7 +318,9 @@ Public Class Skins
 
         oHelper.bCalcSkins = True
         sSkinsIndexes = oHelper.FCalcSkins(dgScores)
+
         sSkinsIndexes.Sort()
+
         Dim iSkinVal As Integer = 0
         Dim iExtra As Integer = 0
 
@@ -314,7 +339,7 @@ Public Class Skins
 
         tbExtra.Text = iExtra
         '20180228-Fix extra dollars incorrect, they were missing leftover ctp calc
-        tbLOPurse.Text += iExtra + tbLOCP1.Text + tbLOCP2.Text
+        'tbLOPurse.Text += iExtra + tbCP1.Text + tbCP2.Text
 
         If sSkinsIndexes.Count > 0 Then
             Dim iprevplayer = 99, iTot = 0.0, iSkins = 0
@@ -346,7 +371,7 @@ Public Class Skins
 
         Dim iSkinsNum = 0
         Dim iSkinsDol = 0.0
-        Dim iCtpsDol = 0.0
+        Dim iCtpsDol = CInt(tbCP1.Text) + CInt(tbCP2.Text)
         Dim iEarnDol = 0.00
         Dim inumCTP = 0
         'Loop through each row and check to see if check box checked for ctp 1/2
@@ -361,23 +386,22 @@ Public Class Skins
                     row.Cells("Player").Style.BackColor = Color.Gold
                 End If
 
-
                 If IsNumeric(row.Cells("CTP_1").Value) Then
                     tbCP1.Text += iEachClosestAmt
                     iCtpsDol += iEachClosestAmt
-                    iEarn += iEachClosestAmt
+                    iEarn += CInt(tbCP1.Text)
                     ithisClosest += iEachClosestAmt
                 End If
                 If IsNumeric(row.Cells("CTP_2").Value) Then
                     tbCP2.Text += iEachClosestAmt
                     iCtpsDol += iEachClosestAmt
-                    iEarn += iEachClosestAmt
+                    iEarn += CInt(tbCP2.Text)
                     ithisClosest += iEachClosestAmt
                 End If
                 If ithisClosest > 0 Then
                     row.Cells("Player").Style.BackColor = Color.Gold
                     row.Cells("$Closest").Style.BackColor = Color.Gold
-                    row.Cells("$Closest").Value = ithisClosest
+                    'row.Cells("$Closest").Value = ithisClosest
                 End If
                 row.Cells("$Earn").Value = iEarn
                 iEarnDol += iEarn
@@ -395,11 +419,11 @@ Public Class Skins
             End If
         Next
         oHelper.bCalcSkins = False
-        dgScores.Visible = True
         tbSkins.Text = iSkinsDol
         tbPurse.Text = iSkinsDol + iCtpsDol
 
         dgScores.Sort(dgScores.Columns("$Earn"), System.ComponentModel.ListSortDirection.Descending)
+        dgScores.Visible = True
         'lbStatus.Text = String.Format("Updating Payments table with earnings")
         'oHelper.status_Msg(lbStatus, Me)
 
@@ -418,13 +442,18 @@ Public Class Skins
     Sub SaveScores()
         oHelper.LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
         Try
+            bcancel = False
             'If Not oHelper.bScreenChanged Then Exit Sub
             If oHelper.bload Then Exit Sub
             'If oHelper.convDBNulltoSpaces(oHelper.rLeagueParmrow("ScoresLocked")) = "N" Then
             If dgScores.RowCount > 1 Then
                 If Not bsave Then
-                    Dim mbr = MsgBox("Do you want to save skin results before you exit this screen", MsgBoxStyle.YesNo)
+                    Dim mbr = MsgBox("Do you want to save skin results before you exit this screen", MsgBoxStyle.YesNoCancel)
                     If mbr = MsgBoxResult.Yes Then bsave = True
+                    If mbr = MsgBoxResult.Cancel Then
+                        bcancel = True
+                        Exit Sub
+                    End If
                 End If
                 If bsave Then
                     lbStatus.Text = "Saving scores from this screen..."
@@ -465,8 +494,13 @@ Public Class Skins
             Catch ex As Exception
 
             End Try
-            'End If
 
+            Dim sfn = oHelper.sFilePath & "\" & DateTime.Now.ToString("yyyyMMdd_hhmmss_") & oHelper.dDate.ToString("yyyyMMdd", Globalization.CultureInfo.InvariantCulture) & "_Skins.csv"
+            lbStatus.Text = String.Format("Creating spreadsheet({0}) of Skins from this screen...", sfn)
+            oHelper.status_Msg(lbStatus, Me)
+            oHelper.dgv2csv(dgScores, sfn)
+            lbStatus.Text = "Finished creating Skins spreadsheet from this screen"
+            oHelper.status_Msg(lbStatus, Me)
         Catch ex As Exception
             MsgBox("Error updating scores, better check them")
         End Try
@@ -546,7 +580,7 @@ Public Class Skins
             sScoreCardforDGV = sScoreCardforDGV.Substring(0, Len(sScoreCardforDGV) - 1).Replace(" ", "_")
             '20180120-remove method from skins screen, scores always reflect that in league parm
             'sScoreCardforDGV = sScoreCardforDGV.Replace("Method,", "")
-            Dim dtScorecard As DataTable = dvScores.ToTable(True, sScoreCardforDGV.Split(",").ToArray)
+            Dim dtScorecard As DataTable = dvScores.ToTable(False, sScoreCardforDGV.Split(",").ToArray)
             Try
                 '20180228-moved to change datatable instead of grid and make all scores match the skins method(scratch/handicap), then remove method for skin grid
                 If oHelper.rLeagueParmrow("SkinFmt") = "Handicap" Then
@@ -706,8 +740,8 @@ Public Class Skins
                 iSkinpot += oHelper.rLeagueParmrow("Skins") * iTotSkinPlayers
             End If
 
-            tbLOCP1.Text = iEachClosestAmt
-            tbLOCP2.Text = iEachClosestAmt
+            tbLOCP1.Text = ictp1
+            tbLOCP2.Text = ictp2
 
             tbSkins.Text = iSkinpot
             tbPurse.Text = 0
@@ -749,15 +783,13 @@ Public Class Skins
                 If row.Cells("Player").Value <> "*** Total ***" Then
                     If row.Index = sctps(0) - 1 Then
                         row.Cells("CTP_1").Value = True
-                        tbLOCP1.Text -= iEachClosestAmt
-                        'tbCP1.Text += iEachClosestAmt
-                        row.Cells("$Closest").Value = iEachClosestAmt
+                        row.Cells("$Closest").Value = iEachClosestAmt + tbLOCP1.Text
+                        tbLOCP1.Text -= CInt(tbLOCP1.Text)
                     End If
                     If row.Index = sctps(1) - 1 Then
                         row.Cells("CTP_2").Value = True
-                        tbLOCP2.Text -= iEachClosestAmt
-                        'tbCP2.Text += iEachClosestAmt
-                        row.Cells("$Closest").Value = iEachClosestAmt
+                        row.Cells("$Closest").Value = iEachClosestAmt + tbLOCP2.Text
+                        tbLOCP2.Text -= CInt(tbLOCP2.Text)
                     End If
                 End If
             Next
@@ -770,6 +802,7 @@ Public Class Skins
     Private Sub frmSkins_Resize(sender As Object, e As EventArgs) Handles MyBase.Resize
         oHelper.LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
         Try
+            oHelper.LOGIT(String.Format("Form Height {0} Width {1}", Me.Height, Me.Width))
             'width
             'If gvSsizeW <> 0 Then
             '    dgScores.Width = gvSsizeW + (Me.Size.Width - fromsizeW)
@@ -1077,19 +1110,19 @@ Public Class Skins
         MyBase.Finalize()
     End Sub
 
-    Private Sub dgScores_CellFormatting(sender As Object, e As DataGridViewCellFormattingEventArgs) Handles dgScores.CellFormatting
-        'updated routine to implement AcceptChanges
-        'dt.AcceptChanges() 'note: this causes custom cell font to be cleared
-        'DgvAcceptChanges(dgScores)
-        'Try
-        '    If oHelper.convDBNulltoSpaces(e.Value) <> "" Then
-        '        e.FormattingApplied = True
-        '    End If
-        'Catch ex As Exception
-        '    Dim x = ""
-        'End Try
+    'Private Sub dgScores_CellFormatting(sender As Object, e As DataGridViewCellFormattingEventArgs) Handles dgScores.CellFormatting
+    '    updated routine to implement AcceptChanges
+    '    dt.AcceptChanges() 'note: this causes custom cell font to be cleared
+    '    DgvAcceptChanges(dgScores)
+    '    Try
+    '        If oHelper.convDBNulltoSpaces(e.Value) <> "" Then
+    '            e.FormattingApplied = True
+    '        End If
+    '    Catch ex As Exception
+    '        Dim x = ""
+    '    End Try
 
-    End Sub
+    'End Sub
     Private Sub dgScores_DataError(sender As Object, e As DataGridViewDataErrorEventArgs) Handles dgScores.DataError
         'MsgBox(e.Exception.Message)
 
@@ -1107,61 +1140,61 @@ Public Class Skins
     ''' </summary>
     ''' <param name="dgv">DataGridView object</param>
     ''' <remarks>Could be extended to do other things like cell ReadOnly status or cell BackColor.</remarks>
-    Public Sub DgvAcceptChanges(dgv As DataGridView)
-        Dim dt As DataTable = CType(dgv.DataSource, DataTable)
-        If dt IsNot Nothing Then
-            'save the DataGridView's cell style font to an array
-            Dim cellStyle(dgv.Rows.Count - 1, dgv.Columns.Count - 1) As DataGridViewCellStyle
-            For r As Integer = 0 To dgv.Rows.Count - 1
-                'the DataGridViewRow.IsNewRow Property = Gets a value indicating whether the row is the row for new records.
-                'Remarks: Because the row for new records is in the Rows collection, use the IsNewRow property to determine whether a row
-                'is the row for new records or is a populated row. A row stops being the new row when data entry into the row begins.
-                If Not dgv.Rows(r).IsNewRow Then
-                    For c As Integer = 0 To dgv.Columns.Count - 1
-                        cellStyle(r, c) = dgv.Rows(r).Cells(c).Style
-                    Next c
-                End If
-            Next r
+    'Public Sub DgvAcceptChanges(dgv As DataGridView)
+    '    Dim dt As DataTable = CType(dgv.DataSource, DataTable)
+    '    If dt IsNot Nothing Then
+    '        'save the DataGridView's cell style font to an array
+    '        Dim cellStyle(dgv.Rows.Count - 1, dgv.Columns.Count - 1) As DataGridViewCellStyle
+    '        For r As Integer = 0 To dgv.Rows.Count - 1
+    '            'the DataGridViewRow.IsNewRow Property = Gets a value indicating whether the row is the row for new records.
+    '            'Remarks: Because the row for new records is in the Rows collection, use the IsNewRow property to determine whether a row
+    '            'is the row for new records or is a populated row. A row stops being the new row when data entry into the row begins.
+    '            If Not dgv.Rows(r).IsNewRow Then
+    '                For c As Integer = 0 To dgv.Columns.Count - 1
+    '                    cellStyle(r, c) = dgv.Rows(r).Cells(c).Style
+    '                Next c
+    '            End If
+    '        Next r
 
-            'this causes custom cell font to be cleared in the DataGridView
-            dt.AcceptChanges()
+    '        'this causes custom cell font to be cleared in the DataGridView
+    '        dt.AcceptChanges()
 
-            're-apply the DataGridView's cell style font from an array
-            For r As Integer = 0 To dgv.Rows.Count - 1
-                If Not dgv.Rows(r).IsNewRow Then
-                    For c As Integer = 0 To dgv.Columns.Count - 1
-                        dgv.Rows(r).Cells(c).Style.Font = cellStyle(r, c).Font
-                    Next c
-                End If
-            Next r
-        End If
-    End Sub
-    Public Sub saveFont(dgv As DataGridView)
-        'save the DataGridView's cell style font to an array
-        Dim cellStyle(dgv.Rows.Count - 1, dgv.Columns.Count - 1) As DataGridViewCellStyle
-        For r As Integer = 0 To dgv.Rows.Count - 1
-            'the DataGridViewRow.IsNewRow Property = Gets a value indicating whether the row is the row for new records.
-            'Remarks: Because the row for new records is in the Rows collection, use the IsNewRow property to determine whether a row
-            'is the row for new records or is a populated row. A row stops being the new row when data entry into the row begins.
-            If Not dgv.Rows(r).IsNewRow Then
-                For c As Integer = 0 To dgv.Columns.Count - 1
-                    cellStyle(r, c) = dgv.Rows(r).Cells(c).Style
-                Next c
-            End If
-        Next r
+    '        're-apply the DataGridView's cell style font from an array
+    '        For r As Integer = 0 To dgv.Rows.Count - 1
+    '            If Not dgv.Rows(r).IsNewRow Then
+    '                For c As Integer = 0 To dgv.Columns.Count - 1
+    '                    dgv.Rows(r).Cells(c).Style.Font = cellStyle(r, c).Font
+    '                Next c
+    '            End If
+    '        Next r
+    '    End If
+    'End Sub
+    'Public Sub saveFont(dgv As DataGridView)
+    '    'save the DataGridView's cell style font to an array
+    '    Dim cellStyle(dgv.Rows.Count - 1, dgv.Columns.Count - 1) As DataGridViewCellStyle
+    '    For r As Integer = 0 To dgv.Rows.Count - 1
+    '        'the DataGridViewRow.IsNewRow Property = Gets a value indicating whether the row is the row for new records.
+    '        'Remarks: Because the row for new records is in the Rows collection, use the IsNewRow property to determine whether a row
+    '        'is the row for new records or is a populated row. A row stops being the new row when data entry into the row begins.
+    '        If Not dgv.Rows(r).IsNewRow Then
+    '            For c As Integer = 0 To dgv.Columns.Count - 1
+    '                cellStyle(r, c) = dgv.Rows(r).Cells(c).Style
+    '            Next c
+    '        End If
+    '    Next r
 
-    End Sub
-    Public Sub resetFont(dgv As DataGridView)
-        Dim cellStyle(dgv.Rows.Count - 1, dgv.Columns.Count - 1) As DataGridViewCellStyle
-        're-apply the DataGridView's cell style font from an array
-        For r As Integer = 0 To dgv.Rows.Count - 1
-            If Not dgv.Rows(r).IsNewRow Then
-                For c As Integer = 0 To dgv.Columns.Count - 1
-                    dgv.Rows(r).Cells(c).Style.Font = cellStyle(r, c).Font
-                Next c
-            End If
-        Next r
-    End Sub
+    'End Sub
+    'Public Sub resetFont(dgv As DataGridView)
+    '    Dim cellStyle(dgv.Rows.Count - 1, dgv.Columns.Count - 1) As DataGridViewCellStyle
+    '    're-apply the DataGridView's cell style font from an array
+    '    For r As Integer = 0 To dgv.Rows.Count - 1
+    '        If Not dgv.Rows(r).IsNewRow Then
+    '            For c As Integer = 0 To dgv.Columns.Count - 1
+    '                dgv.Rows(r).Cells(c).Style.Font = cellStyle(r, c).Font
+    '            Next c
+    '        End If
+    '    Next r
+    'End Sub
 
 
 End Class

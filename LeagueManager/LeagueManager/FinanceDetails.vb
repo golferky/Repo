@@ -29,7 +29,7 @@
             'remove trailing column
             sDetails = sDetails.Substring(0, Len(sDetails) - 1)
 
-            Dim wdt As DataTable = dv.ToTable(True, sDetails.Split(",").ToArray)
+            Dim wdt As DataTable = dv.ToTable(False, sDetails.Split(",").ToArray)
             wdt.Columns("Player").ColumnName = "Balance"
             'wdt.Columns.Add("Earned")
             wdt.Columns.Add("Skins")

@@ -49,7 +49,7 @@ Public Class Finance
         '    MsgBox(String.Format("File in use - {1} {0} close file and restart", vbCrLf, safile))
         '    End
         'End If
-        Dim dtr As New DataTable
+        Dim dtr As New Data.DataTable
         dtr.Columns.Add("Player")
         dtr.Columns.Add("Balance Due", GetType(Decimal))
         dtr.Columns.Add("Earned", GetType(Decimal))
