@@ -25,7 +25,6 @@ Partial Class Matches
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(Matches))
         Me.cbDatesPlayers = New System.Windows.Forms.ComboBox()
         Me.lbPS = New System.Windows.Forms.Label()
-        Me.btnMatches = New System.Windows.Forms.Button()
         Me.dgScores = New System.Windows.Forms.DataGridView()
         Me.btnExit = New System.Windows.Forms.Button()
         Me.lbStatus = New System.Windows.Forms.Label()
@@ -36,7 +35,7 @@ Partial Class Matches
         'cbDatesPlayers
         '
         Me.cbDatesPlayers.FormattingEnabled = True
-        Me.cbDatesPlayers.Location = New System.Drawing.Point(52, 43)
+        Me.cbDatesPlayers.Location = New System.Drawing.Point(54, 29)
         Me.cbDatesPlayers.Margin = New System.Windows.Forms.Padding(2)
         Me.cbDatesPlayers.Name = "cbDatesPlayers"
         Me.cbDatesPlayers.Size = New System.Drawing.Size(115, 21)
@@ -45,22 +44,12 @@ Partial Class Matches
         'lbPS
         '
         Me.lbPS.AutoSize = True
-        Me.lbPS.Location = New System.Drawing.Point(93, 23)
+        Me.lbPS.Location = New System.Drawing.Point(95, 9)
         Me.lbPS.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
         Me.lbPS.Name = "lbPS"
         Me.lbPS.Size = New System.Drawing.Size(30, 13)
         Me.lbPS.TabIndex = 63
         Me.lbPS.Text = "Date"
-        '
-        'btnMatches
-        '
-        Me.btnMatches.Location = New System.Drawing.Point(601, 14)
-        Me.btnMatches.Margin = New System.Windows.Forms.Padding(2)
-        Me.btnMatches.Name = "btnMatches"
-        Me.btnMatches.Size = New System.Drawing.Size(106, 30)
-        Me.btnMatches.TabIndex = 69
-        Me.btnMatches.Text = "Calc Matches"
-        Me.btnMatches.UseVisualStyleBackColor = True
         '
         'dgScores
         '
@@ -72,10 +61,11 @@ Partial Class Matches
         Me.dgScores.Name = "dgScores"
         Me.dgScores.Size = New System.Drawing.Size(659, 747)
         Me.dgScores.TabIndex = 70
+        Me.dgScores.Visible = False
         '
         'btnExit
         '
-        Me.btnExit.Location = New System.Drawing.Point(601, 100)
+        Me.btnExit.Location = New System.Drawing.Point(186, 64)
         Me.btnExit.Margin = New System.Windows.Forms.Padding(2)
         Me.btnExit.Name = "btnExit"
         Me.btnExit.Size = New System.Drawing.Size(106, 30)
@@ -95,7 +85,7 @@ Partial Class Matches
         '
         'btnSave
         '
-        Me.btnSave.Location = New System.Drawing.Point(601, 59)
+        Me.btnSave.Location = New System.Drawing.Point(186, 23)
         Me.btnSave.Margin = New System.Windows.Forms.Padding(2)
         Me.btnSave.Name = "btnSave"
         Me.btnSave.Size = New System.Drawing.Size(106, 30)
@@ -112,7 +102,6 @@ Partial Class Matches
         Me.Controls.Add(Me.lbStatus)
         Me.Controls.Add(Me.btnExit)
         Me.Controls.Add(Me.dgScores)
-        Me.Controls.Add(Me.btnMatches)
         Me.Controls.Add(Me.cbDatesPlayers)
         Me.Controls.Add(Me.lbPS)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
@@ -126,7 +115,6 @@ Partial Class Matches
 
     Friend WithEvents cbDatesPlayers As ComboBox
     Friend WithEvents lbPS As Label
-    Friend WithEvents btnMatches As Button
     Friend WithEvents dgScores As DataGridView
     Friend WithEvents btnExit As Button
     Friend WithEvents lbStatus As Label

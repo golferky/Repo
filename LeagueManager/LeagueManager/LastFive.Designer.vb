@@ -25,12 +25,16 @@ Partial Class LastFive
         Me.btnDisplayScores = New System.Windows.Forms.Button()
         Me.Label1 = New System.Windows.Forms.Label()
         Me.cbDates = New System.Windows.Forms.ComboBox()
+        Me.dgLast5 = New System.Windows.Forms.DataGridView()
+        Me.lbStatus = New System.Windows.Forms.Label()
+        Me.cb2018 = New System.Windows.Forms.CheckBox()
+        CType(Me.dgLast5, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
         'btnDisplayScores
         '
         Me.btnDisplayScores.Location = New System.Drawing.Point(272, 41)
-        Me.btnDisplayScores.Margin = New System.Windows.Forms.Padding(2)
+        Me.btnDisplayScores.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
         Me.btnDisplayScores.Name = "btnDisplayScores"
         Me.btnDisplayScores.Size = New System.Drawing.Size(129, 37)
         Me.btnDisplayScores.TabIndex = 16
@@ -51,22 +55,59 @@ Partial Class LastFive
         '
         Me.cbDates.FormattingEnabled = True
         Me.cbDates.Location = New System.Drawing.Point(35, 50)
-        Me.cbDates.Margin = New System.Windows.Forms.Padding(2)
+        Me.cbDates.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
         Me.cbDates.Name = "cbDates"
         Me.cbDates.Size = New System.Drawing.Size(168, 21)
         Me.cbDates.Sorted = True
         Me.cbDates.TabIndex = 14
         '
+        'dgLast5
+        '
+        Me.dgLast5.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
+        Me.dgLast5.Location = New System.Drawing.Point(35, 152)
+        Me.dgLast5.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
+        Me.dgLast5.Name = "dgLast5"
+        Me.dgLast5.RowTemplate.Height = 33
+        Me.dgLast5.Size = New System.Drawing.Size(532, 843)
+        Me.dgLast5.TabIndex = 17
+        '
+        'lbStatus
+        '
+        Me.lbStatus.AutoSize = True
+        Me.lbStatus.Location = New System.Drawing.Point(32, 100)
+        Me.lbStatus.Name = "lbStatus"
+        Me.lbStatus.Size = New System.Drawing.Size(37, 13)
+        Me.lbStatus.TabIndex = 27
+        Me.lbStatus.Text = "Status"
+        '
+        'cb2018
+        '
+        Me.cb2018.AutoSize = True
+        Me.cb2018.Checked = True
+        Me.cb2018.CheckState = System.Windows.Forms.CheckState.Checked
+        Me.cb2018.Location = New System.Drawing.Point(272, 100)
+        Me.cb2018.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
+        Me.cb2018.Name = "cb2018"
+        Me.cb2018.Size = New System.Drawing.Size(100, 17)
+        Me.cb2018.TabIndex = 28
+        Me.cb2018.Text = "Exclude < 2018"
+        Me.cb2018.UseVisualStyleBackColor = True
+        '
         'LastFive
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(611, 789)
+        Me.AutoScroll = True
+        Me.ClientSize = New System.Drawing.Size(598, 552)
+        Me.Controls.Add(Me.cb2018)
+        Me.Controls.Add(Me.lbStatus)
+        Me.Controls.Add(Me.dgLast5)
         Me.Controls.Add(Me.btnDisplayScores)
         Me.Controls.Add(Me.Label1)
         Me.Controls.Add(Me.cbDates)
         Me.Name = "LastFive"
         Me.Text = "LastFive"
+        CType(Me.dgLast5, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
@@ -75,4 +116,7 @@ Partial Class LastFive
     Friend WithEvents btnDisplayScores As Button
     Friend WithEvents Label1 As Label
     Friend WithEvents cbDates As ComboBox
+    Friend WithEvents dgLast5 As DataGridView
+    Friend WithEvents lbStatus As Label
+    Friend WithEvents cb2018 As CheckBox
 End Class

@@ -9,23 +9,27 @@ Public Class Matches
     Dim bsave As Boolean = False
     Public sByeOpponent As String
     Private Sub Matches_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        rs.FindAllControls(Me)
+        'rs.FindAllControls(Me)
         oHelper = Main.oHelper
 
-        'load dates from schedule
-        'oHelper.dtSchedule = oHelper.CSV2DataTable(txtLeagueName.Text & "_sch.csv")
-        'get the date of the schedule for this week
-        'just use the Column names which have dates of the schedule table
-        'this loop will compare the league start date and flip the hole marker based on front/back
-        If oHelper.bsch Then
-            For Each col As DataColumn In oHelper.dsLeague.Tables("dtSchedule").Columns
-                'Dim wkdate As DateTime = DateTime.ParseExact(col.ColumnName, "MM/dd/yy", Globalization.CultureInfo.InvariantCulture)
-                Dim wkdate As DateTime = col.ColumnName
-                Dim reformatted As String = wkdate.ToString("yyyyMMdd", Globalization.CultureInfo.InvariantCulture)
-                cbDatesPlayers.Items.Add(reformatted)
-            Next
+        'cbDatesPlayers.Items.AddRange(Main.cbDates.Items.Cast(Of String).ToArray)
+        For Each item In Main.cbDates.Items
+            If item >= CDate(oHelper.rLeagueParmrow("PostSeasonDt")).ToString("yyyyMMdd") Then Continue For
+            cbDatesPlayers.Items.Add(item)
+        Next
+        If cbDatesPlayers.Items.Contains(oHelper.dDate.ToString("yyyyMMdd")) Then cbDatesPlayers.SelectedIndex = cbDatesPlayers.Items.IndexOf(oHelper.dDate.ToString("yyyyMMdd"))
+        Dim sWH As String = oHelper.ScreenResize()
+        If Me.Width >= sWH.Split(":")(0) Then
+            Me.Width = sWH.Split(":")(0) - (sWH.Split(":")(0) * 0.1)
+        Else
+            'Me.Width = sWH.Split(":")(0)
         End If
-        cbDatesPlayers.SelectedItem = oHelper.dDate.ToString("yyyyMMdd")
+        If Me.Height >= sWH.Split(":")(1) Then
+            Me.Height = sWH.Split(":")(1) - (sWH.Split(":")(1) * 0.1)
+        Else
+            'Me.Height = sWH.Split(":")(1)
+        End If
+
         bsave = False
         lbStatus.Text = ""
         '20180130-check for locked scores
@@ -34,10 +38,14 @@ Public Class Matches
         Else
             btnSave.Visible = False
         End If
+        If oHelper.bLockScores Then
+            btnMatches_Click(sender, e)
+            'Me.Close()
+        End If
     End Sub
 
     Private Sub Matches_Resize(sender As Object, e As EventArgs) Handles MyBase.Resize
-        rs.ResizeAllControls(Me)
+        'rs.ResizeAllControls(Me)
     End Sub
 
     Private Sub btnExit_Click(sender As Object, e As EventArgs) Handles btnExit.Click
@@ -48,7 +56,7 @@ Public Class Matches
     End Sub
 
     Private Sub Matches_FormClosing(sender As Object, e As FormClosingEventArgs) Handles MyBase.FormClosing
-        SaveScores()
+        If Not oHelper.bLockScores Then SaveScores()
         'If Not bCloseScreen Then
         '    MsgBox("Press Exit to close this form")
         '    e.Cancel = True
@@ -62,15 +70,17 @@ Public Class Matches
         SaveScores()
     End Sub
 
-    Private Sub btnMatches_Click(sender As Object, e As EventArgs) Handles btnMatches.Click
+    Private Sub btnMatches_Click(sender As Object, e As EventArgs)
+
+    End Sub
+
+    Private Sub cbDatesPlayers_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cbDatesPlayers.SelectedIndexChanged
         oHelper.LOGIT("--------------------------------------------------------------")
         oHelper.LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
         With lbStatus
             .Text = "Calculating Matches..."
         End With
         oHelper.status_Msg(lbStatus, Me)
-
-        SaveScores()
 
         If cbDatesPlayers.SelectedItem Is Nothing Then
             MsgBox("Please select a date from the dropdown")
@@ -100,13 +110,21 @@ Public Class Matches
 
         sByeOpponent = ""
         oHelper.bByeFound = False
+        Dim sfilename As String = Main.cbLeagues.SelectedItem.ToString.Substring(Main.cbLeagues.SelectedItem.ToString.IndexOf("(") + 1, 4) &
+                               "_" & Main.cbLeagues.SelectedItem.ToString.Substring(0, Main.cbLeagues.SelectedItem.ToString.IndexOf("(") - 1) & "_Schedule.csv"
+        'this restores the screen with the new schedule
+        Dim dt = New DataTable
+        If Not oHelper.CSV2DataTable(dt, oHelper.sFilePath & "\" & sfilename) Then
+            MsgBox(String.Format("Schedule file not available {0}, exiting", sfilename))
+            Exit Sub
+        End If
         '20180325-find byes opponent
         If oHelper.rLeagueParmrow("Byes") IsNot DBNull.Value Then
-            For Each col As DataColumn In oHelper.dsLeague.Tables("dtSchedule").Columns
+            For Each col As DataColumn In dt.Columns
                 Dim wkdate As DateTime = col.ColumnName
                 Dim reformatted As String = wkdate.ToString("yyyyMMdd", Globalization.CultureInfo.InvariantCulture)
                 If cbDatesPlayers.SelectedItem = reformatted Then
-                    For Each row In oHelper.dsLeague.Tables("dtSchedule").Rows
+                    For Each row In dt.Rows
                         Dim sMatch = row(col).ToString
                         If sMatch.Split("v")(0) = oHelper.rLeagueParmrow("Byes") Then
                             sByeOpponent = sMatch.Split("v")(1)
@@ -177,10 +195,31 @@ Public Class Matches
                 End If
             Next
         End If
+        dgScores.Visible = True
+        bsave = True
+        oHelper.rLeagueParmrow("ScoresLocked") = "Y"
+        SaveScores()
+
         oHelper.bNoRowLeave = False
         For Each row In dgScores.Rows
             oHelper.MakeCellsStrings(row)
         Next
+        If Not Debugger.IsAttached Then
+            Dim sfn = oHelper.sReportPath & "\" & DateTime.Now.ToString("yyyyMMdd_hhmmss_") & oHelper.dDate.ToString("yyyyMMdd", Globalization.CultureInfo.InvariantCulture) & "_Matches.csv"
+            lbStatus.Text = String.Format("Creating spreadsheet({0}) of Matches from this screen...", sfn)
+            oHelper.status_Msg(lbStatus, Me)
+            oHelper.dgv2csv(dgScores, sfn)
+            '20190822 - new html
+            Dim sHtml As String = oHelper.Create_Html_From_DGV(dgScores)
+            sHtml = oHelper.ConvertDataGridViewToHTMLWithFormatting(dgScores, Me)
+            Dim swhtml As New IO.StreamWriter(sfn.Replace(".csv", ".html"), False)
+            swhtml.WriteLine(sHtml)
+            swhtml.Close()
+            lbStatus.Text = "Finished creating Matches spreadsheet from this screen"
+            oHelper.status_Msg(lbStatus, Me)
+
+        End If
+
         With lbStatus
             .Text = "Finished Calculating Matches"
         End With
@@ -228,6 +267,7 @@ Public Class Matches
                 oHelper.bScoresbyPlayer = False
             End If
         End If
+
         With lbStatus
             .Text = String.Format("Done Listing scores for {0}", cell.Value)
             .BackColor = Color.LightGreen
@@ -252,7 +292,7 @@ Public Class Matches
             Dim sc1 = oHelper.RemoveSpcChar(oHelper.convDBNulltoSpaces(e.CellValue1).Trim)
             Dim sc2 = oHelper.RemoveSpcChar(oHelper.convDBNulltoSpaces(e.CellValue2).Trim)
             If IsNumeric(sc1) And IsNumeric(sc2) Then
-                Debug.Print(sc1 & "-" & sc2)
+                oHelper.LOGIT(sc1 & "-" & sc2)
                 e.SortResult = If(CInt(sc1) < CInt(sc2), -1, 1)
             Else
                 e.SortResult = If(CStr(sc1) < CStr(sc2), -1, 1)
@@ -269,7 +309,7 @@ Public Class Matches
                 If dgScores.RowCount > 0 Then
                     If Not bsave Then
                         Dim mbr = MsgBox("Do you want to save Match Results before you exit?", MsgBoxStyle.YesNo)
-                        If mbr = MsgBoxResult.No Then bsave = True
+                        If mbr = MsgBoxResult.Yes Then bsave = True
                     End If
                 End If
             End If
@@ -280,7 +320,8 @@ Public Class Matches
                 For Each row In dgScores.Rows
                     UpdateScoresFromDataGrid(row)
                 Next
-                oHelper.DataTable2CSV(oHelper.dsLeague.Tables("dtScores"), oHelper.sFilePath & "\" & Now.ToString("yyyyMMdd") & "_Scores.csv")
+                'oHelper.DataTable2CSV(oHelper.dsLeague.Tables("dtScores"), oHelper.sFilePath & "\" & Now.ToString("yyyyMMdd") & "_Scores.csv")
+                oHelper.DataTable2CSV(oHelper.dsLeague.Tables("dtScores"), oHelper.sFilePath & "\Scores.csv")
                 lbStatus.Text = "Done saving scores from this screen"
                 lbStatus.BackColor = Color.LightGreen
                 bsave = False
@@ -306,9 +347,9 @@ Public Class Matches
             If sdate = "" Then
                 MsgBox("Please enter or select a date")
                 Exit Sub
-            Else
-                cbDatesPlayers.Items.Add(sdate)
-                cbDatesPlayers.SelectedItem = sdate
+                'Else
+                '    cbDatesPlayers.Items.Add(sdate)
+                '    cbDatesPlayers.SelectedItem = sdate
             End If
 
             'oHelper.CalcHoleMarker(sdate)
@@ -319,11 +360,16 @@ Public Class Matches
 
             For Each srow As DataRowView In dvscores
                 If srow("Hole1") IsNot DBNull.Value Then
-                    If IsNumeric(srow("Hole1")) Then oHelper.iHoleMarker = 1
+                    If IsNumeric(srow("Hole1")) Then
+                        oHelper.iHoleMarker = 1
+                        Exit For
+                    End If
                 ElseIf srow("Hole10") IsNot DBNull.Value Then
-                    If IsNumeric(srow("Hole10")) Then oHelper.iHoleMarker = 10
+                    If IsNumeric(srow("Hole10")) Then
+                        oHelper.iHoleMarker = 10
+                        Exit For
+                    End If
                 End If
-                Exit For
             Next
 
             If oHelper.iHoles = 0 Then oHelper.iHoles = oHelper.rLeagueParmrow("Holes")
@@ -338,7 +384,7 @@ Public Class Matches
 
             For Each parm As String In sArray
                 'set detault pattern
-                Dim sPat = oHelper.cPat40
+                Dim sPat = Helper.cPat40
                 Dim sParm = ""
 
                 If UBound(parm.Split("-")) = 0 Then
@@ -367,7 +413,7 @@ Public Class Matches
             Next
 
             dvScores.Sort = "Partner"
-            Dim dtScorecard As DataTable = dvScores.ToTable(True, sScoreCardforDGV.Split(",").ToArray)
+            Dim dtScorecard As DataTable = dvscores.ToTable(False, sScoreCardforDGV.Split(",").ToArray)
 
             dgScores.Columns.Clear()
 
@@ -387,19 +433,19 @@ Public Class Matches
                 Try
                     Select Case sColFormat(col.Index)
                         Case "cPat40nt"
-                            sformat = oHelper.cPat40nt
+                            sformat = Helper.cPat40nt
                         Case "cPat60"
-                            sformat = oHelper.cPat60
+                            sformat = Helper.cPat60
                         Case "cPatMeth"
-                            sformat = oHelper.cPatMeth
+                            sformat = Helper.cPatMeth
                         Case "cPat120"
-                            sformat = oHelper.cPat120
+                            sformat = Helper.cPat120
                         Case "cPat170"
-                            sformat = oHelper.cPat170
+                            sformat = Helper.cPat170
                         Case "cPat170nt"
-                            sformat = oHelper.cPat170nt
+                            sformat = Helper.cPat170nt
                         Case Else
-                            sformat = oHelper.cPat40
+                            sformat = Helper.cPat40
                     End Select
 
                 Catch ex As Exception
@@ -482,7 +528,13 @@ Public Class Matches
             Dim sKeys() As Object = {row.Cells("Player").Value, oHelper.dDate.ToString("yyyyMMdd", Globalization.CultureInfo.InvariantCulture)} 'cbDatesPlayers.SelectedItem
             Dim dr As DataRow = oHelper.dsLeague.Tables("dtScores").Rows.Find(sKeys)
             For Each cell As DataGridViewCell In row.Cells
-                If cell.Value IsNot DBNull.Value Then dr(cell.OwningColumn.Name) = cell.Value
+                If oHelper.convDBNulltoSpaces(cell.Value) = "" Then
+                    dr(cell.OwningColumn.Name) = DBNull.Value
+                Else
+                    dr(cell.OwningColumn.Name) = cell.Value
+                End If
+
+                'End If
             Next
 
         Catch ex As Exception

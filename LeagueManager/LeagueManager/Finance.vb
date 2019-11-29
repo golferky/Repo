@@ -43,13 +43,13 @@ Public Class Finance
         '        oXL.Quit()
 
         oHelper = Main.oHelper
-        oHelper.dt = New DataTable
-        Dim safile = "\\wdmycloud\Gary\LeagueManager\Files\20180917_Payments.csv"
-        If Not oHelper.CSV2DataTable(oHelper.dt, safile) Then
-            MsgBox(String.Format("File in use - {1} {0} close file and restart", vbCrLf, safile))
-            End
-        End If
-        Dim dtr As New DataTable
+        'oHelper.dt = New DataTable
+        'Dim safile = "\\wdmycloud\Gary\LeagueManager\Files\20180917_Payments.csv"
+        'If Not oHelper.CSV2DataTable(oHelper.dt, safile) Then
+        '    MsgBox(String.Format("File in use - {1} {0} close file and restart", vbCrLf, safile))
+        '    End
+        'End If
+        Dim dtr As New Data.DataTable
         dtr.Columns.Add("Player")
         dtr.Columns.Add("Balance Due", GetType(Decimal))
         dtr.Columns.Add("Earned", GetType(Decimal))
@@ -66,7 +66,7 @@ Public Class Finance
 
         dtr.PrimaryKey = New DataColumn() {dtr.Columns("Player")}
         dtr.DefaultView.Sort = "Player Asc"
-        Dim dv As New DataView(oHelper.dt)
+        Dim dv As New DataView(oHelper.dsLeague.Tables("dtPayments"))
         Dim sdate = Main.cbLeagues.SelectedItem.ToString.Substring(Main.cbLeagues.SelectedItem.ToString.IndexOf("(") + 1, 4) & "0101"
         dv.RowFilter = String.Format("Date > {0} And Date < {1} ", sdate, sdate.Replace("0101", "1231"))
         For Each row As DataRowView In dv
@@ -78,7 +78,7 @@ Public Class Finance
         Next
 
         Dim iEarned = iSkinspaidout + iCTPpaidout + irspaidout + iccpaidout + iesPaidOut1 + iesPaidOut2 + iecPaidOut1 + iecPaidOut2
-        dtr.Rows.Add("*** Totals ***", 0, iEarned, iSkins, iCTP, iSkinspaidout, iCTPpaidout, irspaidout, iccpaidout,
+        dtr.Rows.Add("*** Totals ***", idue, iEarned, iSkins, iCTP, iSkinspaidout, iCTPpaidout, irspaidout, iccpaidout,
                      iesPaidOut1, iesPaidOut2, iecPaidOut1, iecPaidOut2)
 
         tbDue.Text = idue
@@ -115,8 +115,8 @@ Public Class Finance
             If row("Player").ToString.Contains("***") Or row("Balance Due") > 0 Then
             Else
                 'this code checks to see if a player participated in EOY skins
-                Dim dvs As New DataView(oHelper.dt)
-                dvs.RowFilter = String.Format("Desc = '{0}' And Detail = '{1}'", "EOY Skins", "Payment")
+                Dim dvs As New DataView(oHelper.dsLeague.Tables("dtPayments"))
+                dvs.RowFilter = String.Format("Desc = '{0}' And Detail = '{1}' And Date >= '{2}' And Date <= '{3}'", "EOY Skins", "Payment", sdate, sdate.Replace("0101", "1231"))
                 Dim dt = dvs.ToTable
                 dt.PrimaryKey = New DataColumn() {dt.Columns("Player")}
                 Dim sKeys() As Object = {row("Player")}
@@ -139,7 +139,7 @@ Public Class Finance
         lbStatus.Text = ""
 
     End Sub
-    Sub calcAmount(dtr As DataTable, row As DataRowView)
+    Sub CalcAmount(dtr As DataTable, row As DataRowView)
         Dim sKeys() As Object = {row("Player")}
         Dim dr As DataRow = dtr.Rows.Find(sKeys)
         'build a new row if it doesnt exist
@@ -148,7 +148,7 @@ Public Class Finance
             dr = dtr.Rows.Find(sKeys)
         End If
 
-        If row("Desc") = "Skin " Then
+        If row("Desc") = "Skin" Then
             dr("#Skins") += 1
             dr("$Skins") += row("Earned")
             iSkins += 1
@@ -160,7 +160,10 @@ Public Class Finance
             iCTPpaidout += row("Earned")
         ElseIf sdesc = "League Dues" Then
             If row("Detail") = "Invoice" Then
-                If row("DatePaid") Is DBNull.Value Then idue += row("Earned") * -1
+                If row("DatePaid") Is DBNull.Value Then
+                    idue += row("Earned") * -1
+                    dr("Balance Due") = row("Earned") * -1
+                End If
             ElseIf row("Detail") = "Payment" Then
                 'add to total collected
                 irscollected += row("Earned")

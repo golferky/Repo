@@ -25,21 +25,26 @@ Partial Class frmScoreCard
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmScoreCard))
         Me.lbPS = New System.Windows.Forms.Label()
         Me.btnExit = New System.Windows.Forms.Button()
-        Me.btnShowScores = New System.Windows.Forms.Button()
         Me.rbNet = New System.Windows.Forms.RadioButton()
         Me.rbGross = New System.Windows.Forms.RadioButton()
         Me.gbDefMeth = New System.Windows.Forms.GroupBox()
         Me.rbScore = New System.Windows.Forms.RadioButton()
-        Me.cbDatesPlayers = New System.Windows.Forms.ComboBox()
-        Me.gbDefGames = New System.Windows.Forms.GroupBox()
-        Me.cbClosest = New System.Windows.Forms.CheckBox()
-        Me.cbSkins = New System.Windows.Forms.CheckBox()
-        Me.GroupBox3 = New System.Windows.Forms.GroupBox()
+        Me.cbDates = New System.Windows.Forms.ComboBox()
+        Me.cbStrokesId = New System.Windows.Forms.GroupBox()
         Me.rbDots = New System.Windows.Forms.RadioButton()
         Me.rbColors = New System.Windows.Forms.RadioButton()
         Me.lbStatus = New System.Windows.Forms.Label()
         Me.btnSave = New System.Windows.Forms.Button()
         Me.GroupBox1 = New System.Windows.Forms.GroupBox()
+        Me.tbKitty = New System.Windows.Forms.TextBox()
+        Me.Label25 = New System.Windows.Forms.Label()
+        Me.GroupBox8 = New System.Windows.Forms.GroupBox()
+        Me.Label26 = New System.Windows.Forms.Label()
+        Me.tbExtraCP2 = New System.Windows.Forms.TextBox()
+        Me.Label27 = New System.Windows.Forms.Label()
+        Me.Label28 = New System.Windows.Forms.Label()
+        Me.tbExtraCP1 = New System.Windows.Forms.TextBox()
+        Me.tbExtraSkins = New System.Windows.Forms.TextBox()
         Me.GroupBox7 = New System.Windows.Forms.GroupBox()
         Me.Label22 = New System.Windows.Forms.Label()
         Me.tbCP2Tot = New System.Windows.Forms.TextBox()
@@ -77,7 +82,7 @@ Partial Class frmScoreCard
         Me.Label6 = New System.Windows.Forms.Label()
         Me.Label5 = New System.Windows.Forms.Label()
         Me.Label4 = New System.Windows.Forms.Label()
-        Me.GroupBox5 = New System.Windows.Forms.GroupBox()
+        Me.gbColors = New System.Windows.Forms.GroupBox()
         Me.Label13 = New System.Windows.Forms.Label()
         Me.Label12 = New System.Windows.Forms.Label()
         Me.Label11 = New System.Windows.Forms.Label()
@@ -87,24 +92,30 @@ Partial Class frmScoreCard
         Me.gbFrontBack = New System.Windows.Forms.GroupBox()
         Me.rbFront = New System.Windows.Forms.RadioButton()
         Me.rbBack = New System.Windows.Forms.RadioButton()
+        Me.lbParmFile = New System.Windows.Forms.Label()
+        Me.StatusStrip1 = New System.Windows.Forms.StatusStrip()
+        Me.tspb = New System.Windows.Forms.ToolStripProgressBar()
+        Me.tssl = New System.Windows.Forms.ToolStripStatusLabel()
+        Me.lbMonitor = New System.Windows.Forms.Label()
         Me.gbDefMeth.SuspendLayout()
-        Me.gbDefGames.SuspendLayout()
-        Me.GroupBox3.SuspendLayout()
+        Me.cbStrokesId.SuspendLayout()
         Me.GroupBox1.SuspendLayout()
+        Me.GroupBox8.SuspendLayout()
         Me.GroupBox7.SuspendLayout()
         Me.GroupBox6.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
         CType(Me.dgScores, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.gbHoleLegend.SuspendLayout()
         Me.GroupBox4.SuspendLayout()
-        Me.GroupBox5.SuspendLayout()
+        Me.gbColors.SuspendLayout()
         Me.gbFrontBack.SuspendLayout()
+        Me.StatusStrip1.SuspendLayout()
         Me.SuspendLayout()
         '
         'lbPS
         '
         Me.lbPS.AutoSize = True
-        Me.lbPS.Location = New System.Drawing.Point(1007, 9)
+        Me.lbPS.Location = New System.Drawing.Point(1141, 13)
         Me.lbPS.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
         Me.lbPS.Name = "lbPS"
         Me.lbPS.Size = New System.Drawing.Size(30, 13)
@@ -113,31 +124,20 @@ Partial Class frmScoreCard
         '
         'btnExit
         '
-        Me.btnExit.Location = New System.Drawing.Point(1139, 98)
+        Me.btnExit.Location = New System.Drawing.Point(1100, 105)
         Me.btnExit.Margin = New System.Windows.Forms.Padding(2)
         Me.btnExit.Name = "btnExit"
-        Me.btnExit.Size = New System.Drawing.Size(106, 37)
+        Me.btnExit.Size = New System.Drawing.Size(115, 37)
         Me.btnExit.TabIndex = 57
         Me.btnExit.TabStop = False
         Me.btnExit.Text = "Exit"
         Me.btnExit.UseVisualStyleBackColor = True
         '
-        'btnShowScores
-        '
-        Me.btnShowScores.Location = New System.Drawing.Point(1139, 11)
-        Me.btnShowScores.Margin = New System.Windows.Forms.Padding(2)
-        Me.btnShowScores.Name = "btnShowScores"
-        Me.btnShowScores.Size = New System.Drawing.Size(106, 37)
-        Me.btnShowScores.TabIndex = 58
-        Me.btnShowScores.TabStop = False
-        Me.btnShowScores.Text = "Show Scores"
-        Me.btnShowScores.UseVisualStyleBackColor = True
-        '
         'rbNet
         '
         Me.rbNet.AutoSize = True
         Me.rbNet.Checked = True
-        Me.rbNet.Location = New System.Drawing.Point(30, 19)
+        Me.rbNet.Location = New System.Drawing.Point(6, 40)
         Me.rbNet.Name = "rbNet"
         Me.rbNet.Size = New System.Drawing.Size(42, 17)
         Me.rbNet.TabIndex = 1
@@ -148,7 +148,7 @@ Partial Class frmScoreCard
         'rbGross
         '
         Me.rbGross.AutoSize = True
-        Me.rbGross.Location = New System.Drawing.Point(30, 42)
+        Me.rbGross.Location = New System.Drawing.Point(6, 63)
         Me.rbGross.Name = "rbGross"
         Me.rbGross.Size = New System.Drawing.Size(52, 17)
         Me.rbGross.TabIndex = 60
@@ -160,83 +160,49 @@ Partial Class frmScoreCard
         Me.gbDefMeth.Controls.Add(Me.rbScore)
         Me.gbDefMeth.Controls.Add(Me.rbNet)
         Me.gbDefMeth.Controls.Add(Me.rbGross)
-        Me.gbDefMeth.Location = New System.Drawing.Point(41, 9)
+        Me.gbDefMeth.Location = New System.Drawing.Point(12, 30)
         Me.gbDefMeth.Name = "gbDefMeth"
-        Me.gbDefMeth.Size = New System.Drawing.Size(131, 100)
+        Me.gbDefMeth.Size = New System.Drawing.Size(72, 123)
         Me.gbDefMeth.TabIndex = 61
         Me.gbDefMeth.TabStop = False
-        Me.gbDefMeth.Text = "Default Score Method"
+        Me.gbDefMeth.Text = "Score Method"
         '
         'rbScore
         '
         Me.rbScore.AutoSize = True
-        Me.rbScore.Location = New System.Drawing.Point(30, 65)
+        Me.rbScore.Location = New System.Drawing.Point(6, 86)
         Me.rbScore.Name = "rbScore"
         Me.rbScore.Size = New System.Drawing.Size(53, 17)
         Me.rbScore.TabIndex = 61
         Me.rbScore.Text = "Score"
         Me.rbScore.UseVisualStyleBackColor = True
         '
-        'cbDatesPlayers
+        'cbDates
         '
-        Me.cbDatesPlayers.FormattingEnabled = True
-        Me.cbDatesPlayers.Location = New System.Drawing.Point(966, 26)
-        Me.cbDatesPlayers.Margin = New System.Windows.Forms.Padding(2)
-        Me.cbDatesPlayers.Name = "cbDatesPlayers"
-        Me.cbDatesPlayers.Size = New System.Drawing.Size(115, 21)
-        Me.cbDatesPlayers.TabIndex = 76
-        Me.cbDatesPlayers.TabStop = False
+        Me.cbDates.FormattingEnabled = True
+        Me.cbDates.Location = New System.Drawing.Point(1100, 30)
+        Me.cbDates.Margin = New System.Windows.Forms.Padding(2)
+        Me.cbDates.Name = "cbDates"
+        Me.cbDates.Size = New System.Drawing.Size(115, 21)
+        Me.cbDates.TabIndex = 76
+        Me.cbDates.TabStop = False
         '
-        'gbDefGames
+        'cbStrokesId
         '
-        Me.gbDefGames.Controls.Add(Me.cbClosest)
-        Me.gbDefGames.Controls.Add(Me.cbSkins)
-        Me.gbDefGames.Location = New System.Drawing.Point(438, 90)
-        Me.gbDefGames.Name = "gbDefGames"
-        Me.gbDefGames.Size = New System.Drawing.Size(104, 73)
-        Me.gbDefGames.TabIndex = 63
-        Me.gbDefGames.TabStop = False
-        Me.gbDefGames.Text = "Default Games"
-        Me.gbDefGames.Visible = False
-        '
-        'cbClosest
-        '
-        Me.cbClosest.AutoSize = True
-        Me.cbClosest.Location = New System.Drawing.Point(11, 45)
-        Me.cbClosest.Name = "cbClosest"
-        Me.cbClosest.Size = New System.Drawing.Size(60, 17)
-        Me.cbClosest.TabIndex = 61
-        Me.cbClosest.TabStop = False
-        Me.cbClosest.Text = "Closest"
-        Me.cbClosest.UseVisualStyleBackColor = True
-        '
-        'cbSkins
-        '
-        Me.cbSkins.AutoSize = True
-        Me.cbSkins.Location = New System.Drawing.Point(11, 22)
-        Me.cbSkins.Name = "cbSkins"
-        Me.cbSkins.Size = New System.Drawing.Size(52, 17)
-        Me.cbSkins.TabIndex = 60
-        Me.cbSkins.TabStop = False
-        Me.cbSkins.Text = "Skins"
-        Me.cbSkins.UseVisualStyleBackColor = True
-        '
-        'GroupBox3
-        '
-        Me.GroupBox3.Controls.Add(Me.rbDots)
-        Me.GroupBox3.Controls.Add(Me.rbColors)
-        Me.GroupBox3.Location = New System.Drawing.Point(434, 11)
-        Me.GroupBox3.Name = "GroupBox3"
-        Me.GroupBox3.Size = New System.Drawing.Size(108, 73)
-        Me.GroupBox3.TabIndex = 69
-        Me.GroupBox3.TabStop = False
-        Me.GroupBox3.Text = "Strokes Identifier"
+        Me.cbStrokesId.Controls.Add(Me.rbDots)
+        Me.cbStrokesId.Controls.Add(Me.rbColors)
+        Me.cbStrokesId.Location = New System.Drawing.Point(86, 30)
+        Me.cbStrokesId.Name = "cbStrokesId"
+        Me.cbStrokesId.Size = New System.Drawing.Size(100, 107)
+        Me.cbStrokesId.TabIndex = 69
+        Me.cbStrokesId.TabStop = False
+        Me.cbStrokesId.Text = "Strokes Identifier"
         '
         'rbDots
         '
         Me.rbDots.AutoSize = True
         Me.rbDots.Checked = True
-        Me.rbDots.Location = New System.Drawing.Point(30, 19)
+        Me.rbDots.Location = New System.Drawing.Point(30, 41)
         Me.rbDots.Name = "rbDots"
         Me.rbDots.Size = New System.Drawing.Size(47, 17)
         Me.rbDots.TabIndex = 1
@@ -247,7 +213,7 @@ Partial Class frmScoreCard
         'rbColors
         '
         Me.rbColors.AutoSize = True
-        Me.rbColors.Location = New System.Drawing.Point(30, 42)
+        Me.rbColors.Location = New System.Drawing.Point(30, 64)
         Me.rbColors.Name = "rbColors"
         Me.rbColors.Size = New System.Drawing.Size(54, 17)
         Me.rbColors.TabIndex = 60
@@ -257,7 +223,7 @@ Partial Class frmScoreCard
         'lbStatus
         '
         Me.lbStatus.AutoSize = True
-        Me.lbStatus.Location = New System.Drawing.Point(2, 131)
+        Me.lbStatus.Location = New System.Drawing.Point(11, 170)
         Me.lbStatus.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
         Me.lbStatus.Name = "lbStatus"
         Me.lbStatus.Size = New System.Drawing.Size(83, 13)
@@ -266,10 +232,10 @@ Partial Class frmScoreCard
         '
         'btnSave
         '
-        Me.btnSave.Location = New System.Drawing.Point(1139, 56)
+        Me.btnSave.Location = New System.Drawing.Point(1100, 63)
         Me.btnSave.Margin = New System.Windows.Forms.Padding(2)
         Me.btnSave.Name = "btnSave"
-        Me.btnSave.Size = New System.Drawing.Size(106, 37)
+        Me.btnSave.Size = New System.Drawing.Size(115, 37)
         Me.btnSave.TabIndex = 71
         Me.btnSave.TabStop = False
         Me.btnSave.Text = "Save Scores"
@@ -277,17 +243,114 @@ Partial Class frmScoreCard
         '
         'GroupBox1
         '
+        Me.GroupBox1.Controls.Add(Me.tbKitty)
+        Me.GroupBox1.Controls.Add(Me.Label25)
+        Me.GroupBox1.Controls.Add(Me.GroupBox8)
         Me.GroupBox1.Controls.Add(Me.GroupBox7)
         Me.GroupBox1.Controls.Add(Me.GroupBox6)
         Me.GroupBox1.Controls.Add(Me.tbPurse)
         Me.GroupBox1.Controls.Add(Me.Label3)
         Me.GroupBox1.Controls.Add(Me.GroupBox2)
-        Me.GroupBox1.Location = New System.Drawing.Point(551, 11)
+        Me.GroupBox1.Location = New System.Drawing.Point(420, 12)
         Me.GroupBox1.Name = "GroupBox1"
-        Me.GroupBox1.Size = New System.Drawing.Size(409, 149)
+        Me.GroupBox1.Size = New System.Drawing.Size(526, 149)
         Me.GroupBox1.TabIndex = 78
         Me.GroupBox1.TabStop = False
         Me.GroupBox1.Text = "Prize Money"
+        '
+        'tbKitty
+        '
+        Me.tbKitty.Location = New System.Drawing.Point(446, 105)
+        Me.tbKitty.Name = "tbKitty"
+        Me.tbKitty.ReadOnly = True
+        Me.tbKitty.Size = New System.Drawing.Size(41, 20)
+        Me.tbKitty.TabIndex = 80
+        Me.tbKitty.TabStop = False
+        '
+        'Label25
+        '
+        Me.Label25.AutoSize = True
+        Me.Label25.Location = New System.Drawing.Point(443, 81)
+        Me.Label25.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
+        Me.Label25.Name = "Label25"
+        Me.Label25.Size = New System.Drawing.Size(27, 13)
+        Me.Label25.TabIndex = 81
+        Me.Label25.Text = "Kitty"
+        '
+        'GroupBox8
+        '
+        Me.GroupBox8.Controls.Add(Me.Label26)
+        Me.GroupBox8.Controls.Add(Me.tbExtraCP2)
+        Me.GroupBox8.Controls.Add(Me.Label27)
+        Me.GroupBox8.Controls.Add(Me.Label28)
+        Me.GroupBox8.Controls.Add(Me.tbExtraCP1)
+        Me.GroupBox8.Controls.Add(Me.tbExtraSkins)
+        Me.GroupBox8.Location = New System.Drawing.Point(321, 21)
+        Me.GroupBox8.Name = "GroupBox8"
+        Me.GroupBox8.Size = New System.Drawing.Size(95, 122)
+        Me.GroupBox8.TabIndex = 79
+        Me.GroupBox8.TabStop = False
+        Me.GroupBox8.Text = "            Extra"
+        Me.GroupBox8.Visible = False
+        '
+        'Label26
+        '
+        Me.Label26.AutoSize = True
+        Me.Label26.Location = New System.Drawing.Point(5, 98)
+        Me.Label26.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
+        Me.Label26.Name = "Label26"
+        Me.Label26.Size = New System.Drawing.Size(27, 13)
+        Me.Label26.TabIndex = 80
+        Me.Label26.Text = "CP2"
+        '
+        'tbExtraCP2
+        '
+        Me.tbExtraCP2.AcceptsReturn = True
+        Me.tbExtraCP2.Location = New System.Drawing.Point(38, 95)
+        Me.tbExtraCP2.Name = "tbExtraCP2"
+        Me.tbExtraCP2.ReadOnly = True
+        Me.tbExtraCP2.Size = New System.Drawing.Size(41, 20)
+        Me.tbExtraCP2.TabIndex = 79
+        Me.tbExtraCP2.TabStop = False
+        '
+        'Label27
+        '
+        Me.Label27.AutoSize = True
+        Me.Label27.Location = New System.Drawing.Point(5, 65)
+        Me.Label27.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
+        Me.Label27.Name = "Label27"
+        Me.Label27.Size = New System.Drawing.Size(27, 13)
+        Me.Label27.TabIndex = 76
+        Me.Label27.Text = "CP1"
+        '
+        'Label28
+        '
+        Me.Label28.AutoSize = True
+        Me.Label28.Location = New System.Drawing.Point(5, 34)
+        Me.Label28.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
+        Me.Label28.Name = "Label28"
+        Me.Label28.Size = New System.Drawing.Size(33, 13)
+        Me.Label28.TabIndex = 75
+        Me.Label28.Text = "Skins"
+        '
+        'tbExtraCP1
+        '
+        Me.tbExtraCP1.AcceptsReturn = True
+        Me.tbExtraCP1.Location = New System.Drawing.Point(38, 62)
+        Me.tbExtraCP1.Name = "tbExtraCP1"
+        Me.tbExtraCP1.ReadOnly = True
+        Me.tbExtraCP1.Size = New System.Drawing.Size(41, 20)
+        Me.tbExtraCP1.TabIndex = 74
+        Me.tbExtraCP1.TabStop = False
+        '
+        'tbExtraSkins
+        '
+        Me.tbExtraSkins.Location = New System.Drawing.Point(38, 29)
+        Me.tbExtraSkins.Name = "tbExtraSkins"
+        Me.tbExtraSkins.ReadOnly = True
+        Me.tbExtraSkins.Size = New System.Drawing.Size(41, 20)
+        Me.tbExtraSkins.TabIndex = 73
+        Me.tbExtraSkins.TabStop = False
         '
         'GroupBox7
         '
@@ -393,6 +456,7 @@ Partial Class frmScoreCard
         Me.tbPCP2.AcceptsReturn = True
         Me.tbPCP2.Location = New System.Drawing.Point(38, 95)
         Me.tbPCP2.Name = "tbPCP2"
+        Me.tbPCP2.ReadOnly = True
         Me.tbPCP2.Size = New System.Drawing.Size(41, 20)
         Me.tbPCP2.TabIndex = 75
         '
@@ -421,6 +485,7 @@ Partial Class frmScoreCard
         Me.tbPCP1.AcceptsReturn = True
         Me.tbPCP1.Location = New System.Drawing.Point(38, 62)
         Me.tbPCP1.Name = "tbPCP1"
+        Me.tbPCP1.ReadOnly = True
         Me.tbPCP1.Size = New System.Drawing.Size(41, 20)
         Me.tbPCP1.TabIndex = 74
         '
@@ -428,12 +493,13 @@ Partial Class frmScoreCard
         '
         Me.tbPSkins.Location = New System.Drawing.Point(38, 29)
         Me.tbPSkins.Name = "tbPSkins"
+        Me.tbPSkins.ReadOnly = True
         Me.tbPSkins.Size = New System.Drawing.Size(41, 20)
         Me.tbPSkins.TabIndex = 73
         '
         'tbPurse
         '
-        Me.tbPurse.Location = New System.Drawing.Point(346, 84)
+        Me.tbPurse.Location = New System.Drawing.Point(446, 49)
         Me.tbPurse.Name = "tbPurse"
         Me.tbPurse.ReadOnly = True
         Me.tbPurse.Size = New System.Drawing.Size(41, 20)
@@ -443,7 +509,7 @@ Partial Class frmScoreCard
         'Label3
         '
         Me.Label3.AutoSize = True
-        Me.Label3.Location = New System.Drawing.Point(343, 55)
+        Me.Label3.Location = New System.Drawing.Point(443, 25)
         Me.Label3.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
         Me.Label3.Name = "Label3"
         Me.Label3.Size = New System.Drawing.Size(61, 13)
@@ -528,15 +594,15 @@ Partial Class frmScoreCard
             Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.dgScores.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
-        Me.dgScores.Location = New System.Drawing.Point(28, 166)
+        Me.dgScores.Location = New System.Drawing.Point(12, 198)
         Me.dgScores.Name = "dgScores"
-        Me.dgScores.Size = New System.Drawing.Size(1424, 586)
+        Me.dgScores.Size = New System.Drawing.Size(1209, 365)
         Me.dgScores.TabIndex = 0
         '
         'cbScoresLocked
         '
         Me.cbScoresLocked.AutoSize = True
-        Me.cbScoresLocked.Location = New System.Drawing.Point(966, 100)
+        Me.cbScoresLocked.Location = New System.Drawing.Point(963, 138)
         Me.cbScoresLocked.Name = "cbScoresLocked"
         Me.cbScoresLocked.Size = New System.Drawing.Size(86, 17)
         Me.cbScoresLocked.TabIndex = 79
@@ -553,9 +619,9 @@ Partial Class frmScoreCard
         Me.gbHoleLegend.Controls.Add(Me.Label6)
         Me.gbHoleLegend.Controls.Add(Me.Label5)
         Me.gbHoleLegend.Controls.Add(Me.Label4)
-        Me.gbHoleLegend.Location = New System.Drawing.Point(188, 90)
+        Me.gbHoleLegend.Location = New System.Drawing.Point(188, 92)
         Me.gbHoleLegend.Name = "gbHoleLegend"
-        Me.gbHoleLegend.Size = New System.Drawing.Size(214, 65)
+        Me.gbHoleLegend.Size = New System.Drawing.Size(226, 67)
         Me.gbHoleLegend.TabIndex = 80
         Me.gbHoleLegend.TabStop = False
         Me.gbHoleLegend.Text = "Holes Colors Legend"
@@ -692,18 +758,18 @@ Partial Class frmScoreCard
         Me.Label4.TabIndex = 72
         Me.Label4.Text = "Stroke Hole"
         '
-        'GroupBox5
+        'gbColors
         '
-        Me.GroupBox5.Controls.Add(Me.Label13)
-        Me.GroupBox5.Controls.Add(Me.Label12)
-        Me.GroupBox5.Controls.Add(Me.Label11)
-        Me.GroupBox5.Controls.Add(Me.Label10)
-        Me.GroupBox5.Location = New System.Drawing.Point(210, 12)
-        Me.GroupBox5.Name = "GroupBox5"
-        Me.GroupBox5.Size = New System.Drawing.Size(165, 65)
-        Me.GroupBox5.TabIndex = 81
-        Me.GroupBox5.TabStop = False
-        Me.GroupBox5.Text = "Colors Legend"
+        Me.gbColors.Controls.Add(Me.Label13)
+        Me.gbColors.Controls.Add(Me.Label12)
+        Me.gbColors.Controls.Add(Me.Label11)
+        Me.gbColors.Controls.Add(Me.Label10)
+        Me.gbColors.Location = New System.Drawing.Point(188, 30)
+        Me.gbColors.Name = "gbColors"
+        Me.gbColors.Size = New System.Drawing.Size(177, 61)
+        Me.gbColors.TabIndex = 81
+        Me.gbColors.TabStop = False
+        Me.gbColors.Text = "Colors Legend"
         '
         'Label13
         '
@@ -756,7 +822,7 @@ Partial Class frmScoreCard
         'cbMarkPaid
         '
         Me.cbMarkPaid.AutoSize = True
-        Me.cbMarkPaid.Location = New System.Drawing.Point(966, 54)
+        Me.cbMarkPaid.Location = New System.Drawing.Point(963, 92)
         Me.cbMarkPaid.Name = "cbMarkPaid"
         Me.cbMarkPaid.Size = New System.Drawing.Size(129, 17)
         Me.cbMarkPaid.TabIndex = 77
@@ -767,7 +833,7 @@ Partial Class frmScoreCard
         'cbMatches
         '
         Me.cbMatches.AutoSize = True
-        Me.cbMatches.Location = New System.Drawing.Point(966, 77)
+        Me.cbMatches.Location = New System.Drawing.Point(963, 115)
         Me.cbMatches.Name = "cbMatches"
         Me.cbMatches.Size = New System.Drawing.Size(125, 17)
         Me.cbMatches.TabIndex = 78
@@ -779,9 +845,9 @@ Partial Class frmScoreCard
         '
         Me.gbFrontBack.Controls.Add(Me.rbFront)
         Me.gbFrontBack.Controls.Add(Me.rbBack)
-        Me.gbFrontBack.Location = New System.Drawing.Point(1288, 12)
+        Me.gbFrontBack.Location = New System.Drawing.Point(963, 13)
         Me.gbFrontBack.Name = "gbFrontBack"
-        Me.gbFrontBack.Size = New System.Drawing.Size(108, 73)
+        Me.gbFrontBack.Size = New System.Drawing.Size(125, 73)
         Me.gbFrontBack.TabIndex = 92
         Me.gbFrontBack.TabStop = False
         Me.gbFrontBack.Text = "Swap Nines"
@@ -808,25 +874,68 @@ Partial Class frmScoreCard
         Me.rbBack.Text = "Back"
         Me.rbBack.UseVisualStyleBackColor = True
         '
+        'lbParmFile
+        '
+        Me.lbParmFile.AutoSize = True
+        Me.lbParmFile.Location = New System.Drawing.Point(962, 175)
+        Me.lbParmFile.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
+        Me.lbParmFile.Name = "lbParmFile"
+        Me.lbParmFile.Size = New System.Drawing.Size(50, 13)
+        Me.lbParmFile.TabIndex = 93
+        Me.lbParmFile.Text = "Parm File"
+        '
+        'StatusStrip1
+        '
+        Me.StatusStrip1.ImageScalingSize = New System.Drawing.Size(32, 32)
+        Me.StatusStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.tspb, Me.tssl})
+        Me.StatusStrip1.Location = New System.Drawing.Point(0, 571)
+        Me.StatusStrip1.Name = "StatusStrip1"
+        Me.StatusStrip1.Padding = New System.Windows.Forms.Padding(0, 0, 7, 0)
+        Me.StatusStrip1.Size = New System.Drawing.Size(1263, 23)
+        Me.StatusStrip1.TabIndex = 94
+        Me.StatusStrip1.Text = "StatusStrip1"
+        '
+        'tspb
+        '
+        Me.tspb.Name = "tspb"
+        Me.tspb.Size = New System.Drawing.Size(50, 17)
+        Me.tspb.Style = System.Windows.Forms.ProgressBarStyle.Continuous
+        '
+        'tssl
+        '
+        Me.tssl.Name = "tssl"
+        Me.tssl.Size = New System.Drawing.Size(119, 18)
+        Me.tssl.Text = "ToolStripStatusLabel1"
+        '
+        'lbMonitor
+        '
+        Me.lbMonitor.AutoSize = True
+        Me.lbMonitor.Location = New System.Drawing.Point(15, 9)
+        Me.lbMonitor.Name = "lbMonitor"
+        Me.lbMonitor.Size = New System.Drawing.Size(45, 13)
+        Me.lbMonitor.TabIndex = 95
+        Me.lbMonitor.Text = "Label26"
+        '
         'frmScoreCard
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(1486, 752)
+        Me.ClientSize = New System.Drawing.Size(1263, 594)
+        Me.Controls.Add(Me.lbMonitor)
+        Me.Controls.Add(Me.StatusStrip1)
+        Me.Controls.Add(Me.lbParmFile)
         Me.Controls.Add(Me.gbFrontBack)
         Me.Controls.Add(Me.cbMatches)
         Me.Controls.Add(Me.cbMarkPaid)
-        Me.Controls.Add(Me.GroupBox5)
+        Me.Controls.Add(Me.gbColors)
         Me.Controls.Add(Me.gbHoleLegend)
         Me.Controls.Add(Me.cbScoresLocked)
         Me.Controls.Add(Me.dgScores)
         Me.Controls.Add(Me.GroupBox1)
         Me.Controls.Add(Me.btnSave)
         Me.Controls.Add(Me.lbStatus)
-        Me.Controls.Add(Me.GroupBox3)
-        Me.Controls.Add(Me.btnShowScores)
-        Me.Controls.Add(Me.gbDefGames)
-        Me.Controls.Add(Me.cbDatesPlayers)
+        Me.Controls.Add(Me.cbStrokesId)
+        Me.Controls.Add(Me.cbDates)
         Me.Controls.Add(Me.gbDefMeth)
         Me.Controls.Add(Me.btnExit)
         Me.Controls.Add(Me.lbPS)
@@ -836,12 +945,12 @@ Partial Class frmScoreCard
         Me.Text = "ScoreCard"
         Me.gbDefMeth.ResumeLayout(False)
         Me.gbDefMeth.PerformLayout()
-        Me.gbDefGames.ResumeLayout(False)
-        Me.gbDefGames.PerformLayout()
-        Me.GroupBox3.ResumeLayout(False)
-        Me.GroupBox3.PerformLayout()
+        Me.cbStrokesId.ResumeLayout(False)
+        Me.cbStrokesId.PerformLayout()
         Me.GroupBox1.ResumeLayout(False)
         Me.GroupBox1.PerformLayout()
+        Me.GroupBox8.ResumeLayout(False)
+        Me.GroupBox8.PerformLayout()
         Me.GroupBox7.ResumeLayout(False)
         Me.GroupBox7.PerformLayout()
         Me.GroupBox6.ResumeLayout(False)
@@ -853,26 +962,24 @@ Partial Class frmScoreCard
         Me.gbHoleLegend.PerformLayout()
         Me.GroupBox4.ResumeLayout(False)
         Me.GroupBox4.PerformLayout()
-        Me.GroupBox5.ResumeLayout(False)
-        Me.GroupBox5.PerformLayout()
+        Me.gbColors.ResumeLayout(False)
+        Me.gbColors.PerformLayout()
         Me.gbFrontBack.ResumeLayout(False)
         Me.gbFrontBack.PerformLayout()
+        Me.StatusStrip1.ResumeLayout(False)
+        Me.StatusStrip1.PerformLayout()
         Me.ResumeLayout(False)
         Me.PerformLayout()
 
     End Sub
     Friend WithEvents lbPS As System.Windows.Forms.Label
     Friend WithEvents btnExit As Button
-    Friend WithEvents btnShowScores As Button
     Friend WithEvents rbNet As RadioButton
     Friend WithEvents rbGross As RadioButton
     Friend WithEvents gbDefMeth As GroupBox
     Friend WithEvents rbScore As RadioButton
-    Friend WithEvents cbDatesPlayers As ComboBox
-    Friend WithEvents gbDefGames As GroupBox
-    Friend WithEvents cbClosest As CheckBox
-    Friend WithEvents cbSkins As CheckBox
-    Friend WithEvents GroupBox3 As GroupBox
+    Friend WithEvents cbDates As ComboBox
+    Friend WithEvents cbStrokesId As GroupBox
     Friend WithEvents rbDots As RadioButton
     Friend WithEvents rbColors As RadioButton
     Friend WithEvents lbStatus As Label
@@ -894,7 +1001,7 @@ Partial Class frmScoreCard
     Friend WithEvents Label15 As Label
     Friend WithEvents Label16 As Label
     Friend WithEvents Label17 As Label
-    Friend WithEvents GroupBox5 As GroupBox
+    Friend WithEvents gbColors As GroupBox
     Friend WithEvents Label13 As Label
     Friend WithEvents Label12 As Label
     Friend WithEvents Label11 As Label
@@ -925,4 +1032,18 @@ Partial Class frmScoreCard
     Friend WithEvents Label24 As Label
     Friend WithEvents tbCP1Tot As TextBox
     Friend WithEvents tbSkinTot As TextBox
+    Friend WithEvents lbParmFile As Label
+    Friend WithEvents StatusStrip1 As StatusStrip
+    Friend WithEvents tspb As ToolStripProgressBar
+    Friend WithEvents tssl As ToolStripStatusLabel
+    Friend WithEvents lbMonitor As Label
+    Friend WithEvents GroupBox8 As GroupBox
+    Friend WithEvents Label26 As Label
+    Friend WithEvents tbExtraCP2 As TextBox
+    Friend WithEvents Label27 As Label
+    Friend WithEvents Label28 As Label
+    Friend WithEvents tbExtraCP1 As TextBox
+    Friend WithEvents tbExtraSkins As TextBox
+    Friend WithEvents tbKitty As TextBox
+    Friend WithEvents Label25 As Label
 End Class
