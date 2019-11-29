@@ -80,7 +80,7 @@
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
     <DefineTrace>true</DefineTrace>
-    <OutputPath>..\..\..\LeagueManager\Files\</OutputPath>
+    <OutputPath>C:\LeagueManager\</OutputPath>
     <Optimize>true</Optimize>
     <NoWarn>41999,42016,42017,42018,42019,42020,42021,42022,42032,42036</NoWarn>
     <DebugType>none</DebugType>
@@ -111,6 +111,16 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>dsLeague.xsd</DependentUpon>
     </Compile>
+    <Compile Include="dsLeague.vb">
+      <DependentUpon>dsLeague.xsd</DependentUpon>
+    </Compile>
+    <Compile Include="EmailMessage.Designer.vb">
+      <DependentUpon>EmailMessage.vb</DependentUpon>
+    </Compile>
+    <Compile Include="EmailMessage.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="FileLayout.vb" />
     <Compile Include="Finance.Designer.vb">
       <DependentUpon>Finance.vb</DependentUpon>
     </Compile>
@@ -121,6 +131,12 @@
       <DependentUpon>FinanceDetails.vb</DependentUpon>
     </Compile>
     <Compile Include="FinanceDetails.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="frm_Popup.Designer.vb">
+      <DependentUpon>frm_Popup.vb</DependentUpon>
+    </Compile>
+    <Compile Include="frm_Popup.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="GGSMTP_GMAIL.vb" />
@@ -143,6 +159,12 @@
       <DependentUpon>Matches.vb</DependentUpon>
     </Compile>
     <Compile Include="Matches.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="NewPlayer.Designer.vb">
+      <DependentUpon>NewPlayer.vb</DependentUpon>
+    </Compile>
+    <Compile Include="NewPlayer.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Payments.Designer.vb">
@@ -177,6 +199,12 @@
     <Compile Include="Scores.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="Setup.Designer.vb">
+      <DependentUpon>Setup.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Setup.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="SkinRpt.Designer.vb">
       <DependentUpon>SkinRpt.vb</DependentUpon>
     </Compile>
@@ -193,6 +221,12 @@
       <DependentUpon>Standings.vb</DependentUpon>
     </Compile>
     <Compile Include="Standings.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="StandingsSnapshot.Designer.vb">
+      <DependentUpon>StandingsSnapshot.vb</DependentUpon>
+    </Compile>
+    <Compile Include="StandingsSnapshot.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Team.Designer.vb">
@@ -305,6 +339,10 @@
       <DependentUpon>Choose Scores.vb</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
+    <EmbeddedResource Include="EmailMessage.resx">
+      <DependentUpon>EmailMessage.vb</DependentUpon>
+      <SubType>Designer</SubType>
+    </EmbeddedResource>
     <EmbeddedResource Include="EnterScore.resx">
       <DependentUpon>EnterScore.vb</DependentUpon>
       <SubType>Designer</SubType>
@@ -315,11 +353,17 @@
     <EmbeddedResource Include="FinanceDetails.resx">
       <DependentUpon>FinanceDetails.vb</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="frm_Popup.resx">
+      <DependentUpon>frm_Popup.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="LastFive.resx">
       <DependentUpon>LastFive.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Matches.resx">
       <DependentUpon>Matches.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="NewPlayer.resx">
+      <DependentUpon>NewPlayer.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Payments.resx">
       <DependentUpon>Payments.vb</DependentUpon>
@@ -336,6 +380,9 @@
     <EmbeddedResource Include="Scores.resx">
       <DependentUpon>Scores.vb</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="Setup.resx">
+      <DependentUpon>Setup.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="SkinRpt.resx">
       <DependentUpon>SkinRpt.vb</DependentUpon>
     </EmbeddedResource>
@@ -344,6 +391,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Standings.resx">
       <DependentUpon>Standings.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="StandingsSnapshot.resx">
+      <DependentUpon>StandingsSnapshot.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Team.resx">
       <DependentUpon>Team.vb</DependentUpon>

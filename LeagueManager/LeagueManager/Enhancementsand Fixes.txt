@@ -3,35 +3,37 @@
 *************************************************************************************************
 * yyyymmdd - Priority - Complexity -  Module        Code Package    Description
 * ----------------------------------------------------------------- ------------------------------------------------------------------------------------------------------------
+* 20191115 - M        - Easy to Med - Main							Redesign Setup Menus-League, Player, Course
+* 20191115 - M        - Easy to Med - Main							Move dates off Main screen and add to league setup and dont use datepicker
+* 20190904 - M        - Med to Hard - Helper(fgetPlayer)			allow for special characters in name
+* 20190830 - M        - Med to Hard - Several						Add Email Option for reports (standings,scorescard,skins,schedule,etc)
+* 20190820 - M        - Med to Hard - scorecard						crash when saving blank scrorecard screen
+* 20190820 - M        - Med to Hard - scorecard						cant create a player from initials bs
 * 20190725 - L        - Easy        - Main,scorecard				add progress bar to screens so we can tell how long its taking
 * 20190709 - L        - Easy        - Main							remove datepicker and replace with dropdown of dates with schedule dates
-* 20190702 - L        - Easy        - Skins							when loading dates dropdown, dont load dates past current or dates rained out
-* 20190616 - M        - Med         - Several						change start/end parm to be MM/DD MM = month, dd day of month(dd of 1 = first tuesday of month)
 * 20190611 - M        - Med to Hard - ScheduleBuilder				Add additional screen to manage schedule, in progress
 * 20190606 - M        - Med         - Scorecard						Add additional fields to player file(Standings,Matches,Skins,PlayerStats), remove fields also(Nickname,DateLeft,Paid)
 * 20190605 - M        - Med         - Scorecard						Locking scores not working right, when enter scores clicked, make sure the league Parm is also properly updated
-* 20190604 - H        - Easy        - Scorecard						Checkbox off/on isnt working on skins/ctp (intermittent 6/6, working sometime), could be locking scores issue
 * 20190530 - H        - Med         -							    scores.csv $earn not being updated for 2019
 * 20190409 - M        - Med         - Finance					    amounts not showing from skins
 * 20190409 - M        - Med         - SkinsRpt						amounts not showing from skins
-* 20190402 - H        - Med         - Scorecard						account for break weeks or rainouts as blank matches
 * 20190330 - L        - Easy to Med - Payments						use leagueparm "Cost" instead of hardcoded 35
 * 20180430 - L        - Med to Hard - 								Need to account for Rainouts
-* 20190329 - M        - Easy to Med - dsleague.xsd                  Add homephone and cell carrier to player file
-* 20190329 - M        - Easy to Med - player.designer.vb            Add homephone and cell carrier to player file
+*																	Option 1 Push the schedule back a week and adjust the end date
+*																	Option 2 Dont make up the rainout and just play the next week as is
+*																	if rainout and play each team option is on, then we must deploy Option 1
 * 20181211 - EM       - Easy to Med -                               Add post season skin/ctp percent to league parameters table, change code to use instead of hardcode
-* 20181204 - EM       - Easy to Med -                               Add logging to Main to help troubleshoot issues on loading tables
 * 20181102 - MH       - Med to Hard -								only allow tuesdays for Dates, add parm to league parm
 * 20181026 - MH       - Med to hard - 								allow multiple players for player file(a player for each league)
 * 20180919 - M        - Easy        - 								Standings.vb Re-sorting numeric columns arent working right (col sort needed)
 * 20180801 - M        - Med         - 								dont allow standings until matches have been done for that week
 * 20180423 - L        - Easy        - 								Add Grade to Matches grid
-* 20180423 - M        - Med         - 								Create HTML file for standings and other sheets
 * 20180403 - L        - Hard        - 								Create option for league average for opponent noshow
 *************************************************************************************************
-* 20180219 - My Review
-* 20180302 - L        - Hard        - Standings.vb					Create html printable standings, reports
-* 20180225 - H        - Easy        - Main.vb						email files to league secretary after each change for backup,zip them also
+*			 My Review
+* 
+* 20190905 - M        - Med to Hard - Scorecard						allow playin of previous weeks scores for testing
+* 20190905 - M        - Med to Hard - Scorecard						only pull in this weeks scores into dtscores datatable
 * 20180225 - MH       - Hard        - Several						make sure league can expand or contract 
 * 20180225 - H        - Med         - Skins.vb						Change CTP1,2 from hardcoded to dynamic, add hole number to screen column hdg
 * 20180219 - MH       - Med         -							    tell which players are getting an email and track if email already sent to warn were sending again
@@ -50,22 +52,43 @@
 *************************************************************************************************
 * yyyymmdd - Priority - Complexity -  Module        Release         Description
 * --------   --------	-----------	  -------------	--------------- ----------------------------------------------------------------------------------------------	
+* 20191115 - M        - Easy to Med - Skins							Fix Skins logic when switching dates
+* 20190904 - M        - Med to Hard - Helper(getMatches)			League Championship not working 
+* 20190830 - M        - Med to Hard - Standings						Create a standings snapshot team, a player, b player points sorted by points
+* 20190831 - M        - Easy		- Scorecard						Sort Scores file before saving(savescores)
+* 20190829 - M        - Med to Hard - Several						Add email Message form to communicate with league members
+* 20190822 - M        - Med to Hard - Several						Create HTML from all screens
+* 20190814 - M        - Med to Hard - Main,scorecard				matches not updating standings, must calc matches, go back into standings
+* 20190828 - M        - Med to Hard - Scorecard						checkboxes for skins and ctp not working
+* 20190828 - M        - Med to Hard - Scorecard						checkboxes for skins and ctp not working
+* 20190823 - M        - Med to Hard - Payments						abends line 59
+* 20190402 - H        - Med         - Scorecard						account for break weeks or rainouts as blank matches
+* 20190814 - M        - Med         - Several						make a seperate path for reports and files
 * 20190717 - M        - Med         - Standings						when updating standings for the first time with new scores, points arent getting updated, gotta unlock and lock
 * 20190716 - H        - Easy        - Main							when searching for files, include the path in the message, and tell how it happened
 * 20190710 - H        - Easy        - Scorecard						when clicking on skins/ctp box it wsnt updating the checkboxes or amounts
 * 20190705 - L        - Easy        - Skins,scorecard				when loading screens, check monitor size to determine form/grid size
+* 20190702 - L        - Easy        - Skins							when loading dates dropdown, dont load dates past current or dates rained out
 * 20190630 - M        - Med         - Skins							when skins are tied, strikeout isnt working all the time(just when the tie is a 4, turned out to be a font issue)
 * 20190627 - MH       - Med         - Standings						make first half/2nd half an optional column, default to sam style standings page
+* 20190616 - M        - Med         - Several						change start/end parm to be MM/DD MM = month, dd day of month(dd of 1 = first tuesday of month)
+* 20190604 - H        - Easy        - Scorecard						Checkbox off/on isnt working on skins/ctp (intermittent 6/6, working sometime), could be locking scores issue
 * 20190523 - H        - Easy        - Matches					    scores.csv not correct, showing .25 when there isnt any, set all cells even when null
 * 20190515 - M        - Med         - Skins						    not carrying over ctp
 * 20190515 - M        - Med         - Player					    adding new players on scorecard screen or player screen not working
 * 20190507 - M        - Med         - Playerstats					make all scores gross
 * 20190502 - M        - Med         - Several                       when scores are locked, force matches and standings to run
+* 20190329 - M        - Easy to Med - dsleague.xsd                  Add homephone and cell carrier to player file
+* 20190329 - M        - Easy to Med - player.designer.vb            Add homephone and cell carrier to player file
+* 20181204 - EM       - Easy to Med -                               Add logging to Main to help troubleshoot issues on loading tables
+* 20180302 - L        - Hard        - Standings.vb					Create html printable standings, reports
+* 20180225 - H        - Easy        - Main.vb						email files to league secretary after each change for backup,zip them also
 * 20180408 - M        - Med         - Several                       adjust from 24 to 20 players, add resize info to logs
 * 20180219 - M        - Med         -								Finance $$$ tracking who paid, prize distribution, total $$earned, etc
 * 20180512 - L        - Med         -								Enhance Player Scores, have back 9 as part of grid, do stats on each
 * 20180219 - MH       - Med to Hard -								Extra money not correct always, it is always but its not clear
 * 20180919 - ML       - Med to hard - 							    Playerstats.vb show league average stats for each hole and rank
+* 20180423 - M        - Med         - 								Create HTML file for standings and other sheets
 * 20180324 - M        - Med         - 		     					Track finances, payment history, distribution history, payment method
 *									- 								New table/file(Payment file)
 * 20190314 - M        - Med         - Finance                       send receipt txt or email when making payment

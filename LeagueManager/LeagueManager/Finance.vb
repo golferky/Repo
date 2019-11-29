@@ -116,7 +116,7 @@ Public Class Finance
             Else
                 'this code checks to see if a player participated in EOY skins
                 Dim dvs As New DataView(oHelper.dsLeague.Tables("dtPayments"))
-                dvs.RowFilter = String.Format("Desc = '{0}' And Detail = '{1}' And Date >= '{2}'", "EOY Skins", "Payment", sdate)
+                dvs.RowFilter = String.Format("Desc = '{0}' And Detail = '{1}' And Date >= '{2}' And Date <= '{3}'", "EOY Skins", "Payment", sdate, sdate.Replace("0101", "1231"))
                 Dim dt = dvs.ToTable
                 dt.PrimaryKey = New DataColumn() {dt.Columns("Player")}
                 Dim sKeys() As Object = {row("Player")}

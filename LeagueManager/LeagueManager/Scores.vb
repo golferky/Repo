@@ -11,11 +11,26 @@ Public Class Scores
         oHelper = Main.oHelper
         BldScoresDataGridFromFile()
         Dim sWH As String = oHelper.ScreenResize()
-        Me.Width = sWH.Split(":")(0)
-        Me.Height = sWH.Split(":")(1)
-        Dim sfilename = oHelper.sFilePath & "\" & String.Format(DateTime.Now.ToString("yyyyMMdd_hhmmss_{0}_") & "ScoresAll.csv", oHelper.sPlayer)
-        oHelper.dgv2csv(dgScores, sfilename)
-
+        If Me.Width >= sWH.Split(":")(0) Then
+            Me.Width = sWH.Split(":")(0) - (sWH.Split(":")(0) * 0.1)
+        Else
+            Me.Width = sWH.Split(":")(0)
+        End If
+        If Me.Height >= sWH.Split(":")(1) Then
+            Me.Height = sWH.Split(":")(1) - (sWH.Split(":")(1) * 0.1)
+        Else
+            Me.Height = sWH.Split(":")(1)
+        End If
+        If Not Debugger.IsAttached Then
+            Dim sfn = oHelper.sReportPath & "\" & String.Format(DateTime.Now.ToString("yyyyMMdd_hhmmss_{0}_") & "ScoresAll.csv", oHelper.sPlayer)
+            oHelper.dgv2csv(dgScores, sfn)
+            '20190822 - new html
+            Dim sHtml As String = oHelper.Create_Html_From_DGV(dgScores)
+            sHtml = oHelper.ConvertDataGridViewToHTMLWithFormatting(dgScores, Me)
+            Dim swhtml As New IO.StreamWriter(sfn.Replace(".csv", ".html"), False)
+            swhtml.WriteLine(sHtml)
+            swhtml.Close()
+        End If
         '    rs.FindAllControls(Me)
     End Sub
 

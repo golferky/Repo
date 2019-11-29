@@ -26,8 +26,16 @@ Public Class Standings
         oHelper = Main.oHelper
         oHelper.LOGIT(Reflection.MethodBase.GetCurrentMethod().Name & " -------------------------")
         Dim sWH As String = oHelper.ScreenResize()
-        Me.Width = sWH.Split(":")(0)
-        Me.Height = sWH.Split(":")(1)
+        If Me.Width >= sWH.Split(":")(0) Then
+            Me.Width = sWH.Split(":")(0) - (sWH.Split(":")(0) * 0.1)
+            'Else
+            '    Me.Width = sWH.Split(":")(0)
+        End If
+        If Me.Height >= sWH.Split(":")(1) Then
+            Me.Height = sWH.Split(":")(1) - (sWH.Split(":")(1) * 0.1)
+            'Else
+            '    Me.Height = sWH.Split(":")(1)
+        End If
 
         If oHelper.dsLeague.Tables("dtLeagueParms").Rows(0)("SplitSeason") <> "Y" Then
             cb1stHalf.Visible = False
@@ -38,10 +46,12 @@ Public Class Standings
         dgStandings.Visible = False
         btnEmail.Visible = False
         dtSchedule = oHelper.dsLeague.Tables("dtSchedule")
-        If oHelper.rLeagueParmrow("ScoresLocked") = "Y" Then
-            btnStandings_Click(sender, e)
-            'Me.Close()
-        End If
+        For Each item In Main.cbDates.Items
+            If item >= CDate(oHelper.rLeagueParmrow("PostSeasonDt")).ToString("yyyyMMdd") Then Continue For
+            cbDates.Items.Add(item)
+        Next
+        If cbDates.Items.Contains(oHelper.dDate.ToString("yyyyMMdd")) Then cbDates.SelectedIndex = cbDates.Items.IndexOf(oHelper.dDate.ToString("yyyyMMdd"))
+
     End Sub
     Sub doStandings()
         'Sub BldStandings()
@@ -119,7 +129,7 @@ Public Class Standings
             'now lets create a standings table based on checkboxes and radio buttons
             For index As Integer = dtStandings.Columns.Count - 1 To 0 Step -1
                 Dim columnName As String = dtStandings.Columns(index).ColumnName
-                'Debug.Print(String.Format("processing index {0}, name {1}", index, columnName))
+                'oHelper.LOGIT(String.Format("processing index {0}, name {1}", index, columnName))
                 If Not cb1stHalf.Checked Then
                     'If columnName.Contains("1st Half") Then
                     '    dtStandings.Columns.RemoveAt(index)
@@ -128,7 +138,7 @@ Public Class Standings
                     ' CDate(sHalfwayDate).ToString("yyyyMMdd")
                     If columnName.Contains("/") Then
                         If CDate(columnName).ToString("yyyyMMdd") < CDate(sHalfwayDate).ToString("yyyyMMdd") Then
-                            'Debug.Print(String.Format("not 1st half, removing index {0}, name {1}", index, columnName))
+                            'oHelper.LOGIT(String.Format("not 1st half, removing index {0}, name {1}", index, columnName))
                             dtStandings.Columns.RemoveAt(index)
                             Continue For
                         End If
@@ -141,7 +151,7 @@ Public Class Standings
                     'End If
                     If columnName.Contains("/") Then
                         If CDate(columnName).ToString("yyyyMMdd") >= CDate(sHalfwayDate).ToString("yyyyMMdd") Then
-                            'Debug.Print(String.Format("not 2nd half, removing index {0}, name {1}", index, columnName))
+                            'oHelper.LOGIT(String.Format("not 2nd half, removing index {0}, name {1}", index, columnName))
                             dtStandings.Columns.RemoveAt(index)
                             Continue For
                         End If
@@ -212,10 +222,10 @@ Public Class Standings
                 For Each col As DataGridViewTextBoxColumn In dgStandings.Columns
                     col.ReadOnly = True                 'make all columns read only
                     If col.Name.Contains("/") Then      'is this a date column
-                        .Columns(col.Name).Width = 40   'yep, make width 40
+                        .Columns(col.Name).Width = 50   'yep, make width 40
                         'If cbHdcp.Checked Then .Columns(col.Name).Width += 10   'if hdcp, adjust by 10
                         'If cbScore.Checked Then .Columns(col.Name).Width += 10  'if score, adjust by 10
-                        .Columns(col.Name).HeaderText = col.Name.Substring(0, col.Name.LastIndexOf("/")) 'just use mm/dd
+                        '.Columns(col.Name).HeaderText = col.Name.Substring(0, col.Name.LastIndexOf("/")) 'just use mm/dd
                     ElseIf col.Name.Contains("Half") Or col.Name.Contains("Total") Or col.Name = "Rnds" Or col.Name = "Team Points" Or col.Name = "WKY Points" Then
                         .Columns(col.Name).Width = 40
                     End If
@@ -362,7 +372,9 @@ Public Class Standings
                     If cb1stHalf.Checked Then row.Cells("Team 1st Half").Value = drow("Team 1st Half")
                     If cb2ndHalf.Checked Then row.Cells("Team 2nd Half").Value = drow("Team 2nd Half")
                     If cbTotalPts.Checked Then row.Cells("Total").Value = CDec(drow("Team 1st Half")) + CDec(drow("Team 2nd Half"))
-                    row.Cells("WKY Points").Value = drow(oHelper.dDate.ToShortDateString)
+                    If oHelper.dDate.ToString("yyyyMMdd") <= CDate(oHelper.rLeagueParmrow("EndDate")).ToString("yyyyMMdd") Then
+                        row.Cells("WKY Points").Value = drow(oHelper.dDate.ToString("yyyyMMdd").Substring(4, 2) & "/" & oHelper.dDate.ToString("yyyyMMdd").Substring(6, 2))
+                    End If
                     sprevteam = row.Cells("Team").Value
                     saPlayer = row.Cells("Player").Value
                 Else
@@ -386,7 +398,7 @@ Public Class Standings
             buildEmailFile = True
             Dim amonths As New List(Of String)("Jan,Feb,Mar,Apr,May,Jun,Jul,Aug,Sept,Oct,Nov,Dec".Split(","))
 
-            semailfile = oHelper.sFilePath & "\" & Now.ToString("yyyyMMdd") & "_Standings.csv"
+            semailfile = oHelper.sReportPath & "\" & Now.ToString("yyyyMMdd") & "_Standings.csv"
             Using sw As New IO.StreamWriter(semailfile, False)
                 Try
 
@@ -437,7 +449,7 @@ Public Class Standings
                         Dim i = 1
                         sline = ",,,,"
                         For Each col As DataColumn In oHelper.dsLeague.Tables("dtSchedule").Columns
-                            Debug.Print(String.Format("i = {0} - {1}", i, oHelper.rLeagueParmrow("Teams")))
+                            oHelper.LOGIT(String.Format("i = {0} - {1}", i, oHelper.rLeagueParmrow("Teams")))
                             If i = oHelper.rLeagueParmrow("Teams") Then
                                 i = 1
                                 ii += 1
@@ -458,13 +470,14 @@ Public Class Standings
                 End Try
 
             End Using
-
-            Dim sHtml As String = oHelper.Create_Html_From_DGV(dgStandings)
-            sHtml = ConvertDataGridViewToHTMLWithFormatting(dgStandings)
-            semailfile = semailfile.Replace("csv", "html")
-            Dim swhtml As New IO.StreamWriter(semailfile, False)
-            swhtml.WriteLine(sHtml)
-            swhtml.Close()
+            If Not Debugger.IsAttached Then
+                Dim sHtml As String = oHelper.Create_Html_From_DGV(dgStandings)
+                sHtml = oHelper.ConvertDataGridViewToHTMLWithFormatting(dgStandings, Me)
+                semailfile = semailfile.Replace("csv", "html")
+                Dim swhtml As New IO.StreamWriter(semailfile, False)
+                swhtml.WriteLine(sHtml)
+                swhtml.Close()
+            End If
             If semailfile <> Nothing Then btnEmail.Visible = True
         Catch ex As Exception
             buildEmailFile = False
@@ -473,200 +486,37 @@ Public Class Standings
 
     End Function
 
-    'Function dt_buildEmailFile() As Boolean
-    '    dt_buildEmailFile = True
-    '    Try
-    '        Dim dtStandings = New Data.DataTable
-    '        dtStandings = BuilddtPoints(True)
-    '        dtStandings.PrimaryKey = New DataColumn() {dtStandings.Columns("Team"), dtStandings.Columns("Player")}
-    '        Dim dtStandingsForPts = New Data.DataTable
-    '        dtStandingsForPts = BuilddtPoints()
-    '        'build this table for points collection
-    '        Dim dtPoints As Data.DataTable = dtStandings.Clone
-    '        dtPoints.TableName = "dtPoints"
-    '        dtPoints.PrimaryKey = New DataColumn() {dtPoints.Columns("Team")}
-    '        For index As Integer = dtPoints.Columns.Count - 1 To 0 Step -1
-    '            Dim columnName As String = dtPoints.Columns(index).ColumnName
-    '            If columnName = "Player" Or columnName = "Grade" Or columnName = "Rnds" Or columnName = "1st Half" Or columnName = "2nd Half" Or columnName = "Total" Then
-    '                dtPoints.Columns.RemoveAt(index)
-    '                Continue For
-    '            End If
-    '            'If columnName.Contains("Team") Then columnName = columnName.Replace("Team ", "")
-    '        Next
-
-    '        Dim sprevteam = 0, sprevgrade = ""
-    '        For Each row As DataRow In dtStandingsForPts.Rows
-    '            Dim sTeam = row("Team")
-    '            Dim sKeys() As Object = {row("Team")}
-    '            Dim drow As DataRow = dtPoints.Rows.Find(sKeys)
-    '            If drow Is Nothing Then
-    '                drow = dtPoints.NewRow
-    '                drow("Team") = row("Team")
-    '                For Each col As DataColumn In dtStandingsForPts.Columns
-    '                    If col.ColumnName <> "Player" And col.ColumnName <> "Team" And col.ColumnName <> "Grade" And col.ColumnName <> "Rnds" And col.ColumnName <> "1st Half" And col.ColumnName <> "2nd Half" And col.ColumnName <> "Total" Then
-    '                        drow(col.ColumnName) = 0
-    '                    End If
-    '                Next
-    '                dtPoints.Rows.Add(drow)
-    '            End If
-    '            For Each col As DataColumn In dtStandingsForPts.Columns
-    '                If col.ColumnName.Contains("/") Then
-    '                    'accumulate points from gridview
-    '                    drow(col.ColumnName) += getPts(row(col.ColumnName))
-    '                End If
-    '            Next
-    '        Next
-    '        Dim i = 0
-    '        'has to be done from back to front because the collection numbers change from front to back
-    '        For index As Integer = dtStandings.Columns.Count - 1 To 0 Step -1
-    '            Dim columnName As String = dtStandings.Columns(index).ColumnName
-    '            'If columnName.Contains("Team") Then columnName = columnName.Replace("Team ", "")
-    '            If columnName = "Team 1st Half" Or columnName = "Team 2nd Half" Or columnName = "Team Points" Then dtStandings.Columns.RemoveAt(index)
-    '            If columnName = "Total" Then
-    '                If Not cbTotalPts.Checked Then dtStandings.Columns.RemoveAt(index)
-    '            End If
-    '        Next
-
-    '        'this loop will roll all team points into the first players totals and clear out the rest
-    '        Dim dvStandings As New DataView(dtStandings)
-    '        dvStandings.Sort = ("Team,Grade")
-    '        Dim iwkly As Decimal = 0.0
-    '        Dim saPlayer As String = ""
-    '        For Each row As DataRowView In dvStandings
-    '            oHelper.sPlayer = row("Player") & "-" & row("Grade")
-    '            Dim sKeys() As Object = {row("Team")}
-    '            Dim drow As DataRow = dtPoints.Rows.Find(sKeys)
-    '            'If cb1stHalf.Checked Then row("1st Half") = ""
-    '            'If cb2ndHalf.Checked Then row("2nd Half") = ""
-
-    '            row("1st half") = 0
-    '            row("2nd half") = 0
-    '            If cbTotalPts.Checked Then row("Total") = 0
-
-    '            If row("team") <> sprevteam Then
-    '                Dim ipts As Decimal = 0.0
-    '                Dim ifh As Decimal = 0.0
-    '                Dim ish As Decimal = 0.0
-    '                'total up halves
-    '                For Each col As DataColumn In dtPoints.Columns
-    '                    If col.ColumnName.Contains("/") Then
-    '                        ipts += CDec(oHelper.convDBNulltoSpaces(drow(col.ColumnName)))
-    '                        If CDate(col.ColumnName).ToString("yyyyMMdd") >= CDate(sHalfwayDate).ToString("yyyyMMdd") Then
-    '                            ish += CDec(oHelper.convDBNulltoSpaces(drow(col.ColumnName)))
-    '                        Else
-    '                            ifh += CDec(oHelper.convDBNulltoSpaces(drow(col.ColumnName)))
-    '                        End If
-    '                    End If
-    '                Next
-
-    '                row("1st half") = ifh
-    '                row("2nd half") = ish
-    '                If cbTotalPts.Checked Then row("Total") = ipts
-    '                If sprevteam <> 0 Then
-    '                    Dim sdsAPlayerKey() As Object = {sprevteam, saPlayer}
-    '                    Dim dsr As DataRow = dtStandings.Rows.Find(sdsAPlayerKey)
-    '                    Dim sdpKey() As Object = {sprevteam}
-    '                    Dim dprow As DataRow = dtPoints.Rows.Find(sdpKey)
-    '                    dsr("WKY Points") = dprow(oHelper.dDate.ToShortDateString)
-    '                    'End If
-    '                    saPlayer = row("Player")
-    '                Else
-    '                    row("WKY Points") = ""
-    '                End If
-    '                sprevteam = row("team")
-    '            End If
-    '        Next
-
-    '        Dim amonths As New List(Of String)("Jan,Feb,Mar,Apr,May,Jun,Jul,Aug,Sept,Oct,Nov,Dec".Split(","))
-
-    '        semailfile = oHelper.sFilePath & "\" & Now.ToString("yyyyMMdd") & "_Standings.csv"
-    '        Using sw As New IO.StreamWriter(semailfile, False)
-    '            Try
-
-    '                Dim sb1 As New System.Text.StringBuilder
-    '                Dim sb2 As New System.Text.StringBuilder
-    '                For Each col As DataColumn In dtStandings.Columns
-    '                    If col.ColumnName.Contains("/") Then
-    '                        'example Apr/11
-    '                        sb1.Append(amonths(Convert.ToDateTime(col.ColumnName).ToString("MM") - 1) & ",")
-    '                        sb2.Append(Convert.ToDateTime(col.ColumnName).ToString("dd") & ",")
-    '                    Else
-    '                        Dim scols As New List(Of String)(col.ColumnName.Split(" "))
-    '                        If scols.Count > 1 Then
-    '                            sb1.Append(scols(0) & ",")
-    '                            sb2.Append(scols(1) & ",")
-    '                        Else
-    '                            sb1.Append(",")
-    '                            sb2.Append(scols(0) & ",")
-    '                        End If
-    '                    End If
-    '                Next
-
-    '                sw.WriteLine(sb1.ToString)
-    '                sw.WriteLine(sb2.ToString)
-
-    '                Dim sline = ""
-    '                sprevteam = 0
-    '                For Each row As DataRow In dtStandings.Rows
-    '                    If row("Team") <> sprevteam Then
-    '                        sline = "Team #" & row("Team")
-    '                        sw.WriteLine(sline)
-    '                        sprevteam = row("Team")
-    '                    Else
-    '                        row("WKY Points") = ""
-    '                    End If
-    '                    sline = ""
-    '                    For Each item As DataColumn In dtStandings.Columns
-    '                        sline = sline & oHelper.convDBNulltoSpaces(row(item).ToString) & ","
-    '                    Next
-    '                    sw.WriteLine(sline)
-    '                Next
-    '                sw.Close()
-
-    '            Catch ex As Exception
-
-    '            End Try
-
-    '        End Using
-
-    '        'Dim sHtml = oHelper.ConvertToHtmlFile(dtStandings)
-    '        'sHtml = oHelper.ConvertToHTMLString(dtStandings)
-    '        Dim sHtml As String = oHelper.Create_Html(dtStandings)
-    '        sHtml = ConvertDataGridViewToHTMLWithFormatting(dgStandings)
-    '        Dim swhtml As New IO.StreamWriter(semailfile.replace("csv", "html"), False)
-    '        swhtml.WriteLine(sHtml)
-    '        swhtml.Close()
-    '        If semailfile <> Nothing Then btnEmail.Visible = True
-    '    Catch ex As Exception
-    '        dt_buildEmailFile = False
-
-    '        If Not ex.Message.ToUpper.Contains("CANNOT ACCESS THE FILE") Then MsgBox("Error " & ex.Message & vbCrLf & ex.StackTrace)
-
-    '    End Try
-
-
-    'End Function
-
     Function BuilddtPoints() As Data.DataTable
         Return BuilddtPoints(False)
     End Function
     Function BuilddtPoints(email As Boolean) As Data.DataTable
         BuilddtPoints = Nothing
         Try
-            'copy the schedule table 
-            Dim dtStandings As Data.DataTable = oHelper.dsLeague.Tables("dtSchedule").Clone()
-            sEndDate = oHelper.rLeagueParmrow("EndDate").ToString
+            sEndDate = oHelper.rLeagueParmrow("EndDate")
 
             '20180527-post season makes season 2 weeks earlier
             '20180930-dont adjust postseason Date
             'If oHelper.rLeagueParmrow("PostSeason").ToString.ToUpper = "Y" Then sEndDate = sEndDate.AddDays(-14)
 
+            '2019-11-23 - build using schedule from file in folder
+            'copy the schedule table 
+            'Dim dtStandings As Data.DataTable oHelper.dsLeague.Tables("dtSchedule").Clone()
+            'dtStandings.TableName = "dtStandings"
+            ''only build the schedule up thru the end date, this eliminates post season tournament from schedule
+            'For index As Integer = dtStandings.Columns.Count - 1 To 0 Step -1
+            '    Dim columnName As String = dtStandings.Columns(index).ColumnName
+            '    If columnName > sEndDate Or dtSchedule.Rows(0)(columnName) Is DBNull.Value Then
+            '        dtStandings.Columns.RemoveAt(index)
+            '    End If
+            'Next
+
+            '2019-11-23 - built using schedule rebuilt for a row for each date
+            Dim dtStandings As New DataTable
             dtStandings.TableName = "dtStandings"
             'only build the schedule up thru the end date, this eliminates post season tournament from schedule
-            For index As Integer = dtStandings.Columns.Count - 1 To 0 Step -1
-                Dim columnName As String = dtStandings.Columns(index).ColumnName
-                If columnName > sEndDate Or dtSchedule.Rows(0)(columnName) Is DBNull.Value Then
-                    dtStandings.Columns.RemoveAt(index)
+            For Each row In oHelper.dsLeague.Tables("dtSchedule").Rows
+                If row("Date") <= sEndDate.ToString("yyyyMMdd") Then
+                    dtStandings.Columns.Add(row("Date").ToString.Substring(4, 2) & "/" & row("Date").ToString.Substring(6, 2))
                 End If
             Next
 
@@ -676,8 +526,7 @@ Public Class Standings
 
             sHalfwayDate = dtStandings.Columns.Item(iNumWeeksSplit).ToString
             '20190605 - hardcode first half date
-            Dim x = ""
-            sHalfwayDate = "6/11/2019"
+            'sHalfwayDate = "6/11/2019"
             With dtStandings
                 .Columns.Add("Rnds", GetType(Integer)).SetOrdinal(0)
                 .Columns.Add("Grade", GetType(String)).SetOrdinal(0)
@@ -688,8 +537,8 @@ Public Class Standings
                 '.Columns.Add("Team 1st Half", GetType(String)).SetOrdinal(iNumWeeksSplit + 4)
                 '.Columns.Add("1st Half", GetType(String)).SetOrdinal(iNumWeeksSplit + 4)
 
-                .Columns.Add("Team 1st Half", GetType(String)).SetOrdinal(iNumWeeksSplit + 1)
-                .Columns.Add("1st Half", GetType(String)).SetOrdinal(iNumWeeksSplit + 1)
+                .Columns.Add("Team 1st Half", GetType(String)).SetOrdinal(iNumWeeksSplit + 4)
+                .Columns.Add("1st Half", GetType(String)).SetOrdinal(iNumWeeksSplit + 4)
 
                 .Columns.Add("2nd Half", GetType(String))
                 .Columns.Add("Team 2nd Half", GetType(String))
@@ -706,7 +555,8 @@ Public Class Standings
             'dvScores.RowFilter = "Date >= " & sEndDate.ToString("yyyyMMdd").Substring(0, 4) & "0101"
             'this gets a whole years worth of scores
             'dvScores.RowFilter += String.Format("date >= {0} and date <= {1}", sEndDate.ToString("yyyyMMdd").Substring(0, 4) & "0101", sEndDate.ToString("yyyMMdd").Substring(0, 4) + 1) & "0101"
-            dvScores.RowFilter += String.Format("date >= {0} and date <= {1}", sEndDate.ToString("yyyyMMdd").Substring(0, 4) & "0101", sEndDate.ToString("yyyMMdd"))
+            'dvScores.RowFilter += String.Format("date >= {0} and date <= {1}", sEndDate.ToString("yyyyMMdd").Substring(0, 4) & "0101", sEndDate.ToString("yyyMMdd"))
+            dvScores.RowFilter += String.Format("date >= {0} and date <= {1}", CDate(oHelper.rLeagueParmrow("StartDate")).ToString("yyyyMMdd"), oHelper.dDate.ToString("yyyyMMdd"))
             'dvScores.Sort = "Team,Date,Grade"
             Dim sPoints = "", sTeamPoints = ""
             Try
@@ -756,7 +606,8 @@ Public Class Standings
 
                     End Try
 
-                    Dim sColname As String = CInt(score("Date").ToString.Substring(4, 2)).ToString + "/" + CInt(score("Date").ToString.Substring(6, 2)).ToString + "/" + score("Date").ToString.Substring(0, 4)
+                    'Dim sColname As String = CInt(score("Date").ToString.Substring(4, 2)).ToString + "/" + CInt(score("Date").ToString.Substring(6, 2)).ToString + "/" + score("Date").ToString.Substring(0, 4)
+                    Dim sColname As String = score("Date").ToString.Substring(4, 2) + "/" + score("Date").ToString.Substring(6, 2) '+ "/" + score("Date").ToString.Substring(0, 4)
                     drow(sColname) = ""
                     'default to points and team points 
                     sPoints = dPoints
@@ -774,7 +625,8 @@ Public Class Standings
                     'End If
 
                     'calculate team first half, second half, total points 
-                    If score("date") < CDate(sHalfwayDate).ToString("yyyyMMdd") Then
+                    Dim x = CDate(sHalfwayDate & "/" & score("date").ToString.Substring(0, 4)).ToString("yyyyMMdd")
+                    If score("date") < CDate(sHalfwayDate & "/" & score("date").ToString.Substring(0, 4)).ToString("yyyyMMdd") Then
                         drow("1st Half") += dPoints
                         drow("Team 1st Half") += dTeamPoints
                     Else
@@ -782,7 +634,7 @@ Public Class Standings
                         drow("Team 2nd Half") += dTeamPoints
                     End If
                     drow("Total") += dPoints
-                    If score("date") = oHelper.dDate.ToString("yyyyMMdd") Then
+                    If score("date") = oHelper.dDate.ToString("yyyyMMdd") And score("date") <= CDate(oHelper.rLeagueParmrow("EndDate")).ToString("yyyyMMdd") Then
                         drow("WKY Points") += dTeamPoints
                         drow("WKY Points") += dPoints
                     End If
@@ -813,9 +665,9 @@ Public Class Standings
         label.BringToFront()
     End Sub
 
-    Private Sub btnStandings_Click(sender As Object, e As EventArgs) Handles btnStandings.Click
-        doStandings()
-    End Sub
+    'Private Sub btnStandings_Click(sender As Object, e As EventArgs)
+    '    doStandings()
+    'End Sub
     Private Sub dgStandings_CellMouseDoubleClick(sender As Object, e As DataGridViewCellMouseEventArgs) Handles dgStandings.CellMouseDoubleClick
         oHelper.LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
         'If MousePosition.Y < 0 Then
@@ -883,6 +735,10 @@ Public Class Standings
 
         Dim ToAddresses As New List(Of String)  '{"garyrscudder@gmail.com", "garyrscudder@gmail.com"}
         For Each player In oHelper.dsLeague.Tables("dtPlayers").Rows
+            If player("Name").ToString.Contains("Carr") Then
+                Dim x = player("Name")
+            End If
+
             If oHelper.convDBNulltoSpaces(player("Email")).Trim <> "" Then
                 'If player("Name") = "Gary Scudder" Then 'Or player("Name") = "Greg Lemker" Then
                 ToAddresses.Add(player("Email"))
@@ -932,169 +788,6 @@ Public Class Standings
         End Try
 
     End Sub
-#Region "Future Changes"
-
-    Public Function ConvertDataGridViewToHTMLWithFormatting(ByVal dgv As DataGridView) As String
-        ConvertDataGridViewToHTMLWithFormatting = ""
-        Try
-
-            Dim sb As StringBuilder = New StringBuilder()
-            sb.AppendLine("<html><body><center><table border='1' cellpadding='0' cellspacing='0'>")
-            sb.AppendLine("<tr>")
-            For i As Integer = 0 To dgv.Columns.Count - 1
-                sb.Append(DGVHeaderCellToHTMLWithFormatting(dgv, i))
-                'sb.Append(DGVCellFontAndValueToHTML(dgv.Columns(i).HeaderText, dgv.Columns(i).HeaderCell.Style.Font))
-                sb.Append(DGVCellFontAndValueToHTML(dgv.Columns(i).HeaderText, dgStandings.ColumnHeadersDefaultCellStyle.Font))
-                sb.AppendLine("</td>")
-            Next
-
-            sb.AppendLine("</tr>")
-            For rowIndex As Integer = 0 To dgv.Rows.Count - 1
-                sb.AppendLine("<tr>")
-                For Each dgvc As DataGridViewCell In dgv.Rows(rowIndex).Cells
-                    sb.AppendLine(DGVCellToHTMLWithFormatting(dgv, rowIndex, dgvc.ColumnIndex))
-                    Dim cellValue As String = If(dgvc.Value Is Nothing, String.Empty, dgvc.Value.ToString())
-                    sb.AppendLine(DGVCellFontAndValueToHTML(cellValue, dgvc.Style.Font))
-                    sb.AppendLine("</td>")
-                Next
-
-                sb.AppendLine("</tr>")
-            Next
-
-            sb.AppendLine("</table></center></body></html>")
-            Return sb.ToString()
-        Catch ex As Exception
-            MsgBox("Error " & ex.Message & vbCrLf & ex.StackTrace)
-        End Try
-
-    End Function
-
-    Public Function DGVHeaderCellToHTMLWithFormatting(ByVal dgv As DataGridView, ByVal col As Integer) As String
-        Dim sb As StringBuilder = New StringBuilder()
-        sb.Append("<td")
-        sb.Append(" width=" & Chr(34) & dgv.Columns(col).Width & Chr(34) & " ")
-        'Dim sHdr = dgv.Columns(col).HeaderText
-        'If sHdr.Contains("Half") Or sHdr.Contains("Points") Or sHdr.Contains("/") Then
-        '    sb.Append(" width=" & Chr(34) & "40" & Chr(34) & " ")
-        'End If
-
-        sb.Append(DGVCellColorToHTML(dgv.Columns(col).HeaderCell.Style.ForeColor, dgv.Columns(col).HeaderCell.Style.BackColor))
-        sb.Append(DGVCellAlignmentToHTML(dgv.Columns(col).HeaderCell.Style.Alignment))
-        sb.Append(">")
-        Return sb.ToString()
-    End Function
-
-    Public Function DGVCellToHTMLWithFormatting(ByVal dgv As DataGridView, ByVal row As Integer, ByVal col As Integer) As String
-        Dim sb As StringBuilder = New StringBuilder()
-        sb.Append("<td")
-        If dgv.Rows(row).DefaultCellStyle.BackColor <> DefaultBackColor Then
-            sb.Append(DGVCellColorToHTML(dgv.Rows(row).DefaultCellStyle.ForeColor, dgv.Rows(row).DefaultCellStyle.BackColor))
-        Else
-            sb.Append(DGVCellColorToHTML(dgv.Rows(row).Cells(col).Style.ForeColor, dgv.Rows(row).Cells(col).Style.BackColor))
-        End If
-
-        sb.Append(DGVCellAlignmentToHTML(dgv.Rows(row).Cells(col).Style.Alignment))
-        sb.Append(">")
-        Return sb.ToString()
-    End Function
-
-    Public Function DGVCellColorToHTML(ByVal foreColor As Color, ByVal backColor As Color) As String
-        If foreColor.Name = "0" AndAlso backColor.Name = "0" Then Return String.Empty
-        Dim sb As StringBuilder = New StringBuilder()
-        sb.Append(" style=""")
-        If foreColor.Name <> "0" AndAlso backColor.Name <> "0" Then
-            sb.Append("color:#")
-            sb.Append(foreColor.R.ToString("X2") + foreColor.G.ToString("X2") + foreColor.B.ToString("X2"))
-            sb.Append("; background-color:#")
-            sb.Append(backColor.R.ToString("X2") + backColor.G.ToString("X2") + backColor.B.ToString("X2"))
-        ElseIf foreColor.Name <> "0" AndAlso backColor.Name = "0" Then
-            sb.Append("color:#")
-            sb.Append(foreColor.R.ToString("X2") + foreColor.G.ToString("X2") + foreColor.B.ToString("X2"))
-        Else
-            sb.Append("background-color:#")
-            sb.Append(backColor.R.ToString("X2") + backColor.G.ToString("X2") + backColor.B.ToString("X2"))
-        End If
-
-        sb.Append(";""")
-        Return sb.ToString()
-    End Function
-
-    Public Function DGVCellFontAndValueToHTML(ByVal value As String, ByVal font As Font) As String
-        'If font Is Nothing OrElse font = Me.Font AndAlso Not (font.Bold Or font.Italic Or font.Underline Or font.Strikeout) Then Return value
-        If font Is Nothing OrElse Not (font.Bold Or font.Italic Or font.Underline Or font.Strikeout) Then Return value
-        Dim sb As StringBuilder = New StringBuilder()
-        sb.Append(" ")
-        If font.Bold Then sb.Append("<b>")
-        If font.Italic Then sb.Append("<i>")
-        If font.Strikeout Then sb.Append("<strike>")
-        If font.Underline Then sb.Append("<u>")
-        Dim size As String = String.Empty
-        If font.Size <> Me.Font.Size Then size = "font-size: " & font.Size & "pt;"
-        If font.FontFamily.Name <> Me.Font.Name Then
-            sb.Append("<span style=""font-family: ")
-            sb.Append(font.FontFamily.Name)
-            sb.Append("; ")
-            sb.Append(size)
-            sb.Append(""">")
-        End If
-
-        sb.Append(value)
-        If font.FontFamily.Name <> Me.Font.Name Then sb.Append("</span>")
-        If font.Underline Then sb.Append("</u>")
-        If font.Strikeout Then sb.Append("</strike>")
-        If font.Italic Then sb.Append("</i>")
-        If font.Bold Then sb.Append("</b>")
-        Return sb.ToString()
-    End Function
-
-    Public Function DGVCellAlignmentToHTML(ByVal align As DataGridViewContentAlignment) As String
-        If align = DataGridViewContentAlignment.NotSet Then Return String.Empty
-        Dim horizontalAlignment As String = String.Empty
-        Dim verticalAlignment As String = String.Empty
-        CellAlignment(align, horizontalAlignment, verticalAlignment)
-        Dim sb As StringBuilder = New StringBuilder()
-        sb.Append(" align='")
-        sb.Append(horizontalAlignment)
-        sb.Append("' valign='")
-        sb.Append(verticalAlignment)
-        sb.Append("'")
-        Return sb.ToString()
-    End Function
-
-    Private Sub CellAlignment(ByVal align As DataGridViewContentAlignment, ByRef horizontalAlignment As String, ByRef verticalAlignment As String)
-        Select Case align
-            Case DataGridViewContentAlignment.MiddleRight
-                horizontalAlignment = "right"
-                verticalAlignment = "middle"
-            Case DataGridViewContentAlignment.MiddleLeft
-                horizontalAlignment = "left"
-                verticalAlignment = "middle"
-            Case DataGridViewContentAlignment.MiddleCenter
-                horizontalAlignment = "centre"
-                verticalAlignment = "middle"
-            Case DataGridViewContentAlignment.TopCenter
-                horizontalAlignment = "centre"
-                verticalAlignment = "top"
-            Case DataGridViewContentAlignment.BottomCenter
-                horizontalAlignment = "centre"
-                verticalAlignment = "bottom"
-            Case DataGridViewContentAlignment.TopLeft
-                horizontalAlignment = "left"
-                verticalAlignment = "top"
-            Case DataGridViewContentAlignment.BottomLeft
-                horizontalAlignment = "left"
-                verticalAlignment = "bottom"
-            Case DataGridViewContentAlignment.TopRight
-                horizontalAlignment = "right"
-                verticalAlignment = "top"
-            Case DataGridViewContentAlignment.BottomRight
-                horizontalAlignment = "right"
-                verticalAlignment = "bottom"
-            Case Else
-                horizontalAlignment = "left"
-                verticalAlignment = "middle"
-        End Select
-    End Sub
 
     Private Sub CbExcel_CheckedChanged(sender As Object, e As EventArgs) Handles cbExcel.CheckedChanged
         Try
@@ -1122,6 +815,12 @@ Public Class Standings
         Dim x = ""
     End Sub
 
+    Private Sub cbDates_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cbDates.SelectedIndexChanged
+        oHelper.dDate = Date.ParseExact(cbDates.Text, "yyyyMMdd", System.Globalization.DateTimeFormatInfo.InvariantInfo)
+        doStandings()
+    End Sub
 
-#End Region
+    Private Sub btnDisplay_Click(sender As Object, e As EventArgs) Handles btnDisplay.Click
+        doStandings()
+    End Sub
 End Class

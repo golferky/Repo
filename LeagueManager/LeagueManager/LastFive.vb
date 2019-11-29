@@ -6,24 +6,12 @@
     Private Sub frmPlayerStats_Load(sender As System.Object, e As System.EventArgs) Handles MyBase.Load
         oHelper = Main.oHelper
         rs.FindAllControls(Me)
-        Dim scbdates As New List(Of String)
-        If oHelper.bsch Then
-            For Each col As DataColumn In oHelper.dsLeague.Tables("dtSchedule").Columns
-                Dim wkdate As DateTime = col.ColumnName
-                'Dim wkdate As DateTime = DateTime.ParseExact(col.ColumnName, "MM/dd/yy", Globalization.CultureInfo.InvariantCulture)
-                Dim reformatted As String = wkdate.ToString("yyyyMMdd", Globalization.CultureInfo.InvariantCulture)
-                'cbDates.Items.Add(reformatted)
-                scbdates.Add(reformatted)
-            Next
-        End If
-        scbdates.Reverse()
-        cbDates.Sorted = False
-        'Dim wkdate2 As Date = oHelper.rLeagueParmrow("PostSeasonDt")
-        'Dim reformatted2 As String = wkdate2.ToString("yyyyMMdd", Globalization.CultureInfo.InvariantCulture)
-        For Each sDate In scbdates
-            cbDates.Items.Add(sDate)
+
+        For Each item In Main.cbDates.Items
+            If item >= CDate(oHelper.rLeagueParmrow("PostSeasonDt")).ToString("yyyyMMdd") Then Continue For
+            cbDates.Items.Add(item)
         Next
-        cbDates.SelectedIndex = 0
+        If cbDates.Items.Contains(oHelper.dDate.ToString("yyyyMMdd")) Then cbDates.SelectedIndex = cbDates.Items.IndexOf(oHelper.dDate.ToString("yyyyMMdd"))
 
         dgLast5.RowTemplate.Height = 15
         'Me.Height = 1500
@@ -48,7 +36,12 @@
             Dim dvScores = New DataView(oHelper.dsLeague.Tables("dtScores"))
 
             dvScores.Sort = "Player, Date desc"
-            dvScores.RowFilter = String.Format("Date <= {0}", cbDates.SelectedItem) '& String.Format(" and Player = 'Howard Gorman'")
+            Dim lignoreDates = New List(Of String)
+            For Each row As DataRow In oHelper.dsLeague.Tables("dtLeagueParms").Rows
+                lignoreDates.Add(CDate(row("PostSeasonDt")).ToString("yyyyMMdd"))
+                lignoreDates.Add(CDate(row("PostSeasonDt")).AddDays(7).ToString("yyyyMMdd"))
+            Next
+            dvScores.RowFilter = String.Format("Date <= {0} and date not in ('{1}')", cbDates.SelectedItem, String.Join("','", lignoreDates)) '& String.Format(" and Player = 'Howard Gorman'")
             If dvScores(0)("Out_Gross") Is DBNull.Value And dvScores(0)("In_Gross") Is DBNull.Value Then
                 cbDates.SelectedItem = dvScores(1)("Date")
             End If
@@ -93,9 +86,9 @@
 
             For Each splayer In dvPlayers
                 If cb2018.Checked Then
-                    dvScores.RowFilter = String.Format("Player = '{0}' and Date <= {1} and Date >= {2}", splayer(0), cbDates.SelectedItem, "20180101")
+                    dvScores.RowFilter = String.Format("Player = '{0}' and Date <= {1} and Date >= {2} and Date not in ('{3}')", splayer(0), cbDates.SelectedItem, "20180101", String.Join("','", lignoreDates))
                 Else
-                    dvScores.RowFilter = String.Format("Player = '{0}' and Date <= {1}", splayer(0), cbDates.SelectedItem)
+                    dvScores.RowFilter = String.Format("Player = '{0}' and Date <= {1} and Date not in ('{2}')", splayer(0), cbDates.SelectedItem, String.Join("','", lignoreDates))
                 End If
                 If dvScores.Count = 0 Then Continue For
                 Dim newrow As DataRow = dtLast5.NewRow
@@ -123,11 +116,17 @@
                 Next
                 dgLast5.Rows.Add(newrow.ItemArray)
             Next
-
-            'oHelper.CopyDataGridViewToClipboard(dgLast5)
-            Dim sfilename = oHelper.sFilePath & "\" & DateTime.Now.ToString("yyyyMMdd_hhmmss_") & "LastFive.csv"
-            oHelper.dgv2csv(dgLast5, sfilename)
-
+            If Not Debugger.IsAttached Then
+                'oHelper.CopyDataGridViewToClipboard(dgLast5)
+                Dim sfn = oHelper.sReportPath & "\" & DateTime.Now.ToString("yyyyMMdd_hhmmss_") & "LastFive.csv"
+                oHelper.dgv2csv(dgLast5, sfn)
+                '20190822 - new html
+                Dim sHtml As String = oHelper.Create_Html_From_DGV(dgLast5)
+                sHtml = oHelper.ConvertDataGridViewToHTMLWithFormatting(dgLast5, Me)
+                Dim swhtml As New IO.StreamWriter(sfn.Replace(".csv", ".html"), False)
+                swhtml.WriteLine(sHtml)
+                swhtml.Close()
+            End If
         Catch ex As Exception
             MsgBox("Error " & ex.Message & vbCrLf & ex.StackTrace)
         End Try

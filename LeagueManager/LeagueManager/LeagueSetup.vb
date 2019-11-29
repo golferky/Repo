@@ -31,7 +31,7 @@
         'delete the temp file
         System.IO.File.Delete(sfilename)
         'now create the csv from it
-        oHelper.DataTable2CSV(DsLeague.Tables(stable), oHelper.sFilePath & "\" & Now.ToString("yyyyMMdd") & "_LeagueParms.csv")
+        oHelper.DataTable2CSV(DsLeague.Tables(stable), oHelper.sFilePath & "\LeagueParms.csv")
         'DsLeague.WriteXml(oHelper.sFilePath & "\" & DateTime.Now.ToString("yyyyMMdd_") & "LeagueParms.xml", XmlWriteMode.WriteSchema)
     End Sub
 
