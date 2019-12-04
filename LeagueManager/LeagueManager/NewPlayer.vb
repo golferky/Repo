@@ -24,6 +24,7 @@
         Dim sWH As String = oHelper.ScreenResize("1150", "650")
         Me.Width = sWH.Split(":")(0)
         Me.Height = sWH.Split(":")(1)
+        tbName.Text = oHelper.sPlayer
     End Sub
 
     Private Sub BtnUpdate_Click(sender As Object, e As EventArgs) Handles btnUpdate.Click
@@ -49,6 +50,7 @@
             Dim sResult As MsgBoxResult
             sResult = MsgBox("Player not saved, still want to exit? ", MsgBoxStyle.YesNo)
             If sResult = MsgBoxResult.Yes Then
+                Me.Close()
                 Exit Sub
             End If
         End If

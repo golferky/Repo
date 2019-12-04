@@ -31,7 +31,7 @@ Public Class Scores
             swhtml.WriteLine(sHtml)
             swhtml.Close()
         End If
-        '    rs.FindAllControls(Me)
+        rs.FindAllControls(Me)
     End Sub
 
     Sub BldScoresDataGridFromFile()

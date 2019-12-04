@@ -69,7 +69,6 @@ Partial Class frmScoreCard
         Me.tbCP2 = New System.Windows.Forms.TextBox()
         Me.tbSkins = New System.Windows.Forms.TextBox()
         Me.dgScores = New System.Windows.Forms.DataGridView()
-        Me.cbScoresLocked = New System.Windows.Forms.CheckBox()
         Me.gbHoleLegend = New System.Windows.Forms.GroupBox()
         Me.GroupBox4 = New System.Windows.Forms.GroupBox()
         Me.Label14 = New System.Windows.Forms.Label()
@@ -599,17 +598,6 @@ Partial Class frmScoreCard
         Me.dgScores.Size = New System.Drawing.Size(1209, 365)
         Me.dgScores.TabIndex = 0
         '
-        'cbScoresLocked
-        '
-        Me.cbScoresLocked.AutoSize = True
-        Me.cbScoresLocked.Location = New System.Drawing.Point(963, 138)
-        Me.cbScoresLocked.Name = "cbScoresLocked"
-        Me.cbScoresLocked.Size = New System.Drawing.Size(86, 17)
-        Me.cbScoresLocked.TabIndex = 79
-        Me.cbScoresLocked.TabStop = False
-        Me.cbScoresLocked.Text = "Lock Scores"
-        Me.cbScoresLocked.UseVisualStyleBackColor = True
-        '
         'gbHoleLegend
         '
         Me.gbHoleLegend.Controls.Add(Me.GroupBox4)
@@ -929,7 +917,6 @@ Partial Class frmScoreCard
         Me.Controls.Add(Me.cbMarkPaid)
         Me.Controls.Add(Me.gbColors)
         Me.Controls.Add(Me.gbHoleLegend)
-        Me.Controls.Add(Me.cbScoresLocked)
         Me.Controls.Add(Me.dgScores)
         Me.Controls.Add(Me.GroupBox1)
         Me.Controls.Add(Me.btnSave)
@@ -988,7 +975,6 @@ Partial Class frmScoreCard
     Friend WithEvents Label3 As Label
     Friend WithEvents tbPurse As TextBox
     Friend WithEvents dgScores As DataGridView
-    Friend WithEvents cbScoresLocked As CheckBox
     Friend WithEvents gbHoleLegend As GroupBox
     Friend WithEvents Label4 As Label
     Friend WithEvents Label9 As Label

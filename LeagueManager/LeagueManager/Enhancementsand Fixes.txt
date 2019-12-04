@@ -4,19 +4,12 @@
 * yyyymmdd - Priority - Complexity -  Module        Code Package    Description
 * ----------------------------------------------------------------- ------------------------------------------------------------------------------------------------------------
 * 20191115 - M        - Easy to Med - Main							Redesign Setup Menus-League, Player, Course
-* 20191115 - M        - Easy to Med - Main							Move dates off Main screen and add to league setup and dont use datepicker
 * 20190904 - M        - Med to Hard - Helper(fgetPlayer)			allow for special characters in name
 * 20190830 - M        - Med to Hard - Several						Add Email Option for reports (standings,scorescard,skins,schedule,etc)
 * 20190820 - M        - Med to Hard - scorecard						crash when saving blank scrorecard screen
 * 20190820 - M        - Med to Hard - scorecard						cant create a player from initials bs
-* 20190725 - L        - Easy        - Main,scorecard				add progress bar to screens so we can tell how long its taking
-* 20190709 - L        - Easy        - Main							remove datepicker and replace with dropdown of dates with schedule dates
-* 20190611 - M        - Med to Hard - ScheduleBuilder				Add additional screen to manage schedule, in progress
 * 20190606 - M        - Med         - Scorecard						Add additional fields to player file(Standings,Matches,Skins,PlayerStats), remove fields also(Nickname,DateLeft,Paid)
 * 20190605 - M        - Med         - Scorecard						Locking scores not working right, when enter scores clicked, make sure the league Parm is also properly updated
-* 20190530 - H        - Med         -							    scores.csv $earn not being updated for 2019
-* 20190409 - M        - Med         - Finance					    amounts not showing from skins
-* 20190409 - M        - Med         - SkinsRpt						amounts not showing from skins
 * 20190330 - L        - Easy to Med - Payments						use leagueparm "Cost" instead of hardcoded 35
 * 20180430 - L        - Med to Hard - 								Need to account for Rainouts
 *																	Option 1 Push the schedule back a week and adjust the end date
@@ -25,9 +18,6 @@
 * 20181211 - EM       - Easy to Med -                               Add post season skin/ctp percent to league parameters table, change code to use instead of hardcode
 * 20181102 - MH       - Med to Hard -								only allow tuesdays for Dates, add parm to league parm
 * 20181026 - MH       - Med to hard - 								allow multiple players for player file(a player for each league)
-* 20180919 - M        - Easy        - 								Standings.vb Re-sorting numeric columns arent working right (col sort needed)
-* 20180801 - M        - Med         - 								dont allow standings until matches have been done for that week
-* 20180423 - L        - Easy        - 								Add Grade to Matches grid
 * 20180403 - L        - Hard        - 								Create option for league average for opponent noshow
 *************************************************************************************************
 *			 My Review
@@ -52,7 +42,17 @@
 *************************************************************************************************
 * yyyymmdd - Priority - Complexity -  Module        Release         Description
 * --------   --------	-----------	  -------------	--------------- ----------------------------------------------------------------------------------------------	
+* 20180919 - M        - Easy        - 								Standings.vb Re-sorting numeric columns arent working right (col sort needed)
+* 20180801 - M        - Med         - 								dont allow standings until matches have been done for that week
+* 20180423 - L        - Easy        - 								Add Grade to Matches grid
+* 20191115 - M        - Easy to Med - Main							Move dates off Main screen and add to league setup and dont use datepicker
 * 20191115 - M        - Easy to Med - Skins							Fix Skins logic when switching dates
+* 20190725 - L        - Easy        - Main,scorecard				add progress bar to screens so we can tell how long its taking
+* 20190709 - L        - Easy        - Main							remove datepicker and replace with dropdown of dates with schedule dates
+* 20190611 - M        - Med to Hard - ScheduleBuilder				Add additional screen to manage schedule, in progress
+* 20190530 - H        - Med         -							    scores.csv $earn not being updated for 2019
+* 20190409 - M        - Med         - Finance					    amounts not showing from skins
+* 20190409 - M        - Med         - SkinsRpt						amounts not showing from skins
 * 20190904 - M        - Med to Hard - Helper(getMatches)			League Championship not working 
 * 20190830 - M        - Med to Hard - Standings						Create a standings snapshot team, a player, b player points sorted by points
 * 20190831 - M        - Easy		- Scorecard						Sort Scores file before saving(savescores)

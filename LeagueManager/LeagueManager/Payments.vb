@@ -130,13 +130,12 @@
             '20190319 - columns built in designer
             Dim dv As New DataView(dsLeague.dtPayments)
             dv.RowFilter = "Detail in('Payment','Charge') "
-                    If cbPlayers.SelectedItem <> "All Players" Then dv.RowFilter = dv.RowFilter & String.Format("AND Player = '{0}'", cbPlayers.SelectedItem)
-            If cbDate.SelectedItem <> "All Dates" Then
-                dv.RowFilter = dv.RowFilter & String.Format("AND Date = '{0}'", cbDate.SelectedItem)
-            Else
-                'dv.RowFilter = dv.RowFilter & String.Format(" AND Date >= '{0}' AND Date <= '{1}'", Main.dtRSStart.Value.ToString("yyyyMMdd"), Main.tbPSEnd.Text)
-                dv.RowFilter = dv.RowFilter & String.Format(" AND Date >= '{0}' AND Date <= '{1}'", CDate(oHelper.rLeagueParmrow("StartDate")).ToString("yyyyMMdd"), CDate(oHelper.rLeagueParmrow("EndDate")).ToString("yyyyMMdd"))
-            End If
+            If cbPlayers.SelectedItem <> "All Players" Then dv.RowFilter &= String.Format("AND Player = '{0}'", cbPlayers.SelectedItem)
+            If cbDate.SelectedItem <> "All Dates" Then dv.RowFilter &= String.Format("AND Date = '{0}'", cbDate.SelectedItem)
+            'Else
+            'dv.RowFilter = dv.RowFilter & String.Format(" AND Date >= '{0}' AND Date <= '{1}'", Main.dtRSStart.Value.ToString("yyyyMMdd"), Main.tbPSEnd.Text)
+            'dv.RowFilter = dv.RowFilter & String.Format(" AND Date >= '{0}' AND Date <= '{1}'", CDate(oHelper.rLeagueParmrow("StartDate")).ToString("yyyyMMdd"), CDate(oHelper.rLeagueParmrow("EndDate")).ToString("yyyyMMdd"))
+            'End If
             dgPayments.Rows.Clear()
 
             For Each row As DataRowView In dv

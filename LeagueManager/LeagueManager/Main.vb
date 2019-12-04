@@ -2,7 +2,7 @@
 Imports System.IO.Packaging
 Imports LeagueManager.FileLayout
 Public Class Main
-    Dim cVersion = "Version : 2019.11.17"
+    Dim cVersion = "Version : 2019.12.03"
     Public oHelper As Helper
     Private dsLeague As New dsLeague
     Dim bload As Boolean = True
@@ -342,7 +342,6 @@ Public Class Main
                     .rLeagueParmrow = row
                     .sLeagueName = .rLeagueParmrow("Name")
                     oHelper.UpdateINI()
-                    If .rLeagueParmrow("ScoresLocked") Is DBNull.Value Then .rLeagueParmrow("ScoresLocked") = "N"
                     BuildTablesForLeague()
                     If row("StartDate").year <> oHelper.dDate.Year Then oHelper.dDate = row("StartDate")
                     Exit For
@@ -382,6 +381,7 @@ Public Class Main
 
     Private Sub btnExit_Click(sender As Object, e As EventArgs) Handles btnExit.Click
         '20180306-added checkbox for email backup option
+        oHelper.DataTable2CSV(dsLeague.dtLeagueParms, oHelper.sFilePath & "\LeagueParms.csv")
         If cbMail.Checked Then
             Dim sfile = oHelper.sReportPath & "\" & Now.ToString("yyyyMMdd") & "_LeagueFiles.zip"
             If IO.File.Exists((sfile)) Then

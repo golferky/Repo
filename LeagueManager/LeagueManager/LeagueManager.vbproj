@@ -161,6 +161,12 @@
     <Compile Include="Matches.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="NewLeague.Designer.vb">
+      <DependentUpon>NewLeague.vb</DependentUpon>
+    </Compile>
+    <Compile Include="NewLeague.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="NewPlayer.Designer.vb">
       <DependentUpon>NewPlayer.vb</DependentUpon>
     </Compile>
@@ -171,6 +177,12 @@
       <DependentUpon>Payments.vb</DependentUpon>
     </Compile>
     <Compile Include="Payments.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="oldPlayer.Designer.vb">
+      <DependentUpon>oldPlayer.vb</DependentUpon>
+    </Compile>
+    <Compile Include="oldPlayer.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Player.Designer.vb">
@@ -362,11 +374,17 @@
     <EmbeddedResource Include="Matches.resx">
       <DependentUpon>Matches.vb</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="NewLeague.resx">
+      <DependentUpon>NewLeague.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="NewPlayer.resx">
       <DependentUpon>NewPlayer.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Payments.resx">
       <DependentUpon>Payments.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="oldPlayer.resx">
+      <DependentUpon>oldPlayer.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Player.resx">
       <DependentUpon>Player.vb</DependentUpon>

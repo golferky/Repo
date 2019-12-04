@@ -48,7 +48,8 @@ Partial Class SkinRpt
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(1188, 905)
+        Me.AutoScroll = True
+        Me.ClientSize = New System.Drawing.Size(1188, 749)
         Me.Controls.Add(Me.lbStatus)
         Me.Controls.Add(Me.dgSkins)
         Me.Name = "SkinRpt"

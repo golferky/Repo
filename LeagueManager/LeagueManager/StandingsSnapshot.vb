@@ -71,12 +71,15 @@
                             row("APlayer") = aPlayer
                             Dim srowfilter = String.Format("Team = {0} AND Date >= '{1}' AND Date <= '{2}'", iTeam, sFromDate, sToDate)
                             ohelper.LOGIT(String.Format("rowfilter={0}", srowfilter))
+                            Dim dPoints As Decimal = 0
                             dvscores.RowFilter = srowfilter
-                            For Each drow As DataRowView In dvscores
-                                If drow("Team_Points") Is DBNull.Value Then drow("Team_Points") = "0"
-                            Next
-                            Dim dPoints As Decimal = dvscores.ToTable.Compute("SUM(Points)", "")
-                            dPoints += dvscores.ToTable.Compute("SUM(Team_Points)", "")
+                            If dvscores.Count > 0 Then
+                                For Each drow As DataRowView In dvscores
+                                    If drow("Team_Points") Is DBNull.Value Then drow("Team_Points") = "0"
+                                Next
+                                dPoints += dvscores.ToTable.Compute("SUM(Points)", "")
+                                dPoints += dvscores.ToTable.Compute("SUM(Team_Points)", "")
+                            End If
                             row("Points") = dPoints.ToString("##.0")
                             .Rows.Add(row.ItemArray)
                         Else
@@ -118,6 +121,7 @@
     Private Sub cbDates_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cbDates.SelectedIndexChanged
 
         dvscores = New DataView(ohelper.dsLeague.Tables("dtScores"))
+        'this changes the date back to mm/dd/yyyy
         ohelper.dDate = Date.ParseExact(cbDates.SelectedItem, "yyyyMMdd", System.Globalization.DateTimeFormatInfo.InvariantInfo)
 
         iRnds = cbDates.Items.Count - cbDates.SelectedIndex

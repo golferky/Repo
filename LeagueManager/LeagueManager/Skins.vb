@@ -75,12 +75,6 @@ Public Class Skins
         End If
         'rs.FindAllControls(Me)
         lbStatus.Text = ""
-        '20180130-check for locked scores
-        If oHelper.convDBNulltoSpaces(oHelper.rLeagueParmrow("ScoresLocked")) = "Y" Then
-            btnSave.Visible = False
-        Else
-            btnSave.Visible = True
-        End If
         oHelper.bScreenChanged = False
         '20180318-add handler for checking dots
         'AddHandler rbDots.CheckedChanged, AddressOf checkDotsColors
@@ -958,14 +952,6 @@ Public Class Skins
                 iEachClosestAmt = (iTotCTPPlayers * 3) / 2
                 iSkinpot = iTotSkinPlayers * 7
             Else
-                Dim sLP As String = oHelper.getLeagParm(cbDatesPlayers.SelectedItem, lbStatus, Me)
-                If oHelper.rLeagueParmrow("RolledOverDate") IsNot DBNull.Value Then
-                    If oHelper.rLeagueParmrow("RolledOverDate") < cbDatesPlayers.SelectedItem Then
-                        iSkinpot = oHelper.convDBNulltoSpaces(oHelper.rLeagueParmrow("RolledOverSkins"))
-                        If IsNumeric(oHelper.rLeagueParmrow("RolledOverCTP1")) Then ictp1 = oHelper.rLeagueParmrow("RolledOverCTP1")
-                        If IsNumeric(oHelper.rLeagueParmrow("RolledOverCTP2")) Then ictp2 = oHelper.rLeagueParmrow("RolledOverCTP2")
-                    End If
-                End If
                 iSkinpot += oHelper.rLeagueParmrow("Skins") * iTotSkinPlayers
             End If
 
@@ -1069,7 +1055,6 @@ Public Class Skins
         oHelper.LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
         Try
             oHelper.LOGIT(String.Format("Form Height {0} Width {1}", Me.Height, Me.Width))
-
             rs.ResizeAllControls(Me)
 
         Catch ex As Exception

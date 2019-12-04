@@ -33,11 +33,7 @@ Public Class Matches
         bsave = False
         lbStatus.Text = ""
         '20180130-check for locked scores
-        If oHelper.convDBNulltoSpaces(oHelper.rLeagueParmrow("ScoresLocked")) = "Y" Then
-            btnSave.Visible = True
-        Else
-            btnSave.Visible = False
-        End If
+
         If oHelper.bLockScores Then
             btnMatches_Click(sender, e)
             'Me.Close()
@@ -197,7 +193,6 @@ Public Class Matches
         End If
         dgScores.Visible = True
         bsave = True
-        oHelper.rLeagueParmrow("ScoresLocked") = "Y"
         SaveScores()
 
         oHelper.bNoRowLeave = False
@@ -305,15 +300,6 @@ Public Class Matches
 
     Sub SaveScores()
         Try
-            If oHelper.convDBNulltoSpaces(oHelper.rLeagueParmrow("ScoresLocked")) = "Y" Then
-                If dgScores.RowCount > 0 Then
-                    If Not bsave Then
-                        Dim mbr = MsgBox("Do you want to save Match Results before you exit?", MsgBoxStyle.YesNo)
-                        If mbr = MsgBoxResult.Yes Then bsave = True
-                    End If
-                End If
-            End If
-
             If bsave Then
                 lbStatus.Text = "Saving scores from this screen..."
                 lbStatus.BackColor = Color.Red

@@ -4,14 +4,23 @@
         oHelper = Main.oHelper
     End Sub
     Private Sub LeagueSetup_Click(sender As Object, e As EventArgs) Handles btnLeagueSetup.Click
-        frmLeagueSetup.Show()
+        'frmLeagueSetup.Show()
+        'NewLeague.Show()
+        Dim bs As New BindingSource
+        bs.DataSource = oHelper.dsLeague.Tables("dtLeagueParms")
+        NewLeague.dgvNL.DataSource = bs
+        NewLeague.dgvNL.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells
+        NewLeague.dgvNL.ClipboardCopyMode = DataGridViewClipboardCopyMode.EnableWithoutHeaderText
+        NewLeague.Show()
+
     End Sub
     Private Sub CourseSetup_Click(sender As System.Object, e As System.EventArgs) Handles btnCourseSetup.Click
         frmCourse.Show()
     End Sub
 
     Private Sub PlayerSetup_Click(sender As System.Object, e As System.EventArgs) Handles btnPlayerSetup.Click
-        frmPlayer.Show()
+        'frmPlayer.Show()
+        Player.Show()
         'reload player table after updating
     End Sub
 

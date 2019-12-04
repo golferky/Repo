@@ -1712,26 +1712,6 @@ Partial Public Class dsLeague
         
         Private columnEmailPassword As Global.System.Data.DataColumn
         
-        Private columnRolledOverSkins As Global.System.Data.DataColumn
-        
-        Private columnRolledOverCTP As Global.System.Data.DataColumn
-        
-        Private columnRolledOverDate As Global.System.Data.DataColumn
-        
-        Private columnExtraMoney As Global.System.Data.DataColumn
-        
-        Private columnScoresLocked As Global.System.Data.DataColumn
-        
-        Private columnRolledOverCTP1 As Global.System.Data.DataColumn
-        
-        Private columnRolledOverCTP2 As Global.System.Data.DataColumn
-        
-        Private columnRolledOverCTP3 As Global.System.Data.DataColumn
-        
-        Private columnRolledOverCTP4 As Global.System.Data.DataColumn
-        
-        Private columnRolledOverCTP5 As Global.System.Data.DataColumn
-        
         Private columnByes As Global.System.Data.DataColumn
         
         Private columnDayofWeek As Global.System.Data.DataColumn
@@ -1981,86 +1961,6 @@ Partial Public Class dsLeague
         
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")>  _
-        Public ReadOnly Property RolledOverSkinsColumn() As Global.System.Data.DataColumn
-            Get
-                Return Me.columnRolledOverSkins
-            End Get
-        End Property
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")>  _
-        Public ReadOnly Property RolledOverCTPColumn() As Global.System.Data.DataColumn
-            Get
-                Return Me.columnRolledOverCTP
-            End Get
-        End Property
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")>  _
-        Public ReadOnly Property RolledOverDateColumn() As Global.System.Data.DataColumn
-            Get
-                Return Me.columnRolledOverDate
-            End Get
-        End Property
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")>  _
-        Public ReadOnly Property ExtraMoneyColumn() As Global.System.Data.DataColumn
-            Get
-                Return Me.columnExtraMoney
-            End Get
-        End Property
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")>  _
-        Public ReadOnly Property ScoresLockedColumn() As Global.System.Data.DataColumn
-            Get
-                Return Me.columnScoresLocked
-            End Get
-        End Property
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")>  _
-        Public ReadOnly Property RolledOverCTP1Column() As Global.System.Data.DataColumn
-            Get
-                Return Me.columnRolledOverCTP1
-            End Get
-        End Property
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")>  _
-        Public ReadOnly Property RolledOverCTP2Column() As Global.System.Data.DataColumn
-            Get
-                Return Me.columnRolledOverCTP2
-            End Get
-        End Property
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")>  _
-        Public ReadOnly Property RolledOverCTP3Column() As Global.System.Data.DataColumn
-            Get
-                Return Me.columnRolledOverCTP3
-            End Get
-        End Property
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")>  _
-        Public ReadOnly Property RolledOverCTP4Column() As Global.System.Data.DataColumn
-            Get
-                Return Me.columnRolledOverCTP4
-            End Get
-        End Property
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")>  _
-        Public ReadOnly Property RolledOverCTP5Column() As Global.System.Data.DataColumn
-            Get
-                Return Me.columnRolledOverCTP5
-            End Get
-        End Property
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")>  _
         Public ReadOnly Property ByesColumn() As Global.System.Data.DataColumn
             Get
                 Return Me.columnByes
@@ -2139,20 +2039,10 @@ Partial Public Class dsLeague
                     ByVal SkinFmt As String,  _
                     ByVal Email As String,  _
                     ByVal EmailPassword As String,  _
-                    ByVal RolledOverSkins As String,  _
-                    ByVal RolledOverCTP As String,  _
-                    ByVal RolledOverDate As String,  _
-                    ByVal ExtraMoney As String,  _
-                    ByVal ScoresLocked As String,  _
-                    ByVal RolledOverCTP1 As String,  _
-                    ByVal RolledOverCTP2 As String,  _
-                    ByVal RolledOverCTP3 As String,  _
-                    ByVal RolledOverCTP4 As String,  _
-                    ByVal RolledOverCTP5 As String,  _
                     ByVal Byes As String,  _
                     ByVal DayofWeek As String) As dtLeagueParmsRow
             Dim rowdtLeagueParmsRow As dtLeagueParmsRow = CType(Me.NewRow,dtLeagueParmsRow)
-            Dim columnValuesArray() As Object = New Object() {Name, Secretary, Format, Cost, Teams, PayPlaces, StartDate, EndDate, HdcpScores, HdcpFormat, CarryLastYears, MaxHdcp, Par3Max, Par4Max, Par5Max, Course, Holes, Start9, Method, Skins, Closest, SplitSeason, PostSeasonDt, SkinFmt, Email, EmailPassword, RolledOverSkins, RolledOverCTP, RolledOverDate, ExtraMoney, ScoresLocked, RolledOverCTP1, RolledOverCTP2, RolledOverCTP3, RolledOverCTP4, RolledOverCTP5, Byes, DayofWeek}
+            Dim columnValuesArray() As Object = New Object() {Name, Secretary, Format, Cost, Teams, PayPlaces, StartDate, EndDate, HdcpScores, HdcpFormat, CarryLastYears, MaxHdcp, Par3Max, Par4Max, Par5Max, Course, Holes, Start9, Method, Skins, Closest, SplitSeason, PostSeasonDt, SkinFmt, Email, EmailPassword, Byes, DayofWeek}
             rowdtLeagueParmsRow.ItemArray = columnValuesArray
             Me.Rows.Add(rowdtLeagueParmsRow)
             Return rowdtLeagueParmsRow
@@ -2201,16 +2091,6 @@ Partial Public Class dsLeague
             Me.columnSkinFmt = MyBase.Columns("SkinFmt")
             Me.columnEmail = MyBase.Columns("Email")
             Me.columnEmailPassword = MyBase.Columns("EmailPassword")
-            Me.columnRolledOverSkins = MyBase.Columns("RolledOverSkins")
-            Me.columnRolledOverCTP = MyBase.Columns("RolledOverCTP")
-            Me.columnRolledOverDate = MyBase.Columns("RolledOverDate")
-            Me.columnExtraMoney = MyBase.Columns("ExtraMoney")
-            Me.columnScoresLocked = MyBase.Columns("ScoresLocked")
-            Me.columnRolledOverCTP1 = MyBase.Columns("RolledOverCTP1")
-            Me.columnRolledOverCTP2 = MyBase.Columns("RolledOverCTP2")
-            Me.columnRolledOverCTP3 = MyBase.Columns("RolledOverCTP3")
-            Me.columnRolledOverCTP4 = MyBase.Columns("RolledOverCTP4")
-            Me.columnRolledOverCTP5 = MyBase.Columns("RolledOverCTP5")
             Me.columnByes = MyBase.Columns("Byes")
             Me.columnDayofWeek = MyBase.Columns("DayofWeek")
         End Sub
@@ -2270,26 +2150,6 @@ Partial Public Class dsLeague
             MyBase.Columns.Add(Me.columnEmail)
             Me.columnEmailPassword = New Global.System.Data.DataColumn("EmailPassword", GetType(String), Nothing, Global.System.Data.MappingType.Element)
             MyBase.Columns.Add(Me.columnEmailPassword)
-            Me.columnRolledOverSkins = New Global.System.Data.DataColumn("RolledOverSkins", GetType(String), Nothing, Global.System.Data.MappingType.Element)
-            MyBase.Columns.Add(Me.columnRolledOverSkins)
-            Me.columnRolledOverCTP = New Global.System.Data.DataColumn("RolledOverCTP", GetType(String), Nothing, Global.System.Data.MappingType.Element)
-            MyBase.Columns.Add(Me.columnRolledOverCTP)
-            Me.columnRolledOverDate = New Global.System.Data.DataColumn("RolledOverDate", GetType(String), Nothing, Global.System.Data.MappingType.Element)
-            MyBase.Columns.Add(Me.columnRolledOverDate)
-            Me.columnExtraMoney = New Global.System.Data.DataColumn("ExtraMoney", GetType(String), Nothing, Global.System.Data.MappingType.Element)
-            MyBase.Columns.Add(Me.columnExtraMoney)
-            Me.columnScoresLocked = New Global.System.Data.DataColumn("ScoresLocked", GetType(String), Nothing, Global.System.Data.MappingType.Element)
-            MyBase.Columns.Add(Me.columnScoresLocked)
-            Me.columnRolledOverCTP1 = New Global.System.Data.DataColumn("RolledOverCTP1", GetType(String), Nothing, Global.System.Data.MappingType.Element)
-            MyBase.Columns.Add(Me.columnRolledOverCTP1)
-            Me.columnRolledOverCTP2 = New Global.System.Data.DataColumn("RolledOverCTP2", GetType(String), Nothing, Global.System.Data.MappingType.Element)
-            MyBase.Columns.Add(Me.columnRolledOverCTP2)
-            Me.columnRolledOverCTP3 = New Global.System.Data.DataColumn("RolledOverCTP3", GetType(String), Nothing, Global.System.Data.MappingType.Element)
-            MyBase.Columns.Add(Me.columnRolledOverCTP3)
-            Me.columnRolledOverCTP4 = New Global.System.Data.DataColumn("RolledOverCTP4", GetType(String), Nothing, Global.System.Data.MappingType.Element)
-            MyBase.Columns.Add(Me.columnRolledOverCTP4)
-            Me.columnRolledOverCTP5 = New Global.System.Data.DataColumn("RolledOverCTP5", GetType(String), Nothing, Global.System.Data.MappingType.Element)
-            MyBase.Columns.Add(Me.columnRolledOverCTP5)
             Me.columnByes = New Global.System.Data.DataColumn("Byes", GetType(String), Nothing, Global.System.Data.MappingType.Element)
             MyBase.Columns.Add(Me.columnByes)
             Me.columnDayofWeek = New Global.System.Data.DataColumn("DayofWeek", GetType(String), Nothing, Global.System.Data.MappingType.Element)
@@ -5534,156 +5394,6 @@ Partial Public Class dsLeague
         
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")>  _
-        Public Property RolledOverSkins() As String
-            Get
-                Try 
-                    Return CType(Me(Me.tabledtLeagueParms.RolledOverSkinsColumn),String)
-                Catch e As Global.System.InvalidCastException
-                    Throw New Global.System.Data.StrongTypingException("The value for column 'RolledOverSkins' in table 'dtLeagueParms' is DBNull.", e)
-                End Try
-            End Get
-            Set
-                Me(Me.tabledtLeagueParms.RolledOverSkinsColumn) = value
-            End Set
-        End Property
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")>  _
-        Public Property RolledOverCTP() As String
-            Get
-                Try 
-                    Return CType(Me(Me.tabledtLeagueParms.RolledOverCTPColumn),String)
-                Catch e As Global.System.InvalidCastException
-                    Throw New Global.System.Data.StrongTypingException("The value for column 'RolledOverCTP' in table 'dtLeagueParms' is DBNull.", e)
-                End Try
-            End Get
-            Set
-                Me(Me.tabledtLeagueParms.RolledOverCTPColumn) = value
-            End Set
-        End Property
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")>  _
-        Public Property RolledOverDate() As String
-            Get
-                Try 
-                    Return CType(Me(Me.tabledtLeagueParms.RolledOverDateColumn),String)
-                Catch e As Global.System.InvalidCastException
-                    Throw New Global.System.Data.StrongTypingException("The value for column 'RolledOverDate' in table 'dtLeagueParms' is DBNull.", e)
-                End Try
-            End Get
-            Set
-                Me(Me.tabledtLeagueParms.RolledOverDateColumn) = value
-            End Set
-        End Property
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")>  _
-        Public Property ExtraMoney() As String
-            Get
-                Try 
-                    Return CType(Me(Me.tabledtLeagueParms.ExtraMoneyColumn),String)
-                Catch e As Global.System.InvalidCastException
-                    Throw New Global.System.Data.StrongTypingException("The value for column 'ExtraMoney' in table 'dtLeagueParms' is DBNull.", e)
-                End Try
-            End Get
-            Set
-                Me(Me.tabledtLeagueParms.ExtraMoneyColumn) = value
-            End Set
-        End Property
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")>  _
-        Public Property ScoresLocked() As String
-            Get
-                Try 
-                    Return CType(Me(Me.tabledtLeagueParms.ScoresLockedColumn),String)
-                Catch e As Global.System.InvalidCastException
-                    Throw New Global.System.Data.StrongTypingException("The value for column 'ScoresLocked' in table 'dtLeagueParms' is DBNull.", e)
-                End Try
-            End Get
-            Set
-                Me(Me.tabledtLeagueParms.ScoresLockedColumn) = value
-            End Set
-        End Property
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")>  _
-        Public Property RolledOverCTP1() As String
-            Get
-                Try 
-                    Return CType(Me(Me.tabledtLeagueParms.RolledOverCTP1Column),String)
-                Catch e As Global.System.InvalidCastException
-                    Throw New Global.System.Data.StrongTypingException("The value for column 'RolledOverCTP1' in table 'dtLeagueParms' is DBNull.", e)
-                End Try
-            End Get
-            Set
-                Me(Me.tabledtLeagueParms.RolledOverCTP1Column) = value
-            End Set
-        End Property
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")>  _
-        Public Property RolledOverCTP2() As String
-            Get
-                Try 
-                    Return CType(Me(Me.tabledtLeagueParms.RolledOverCTP2Column),String)
-                Catch e As Global.System.InvalidCastException
-                    Throw New Global.System.Data.StrongTypingException("The value for column 'RolledOverCTP2' in table 'dtLeagueParms' is DBNull.", e)
-                End Try
-            End Get
-            Set
-                Me(Me.tabledtLeagueParms.RolledOverCTP2Column) = value
-            End Set
-        End Property
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")>  _
-        Public Property RolledOverCTP3() As String
-            Get
-                Try 
-                    Return CType(Me(Me.tabledtLeagueParms.RolledOverCTP3Column),String)
-                Catch e As Global.System.InvalidCastException
-                    Throw New Global.System.Data.StrongTypingException("The value for column 'RolledOverCTP3' in table 'dtLeagueParms' is DBNull.", e)
-                End Try
-            End Get
-            Set
-                Me(Me.tabledtLeagueParms.RolledOverCTP3Column) = value
-            End Set
-        End Property
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")>  _
-        Public Property RolledOverCTP4() As String
-            Get
-                Try 
-                    Return CType(Me(Me.tabledtLeagueParms.RolledOverCTP4Column),String)
-                Catch e As Global.System.InvalidCastException
-                    Throw New Global.System.Data.StrongTypingException("The value for column 'RolledOverCTP4' in table 'dtLeagueParms' is DBNull.", e)
-                End Try
-            End Get
-            Set
-                Me(Me.tabledtLeagueParms.RolledOverCTP4Column) = value
-            End Set
-        End Property
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")>  _
-        Public Property RolledOverCTP5() As String
-            Get
-                Try 
-                    Return CType(Me(Me.tabledtLeagueParms.RolledOverCTP5Column),String)
-                Catch e As Global.System.InvalidCastException
-                    Throw New Global.System.Data.StrongTypingException("The value for column 'RolledOverCTP5' in table 'dtLeagueParms' is DBNull.", e)
-                End Try
-            End Get
-            Set
-                Me(Me.tabledtLeagueParms.RolledOverCTP5Column) = value
-            End Set
-        End Property
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")>  _
         Public Property Byes() As String
             Get
                 Try 
@@ -6022,126 +5732,6 @@ Partial Public Class dsLeague
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")>  _
         Public Sub SetEmailPasswordNull()
             Me(Me.tabledtLeagueParms.EmailPasswordColumn) = Global.System.Convert.DBNull
-        End Sub
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")>  _
-        Public Function IsRolledOverSkinsNull() As Boolean
-            Return Me.IsNull(Me.tabledtLeagueParms.RolledOverSkinsColumn)
-        End Function
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")>  _
-        Public Sub SetRolledOverSkinsNull()
-            Me(Me.tabledtLeagueParms.RolledOverSkinsColumn) = Global.System.Convert.DBNull
-        End Sub
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")>  _
-        Public Function IsRolledOverCTPNull() As Boolean
-            Return Me.IsNull(Me.tabledtLeagueParms.RolledOverCTPColumn)
-        End Function
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")>  _
-        Public Sub SetRolledOverCTPNull()
-            Me(Me.tabledtLeagueParms.RolledOverCTPColumn) = Global.System.Convert.DBNull
-        End Sub
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")>  _
-        Public Function IsRolledOverDateNull() As Boolean
-            Return Me.IsNull(Me.tabledtLeagueParms.RolledOverDateColumn)
-        End Function
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")>  _
-        Public Sub SetRolledOverDateNull()
-            Me(Me.tabledtLeagueParms.RolledOverDateColumn) = Global.System.Convert.DBNull
-        End Sub
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")>  _
-        Public Function IsExtraMoneyNull() As Boolean
-            Return Me.IsNull(Me.tabledtLeagueParms.ExtraMoneyColumn)
-        End Function
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")>  _
-        Public Sub SetExtraMoneyNull()
-            Me(Me.tabledtLeagueParms.ExtraMoneyColumn) = Global.System.Convert.DBNull
-        End Sub
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")>  _
-        Public Function IsScoresLockedNull() As Boolean
-            Return Me.IsNull(Me.tabledtLeagueParms.ScoresLockedColumn)
-        End Function
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")>  _
-        Public Sub SetScoresLockedNull()
-            Me(Me.tabledtLeagueParms.ScoresLockedColumn) = Global.System.Convert.DBNull
-        End Sub
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")>  _
-        Public Function IsRolledOverCTP1Null() As Boolean
-            Return Me.IsNull(Me.tabledtLeagueParms.RolledOverCTP1Column)
-        End Function
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")>  _
-        Public Sub SetRolledOverCTP1Null()
-            Me(Me.tabledtLeagueParms.RolledOverCTP1Column) = Global.System.Convert.DBNull
-        End Sub
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")>  _
-        Public Function IsRolledOverCTP2Null() As Boolean
-            Return Me.IsNull(Me.tabledtLeagueParms.RolledOverCTP2Column)
-        End Function
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")>  _
-        Public Sub SetRolledOverCTP2Null()
-            Me(Me.tabledtLeagueParms.RolledOverCTP2Column) = Global.System.Convert.DBNull
-        End Sub
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")>  _
-        Public Function IsRolledOverCTP3Null() As Boolean
-            Return Me.IsNull(Me.tabledtLeagueParms.RolledOverCTP3Column)
-        End Function
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")>  _
-        Public Sub SetRolledOverCTP3Null()
-            Me(Me.tabledtLeagueParms.RolledOverCTP3Column) = Global.System.Convert.DBNull
-        End Sub
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")>  _
-        Public Function IsRolledOverCTP4Null() As Boolean
-            Return Me.IsNull(Me.tabledtLeagueParms.RolledOverCTP4Column)
-        End Function
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")>  _
-        Public Sub SetRolledOverCTP4Null()
-            Me(Me.tabledtLeagueParms.RolledOverCTP4Column) = Global.System.Convert.DBNull
-        End Sub
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")>  _
-        Public Function IsRolledOverCTP5Null() As Boolean
-            Return Me.IsNull(Me.tabledtLeagueParms.RolledOverCTP5Column)
-        End Function
-        
-        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
-         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")>  _
-        Public Sub SetRolledOverCTP5Null()
-            Me(Me.tabledtLeagueParms.RolledOverCTP5Column) = Global.System.Convert.DBNull
         End Sub
         
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _

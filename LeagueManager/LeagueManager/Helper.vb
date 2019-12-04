@@ -471,7 +471,7 @@ ByVal sepChar As String)
         Dim iPHdcp = 0
         Try
             Dim dvScores As New DataView(dsLeague.Tables("dtScores"))
-            'dvScores.RowFilter = "Player = '" & row.Cells("Player").Value & "'" & " and Date < '" & sDate & "'"
+            'dates past the regular season dont get included in handicap calculations
             Dim lignoreDates = New List(Of String)
             For Each lparm As DataRow In dsLeague.Tables("dtLeagueParms").Rows
                 lignoreDates.Add(CDate(lparm("PostSeasonDt")).ToString("yyyyMMdd"))
@@ -546,162 +546,6 @@ ByVal sepChar As String)
 
             Dim sScore = ""
             'CalcHoleMarker(sDate)
-            sMethod = row.Cells("Method").Value
-            '20181004 - override calcholemarker because of cc and league in same sch
-            If sMethod = "Gross" Or sMethod = "Net" Then
-                For Each col As DataGridViewCell In row.Cells
-                    If col.OwningColumn.Name = "Hole1" Then
-                        iHoleMarker = 1
-                        Exit For
-                    ElseIf col.OwningColumn.Name = "Hole10" Then
-                        iHoleMarker = 10
-                        Exit For
-                    End If
-                Next
-
-            End If
-
-            If iHoleMarker = 1 Then
-                sScore = row.Cells("Out_Gross").Value.ToString()
-            Else
-                sScore = row.Cells("In_Gross").Value.ToString()
-            End If
-            sPlayer = row.Cells("Player").Value.ToString
-            'if the players score is blank, use the latest handicap
-            If sScore <> "" Then
-                iLast5Scores.Add(sScore)
-                iRoundctr += 1
-                IHdcp = GetHdcp(iLast5Scores, iRoundctr, sDate)
-            Else
-                IHdcp = iPHdcp
-            End If
-            row.Cells("Hdcp").ToolTipText = ""
-            For Each score In iLast5Scores
-                row.Cells("Hdcp").ToolTipText = row.Cells("Hdcp").ToolTipText & score & "-"
-            Next
-            row.Cells("Hdcp").ToolTipText = row.Cells("Hdcp").ToolTipText.Trim("-")
-
-            Return IHdcp
-
-        Catch ex As Exception
-            MsgBox("Error " & ex.Message & vbCrLf & ex.StackTrace)
-        End Try
-    End Function
-    Function oldGetNewHdcp(row As DataGridViewRow, sDate As String) As String
-        LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
-
-        'this subroutine assumes dvscores is only one players scores and is sorted by date low to high
-        '1) read a score
-        '2) build 5 score array 
-        '3) rounds 1-3
-        '   a)  update 5 scores array
-        '   b)  calculate hdcp each score (1- below)
-        '   c)  update hdcp in dvscores 1-3 (2- below)
-        '   d)  go to 1)
-        '4) round 4
-        '   a)  loop through the array finding the highest score
-        '   b)  loop through the array again totaling the 3 scores that dont match the highest score
-        '   c)  calculate hdcp each score (1- below)
-        '   d)  update hdcp in dvscores row 4 (2- below)
-        '   e)  go to 1)
-        '5) round 5
-        '   a)  loop through the array finding the highest and lowest scores
-        '   b)  loop through the array again totaling the 3 scores that dont match the highest and lowest scores
-        '   c)  calculate hdcp each score (1- below)
-        '   d)  update hdcp in dvscores row 5 (2- below)
-        '   e)  go to 1)
-        '6) rounds 6-99
-        '   a)  remove score 1 from the array
-        '   b)  add score 6 to end of array
-        '   c)  drop highest and lowest scores moving 3 scores into 3 score array
-        '   d)  calculate hdcp each score (1- below)
-        '   e)  update hdcp in dvscores row 6 - 99 (2- below)
-        '   f)  go to 1)
-        '
-        '1-calculate handicap = (scores - par) / rounds * .8 using array in step 2)
-        '2-Update handicap in dvscores for the round were processing
-        '
-        '20180923-allow for combined club championship and league play dont adjust handicaps for club champ or league play
-        If bCCLeague Then
-            oldGetNewHdcp = row.Cells("pHdcp").Value
-            Exit Function
-        End If
-        oldGetNewHdcp = ""
-        Dim iLast5Scores As New List(Of Decimal)
-        Dim iRoundctr = 0
-        Dim iPHdcp = 0
-        Try
-            Dim dvScores As New DataView(dsLeague.Tables("dtScores"))
-            'dvScores.RowFilter = "Player = '" & row.Cells("Player").Value & "'" & " and Date < '" & sDate & "'"
-            dvScores.RowFilter = String.Format("Player = '{0}' and Date < '{1}' and Method <> '' ", row.Cells("Player").Value, sDate)
-            dvScores.Sort = "Date desc"
-            'this compensates for lost scores after week 1 in 2017, i have hardcoded the prev handicap on 4/11 so we dont have to go back
-            'If sDate > "20170411" Then
-            'dvScores.RowFilter = dvScores.RowFilter & " and Date >= '20170411'"
-            'End If
-            'build a total of 5 max scores in our array
-            iRoundctr = 0
-            Dim sMethod As String = ""
-            For Each score As DataRowView In dvScores
-                sMethod = convDBNulltoSpaces(score("Method"))
-                If sMethod = "" Then Continue For
-                iRoundctr += 1
-                sPlayer = score("Player").ToString
-                iPHdcp = score("PHdcp").ToString
-                Dim sScoreDate As String = score("Date")
-                CalcHoleMarker(sScoreDate)
-                '20181004 - override calcholemarker because of cc and league in same sch
-                If sMethod = "Gross" Or sMethod = "Net" Then
-                    If score("Hole1") IsNot DBNull.Value Then
-                        iHoleMarker = 1
-                    Else
-                        iHoleMarker = 10
-                    End If
-                End If
-                If sMethod = "Net" Then
-                    If iHoles = 9 Then
-                        If iHoleMarker = 10 Then
-                            iLast5Scores.Add(score("In_Net").ToString + iPHdcp)
-                        Else
-                            iLast5Scores.Add(score("Out_Net").ToString + iPHdcp)
-                        End If
-                    Else
-                        iLast5Scores.Add(score("18_Net").ToString + iPHdcp)
-                    End If
-                ElseIf sMethod = "Gross" Then
-                    If iHoles = 9 Then
-                        If iHoleMarker = 10 Then
-                            iLast5Scores.Add(score("In_Gross").ToString)
-                        Else
-                            iLast5Scores.Add(score("Out_Gross").ToString)
-                        End If
-                    Else
-                        iLast5Scores.Add(score("18_Gross").ToString)
-                    End If
-                    'score always uses 9 holes and front 9 gross
-                ElseIf sMethod = "Score" Then
-                    If iHoles = 9 Then
-                        If iHoleMarker = 1 Then
-                            iLast5Scores.Add(score("Out_Gross").ToString)
-                        Else
-                            iLast5Scores.Add(score("In_Gross").ToString)
-                        End If
-                    Else
-                        iLast5Scores.Add(score("18_Gross").ToString)
-                    End If
-
-                End If
-
-                If iRoundctr = 4 Then Exit For
-                'dont recalculate handicap for 4/11, scorebook was lost
-                'If sScoreDate = "20170411" Then
-                '    iPHdcp = GetHdcp(iLast5Scores, iRoundctr, score("Date").ToString)
-                'End If
-            Next
-            'calc using screen score
-
-            Dim sScore = ""
-            CalcHoleMarker(sDate)
             sMethod = row.Cells("Method").Value
             '20181004 - override calcholemarker because of cc and league in same sch
             If sMethod = "Gross" Or sMethod = "Net" Then
@@ -840,11 +684,7 @@ ByVal sepChar As String)
     End Function
     Public Sub LOGIT(ByVal sMess As String)
         Try
-            'If Main.Text.Contains("Debug") Then
-            '    For Each stmpmess As String In sMess.Split(CChar(vbCrLf))
-            '        Debug.WriteLine(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss | ") & stmpmess.Replace(vbCr, "").Replace(vbLf, ""))
-            '    Next
-            '    Exit Sub
+
             If bloghelper Then
                 If Debugger.IsAttached Then
                     Debug.WriteLine(sMess)
@@ -865,22 +705,22 @@ ByVal sepChar As String)
     End Sub
     Sub CalcHoleMarker(sDate As String)
         Try
-
-            Dim sStartMonth As String = rLeagueParmrow("startDate").ToString.Substring(0, rLeagueParmrow("startDate").ToString.IndexOf("/")).PadLeft(2, "0")
-            Dim wkdate As Date = rLeagueParmrow("startDate")
-            Dim reformatted As String = wkdate.ToString("yyyyMMdd", Globalization.CultureInfo.InvariantCulture)
-            If sDate.Substring(0, 4) < reformatted.Substring(0, 4) Then
+            If sDate = CDate(rLeagueParmrow("PostSeasonDt")).ToString("yyyyMMdd") Then
+                iHoleMarker = 1
+                Exit Sub
+            ElseIf sDate = CDate(rLeagueParmrow("PostSeasonDt")).AddDays(7).ToString("yyyyMMdd") Then
+                iHoleMarker = 10
+                Exit Sub
+            End If
+            Dim sStartMonth As String = CDate(rLeagueParmrow("StartDate")).Month 'rLeagueParmrow("startDate").ToString.Substring(0, rLeagueParmrow("startDate").ToString.IndexOf("/")).PadLeft(2, "0")
+            If sDate.Substring(0, 4) < CDate(rLeagueParmrow("StartDate")).Year Then
                 For Each r As DataRow In dsLeague.Tables("dtLeagueParms").Rows
-                    Dim wkdateymd As Date = dsLeague.Tables("dtLeagueParms").Rows(0)("StartDate")
-                    Dim reformattedymd As String = wkdateymd.ToString("yyyyMMdd", Globalization.CultureInfo.InvariantCulture)
-                    If reformattedymd.Substring(0, 4) = sDate.Substring(0, 4) Then
-                        sStartMonth = reformattedymd.Substring(4, 2)
+                    If CDate(r("StartDate")).Year = sDate.Substring(0, 4) Then
+                        sStartMonth = CDate(r("StartDate")).Month
                         Exit For
                     End If
                 Next
             End If
-
-            Dim sScoreMonth = sDate.ToString.Substring(4, 2)
             'odd holes are on the back if the starting hole is front
             If (sDate.ToString.Substring(4, 2) - sStartMonth) Mod 2 = 0 Then
                 If rLeagueParmrow("Start9") = "F" Then
@@ -2065,6 +1905,7 @@ ByVal sepChar As String)
     Function FCalcSkins(dgScores As DataGridView) As List(Of String)
         LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
         'this code goes through the listview and highlights the lowest value on each hole and fron 9, back 9 and total
+        FCalcSkins = Nothing
         Try
             FCalcSkins = New List(Of String)
             Dim ilowrow As New List(Of String)
@@ -2392,6 +2233,7 @@ ByVal sepChar As String)
     End Function
     Function getLeagParm(sScoreDate As String, lbstatus As Label, frm As Form) As String 'parmfile,good(got the league file) or roskins:rocp1:rocp2
         LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
+        getLeagParm = ""
         Try
             Dim sParmFile As String = ""
             Dim oFiles() As IO.FileInfo
@@ -2477,6 +2319,7 @@ ByVal sepChar As String)
         ScreenResize = ScreenResize(Main.iScreenWidth, Main.iScreenHeight)
     End Function
     Function ScreenResize(sprefwidth, sprefheight) As String
+        ScreenResize = ""
         LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
         Try
             '700 X 1550
@@ -2999,5 +2842,88 @@ ByVal sepChar As String)
         End With
 
     End Sub
+    Public Function getHolidayList(ByVal vYear As Integer) As List(Of Date)
+
+        Dim FirstWeek As Integer = 1
+        Dim SecondWeek As Integer = 2
+        Dim ThirdWeek As Integer = 3
+        Dim FourthWeek As Integer = 4
+        Dim LastWeek As Integer = 5
+
+        Dim HolidayList As New List(Of Date)
+
+        '   http://www.usa.gov/citizens/holidays.shtml      
+        '   http://archive.opm.gov/operating_status_schedules/fedhol/2013.asp
+
+        ' New Year's Day            Jan 1
+        HolidayList.Add(DateSerial(vYear, 1, 1))
+
+        ' Martin Luther King, Jr. third Mon in Jan
+        HolidayList.Add(GetNthDayOfNthWeek(DateSerial(vYear, 1, 1), DayOfWeek.Monday, ThirdWeek))
+
+        ' Washington's Birthday third Mon in Feb
+        HolidayList.Add(GetNthDayOfNthWeek(DateSerial(vYear, 2, 1), DayOfWeek.Monday, ThirdWeek))
+
+        ' Memorial Day          last Mon in May
+        HolidayList.Add(GetNthDayOfNthWeek(DateSerial(vYear, 5, 1), DayOfWeek.Monday, LastWeek))
+
+        ' Independence Day      July 4
+        HolidayList.Add(DateSerial(vYear, 7, 4))
+
+        ' Labor Day             first Mon in Sept
+        HolidayList.Add(GetNthDayOfNthWeek(DateSerial(vYear, 9, 1), DayOfWeek.Monday, FirstWeek))
+
+        ' Columbus Day          second Mon in Oct
+        HolidayList.Add(GetNthDayOfNthWeek(DateSerial(vYear, 10, 1), DayOfWeek.Monday, SecondWeek))
+
+        ' Veterans Day          Nov 11
+        HolidayList.Add(DateSerial(vYear, 11, 11))
+
+        ' Thanksgiving Day      fourth Thur in Nov
+        HolidayList.Add(GetNthDayOfNthWeek(DateSerial(vYear, 11, 1), DayOfWeek.Thursday, FourthWeek))
+
+        ' Christmas Day         Dec 25
+        HolidayList.Add(DateSerial(vYear, 12, 25))
+
+        'saturday holidays are moved to Fri; Sun to Mon
+        For i As Integer = 0 To HolidayList.Count - 1
+            Dim dt As Date = HolidayList(i)
+            If dt.DayOfWeek = DayOfWeek.Saturday Then
+                HolidayList(i) = dt.AddDays(-1)
+            End If
+            If dt.DayOfWeek = DayOfWeek.Sunday Then
+                HolidayList(i) = dt.AddDays(1)
+            End If
+        Next
+
+        'return
+        Return HolidayList
+
+    End Function
+
+    Private Function GetNthDayOfNthWeek(ByVal dt As Date, ByVal DayofWeek As Integer, ByVal WhichWeek As Integer) As Date
+        'specify which day of which week of a month and this function will get the date
+        'this function uses the month and year of the date provided
+
+        'get first day of the given date
+        Dim dtFirst As Date = DateSerial(dt.Year, dt.Month, 1)
+
+        'get first DayOfWeek of the month
+        Dim dtRet As Date = dtFirst.AddDays(6 - dtFirst.AddDays(-(DayofWeek + 1)).DayOfWeek)
+
+        'get which week
+        dtRet = dtRet.AddDays((WhichWeek - 1) * 7)
+
+        'if day is past end of month then adjust backwards a week
+        If dtRet >= dtFirst.AddMonths(1) Then
+            dtRet = dtRet.AddDays(-7)
+        End If
+
+        'return
+        Return dtRet
+
+    End Function
+
+
 #End Region
 End Class
