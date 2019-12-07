@@ -28,6 +28,9 @@ Partial Class FinanceDetails
         '
         'dgFinance
         '
+        Me.dgFinance.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.dgFinance.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
         Me.dgFinance.Location = New System.Drawing.Point(63, 60)
         Me.dgFinance.Name = "dgFinance"
@@ -41,7 +44,7 @@ Partial Class FinanceDetails
         Me.ClientSize = New System.Drawing.Size(1086, 1032)
         Me.Controls.Add(Me.dgFinance)
         Me.Name = "FinanceDetails"
-        Me.Text = "FinanceDetails"
+        Me.Text = "Finance Details"
         CType(Me.dgFinance, System.ComponentModel.ISupportInitialize).EndInit()
         Me.ResumeLayout(False)
 

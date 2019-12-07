@@ -47,7 +47,7 @@ Partial Class Payments
         Me.dgPayments.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
         Me.dgPayments.Columns.AddRange(New System.Windows.Forms.DataGridViewColumn() {Me.Player, Me.PayDate, Me.Description, Me.Detail, Me.Amount, Me.PayMethod, Me.EmailText, Me.Comment})
         Me.dgPayments.Location = New System.Drawing.Point(26, 183)
-        Me.dgPayments.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
+        Me.dgPayments.Margin = New System.Windows.Forms.Padding(2)
         Me.dgPayments.Name = "dgPayments"
         Me.dgPayments.RowHeadersWidth = 30
         Me.dgPayments.RowTemplate.Height = 23
@@ -103,7 +103,7 @@ Partial Class Payments
         '
         Me.cbPlayers.FormattingEnabled = True
         Me.cbPlayers.Location = New System.Drawing.Point(26, 35)
-        Me.cbPlayers.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
+        Me.cbPlayers.Margin = New System.Windows.Forms.Padding(2)
         Me.cbPlayers.Name = "cbPlayers"
         Me.cbPlayers.Size = New System.Drawing.Size(152, 21)
         Me.cbPlayers.TabIndex = 1
@@ -132,7 +132,7 @@ Partial Class Payments
         '
         Me.cbDate.FormattingEnabled = True
         Me.cbDate.Location = New System.Drawing.Point(242, 35)
-        Me.cbDate.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
+        Me.cbDate.Margin = New System.Windows.Forms.Padding(2)
         Me.cbDate.Name = "cbDate"
         Me.cbDate.Size = New System.Drawing.Size(77, 21)
         Me.cbDate.TabIndex = 3
@@ -149,7 +149,7 @@ Partial Class Payments
         'btnLoad
         '
         Me.btnLoad.Location = New System.Drawing.Point(374, 35)
-        Me.btnLoad.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
+        Me.btnLoad.Margin = New System.Windows.Forms.Padding(2)
         Me.btnLoad.Name = "btnLoad"
         Me.btnLoad.Size = New System.Drawing.Size(69, 22)
         Me.btnLoad.TabIndex = 6
@@ -159,7 +159,7 @@ Partial Class Payments
         'btnExit
         '
         Me.btnExit.Location = New System.Drawing.Point(565, 35)
-        Me.btnExit.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
+        Me.btnExit.Margin = New System.Windows.Forms.Padding(2)
         Me.btnExit.Name = "btnExit"
         Me.btnExit.Size = New System.Drawing.Size(69, 22)
         Me.btnExit.TabIndex = 7
@@ -169,7 +169,7 @@ Partial Class Payments
         'btnSave
         '
         Me.btnSave.Location = New System.Drawing.Point(468, 35)
-        Me.btnSave.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
+        Me.btnSave.Margin = New System.Windows.Forms.Padding(2)
         Me.btnSave.Name = "btnSave"
         Me.btnSave.Size = New System.Drawing.Size(69, 22)
         Me.btnSave.TabIndex = 8
@@ -191,7 +191,7 @@ Partial Class Payments
         Me.Controls.Add(Me.Label1)
         Me.Controls.Add(Me.cbPlayers)
         Me.Controls.Add(Me.dgPayments)
-        Me.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
+        Me.Margin = New System.Windows.Forms.Padding(2)
         Me.Name = "Payments"
         Me.Text = "Payments"
         CType(Me.dgPayments, System.ComponentModel.ISupportInitialize).EndInit()

@@ -2,7 +2,7 @@
 Imports System.IO.Packaging
 Imports LeagueManager.FileLayout
 Public Class Main
-    Dim cVersion = "Version : 2019.12.03"
+    Dim cVersion = "Version : 2019.12.07"
     Public oHelper As Helper
     Private dsLeague As New dsLeague
     Dim bload As Boolean = True
@@ -514,27 +514,6 @@ Public Class Main
     End Sub
 
     Private Sub cbLeagues_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cbLeagues.SelectedIndexChanged
-        'If bload Then Exit Sub
-        'oHelper.CSV2DataTable(dsLeague.Tables("dtLeagueParms"), oHelper.sFilePath & "\LeagueParms.csv")
-        'Dim sfilename As String = cbLeagues.SelectedItem.ToString.Substring(cbLeagues.SelectedItem.ToString.IndexOf("(") + 1, 4) &
-        '                   "_" & cbLeagues.SelectedItem.ToString.Substring(0, cbLeagues.SelectedItem.ToString.IndexOf("(") - 1) & "_Schedule.csv"
-        'sWorkingYear = cbLeagues.SelectedItem.ToString.Substring(cbLeagues.SelectedItem.ToString.IndexOf("(") + 1, 4)
-        'oHelper.CSV2DataTable(dsLeague.Tables("dtLeagueParms"), oHelper.sFilePath & "\" & sfilename)
-        'Dim sfileparts As String() = sfilename.Split("\")
-        'sfilename = sfileparts(UBound(sfileparts))
-        'sfile &= sfilename.Split(".")(0)
-        'oHelper.LOGIT(String.Format("Matching League Name And Year {0} - {1}", sWorkingYear, sfilename))
-        'If cbLeagues.SelectedItem.ToString.Contains(sfilename) Then oHelper.LOGIT(String.Format("Matched League Name And Year"))
-        'oHelper.bsch = True
-        'If dsLeague.Tables.Contains(sfile) Then
-        '    oHelper.LOGIT(String.Format("dsleague.tables contains table dtschedule {0}", sfile))
-        '    Try
-        '        dsLeague.Tables.Remove(sfile)
-        '    Catch ex As Exception
-
-        '    End Try
-        'End If
-        'dsLeague.Tables.Add(sfile)
 
         GetLeague()
         'GetXSDNameByFileName(oHelper.dsLeague.Tables("dtScores"),
@@ -543,7 +522,6 @@ Public Class Main
         oHelper.GGmail = New GGSMTP_GMAIL(oHelper.rLeagueParmrow("Email"), oHelper.rLeagueParmrow("EmailPassword"))
 
         Dim wkrow As DataRow
-        cbDates.Items.Clear()
         If dsLeague.Tables.Contains("dtschedule") Then
             oHelper.LOGIT(String.Format("dsleague.tables contains table dtschedule {0}", "dtSchedule"))
             Try
@@ -571,8 +549,12 @@ Public Class Main
         For Each row In dtschedule.Rows
             row("Date") = CDate(row("Date")).ToString("yyyyMMdd")
         Next
+        rebuildDates(dtschedule)
+    End Sub
+    Sub rebuildDates(dtschedule As DataTable)
         Dim dv As New DataView(dtschedule)
         dv.Sort = "Date desc"
+        cbDates.Items.Clear()
         For Each row In dv
             cbDates.Items.Add(row("Date"))
         Next
@@ -717,10 +699,6 @@ Public Class Main
     End Sub
 
     Private Sub BtnStandingsSnapshot_Click(sender As Object, e As EventArgs) Handles btnStandingsSnapshot.Click
-        'Dim dt() = oHelper.dsLeague.Tables("dtScores").Select("Date < '20190813' and Points > 0")
-        'Dim dv As New DataView(oHelper.dsLeague.Tables("dtScores"))
-        'dv.RowFilter = "Date < '20190813' and Points > 0"
-        'Dim dt As DataTable = dv.ToTable("Player,Team,Points,Team_Points")
         StandingsSnapshot.Show()
     End Sub
 

@@ -61,7 +61,7 @@
             For Each row In dsLeague.Tables("dtPlayers").Rows
                 Dim dv As New DataView(dsLeague.dtPayments)
                 dv.RowFilter = String.Format("Player in('{0}') and Detail in ('Payment')", row("Name"))
-                dv.RowFilter = dv.RowFilter & String.Format(" AND Date >= '{0}' AND Date <= '{1}'", CDate(oHelper.rLeagueParmrow("StartDate")).ToString("yyyyMMdd"), CDate(oHelper.rLeagueParmrow("EndDate")).ToString("yyyyMMdd"))
+                'dv.RowFilter = dv.RowFilter & String.Format(" AND Date >= '{0}' AND Date <= '{1}'", CDate(oHelper.rLeagueParmrow("StartDate")).ToString("yyyyMMdd"), CDate(oHelper.rLeagueParmrow("EndDate")).ToString("yyyyMMdd"))
                 If dv.Count > 0 Then
                     cbPlayers.Items.Add(row("Name"))
                     cbPlayers.Sorted = True
@@ -411,6 +411,7 @@
     Private Sub dgPayments_RowLeave(sender As Object, e As DataGridViewCellEventArgs) Handles dgPayments.RowLeave
 
     End Sub
+
 #Region "Not_Used"
 #End Region
 

@@ -270,9 +270,17 @@ Public Class ScheduleBuilder
             dt.Rows.Add(newrow)
         Next
 
+        Main.rebuildDates(oHelper.dsLeague.Tables("dtSchedule"))
         Dim sfilename As String = Main.cbLeagues.SelectedItem.ToString.Substring(Main.cbLeagues.SelectedItem.ToString.IndexOf("(") + 1, 4) &
                                "_" & Main.cbLeagues.SelectedItem.ToString.Substring(0, Main.cbLeagues.SelectedItem.ToString.IndexOf("(") - 1) & "_Schedule.csv"
         'col.ColumnName 
+        '2019-12-07 - Update league parm with new dates
+        oHelper.rLeagueParmrow("EndDate") = CDate(oHelper.rLeagueParmrow("EndDate")).AddDays(7).ToString("MM/dd/yyyy")
+        oHelper.rLeagueParmrow("PostSeasonDt") = CDate(oHelper.rLeagueParmrow("PostSeasonDt")).AddDays(7).ToString("MM/dd/yyyy")
+        oHelper.DataTable2CSV(oHelper.dsLeague.Tables("dtLeagueParms"), oHelper.sFilePath & "\LeagueParms.csv")
+        lbStatus.Text = "Updated League Parm post season date"
+        oHelper.status_Msg(lbStatus, Me)
+
         oHelper.DataTable2CSV(dt, oHelper.sFilePath & "\" & sfilename)
         lbStatus.Text = "Finished saving Schedule"
         oHelper.status_Msg(lbStatus, Me)
