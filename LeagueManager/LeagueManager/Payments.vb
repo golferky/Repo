@@ -15,9 +15,20 @@
             dsLeague = oHelper.dsLeague
             oHelper.LOGIT(Reflection.MethodBase.GetCurrentMethod().Name & " -------------------------")
 
-            Dim sWH As String = oHelper.ScreenResize("1150", "650")
-            Me.Width = sWH.Split(":")(0)
-            Me.Height = sWH.Split(":")(1)
+            'Dim sWH As String = oHelper.ScreenResize("1150", "650")
+            'Me.Width = sWH.Split(":")(0)
+            'Me.Height = sWH.Split(":")(1)
+            Dim sWH As String = oHelper.ScreenResize()
+            If Me.Width >= sWH.Split(":")(0) Then
+                Me.Width = sWH.Split(":")(0) - (sWH.Split(":")(0) * 0.1)
+            Else
+                ' Me.Width = sWH.Split(":")(0)
+            End If
+            If Me.Height >= sWH.Split(":")(1) Then
+                Me.Height = sWH.Split(":")(1) - (sWH.Split(":")(1) * 0.1)
+            Else
+                'Me.Height = sWH.Split(":")(1)
+            End If
 
             'dsLeague.Tables("dtPayments").PrimaryKey = New DataColumn() {dsLeague.Tables("dtPayments").Columns("Date"), dsLeague.Tables("dtPayments").Columns("Player"), dsLeague.Tables("dtPayments").Columns("Desc")}
 

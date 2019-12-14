@@ -24,7 +24,6 @@ Partial Class frmScoreCard
     Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmScoreCard))
         Me.lbPS = New System.Windows.Forms.Label()
-        Me.btnExit = New System.Windows.Forms.Button()
         Me.rbNet = New System.Windows.Forms.RadioButton()
         Me.rbGross = New System.Windows.Forms.RadioButton()
         Me.gbDefMeth = New System.Windows.Forms.GroupBox()
@@ -35,7 +34,7 @@ Partial Class frmScoreCard
         Me.rbColors = New System.Windows.Forms.RadioButton()
         Me.lbStatus = New System.Windows.Forms.Label()
         Me.btnSave = New System.Windows.Forms.Button()
-        Me.GroupBox1 = New System.Windows.Forms.GroupBox()
+        Me.gbPrizeMoney = New System.Windows.Forms.GroupBox()
         Me.tbKitty = New System.Windows.Forms.TextBox()
         Me.Label25 = New System.Windows.Forms.Label()
         Me.GroupBox8 = New System.Windows.Forms.GroupBox()
@@ -91,14 +90,13 @@ Partial Class frmScoreCard
         Me.gbFrontBack = New System.Windows.Forms.GroupBox()
         Me.rbFront = New System.Windows.Forms.RadioButton()
         Me.rbBack = New System.Windows.Forms.RadioButton()
-        Me.lbParmFile = New System.Windows.Forms.Label()
         Me.StatusStrip1 = New System.Windows.Forms.StatusStrip()
         Me.tspb = New System.Windows.Forms.ToolStripProgressBar()
         Me.tssl = New System.Windows.Forms.ToolStripStatusLabel()
         Me.lbMonitor = New System.Windows.Forms.Label()
         Me.gbDefMeth.SuspendLayout()
         Me.cbStrokesId.SuspendLayout()
-        Me.GroupBox1.SuspendLayout()
+        Me.gbPrizeMoney.SuspendLayout()
         Me.GroupBox8.SuspendLayout()
         Me.GroupBox7.SuspendLayout()
         Me.GroupBox6.SuspendLayout()
@@ -117,20 +115,9 @@ Partial Class frmScoreCard
         Me.lbPS.Location = New System.Drawing.Point(1141, 13)
         Me.lbPS.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
         Me.lbPS.Name = "lbPS"
-        Me.lbPS.Size = New System.Drawing.Size(30, 13)
+        Me.lbPS.Size = New System.Drawing.Size(61, 13)
         Me.lbPS.TabIndex = 39
-        Me.lbPS.Text = "Date"
-        '
-        'btnExit
-        '
-        Me.btnExit.Location = New System.Drawing.Point(1100, 105)
-        Me.btnExit.Margin = New System.Windows.Forms.Padding(2)
-        Me.btnExit.Name = "btnExit"
-        Me.btnExit.Size = New System.Drawing.Size(115, 37)
-        Me.btnExit.TabIndex = 57
-        Me.btnExit.TabStop = False
-        Me.btnExit.Text = "Exit"
-        Me.btnExit.UseVisualStyleBackColor = True
+        Me.lbPS.Text = "Score Date"
         '
         'rbNet
         '
@@ -179,10 +166,10 @@ Partial Class frmScoreCard
         'cbDates
         '
         Me.cbDates.FormattingEnabled = True
-        Me.cbDates.Location = New System.Drawing.Point(1100, 30)
+        Me.cbDates.Location = New System.Drawing.Point(1140, 29)
         Me.cbDates.Margin = New System.Windows.Forms.Padding(2)
         Me.cbDates.Name = "cbDates"
-        Me.cbDates.Size = New System.Drawing.Size(115, 21)
+        Me.cbDates.Size = New System.Drawing.Size(81, 21)
         Me.cbDates.TabIndex = 76
         Me.cbDates.TabStop = False
         '
@@ -231,31 +218,31 @@ Partial Class frmScoreCard
         '
         'btnSave
         '
-        Me.btnSave.Location = New System.Drawing.Point(1100, 63)
+        Me.btnSave.Location = New System.Drawing.Point(1140, 62)
         Me.btnSave.Margin = New System.Windows.Forms.Padding(2)
         Me.btnSave.Name = "btnSave"
-        Me.btnSave.Size = New System.Drawing.Size(115, 37)
+        Me.btnSave.Size = New System.Drawing.Size(81, 37)
         Me.btnSave.TabIndex = 71
         Me.btnSave.TabStop = False
         Me.btnSave.Text = "Save Scores"
         Me.btnSave.UseVisualStyleBackColor = True
         '
-        'GroupBox1
+        'gbPrizeMoney
         '
-        Me.GroupBox1.Controls.Add(Me.tbKitty)
-        Me.GroupBox1.Controls.Add(Me.Label25)
-        Me.GroupBox1.Controls.Add(Me.GroupBox8)
-        Me.GroupBox1.Controls.Add(Me.GroupBox7)
-        Me.GroupBox1.Controls.Add(Me.GroupBox6)
-        Me.GroupBox1.Controls.Add(Me.tbPurse)
-        Me.GroupBox1.Controls.Add(Me.Label3)
-        Me.GroupBox1.Controls.Add(Me.GroupBox2)
-        Me.GroupBox1.Location = New System.Drawing.Point(420, 12)
-        Me.GroupBox1.Name = "GroupBox1"
-        Me.GroupBox1.Size = New System.Drawing.Size(526, 149)
-        Me.GroupBox1.TabIndex = 78
-        Me.GroupBox1.TabStop = False
-        Me.GroupBox1.Text = "Prize Money"
+        Me.gbPrizeMoney.Controls.Add(Me.tbKitty)
+        Me.gbPrizeMoney.Controls.Add(Me.Label25)
+        Me.gbPrizeMoney.Controls.Add(Me.GroupBox8)
+        Me.gbPrizeMoney.Controls.Add(Me.GroupBox7)
+        Me.gbPrizeMoney.Controls.Add(Me.GroupBox6)
+        Me.gbPrizeMoney.Controls.Add(Me.tbPurse)
+        Me.gbPrizeMoney.Controls.Add(Me.Label3)
+        Me.gbPrizeMoney.Controls.Add(Me.GroupBox2)
+        Me.gbPrizeMoney.Location = New System.Drawing.Point(420, 12)
+        Me.gbPrizeMoney.Name = "gbPrizeMoney"
+        Me.gbPrizeMoney.Size = New System.Drawing.Size(526, 149)
+        Me.gbPrizeMoney.TabIndex = 78
+        Me.gbPrizeMoney.TabStop = False
+        Me.gbPrizeMoney.Text = "Prize Money"
         '
         'tbKitty
         '
@@ -528,7 +515,7 @@ Partial Class frmScoreCard
         Me.GroupBox2.Size = New System.Drawing.Size(95, 122)
         Me.GroupBox2.TabIndex = 74
         Me.GroupBox2.TabStop = False
-        Me.GroupBox2.Text = "This Weeks"
+        Me.GroupBox2.Text = "This Rounds"
         '
         'Label20
         '
@@ -862,16 +849,6 @@ Partial Class frmScoreCard
         Me.rbBack.Text = "Back"
         Me.rbBack.UseVisualStyleBackColor = True
         '
-        'lbParmFile
-        '
-        Me.lbParmFile.AutoSize = True
-        Me.lbParmFile.Location = New System.Drawing.Point(962, 175)
-        Me.lbParmFile.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
-        Me.lbParmFile.Name = "lbParmFile"
-        Me.lbParmFile.Size = New System.Drawing.Size(50, 13)
-        Me.lbParmFile.TabIndex = 93
-        Me.lbParmFile.Text = "Parm File"
-        '
         'StatusStrip1
         '
         Me.StatusStrip1.ImageScalingSize = New System.Drawing.Size(32, 32)
@@ -900,9 +877,9 @@ Partial Class frmScoreCard
         Me.lbMonitor.AutoSize = True
         Me.lbMonitor.Location = New System.Drawing.Point(15, 9)
         Me.lbMonitor.Name = "lbMonitor"
-        Me.lbMonitor.Size = New System.Drawing.Size(45, 13)
+        Me.lbMonitor.Size = New System.Drawing.Size(63, 13)
         Me.lbMonitor.TabIndex = 95
-        Me.lbMonitor.Text = "Label26"
+        Me.lbMonitor.Text = "Monitor Info"
         '
         'frmScoreCard
         '
@@ -911,20 +888,18 @@ Partial Class frmScoreCard
         Me.ClientSize = New System.Drawing.Size(1263, 594)
         Me.Controls.Add(Me.lbMonitor)
         Me.Controls.Add(Me.StatusStrip1)
-        Me.Controls.Add(Me.lbParmFile)
         Me.Controls.Add(Me.gbFrontBack)
         Me.Controls.Add(Me.cbMatches)
         Me.Controls.Add(Me.cbMarkPaid)
         Me.Controls.Add(Me.gbColors)
         Me.Controls.Add(Me.gbHoleLegend)
         Me.Controls.Add(Me.dgScores)
-        Me.Controls.Add(Me.GroupBox1)
+        Me.Controls.Add(Me.gbPrizeMoney)
         Me.Controls.Add(Me.btnSave)
         Me.Controls.Add(Me.lbStatus)
         Me.Controls.Add(Me.cbStrokesId)
         Me.Controls.Add(Me.cbDates)
         Me.Controls.Add(Me.gbDefMeth)
-        Me.Controls.Add(Me.btnExit)
         Me.Controls.Add(Me.lbPS)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.Margin = New System.Windows.Forms.Padding(2)
@@ -934,8 +909,8 @@ Partial Class frmScoreCard
         Me.gbDefMeth.PerformLayout()
         Me.cbStrokesId.ResumeLayout(False)
         Me.cbStrokesId.PerformLayout()
-        Me.GroupBox1.ResumeLayout(False)
-        Me.GroupBox1.PerformLayout()
+        Me.gbPrizeMoney.ResumeLayout(False)
+        Me.gbPrizeMoney.PerformLayout()
         Me.GroupBox8.ResumeLayout(False)
         Me.GroupBox8.PerformLayout()
         Me.GroupBox7.ResumeLayout(False)
@@ -960,7 +935,6 @@ Partial Class frmScoreCard
 
     End Sub
     Friend WithEvents lbPS As System.Windows.Forms.Label
-    Friend WithEvents btnExit As Button
     Friend WithEvents rbNet As RadioButton
     Friend WithEvents rbGross As RadioButton
     Friend WithEvents gbDefMeth As GroupBox
@@ -971,7 +945,7 @@ Partial Class frmScoreCard
     Friend WithEvents rbColors As RadioButton
     Friend WithEvents lbStatus As Label
     Friend WithEvents btnSave As Button
-    Friend WithEvents GroupBox1 As GroupBox
+    Friend WithEvents gbPrizeMoney As GroupBox
     Friend WithEvents Label3 As Label
     Friend WithEvents tbPurse As TextBox
     Friend WithEvents dgScores As DataGridView
@@ -1018,7 +992,6 @@ Partial Class frmScoreCard
     Friend WithEvents Label24 As Label
     Friend WithEvents tbCP1Tot As TextBox
     Friend WithEvents tbSkinTot As TextBox
-    Friend WithEvents lbParmFile As Label
     Friend WithEvents StatusStrip1 As StatusStrip
     Friend WithEvents tspb As ToolStripProgressBar
     Friend WithEvents tssl As ToolStripStatusLabel

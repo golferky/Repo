@@ -46,12 +46,12 @@ Partial Class Payments
         '
         Me.dgPayments.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
         Me.dgPayments.Columns.AddRange(New System.Windows.Forms.DataGridViewColumn() {Me.Player, Me.PayDate, Me.Description, Me.Detail, Me.Amount, Me.PayMethod, Me.EmailText, Me.Comment})
-        Me.dgPayments.Location = New System.Drawing.Point(26, 183)
+        Me.dgPayments.Location = New System.Drawing.Point(26, 121)
         Me.dgPayments.Margin = New System.Windows.Forms.Padding(2)
         Me.dgPayments.Name = "dgPayments"
         Me.dgPayments.RowHeadersWidth = 30
         Me.dgPayments.RowTemplate.Height = 23
-        Me.dgPayments.Size = New System.Drawing.Size(644, 734)
+        Me.dgPayments.Size = New System.Drawing.Size(796, 527)
         Me.dgPayments.TabIndex = 0
         '
         'Player
@@ -124,9 +124,9 @@ Partial Class Payments
         Me.Label2.Location = New System.Drawing.Point(242, 19)
         Me.Label2.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
         Me.Label2.Name = "Label2"
-        Me.Label2.Size = New System.Drawing.Size(30, 13)
+        Me.Label2.Size = New System.Drawing.Size(61, 13)
         Me.Label2.TabIndex = 4
-        Me.Label2.Text = "Date"
+        Me.Label2.Text = "Score Date"
         '
         'cbDate
         '
@@ -134,7 +134,7 @@ Partial Class Payments
         Me.cbDate.Location = New System.Drawing.Point(242, 35)
         Me.cbDate.Margin = New System.Windows.Forms.Padding(2)
         Me.cbDate.Name = "cbDate"
-        Me.cbDate.Size = New System.Drawing.Size(77, 21)
+        Me.cbDate.Size = New System.Drawing.Size(81, 21)
         Me.cbDate.TabIndex = 3
         '
         'lbStatus
@@ -181,7 +181,7 @@ Partial Class Payments
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.AutoScroll = True
-        Me.ClientSize = New System.Drawing.Size(694, 552)
+        Me.ClientSize = New System.Drawing.Size(850, 725)
         Me.Controls.Add(Me.btnSave)
         Me.Controls.Add(Me.btnExit)
         Me.Controls.Add(Me.btnLoad)

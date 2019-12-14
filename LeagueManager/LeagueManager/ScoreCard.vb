@@ -24,6 +24,7 @@ Public Class frmScoreCard
 
     Private Sub ScoreCard_Load(sender As System.Object, e As System.EventArgs) Handles MyBase.Load
         Try
+            oHelper = Main.oHelper
             Me.Show()
             oHelper.LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
             lbStatus.Text = String.Format("Loading Scores from {0}", Main.lbScoresFile.Text)
@@ -31,7 +32,6 @@ Public Class frmScoreCard
             oHelper.status_Msg(lbStatus, Me)
 
             'copy main's helper
-            oHelper = Main.oHelper
             dsLeague = oHelper.dsLeague
             RemoveHandler rbFront.CheckedChanged,
             AddressOf rbFront_CheckedChanged
@@ -69,6 +69,11 @@ Public Class frmScoreCard
             'Me.Height = Main.iScreenHeight
             cbDates.Items.AddRange(Main.cbDates.Items.Cast(Of String).ToArray)
             cbDates.SelectedIndex = cbDates.Items.IndexOf(oHelper.dDate.ToString("yyyyMMdd"))
+            'remove non-match dates from dates combobox
+            'cdateToyyyyMMdd converts a string from 1/1/1900 to 19000101
+            Do While cbDates.Items(0) > oHelper.sDateLastScore
+                cbDates.Items.Remove(cbDates.Items(0))
+            Loop
 
             'set defaults for form
             oHelper.bColors = False
@@ -121,19 +126,11 @@ Public Class frmScoreCard
             AddressOf rbFront_CheckedChanged
 
             bFormLoad = False
-            lbParmFile.Text = ""
             lbStatus.Text = String.Format("Finished Loading Scores from {0}", Main.lbScoresFile.Text)
             oHelper.status_Msg(lbStatus, Me)
         Catch ex As Exception
             Dim x = ""
         End Try
-    End Sub
-    Private Sub btnExit_Click(sender As Object, e As EventArgs) Handles btnExit.Click
-        oHelper.LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
-        bSaveBtn = False
-        'this makes closing form event kick off
-        Me.Close()
-        Exit Sub
     End Sub
 
     'this function is called to validate that all holes were entered and to add up scores to net/gross calculations
@@ -1646,7 +1643,9 @@ Public Class frmScoreCard
         Try
             SaveScores()
             If lbStatus.BackColor = Color.Red Then
-                e.Cancel = True
+                'e.Cancel = True
+                lbStatus.Text = String.Format("Finished Closing Form")
+                oHelper.status_Msg(lbStatus, Me)
                 Exit Sub
             End If
             oHelper.Common_Exit()
@@ -1778,6 +1777,7 @@ Public Class frmScoreCard
         '    If sender.readonly Then MsgBox("This is a calculated field, not editable")
         'End If
     End Sub
+
 
 End Class
 Public Class TeamDuplicate

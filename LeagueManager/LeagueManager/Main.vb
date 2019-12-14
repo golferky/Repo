@@ -2,7 +2,7 @@
 Imports System.IO.Packaging
 Imports LeagueManager.FileLayout
 Public Class Main
-    Dim cVersion = "Version : 2019.12.07"
+    Dim cVersion = "Version : 2019.12.13"
     Public oHelper As Helper
     Private dsLeague As New dsLeague
     Dim bload As Boolean = True
@@ -14,24 +14,36 @@ Public Class Main
     Public iScreenWidth As Integer
     Public iScreenHeight As Integer
     Public sWorkingYear As String
+    Dim toolTipHdcp As New ToolTip
 
     Private Sub Main_Load(sender As System.Object, e As System.EventArgs) Handles MyBase.Load
         Try
+            oHelper = New Helper
             Dim allScreens = Screen.AllScreens
             Dim Current_Screen As Screen = Screen.FromControl(Me)
             If Current_Screen.Primary Then
                 Dim HCenter = Current_Screen.Bounds.Left +
             (((Current_Screen.Bounds.Right - Current_Screen.Bounds.Left) / 2) - ((Me.Width) / 2))
-
                 Dim VCenter = (Current_Screen.Bounds.Bottom / 2) - ((Me.Height) / 2)
-
                 Me.StartPosition = FormStartPosition.Manual
                 Me.Location = New Point(HCenter, VCenter)
-
             Else
-
                 Me.StartPosition = FormStartPosition.CenterScreen
             End If
+            toolTipHdcp = oHelper.toolTipHdcp
+            toolTipHdcp.AutoPopDelay = 5000
+            toolTipHdcp.InitialDelay = 10
+            toolTipHdcp.ReshowDelay = 500
+            ' Force the ToolTip text to be displayed whether or not the form is active.
+            toolTipHdcp.ShowAlways = True
+            ''' Set up the ToolTip text for the datagridviewcell.
+            Dim schanges As String = ""
+            schanges &= vbCrLf & "Change font on schedulebuilder grid"
+            schanges &= vbCrLf & "Payments Screen-loading(top line missing)"
+            schanges &= vbCrLf & "Build Schedule change for Byes"
+            schanges &= vbCrLf & "Fixed issue with blank Scores on Last 5"
+            toolTipHdcp.SetToolTip(Me, String.Format("Changes: {0}{1}", vbCrLf, schanges))
+
 
             'Me.Location = Point.Add(Screen.PrimaryScreen.Bounds.Location, New Size(Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height))
             'Dim primaryScreen = Screen.PrimaryScreen
@@ -52,8 +64,7 @@ Public Class Main
             '    End Using
             'Next
 
-            'Me.Show()
-            oHelper = New Helper
+            Me.Show()
             'Genschedule()
 
             Application.EnableVisualStyles()
@@ -156,6 +167,7 @@ Public Class Main
             oHelper.status_Msg(lblProcessMsg, Me)
 
             Me.Text = Me.Text & " " & String.Format("{0}", cVersion)
+
             lbMonitor.Text = String.Format("{0}, Resolution {1} x {2}, Menu {3} x {4}", My.Computer.Name, iScreenWidth, iScreenHeight, Me.Width, Me.Height)
             oHelper.LOGIT(Me.Text)
 
@@ -187,6 +199,7 @@ Public Class Main
             tspb.ProgressBar.Minimum = 0
             tspb.ProgressBar.Maximum = ofiles.Split(",").Count
             tssl.Text = String.Format("Loading {0} files", tspb.ProgressBar.Maximum)
+
             Dim et As TimeSpan
             Dim sStartTime As DateTime = Now
 
@@ -236,9 +249,9 @@ Public Class Main
 
             et = Now - sStartTime
             If et.TotalMinutes >= 1 Then
-                tssl.Text = String.Format("Loaded {0} files {1} elapsed time", ofiles.Count, CInt(et.TotalMinutes) Mod 60 & " Min :" & CInt(et.TotalSeconds) Mod 60 & " Secs")
+                tssl.Text = String.Format("Loaded {0} files {1} elapsed time", ofiles.Split(",").Count, CInt(et.TotalMinutes) Mod 60 & " Min :" & CInt(et.TotalSeconds) Mod 60 & " Secs")
             Else
-                tssl.Text = String.Format("Loaded {0} files {1} elapsed time", ofiles.Count, CInt(et.TotalSeconds) Mod 60 & " Secs")
+                tssl.Text = String.Format("Loaded {0} files {1} elapsed time", ofiles.Split(",").Count, CInt(et.TotalSeconds) Mod 60 & " Secs")
             End If
             ''get the date of the schedule for this week
             ''just use the Column names which have dates of the schedule table
@@ -359,12 +372,12 @@ Public Class Main
 
         'If oHelper.bsch Then
         lblProcessMsg.Text = String.Format("Loading Scores from {0}", lbScoresFile.Text)
-            oHelper.status_Msg(lblProcessMsg, Me)
+        oHelper.status_Msg(lblProcessMsg, Me)
 
-            frmScoreCard.Show()
+        frmScoreCard.Show()
 
-            lblProcessMsg.Text = String.Format("Finished Loading Scores")
-            oHelper.status_Msg(lblProcessMsg, Me)
+        lblProcessMsg.Text = String.Format("Finished Loading Scores")
+        oHelper.status_Msg(lblProcessMsg, Me)
 
         'Else
         '    MsgBox("Schedule not available, cant do Scores")
@@ -411,7 +424,7 @@ Public Class Main
 
     Private Sub btnStandings_Click(sender As Object, e As EventArgs) Handles btnStandings.Click
         If cbLeagues.SelectedItem.ToString.Substring(cbLeagues.SelectedItem.ToString.IndexOf("(") + 1, 4) < "2018" Then
-            MessageBox.Show("Scores < 2018 are not fully entered, cannot view yet,check with developer")
+            MessageBox.Show(Me, "Scores < 2018 are not fully entered, cannot view yet,check with developer", MessageBoxIcon.Hand)
             Exit Sub
         End If
         'If oHelper.bsch Then
@@ -424,9 +437,32 @@ Public Class Main
 
     Private Sub btnMatches_Click(sender As Object, e As EventArgs) Handles btnMatches.Click
         If cbLeagues.SelectedItem.ToString.Substring(cbLeagues.SelectedItem.ToString.IndexOf("(") + 1, 4) < "2018" Then
-            MessageBox.Show("Scores < 2018 are not fully entered, cannot view yet,check with developer")
+            MessageBox.Show(Me, "Scores < 2018 are not fully entered, cannot view yet,check with developer", MessageBoxIcon.Hand)
             Exit Sub
         End If
+        If cbDates.SelectedItem > oHelper.sDateLastScore Then
+            MessageBox.Show(String.Format("Selected Score {0} cant be greater than the last entered score for matches {1}", cbDates.SelectedItem, oHelper.sDateLastScore),
+                            "Critical Warning",
+                            MessageBoxButtons.OK, MessageBoxIcon.Hand, MessageBoxDefaultButton.Button1)
+            Exit Sub
+        End If
+
+        'Dim dvscores As New DataView(oHelper.dsLeague.Tables("dtScores"))
+        'dvscores.RowFilter = String.Format("Date = '{0}'", cbDates.SelectedItem)
+        'Dim iscores As Integer = 0
+        'For Each srow As DataRowView In dvscores
+        '    If srow("Hole1") IsNot DBNull.Value Then
+        '        If IsNumeric(srow("Hole1")) Then iscores += 1
+        '    ElseIf srow("Hole10") IsNot DBNull.Value Then
+        '        If IsNumeric(srow("Hole10")) Then iscores += 1
+        '    End If
+        'Next
+        'If iscores <> oHelper.rLeagueParmrow("Teams") * 2 Then
+        '    MessageBox.Show(String.Format("All {0} Scores werent entered, Cant Calculate Matches until all {0} scores are entered", oHelper.rLeagueParmrow("Teams") * 2),
+        '                    "Warning-cant proceed",
+        '                    MessageBoxButtons.OK, MessageBoxIcon.Hand, MessageBoxDefaultButton.Button1)
+        '    Exit Sub
+        'End If
         'If oHelper.bsch Then
         Matches.Show()
         '    Else
@@ -562,6 +598,12 @@ Public Class Main
         If oHelper.dDate.ToString("yyyyMMdd").Substring(0, 4) > cbDates.Items(0).ToString.Substring(0, 4) Then
             oHelper.dDate = Date.ParseExact(cbDates.Items(0), "yyyyMMdd", System.Globalization.DateTimeFormatInfo.InvariantInfo)
         End If
+        'remove non-match dates from dates combobox
+        'cdateToyyyyMMdd converts a string from 1/1/1900 to 19000101
+        Do While cbDates.Items(0) > oHelper.sDateLastScore
+            cbDates.Items.Remove(cbDates.Items(0))
+        Loop
+
         cbDates.SelectedIndex = 0
         cbDates.SelectedItem = oHelper.dDate.ToString("yyyyMMdd")
 
@@ -713,6 +755,14 @@ Public Class Main
     Private Sub btnPlayerStats_Click(sender As Object, e As EventArgs) Handles btnPlayerStats.Click
         oHelper.sPlayer = ""
         frmPlayerStats.Show()
+    End Sub
+
+    Private Sub btnSkinGame_Click(sender As Object, e As EventArgs) Handles btnSkinGame.Click
+        frmSkins.Show()
+    End Sub
+
+    Private Sub btnEnterScores_Click(sender As Object, e As EventArgs) Handles btnEnterScores.Click
+        frmEnterScore.Show()
     End Sub
 End Class
 Public Class Team

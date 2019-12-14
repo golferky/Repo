@@ -46,8 +46,11 @@ Public Class Scores
 
             'scores by player only keeps 9 holes for some leagues
             Dim dvScores As New DataView(oHelper.dsLeague.Tables("dtScores"))
-            dvScores.RowFilter = "Player = '" & oHelper.sPlayer & "'"
-            dvScores.RowFilter = dvScores.RowFilter
+            Dim xx = String.Format("Player = '{0}' and Method in ({1}) ", oHelper.sPlayer, "'Score','Gross','Net'")
+
+            dvScores.RowFilter = String.Format("Player = '{0}' and Method in ({1}) ", oHelper.sPlayer, "'Score','Gross','Net'")
+
+            'dvScores.RowFilter = dvScores.RowFilter
             Me.Text = "Scores for Player-" & oHelper.sPlayer
             oHelper.iHoles = oHelper.dsLeague.Tables("dtLeagueParms").Rows(0).Item("Holes")
             oHelper.iHoleMarker = 1

@@ -8,10 +8,10 @@
         'NewLeague.Show()
         Dim bs As New BindingSource
         bs.DataSource = oHelper.dsLeague.Tables("dtLeagueParms")
-        NewLeague.dgvNL.DataSource = bs
-        NewLeague.dgvNL.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells
-        NewLeague.dgvNL.ClipboardCopyMode = DataGridViewClipboardCopyMode.EnableWithoutHeaderText
-        NewLeague.Show()
+        LeagueSetup.dgvNL.DataSource = bs
+        LeagueSetup.dgvNL.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.AllCells
+        LeagueSetup.dgvNL.ClipboardCopyMode = DataGridViewClipboardCopyMode.EnableWithoutHeaderText
+        LeagueSetup.Show()
 
     End Sub
     Private Sub CourseSetup_Click(sender As System.Object, e As System.EventArgs) Handles btnCourseSetup.Click
@@ -20,7 +20,7 @@
 
     Private Sub PlayerSetup_Click(sender As System.Object, e As System.EventArgs) Handles btnPlayerSetup.Click
         'frmPlayer.Show()
-        Player.Show()
+        NewPlayer.Show()
         'reload player table after updating
     End Sub
 

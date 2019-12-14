@@ -8,16 +8,17 @@ Public Class Matches
     Dim rs As New Resizer
     Dim bsave As Boolean = False
     Public sByeOpponent As String
+
     Private Sub Matches_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         'rs.FindAllControls(Me)
         oHelper = Main.oHelper
-
-        'cbDatesPlayers.Items.AddRange(Main.cbDates.Items.Cast(Of String).ToArray)
-        For Each item In Main.cbDates.Items
-            If item >= CDate(oHelper.rLeagueParmrow("PostSeasonDt")).ToString("yyyyMMdd") Then Continue For
-            cbDatesPlayers.Items.Add(item)
-        Next
-        If cbDatesPlayers.Items.Contains(oHelper.dDate.ToString("yyyyMMdd")) Then cbDatesPlayers.SelectedIndex = cbDatesPlayers.Items.IndexOf(oHelper.dDate.ToString("yyyyMMdd"))
+        cbDates.Items.AddRange(Main.cbDates.Items.Cast(Of String).ToArray)
+        'remove non-match dates from dates combobox
+        'cdateToyyyyMMdd converts a string from 1/1/1900 to 19000101
+        Do While cbDates.Items(0) >= oHelper.CDateToyyyyMMdd(oHelper.rLeagueParmrow("PostSeasonDt")) ' CDate(oHelper.rLeagueParmrow("PostSeasonDt")).ToString("yyyyMMdd")
+            cbDates.Items.Remove(cbDates.Items(0))
+        Loop
+        cbDates.SelectedItem = Main.cbDates.SelectedItem
         Dim sWH As String = oHelper.ScreenResize()
         If Me.Width >= sWH.Split(":")(0) Then
             Me.Width = sWH.Split(":")(0) - (sWH.Split(":")(0) * 0.1)
@@ -34,22 +35,14 @@ Public Class Matches
         lbStatus.Text = ""
         '20180130-check for locked scores
 
-        If oHelper.bLockScores Then
-            btnMatches_Click(sender, e)
-            'Me.Close()
-        End If
+        btnMatches_Click(sender, e)
+
     End Sub
 
     Private Sub Matches_Resize(sender As Object, e As EventArgs) Handles MyBase.Resize
         'rs.ResizeAllControls(Me)
     End Sub
 
-    Private Sub btnExit_Click(sender As Object, e As EventArgs) Handles btnExit.Click
-        oHelper.LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
-        'kicks off formclosing
-        Me.Close()
-
-    End Sub
 
     Private Sub Matches_FormClosing(sender As Object, e As FormClosingEventArgs) Handles MyBase.FormClosing
         If Not oHelper.bLockScores Then SaveScores()
@@ -70,7 +63,7 @@ Public Class Matches
 
     End Sub
 
-    Private Sub cbDatesPlayers_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cbDatesPlayers.SelectedIndexChanged
+    Private Sub cbDatesPlayers_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cbDates.SelectedIndexChanged
         oHelper.LOGIT("--------------------------------------------------------------")
         oHelper.LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
         With lbStatus
@@ -78,7 +71,7 @@ Public Class Matches
         End With
         oHelper.status_Msg(lbStatus, Me)
 
-        If cbDatesPlayers.SelectedItem Is Nothing Then
+        If cbDates.SelectedItem Is Nothing Then
             MsgBox("Please select a date from the dropdown")
             With lbStatus
                 .Text = "Enter a date"
@@ -86,14 +79,14 @@ Public Class Matches
             oHelper.status_Msg(lbStatus, Me)
             Exit Sub
         Else
-            oHelper.dDate = Date.ParseExact(cbDatesPlayers.SelectedItem, "yyyyMMdd", System.Globalization.DateTimeFormatInfo.InvariantInfo)
+            oHelper.dDate = Date.ParseExact(cbDates.SelectedItem, "yyyyMMdd", System.Globalization.DateTimeFormatInfo.InvariantInfo)
         End If
 
         BldMatchesDataGridFromCSV()
         '20180325-remove hardcoded players replacing with league parms
         Dim iPlayers As Integer = oHelper.rLeagueParmrow("Teams") * 2
         If dgScores.RowCount < iPlayers Then
-            MsgBox(String.Format("All {0} scores must be entered before you can show or calculate matches for this date {1},exiting", iPlayers, cbDatesPlayers.SelectedItem))
+            MsgBox(String.Format("All {0} scores must be entered before you can show or calculate matches for this date {1},exiting", iPlayers, cbDates.SelectedItem))
             oHelper.Common_Exit()
             With lbStatus
                 .Text = "Error Calculating Matches"
@@ -112,30 +105,42 @@ Public Class Matches
         Dim dt = New DataTable
         If Not oHelper.CSV2DataTable(dt, oHelper.sFilePath & "\" & sfilename) Then
             MsgBox(String.Format("Schedule file not available {0}, exiting", sfilename))
+            With lbStatus
+                .Text = "Error Calculating Matches"
+                .BackColor = Color.Red
+            End With
+            oHelper.status_Msg(lbStatus, Me)
+            Exit Sub
+        End If
+        If cbDates.SelectedItem >= CDate(oHelper.rLeagueParmrow("PostSeasonDt")).ToString("yyyyMMdd") Then
+            MsgBox(String.Format("Score Date {0} > Season End Date {1}{2}Choose a different date", cbDates.SelectedItem, CDate(oHelper.rLeagueParmrow("PostSeasonDt")).AddDays(-7).ToString("yyyyMMdd"), vbCrLf))
+            With lbStatus
+                .Text = "Error Calculating Matches"
+                .BackColor = Color.Red
+            End With
+            oHelper.status_Msg(lbStatus, Me)
             Exit Sub
         End If
         '20180325-find byes opponent
-        If oHelper.rLeagueParmrow("Byes") IsNot DBNull.Value Then
-            For Each col As DataColumn In dt.Columns
-                Dim wkdate As DateTime = col.ColumnName
-                Dim reformatted As String = wkdate.ToString("yyyyMMdd", Globalization.CultureInfo.InvariantCulture)
-                If cbDatesPlayers.SelectedItem = reformatted Then
-                    For Each row In dt.Rows
-                        Dim sMatch = row(col).ToString
-                        If sMatch.Split("v")(0) = oHelper.rLeagueParmrow("Byes") Then
-                            sByeOpponent = sMatch.Split("v")(1)
-                            Exit For
-                        End If
-                        If sMatch.Split("v")(1) = oHelper.rLeagueParmrow("Byes") Then
-                            sByeOpponent = sMatch.Split("v")(0)
-                            Exit For
-                        End If
-                    Next
-                    'if byes opponent found, no need to keep searching, exit
-                    If sByeOpponent <> "" Then Exit For
-                End If
-            Next
-        End If
+        For Each col As DataColumn In dt.Columns
+            'Dim wkdate As DateTime = col.ColumnName
+            'Dim reformatted As String = wkdate.ToString("yyyyMMdd", Globalization.CultureInfo.InvariantCulture)
+            If cbDates.SelectedItem = CDate(col.ColumnName).ToString("yyyyMMdd") Then 'If cbDates.SelectedItem = reformatted Then
+                For Each row In dt.Rows
+                    Dim sMatch = row(col).ToString
+                    If sMatch.Split("v")(0) = "Bye" Then
+                        sByeOpponent = sMatch.Split("v")(1)
+                        Exit For
+                    End If
+                    If sMatch.Split("v")(1) = "Bye" Then
+                        sByeOpponent = sMatch.Split("v")(0)
+                        Exit For
+                    End If
+                Next
+                'if byes opponent found, no need to keep searching, exit
+                If sByeOpponent <> "" Then Exit For
+            End If
+        Next
         '20180525-resorts by match
         'oHelper.getMatchScores(cbDatesPlayers.SelectedItem)
 
@@ -159,36 +164,42 @@ Public Class Matches
                 ihaNet = oHelper.FixNullScore(dgScores.Rows(aPtr + 0).Cells(s9Played).Value.ToString)
                 ihbNet = oHelper.FixNullScore(dgScores.Rows(aPtr + 1).Cells(s9Played).Value.ToString)
 
+                'adjust for bye
                 If dgScores.Rows(aPtr + 0).Cells("Opponent").Value = "Bye" Then
                     ioaNet = 999
                     iobNet = 999
-                Else
-                    ioaNet = oHelper.FixNullScore(dgScores.Rows(aPtr + 2).Cells(s9Played).Value.ToString)
-                    iobNet = oHelper.FixNullScore(dgScores.Rows(aPtr + 3).Cells(s9Played).Value.ToString)
-                End If
-
-                Dim ihTeam As Integer = ihaNet + ihbNet
-                Dim ioTeam As Integer = ioaNet + iobNet
-                For irow = 0 To 3
-                    dgScores.Rows(aPtr + irow).Cells("Team_Points").Value = ""
-                Next
-
-                If ihTeam < ioTeam Then
                     dgScores.Rows(aPtr + 0).Cells("Team_Points").Value = 0.5
                     dgScores.Rows(aPtr + 1).Cells("Team_Points").Value = 0.5
                     dgScores.Rows(aPtr + 0).Cells("Team_Points").Style.BackColor = Color.LightGreen
                     dgScores.Rows(aPtr + 1).Cells("Team_Points").Style.BackColor = Color.LightGreen
-                ElseIf ihTeam > ioTeam Then
-                    dgScores.Rows(aPtr + 2).Cells("Team_Points").Value = 0.5
-                    dgScores.Rows(aPtr + 3).Cells("Team_Points").Value = 0.5
-                    dgScores.Rows(aPtr + 2).Cells("Team_Points").Style.BackColor = Color.LightGreen
-                    dgScores.Rows(aPtr + 3).Cells("Team_Points").Style.BackColor = Color.LightGreen
                 Else
-                    For irow = 0 To 3
-                        dgScores.Rows(aPtr + irow).Cells("Team_Points").Value = 0.25
-                        dgScores.Rows(aPtr + irow).Cells("Team_Points").Style.BackColor = Color.Yellow
-                    Next
+                    ioaNet = oHelper.FixNullScore(dgScores.Rows(aPtr + 2).Cells(s9Played).Value.ToString)
+                    iobNet = oHelper.FixNullScore(dgScores.Rows(aPtr + 3).Cells(s9Played).Value.ToString)
+                    Dim ihTeam As Integer = ihaNet + ihbNet
+                    Dim ioTeam As Integer = ioaNet + iobNet
+                    If ihTeam < ioTeam Then
+                        dgScores.Rows(aPtr + 0).Cells("Team_Points").Value = 0.5
+                        dgScores.Rows(aPtr + 1).Cells("Team_Points").Value = 0.5
+                        dgScores.Rows(aPtr + 0).Cells("Team_Points").Style.BackColor = Color.LightGreen
+                        dgScores.Rows(aPtr + 1).Cells("Team_Points").Style.BackColor = Color.LightGreen
+                    ElseIf ihTeam > ioTeam Then
+                        dgScores.Rows(aPtr + 2).Cells("Team_Points").Value = 0.5
+                        dgScores.Rows(aPtr + 3).Cells("Team_Points").Value = 0.5
+                        dgScores.Rows(aPtr + 2).Cells("Team_Points").Style.BackColor = Color.LightGreen
+                        dgScores.Rows(aPtr + 3).Cells("Team_Points").Style.BackColor = Color.LightGreen
+                    Else
+                        'make all points a tie
+                        dgScores.Rows(aPtr + 0).Cells("Team_Points").Value = 0.25
+                        dgScores.Rows(aPtr + 0).Cells("Team_Points").Style.BackColor = Color.Yellow
+                        dgScores.Rows(aPtr + 1).Cells("Team_Points").Value = 0.25
+                        dgScores.Rows(aPtr + 1).Cells("Team_Points").Style.BackColor = Color.Yellow
+                        dgScores.Rows(aPtr + 2).Cells("Team_Points").Value = 0.25
+                        dgScores.Rows(aPtr + 2).Cells("Team_Points").Style.BackColor = Color.Yellow
+                        dgScores.Rows(aPtr + 3).Cells("Team_Points").Value = 0.25
+                        dgScores.Rows(aPtr + 3).Cells("Team_Points").Style.BackColor = Color.Yellow
+                    End If
                 End If
+
             Next
         End If
         dgScores.Visible = True
@@ -328,7 +339,7 @@ Public Class Matches
             dgScores.AllowUserToAddRows = False
             dgScores.AllowUserToDeleteRows = False
             dgScores.EditMode = DataGridViewEditMode.EditProgrammatically
-            Dim sdate As String = cbDatesPlayers.Text.ToString
+            Dim sdate As String = cbDates.Text.ToString
 
             If sdate = "" Then
                 MsgBox("Please enter or select a date")

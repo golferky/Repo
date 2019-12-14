@@ -159,7 +159,7 @@ Public Class ScheduleBuilder
                 '.Columns.Clear()
                 .DataSource = dt
                 .ColumnHeadersDefaultCellStyle.Font = New Font("Tahoma", 8, FontStyle.Bold)
-                .DefaultCellStyle.Font = New Font("Tahoma", 12)
+                .DefaultCellStyle.Font = New Font("Tahoma", 8)
                 'adjust columns for each field being added
                 Dim i = 1
                 For Each col As DataGridViewTextBoxColumn In .Columns
@@ -287,23 +287,6 @@ Public Class ScheduleBuilder
         'this restores the screen with the new schedule
         oHelper.CSV2DataTable(dt, oHelper.sFilePath & "\" & sfilename)
         doScheduler()
-        'If MousePosition.Y < 0 Then
-        'If sender.mouseenteredcelladdress < 0 Then
-        '    Exit Sub
-        'End If
-
-        'If e.ColumnIndex = 0 Then
-        '    Dim cell As DataGridViewTextBoxCell = sender.currentcell
-        '    If cell.OwningColumn.Name = "Player" Then
-        '        Dim mbResult As MsgBoxResult = MsgBox("List all scores for for " & cell.Value & "?", MsgBoxStyle.YesNo)
-        '        If mbResult = MsgBoxResult.Yes Then
-        '            oHelper.bScoresbyPlayer = True
-        '            oHelper.sPlayer = cell.Value
-        '            Scores.Show()
-        '            oHelper.bScoresbyPlayer = False
-        '        End If
-        '    End If
-        'End If
 
     End Sub
 

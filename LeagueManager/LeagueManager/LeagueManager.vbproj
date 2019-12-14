@@ -155,16 +155,16 @@
     <Compile Include="LastFive.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="LeagueSetup.Designer.vb">
+      <DependentUpon>LeagueSetup.vb</DependentUpon>
+    </Compile>
+    <Compile Include="LeagueSetup.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Matches.Designer.vb">
       <DependentUpon>Matches.vb</DependentUpon>
     </Compile>
     <Compile Include="Matches.vb">
-      <SubType>Form</SubType>
-    </Compile>
-    <Compile Include="NewLeague.Designer.vb">
-      <DependentUpon>NewLeague.vb</DependentUpon>
-    </Compile>
-    <Compile Include="NewLeague.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="NewPlayer.Designer.vb">
@@ -247,10 +247,10 @@
     <Compile Include="Team.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="LeagueSetup.Designer.vb">
-      <DependentUpon>LeagueSetup.vb</DependentUpon>
+    <Compile Include="OldLeagueSetup.Designer.vb">
+      <DependentUpon>OldLeagueSetup.vb</DependentUpon>
     </Compile>
-    <Compile Include="LeagueSetup.vb">
+    <Compile Include="OldLeagueSetup.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="lvSort.vb">
@@ -371,11 +371,11 @@
     <EmbeddedResource Include="LastFive.resx">
       <DependentUpon>LastFive.vb</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="LeagueSetup.resx">
+      <DependentUpon>LeagueSetup.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Matches.resx">
       <DependentUpon>Matches.vb</DependentUpon>
-    </EmbeddedResource>
-    <EmbeddedResource Include="NewLeague.resx">
-      <DependentUpon>NewLeague.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="NewPlayer.resx">
       <DependentUpon>NewPlayer.vb</DependentUpon>
@@ -420,8 +420,8 @@
       <DependentUpon>Handicap.vb</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="LeagueSetup.resx">
-      <DependentUpon>LeagueSetup.vb</DependentUpon>
+    <EmbeddedResource Include="OldLeagueSetup.resx">
+      <DependentUpon>OldLeagueSetup.vb</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Partners.resx">

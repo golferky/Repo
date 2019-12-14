@@ -1,9 +1,9 @@
-﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
+﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()>
 Partial Class Standings
     Inherits System.Windows.Forms.Form
 
     'Form overrides dispose to clean up the component list.
-    <System.Diagnostics.DebuggerNonUserCode()> _
+    <System.Diagnostics.DebuggerNonUserCode()>
     Protected Overrides Sub Dispose(ByVal disposing As Boolean)
         Try
             If disposing AndAlso components IsNot Nothing Then
@@ -20,7 +20,7 @@ Partial Class Standings
     'NOTE: The following procedure is required by the Windows Form Designer
     'It can be modified using the Windows Form Designer.  
     'Do not modify it using the code editor.
-    <System.Diagnostics.DebuggerStepThrough()> _
+    <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
         Me.dgStandings = New System.Windows.Forms.DataGridView()
         Me.gbOptions = New System.Windows.Forms.GroupBox()
@@ -41,7 +41,6 @@ Partial Class Standings
         Me.cbScore = New System.Windows.Forms.CheckBox()
         Me.cbTeam = New System.Windows.Forms.CheckBox()
         Me.cbSubs = New System.Windows.Forms.CheckBox()
-        Me.btnExit = New System.Windows.Forms.Button()
         Me.btnEmail = New System.Windows.Forms.Button()
         Me.cbTotalPts = New System.Windows.Forms.CheckBox()
         Me.cbIndPts = New System.Windows.Forms.CheckBox()
@@ -94,7 +93,7 @@ Partial Class Standings
         'Label2
         '
         Me.Label2.AutoSize = True
-        Me.Label2.Location = New System.Drawing.Point(719, 19)
+        Me.Label2.Location = New System.Drawing.Point(696, 23)
         Me.Label2.Name = "Label2"
         Me.Label2.Size = New System.Drawing.Size(61, 13)
         Me.Label2.TabIndex = 77
@@ -103,7 +102,7 @@ Partial Class Standings
         'cbExcel
         '
         Me.cbExcel.AutoSize = True
-        Me.cbExcel.Location = New System.Drawing.Point(551, 29)
+        Me.cbExcel.Location = New System.Drawing.Point(570, 33)
         Me.cbExcel.Name = "cbExcel"
         Me.cbExcel.Size = New System.Drawing.Size(52, 17)
         Me.cbExcel.TabIndex = 76
@@ -114,7 +113,7 @@ Partial Class Standings
         'lbStatus
         '
         Me.lbStatus.AutoSize = True
-        Me.lbStatus.Location = New System.Drawing.Point(494, 68)
+        Me.lbStatus.Location = New System.Drawing.Point(513, 72)
         Me.lbStatus.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
         Me.lbStatus.Name = "lbStatus"
         Me.lbStatus.Size = New System.Drawing.Size(37, 13)
@@ -125,7 +124,7 @@ Partial Class Standings
         '
         Me.GroupBox1.Controls.Add(Me.cb1stHalf)
         Me.GroupBox1.Controls.Add(Me.cb2ndHalf)
-        Me.GroupBox1.Location = New System.Drawing.Point(260, 19)
+        Me.GroupBox1.Location = New System.Drawing.Point(279, 23)
         Me.GroupBox1.Name = "GroupBox1"
         Me.GroupBox1.Size = New System.Drawing.Size(112, 79)
         Me.GroupBox1.TabIndex = 74
@@ -160,7 +159,7 @@ Partial Class Standings
         '
         Me.gbPoints.Controls.Add(Me.rbCum)
         Me.gbPoints.Controls.Add(Me.rbWeekly)
-        Me.gbPoints.Location = New System.Drawing.Point(378, 19)
+        Me.gbPoints.Location = New System.Drawing.Point(397, 23)
         Me.gbPoints.Name = "gbPoints"
         Me.gbPoints.Size = New System.Drawing.Size(111, 79)
         Me.gbPoints.TabIndex = 72
@@ -199,7 +198,7 @@ Partial Class Standings
         Me.gbCell.Controls.Add(Me.cbTeam)
         Me.gbCell.Location = New System.Drawing.Point(6, 19)
         Me.gbCell.Name = "gbCell"
-        Me.gbCell.Size = New System.Drawing.Size(248, 79)
+        Me.gbCell.Size = New System.Drawing.Size(267, 79)
         Me.gbCell.TabIndex = 74
         Me.gbCell.TabStop = False
         Me.gbCell.Text = "Cell Contents"
@@ -263,22 +262,12 @@ Partial Class Standings
         Me.cbSubs.AutoSize = True
         Me.cbSubs.Checked = True
         Me.cbSubs.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.cbSubs.Location = New System.Drawing.Point(495, 29)
+        Me.cbSubs.Location = New System.Drawing.Point(514, 33)
         Me.cbSubs.Name = "cbSubs"
         Me.cbSubs.Size = New System.Drawing.Size(50, 17)
         Me.cbSubs.TabIndex = 3
         Me.cbSubs.Text = "Subs"
         Me.cbSubs.UseVisualStyleBackColor = True
-        '
-        'btnExit
-        '
-        Me.btnExit.Location = New System.Drawing.Point(959, 79)
-        Me.btnExit.Margin = New System.Windows.Forms.Padding(2)
-        Me.btnExit.Name = "btnExit"
-        Me.btnExit.Size = New System.Drawing.Size(106, 37)
-        Me.btnExit.TabIndex = 73
-        Me.btnExit.Text = "Exit"
-        Me.btnExit.UseVisualStyleBackColor = True
         '
         'btnEmail
         '
@@ -341,7 +330,6 @@ Partial Class Standings
         Me.Controls.Add(Me.btnDisplay)
         Me.Controls.Add(Me.GroupBox2)
         Me.Controls.Add(Me.btnEmail)
-        Me.Controls.Add(Me.btnExit)
         Me.Controls.Add(Me.gbOptions)
         Me.Controls.Add(Me.dgStandings)
         Me.Name = "Standings"
@@ -370,7 +358,6 @@ Partial Class Standings
     Friend WithEvents rbCum As RadioButton
     Friend WithEvents rbWeekly As RadioButton
     Friend WithEvents cbTeam As CheckBox
-    Friend WithEvents btnExit As Button
     Friend WithEvents cb2ndHalf As CheckBox
     Friend WithEvents cb1stHalf As CheckBox
     Friend WithEvents cbOpp As CheckBox

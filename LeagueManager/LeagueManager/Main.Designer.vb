@@ -25,6 +25,7 @@ Partial Class Main
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(Main))
         Me.btnExit = New System.Windows.Forms.Button()
         Me.GroupBox1 = New System.Windows.Forms.GroupBox()
+        Me.btnSkinGame = New System.Windows.Forms.Button()
         Me.btnMatches = New System.Windows.Forms.Button()
         Me.btnSkins = New System.Windows.Forms.Button()
         Me.btnScoreCard = New System.Windows.Forms.Button()
@@ -59,6 +60,7 @@ Partial Class Main
         Me.lbMonitor = New System.Windows.Forms.Label()
         Me.Label2 = New System.Windows.Forms.Label()
         Me.cbDates = New System.Windows.Forms.ComboBox()
+        Me.btnEnterScores = New System.Windows.Forms.Button()
         Me.GroupBox1.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
         Me.GroupBox3.SuspendLayout()
@@ -90,6 +92,16 @@ Partial Class Main
         Me.GroupBox1.TabIndex = 9
         Me.GroupBox1.TabStop = False
         Me.GroupBox1.Text = "Scoring and Games"
+        '
+        'btnSkinGame
+        '
+        Me.btnSkinGame.Location = New System.Drawing.Point(218, 569)
+        Me.btnSkinGame.Margin = New System.Windows.Forms.Padding(2)
+        Me.btnSkinGame.Name = "btnSkinGame"
+        Me.btnSkinGame.Size = New System.Drawing.Size(131, 24)
+        Me.btnSkinGame.TabIndex = 9
+        Me.btnSkinGame.Text = "Skin Game"
+        Me.btnSkinGame.UseVisualStyleBackColor = True
         '
         'btnMatches
         '
@@ -417,12 +429,24 @@ Partial Class Main
         Me.cbDates.Size = New System.Drawing.Size(81, 21)
         Me.cbDates.TabIndex = 29
         '
+        'btnEnterScores
+        '
+        Me.btnEnterScores.Location = New System.Drawing.Point(61, 569)
+        Me.btnEnterScores.Margin = New System.Windows.Forms.Padding(2)
+        Me.btnEnterScores.Name = "btnEnterScores"
+        Me.btnEnterScores.Size = New System.Drawing.Size(131, 24)
+        Me.btnEnterScores.TabIndex = 30
+        Me.btnEnterScores.Text = "Enter Scores"
+        Me.btnEnterScores.UseVisualStyleBackColor = True
+        '
         'Main
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.AutoScroll = True
         Me.ClientSize = New System.Drawing.Size(580, 689)
+        Me.Controls.Add(Me.btnEnterScores)
+        Me.Controls.Add(Me.btnSkinGame)
         Me.Controls.Add(Me.cbDates)
         Me.Controls.Add(Me.Label2)
         Me.Controls.Add(Me.lbMonitor)
@@ -488,4 +512,6 @@ Partial Class Main
     Friend WithEvents lbMonitor As Label
     Friend WithEvents Label2 As Label
     Friend WithEvents cbDates As ComboBox
+    Friend WithEvents btnSkinGame As Button
+    Friend WithEvents btnEnterScores As Button
 End Class

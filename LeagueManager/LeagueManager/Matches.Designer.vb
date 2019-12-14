@@ -23,7 +23,7 @@ Partial Class Matches
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(Matches))
-        Me.cbDatesPlayers = New System.Windows.Forms.ComboBox()
+        Me.cbDates = New System.Windows.Forms.ComboBox()
         Me.lbPS = New System.Windows.Forms.Label()
         Me.dgScores = New System.Windows.Forms.DataGridView()
         Me.btnExit = New System.Windows.Forms.Button()
@@ -32,24 +32,24 @@ Partial Class Matches
         CType(Me.dgScores, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
-        'cbDatesPlayers
+        'cbDates
         '
-        Me.cbDatesPlayers.FormattingEnabled = True
-        Me.cbDatesPlayers.Location = New System.Drawing.Point(54, 29)
-        Me.cbDatesPlayers.Margin = New System.Windows.Forms.Padding(2)
-        Me.cbDatesPlayers.Name = "cbDatesPlayers"
-        Me.cbDatesPlayers.Size = New System.Drawing.Size(115, 21)
-        Me.cbDatesPlayers.TabIndex = 66
+        Me.cbDates.FormattingEnabled = True
+        Me.cbDates.Location = New System.Drawing.Point(54, 29)
+        Me.cbDates.Margin = New System.Windows.Forms.Padding(2)
+        Me.cbDates.Name = "cbDates"
+        Me.cbDates.Size = New System.Drawing.Size(81, 21)
+        Me.cbDates.TabIndex = 66
         '
         'lbPS
         '
         Me.lbPS.AutoSize = True
-        Me.lbPS.Location = New System.Drawing.Point(95, 9)
+        Me.lbPS.Location = New System.Drawing.Point(51, 9)
         Me.lbPS.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
         Me.lbPS.Name = "lbPS"
-        Me.lbPS.Size = New System.Drawing.Size(30, 13)
+        Me.lbPS.Size = New System.Drawing.Size(61, 13)
         Me.lbPS.TabIndex = 63
-        Me.lbPS.Text = "Date"
+        Me.lbPS.Text = "Score Date"
         '
         'dgScores
         '
@@ -72,6 +72,7 @@ Partial Class Matches
         Me.btnExit.TabIndex = 71
         Me.btnExit.Text = "Exit"
         Me.btnExit.UseVisualStyleBackColor = True
+        Me.btnExit.Visible = False
         '
         'lbStatus
         '
@@ -102,7 +103,7 @@ Partial Class Matches
         Me.Controls.Add(Me.lbStatus)
         Me.Controls.Add(Me.btnExit)
         Me.Controls.Add(Me.dgScores)
-        Me.Controls.Add(Me.cbDatesPlayers)
+        Me.Controls.Add(Me.cbDates)
         Me.Controls.Add(Me.lbPS)
         Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
         Me.Name = "Matches"
@@ -113,7 +114,7 @@ Partial Class Matches
 
     End Sub
 
-    Friend WithEvents cbDatesPlayers As ComboBox
+    Friend WithEvents cbDates As ComboBox
     Friend WithEvents lbPS As Label
     Friend WithEvents dgScores As DataGridView
     Friend WithEvents btnExit As Button

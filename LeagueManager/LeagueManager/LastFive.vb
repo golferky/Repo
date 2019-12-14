@@ -6,23 +6,48 @@
     Private Sub frmPlayerStats_Load(sender As System.Object, e As System.EventArgs) Handles MyBase.Load
         oHelper = Main.oHelper
         rs.FindAllControls(Me)
-
-        For Each item In Main.cbDates.Items
-            If item >= CDate(oHelper.rLeagueParmrow("PostSeasonDt")).ToString("yyyyMMdd") Then Continue For
-            cbDates.Items.Add(item)
-        Next
-        If cbDates.Items.Contains(oHelper.dDate.ToString("yyyyMMdd")) Then cbDates.SelectedIndex = cbDates.Items.IndexOf(oHelper.dDate.ToString("yyyyMMdd"))
-
         dgLast5.RowTemplate.Height = 15
         'Me.Height = 1500
         Dim sWH As String = oHelper.ScreenResize("614", "1500")
         Me.Width = sWH.Split(":")(0)
         Me.Height = sWH.Split(":")(1)
         oHelper.LOGIT(String.Format("Screen Height {0} Width {1}", Main.iScreenHeight, Main.iScreenWidth))
-        btnDisplayScores_Click(sender, e)
+        lbStatus.Text = String.Format("Loading Scores")
+        oHelper.status_Msg(lbStatus, Me)
+        cbDates.Items.AddRange(Main.cbDates.Items.Cast(Of String).ToArray)
+        cbDates.SelectedIndex = cbDates.Items.IndexOf(oHelper.dDate.ToString("yyyyMMdd"))
+        lbStatus.Text = String.Format("Finished Loading Scores")
+        oHelper.status_Msg(lbStatus, Me)
+
     End Sub
 
-    Private Sub btnDisplayScores_Click(sender As Object, e As EventArgs) Handles btnDisplayScores.Click
+    Private Sub dglast5_SortCompare(sender As Object, e As DataGridViewSortCompareEventArgs) Handles dgLast5.SortCompare
+
+        Try
+            oHelper.SortCompare(sender, e)
+        Catch
+            Dim x = ""
+        End Try
+
+    End Sub
+    Private Sub dgLast5_ColumnHeaderMouseClick(sender As Object, e As DataGridViewCellMouseEventArgs) Handles dgLast5.ColumnHeaderMouseClick
+        oHelper.LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
+
+        Dim newColumn As DataGridViewColumn = sender.Columns(e.ColumnIndex)
+        lbStatus.Text = String.Format("Resorting Columns by {0}", newColumn.HeaderText)
+        oHelper.status_Msg(lbStatus, Me)
+
+        lbStatus.Text = String.Format("Finished Resorting Column {0}", newColumn.HeaderText)
+        oHelper.status_Msg(lbStatus, Me)
+    End Sub
+
+    Private Sub cb2018_CheckedChanged(sender As Object, e As EventArgs) Handles cb2018.CheckedChanged
+        If cb2018.Checked Then
+
+        End If
+    End Sub
+
+    Private Sub cbDates_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cbDates.SelectedIndexChanged
         Try
             '20180220-fix issue when no date entered
             If cbDates.SelectedItem Is Nothing Then
@@ -34,10 +59,11 @@
 
             'oHelper.DisplayLast5(cbDates.SelectedItem, Me, lv1)
             Dim dvScores = New DataView(oHelper.dsLeague.Tables("dtScores"))
-
             dvScores.Sort = "Player, Date desc"
+            'eliminate ignore dates
             Dim lignoreDates = New List(Of String)
             For Each row As DataRow In oHelper.dsLeague.Tables("dtLeagueParms").Rows
+                If Not oHelper.sLeagueName = row("Name") Then Continue For
                 lignoreDates.Add(CDate(row("PostSeasonDt")).ToString("yyyyMMdd"))
                 lignoreDates.Add(CDate(row("PostSeasonDt")).AddDays(7).ToString("yyyyMMdd"))
             Next
@@ -47,7 +73,7 @@
             End If
             Dim dvPlayers = New DataView(dvScores.ToTable(True, "Player"))
             dvPlayers.Sort = "Player"
-
+            'make out_gross the scores we use 
             Dim dt As DataTable = dvScores.ToTable(False, "Player,Out_Gross,In_Gross".Split(",").ToArray)
             For Each Score In dt.Rows
                 If Score("Out_Gross") Is DBNull.Value And Score("In_Gross") Is DBNull.Value Then Continue For
@@ -86,9 +112,9 @@
 
             For Each splayer In dvPlayers
                 If cb2018.Checked Then
-                    dvScores.RowFilter = String.Format("Player = '{0}' and Date <= {1} and Date >= {2} and Date not in ('{3}')", splayer(0), cbDates.SelectedItem, "20180101", String.Join("','", lignoreDates))
+                    dvScores.RowFilter = String.Format("Player = '{0}' and Date <= {1} and Date >= {2} and Date not in ('{3}') and Method <> ''", splayer(0), cbDates.SelectedItem, "20180101", String.Join("','", lignoreDates))
                 Else
-                    dvScores.RowFilter = String.Format("Player = '{0}' and Date <= {1} and Date not in ('{2}')", splayer(0), cbDates.SelectedItem, String.Join("','", lignoreDates))
+                    dvScores.RowFilter = String.Format("Player = '{0}' and Date <= {1} and Date not in ('{2}')  and Method <> ''", splayer(0), cbDates.SelectedItem, String.Join("','", lignoreDates))
                 End If
                 If dvScores.Count = 0 Then Continue For
                 Dim newrow As DataRow = dtLast5.NewRow
@@ -131,32 +157,6 @@
             MsgBox("Error " & ex.Message & vbCrLf & ex.StackTrace)
         End Try
 
-    End Sub
-
-    Private Sub dglast5_SortCompare(sender As Object, e As DataGridViewSortCompareEventArgs) Handles dgLast5.SortCompare
-
-        Try
-            oHelper.SortCompare(sender, e)
-        Catch
-            Dim x = ""
-        End Try
-
-    End Sub
-    Private Sub dgLast5_ColumnHeaderMouseClick(sender As Object, e As DataGridViewCellMouseEventArgs) Handles dgLast5.ColumnHeaderMouseClick
-        oHelper.LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
-
-        Dim newColumn As DataGridViewColumn = sender.Columns(e.ColumnIndex)
-        lbStatus.Text = String.Format("Resorting Columns by {0}", newColumn.HeaderText)
-        oHelper.status_Msg(lbStatus, Me)
-
-        lbStatus.Text = String.Format("Finished Resorting Column {0}", newColumn.HeaderText)
-        oHelper.status_Msg(lbStatus, Me)
-    End Sub
-
-    Private Sub cb2018_CheckedChanged(sender As Object, e As EventArgs) Handles cb2018.CheckedChanged
-        If cb2018.Checked Then
-
-        End If
     End Sub
 
     Private Sub LastFive_Resize(sender As Object, e As EventArgs) Handles MyBase.Resize

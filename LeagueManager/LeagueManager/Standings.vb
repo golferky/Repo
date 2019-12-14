@@ -46,11 +46,17 @@ Public Class Standings
         dgStandings.Visible = False
         btnEmail.Visible = False
         dtSchedule = oHelper.dsLeague.Tables("dtSchedule")
-        For Each item In Main.cbDates.Items
-            If item >= CDate(oHelper.rLeagueParmrow("PostSeasonDt")).ToString("yyyyMMdd") Then Continue For
-            cbDates.Items.Add(item)
-        Next
-        If cbDates.Items.Contains(oHelper.dDate.ToString("yyyyMMdd")) Then cbDates.SelectedIndex = cbDates.Items.IndexOf(oHelper.dDate.ToString("yyyyMMdd"))
+        'For Each item In Main.cbDates.Items
+        '    If item >= CDate(oHelper.rLeagueParmrow("PostSeasonDt")).ToString("yyyyMMdd") Then Continue For
+        '    cbDates.Items.Add(item)
+        'Next
+        'If cbDates.Items.Contains(oHelper.dDate.ToString("yyyyMMdd")) Then cbDates.SelectedIndex = cbDates.Items.IndexOf(oHelper.dDate.ToString("yyyyMMdd"))
+        lbStatus.Text = String.Format("Loading Scores")
+        oHelper.status_Msg(lbStatus, Me)
+        cbDates.Items.AddRange(Main.cbDates.Items.Cast(Of String).ToArray)
+        cbDates.SelectedIndex = cbDates.Items.IndexOf(oHelper.dDate.ToString("yyyyMMdd"))
+        lbStatus.Text = String.Format("Finished Loading Scores")
+        oHelper.status_Msg(lbStatus, Me)
 
     End Sub
     Sub doStandings()
@@ -722,9 +728,6 @@ Public Class Standings
                 gbPoints.Visible = False
             End If
         End If
-    End Sub
-    Private Sub btnExit_Click(sender As Object, e As EventArgs) Handles btnExit.Click
-        Me.Close()
     End Sub
 
     Private Sub dgStandings_ColumnDividerDoubleClick(sender As Object, e As DataGridViewColumnDividerDoubleClickEventArgs) Handles dgStandings.ColumnDividerDoubleClick

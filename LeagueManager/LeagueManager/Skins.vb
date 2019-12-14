@@ -412,13 +412,13 @@ Public Class Skins
 
         dgScores.Sort(dgScores.Columns("$Earn"), System.ComponentModel.ListSortDirection.Descending)
         '20190822 - put totals row at the end
-        Dim srow As DataGridViewRow = dgScores.Rows(0)
-        For Each row In dgScores.Rows
-            If row.Cells("Player").Value = oHelper.sTotalColumn Then
-                dgScores.Rows.Remove(row)
-            End If
-        Next
-        dgScores.Rows.Add(srow)
+        'Dim srow As DataGridViewRow = dgScores.Rows(0)
+        'For Each row In dgScores.Rows
+        '    If row.Cells("Player").Value = oHelper.sTotalColumn Then
+        '        dgScores.Rows.Remove(row)
+        '    End If
+        'Next
+        'dgScores.Rows.Add(srow)
         dgScores.Visible = True
         'lbStatus.Text = String.Format("Updating Payments table with earnings")
         'oHelper.status_Msg(lbStatus, Me)

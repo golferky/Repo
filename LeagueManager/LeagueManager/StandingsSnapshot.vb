@@ -93,9 +93,10 @@
                     End If
                 Next
                 .Width += 10
-                .Height += .Rows.Count * .Rows(0).Height
+                .Height += (.Rows.Count * .Rows(0).Height)
                 .Sort(dgTeams.Columns("Points"), System.ComponentModel.ListSortDirection.Descending)
             End With
+
         Catch ex As Exception
             MsgBox("Error " & ex.Message & vbCrLf & ex.StackTrace)
         End Try
@@ -111,11 +112,8 @@
         End Try
 
     End Sub
-    Private Sub BtnExit_Click(sender As Object, e As EventArgs) Handles btnExit.Click
-        dtTeam.Dispose()
-        dvTeam.Dispose()
-        dvscores.Dispose()
-        Me.Close()
+    Private Sub BtnExit_Click(sender As Object, e As EventArgs)
+
     End Sub
 
     Private Sub cbDates_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cbDates.SelectedIndexChanged
@@ -142,7 +140,11 @@
             sToDate = cbDates.SelectedItem
             LoadDGV(dgTeams)
         End If
-
-
+        If Me.Height < dgTeams.Height + 150 Then Me.Height *= 1.1
+        If gb1stHalf.Height <= dgTeams.Height Then
+            gb1stHalf.Height *= 1.1
+            gb2ndHalf.Height *= 1.1
+        End If
     End Sub
+
 End Class

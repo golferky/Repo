@@ -18,6 +18,7 @@ Public Class EmailMessage
                 'End If
             End If
         Next
+        tbToAddresses.Text = tbToAddresses.Text.Trim
 
     End Sub
     Private Sub BtnSend_Click(sender As Object, e As EventArgs) Handles btnSend.Click
@@ -27,7 +28,8 @@ Public Class EmailMessage
 
         'Dim attachs() As String = {"d:\temp_Excell226.xlsx", "d:\temp_Excell224.xlsx", "d:\temp_Excell225.xlsx"}
         'Dim attachs() As String = {semailfile}
-        Dim attachs() As String = {tbAttach.Text}
+        Dim attachs() As String = Nothing
+        If tbAttach.Text <> "" Then attachs = {tbAttach.Text}
         Dim subject As String = tbSubject.Text
         Dim body As String = tbMessage.Text
         Dim bresult = False

@@ -1291,6 +1291,12 @@ Partial Public Class dsLeague
         
         Private columnCellCarrier As Global.System.Data.DataColumn
         
+        Private columnCommPref As Global.System.Data.DataColumn
+        
+        Private columnTextStats As Global.System.Data.DataColumn
+        
+        Private columnEmailStats As Global.System.Data.DataColumn
+        
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")>  _
         Public Sub New()
@@ -1415,6 +1421,30 @@ Partial Public Class dsLeague
         End Property
         
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")>  _
+        Public ReadOnly Property CommPrefColumn() As Global.System.Data.DataColumn
+            Get
+                Return Me.columnCommPref
+            End Get
+        End Property
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")>  _
+        Public ReadOnly Property TextStatsColumn() As Global.System.Data.DataColumn
+            Get
+                Return Me.columnTextStats
+            End Get
+        End Property
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")>  _
+        Public ReadOnly Property EmailStatsColumn() As Global.System.Data.DataColumn
+            Get
+                Return Me.columnEmailStats
+            End Get
+        End Property
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0"),  _
          Global.System.ComponentModel.Browsable(false)>  _
         Public ReadOnly Property Count() As Integer
@@ -1451,9 +1481,9 @@ Partial Public Class dsLeague
         
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")>  _
-        Public Overloads Function AdddtPlayersRow(ByVal Name As String, ByVal Team As Short, ByVal Grade As String, ByVal Paid As String, ByVal Email As String, ByVal Phone As String, ByVal NickName As String, ByVal DateLeft As String, ByVal DateJoined As String, ByVal HomePhone As String, ByVal CellCarrier As String) As dtPlayersRow
+        Public Overloads Function AdddtPlayersRow(ByVal Name As String, ByVal Team As Short, ByVal Grade As String, ByVal Paid As String, ByVal Email As String, ByVal Phone As String, ByVal NickName As String, ByVal DateLeft As String, ByVal DateJoined As String, ByVal HomePhone As String, ByVal CellCarrier As String, ByVal CommPref As String, ByVal TextStats As String, ByVal EmailStats As String) As dtPlayersRow
             Dim rowdtPlayersRow As dtPlayersRow = CType(Me.NewRow,dtPlayersRow)
-            Dim columnValuesArray() As Object = New Object() {Name, Team, Grade, Paid, Email, Phone, NickName, DateLeft, DateJoined, HomePhone, CellCarrier}
+            Dim columnValuesArray() As Object = New Object() {Name, Team, Grade, Paid, Email, Phone, NickName, DateLeft, DateJoined, HomePhone, CellCarrier, CommPref, TextStats, EmailStats}
             rowdtPlayersRow.ItemArray = columnValuesArray
             Me.Rows.Add(rowdtPlayersRow)
             Return rowdtPlayersRow
@@ -1493,6 +1523,9 @@ Partial Public Class dsLeague
             Me.columnDateJoined = MyBase.Columns("DateJoined")
             Me.columnHomePhone = MyBase.Columns("HomePhone")
             Me.columnCellCarrier = MyBase.Columns("CellCarrier")
+            Me.columnCommPref = MyBase.Columns("CommPref")
+            Me.columnTextStats = MyBase.Columns("TextStats")
+            Me.columnEmailStats = MyBase.Columns("EmailStats")
         End Sub
         
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
@@ -1520,6 +1553,12 @@ Partial Public Class dsLeague
             MyBase.Columns.Add(Me.columnHomePhone)
             Me.columnCellCarrier = New Global.System.Data.DataColumn("CellCarrier", GetType(String), Nothing, Global.System.Data.MappingType.Element)
             MyBase.Columns.Add(Me.columnCellCarrier)
+            Me.columnCommPref = New Global.System.Data.DataColumn("CommPref", GetType(String), Nothing, Global.System.Data.MappingType.Element)
+            MyBase.Columns.Add(Me.columnCommPref)
+            Me.columnTextStats = New Global.System.Data.DataColumn("TextStats", GetType(String), Nothing, Global.System.Data.MappingType.Element)
+            MyBase.Columns.Add(Me.columnTextStats)
+            Me.columnEmailStats = New Global.System.Data.DataColumn("EmailStats", GetType(String), Nothing, Global.System.Data.MappingType.Element)
+            MyBase.Columns.Add(Me.columnEmailStats)
             Me.Constraints.Add(New Global.System.Data.UniqueConstraint("Constraint1", New Global.System.Data.DataColumn() {Me.columnName}, true))
             Me.columnName.AllowDBNull = false
             Me.columnName.Unique = true
@@ -4868,6 +4907,51 @@ Partial Public Class dsLeague
         
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")>  _
+        Public Property CommPref() As String
+            Get
+                Try 
+                    Return CType(Me(Me.tabledtPlayers.CommPrefColumn),String)
+                Catch e As Global.System.InvalidCastException
+                    Throw New Global.System.Data.StrongTypingException("The value for column 'CommPref' in table 'dtPlayers' is DBNull.", e)
+                End Try
+            End Get
+            Set
+                Me(Me.tabledtPlayers.CommPrefColumn) = value
+            End Set
+        End Property
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")>  _
+        Public Property TextStats() As String
+            Get
+                Try 
+                    Return CType(Me(Me.tabledtPlayers.TextStatsColumn),String)
+                Catch e As Global.System.InvalidCastException
+                    Throw New Global.System.Data.StrongTypingException("The value for column 'TextStats' in table 'dtPlayers' is DBNull.", e)
+                End Try
+            End Get
+            Set
+                Me(Me.tabledtPlayers.TextStatsColumn) = value
+            End Set
+        End Property
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")>  _
+        Public Property EmailStats() As String
+            Get
+                Try 
+                    Return CType(Me(Me.tabledtPlayers.EmailStatsColumn),String)
+                Catch e As Global.System.InvalidCastException
+                    Throw New Global.System.Data.StrongTypingException("The value for column 'EmailStats' in table 'dtPlayers' is DBNull.", e)
+                End Try
+            End Get
+            Set
+                Me(Me.tabledtPlayers.EmailStatsColumn) = value
+            End Set
+        End Property
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")>  _
         Public Function IsTeamNull() As Boolean
             Return Me.IsNull(Me.tabledtPlayers.TeamColumn)
         End Function
@@ -4984,6 +5068,42 @@ Partial Public Class dsLeague
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")>  _
         Public Sub SetCellCarrierNull()
             Me(Me.tabledtPlayers.CellCarrierColumn) = Global.System.Convert.DBNull
+        End Sub
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")>  _
+        Public Function IsCommPrefNull() As Boolean
+            Return Me.IsNull(Me.tabledtPlayers.CommPrefColumn)
+        End Function
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")>  _
+        Public Sub SetCommPrefNull()
+            Me(Me.tabledtPlayers.CommPrefColumn) = Global.System.Convert.DBNull
+        End Sub
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")>  _
+        Public Function IsTextStatsNull() As Boolean
+            Return Me.IsNull(Me.tabledtPlayers.TextStatsColumn)
+        End Function
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")>  _
+        Public Sub SetTextStatsNull()
+            Me(Me.tabledtPlayers.TextStatsColumn) = Global.System.Convert.DBNull
+        End Sub
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")>  _
+        Public Function IsEmailStatsNull() As Boolean
+            Return Me.IsNull(Me.tabledtPlayers.EmailStatsColumn)
+        End Function
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")>  _
+        Public Sub SetEmailStatsNull()
+            Me(Me.tabledtPlayers.EmailStatsColumn) = Global.System.Convert.DBNull
         End Sub
     End Class
     
