@@ -291,8 +291,6 @@
     <Compile Include="PlayerStats.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="RTFCodes.vb" />
-    <Compile Include="RTF_NET.vb" />
     <Compile Include="ScoreCard.Designer.vb">
       <DependentUpon>ScoreCard.vb</DependentUpon>
     </Compile>

@@ -41,28 +41,20 @@
                     dtschedule.Rows.Remove(row)
                     Continue For
                 End If
-                Dim wkdate As Date = row("Date")
-                Dim reformatted As String = wkdate.ToString("yyyyMMdd", Globalization.CultureInfo.InvariantCulture)
-                row("Date") = reformatted
+                'Dim wkdate As Date = row("Date")
+                'Dim reformatted As String = wkdate.ToString("yyyyMMdd", Globalization.CultureInfo.InvariantCulture)
+                row("Date") = CDate(row("Date")).ToString("yyyyMMdd")
             Next
 
             cbDate.Items.Clear()
             cbDate.Items.Add("All Dates")
             Dim dvsch As New DataView(dtschedule)
             For Each rv As DataRowView In dvsch
-                'check the sch date against the last score date
-                '20190314-only load dates < today plus one more score
-                'Dim x = Main.dtScore.Value.ToString("yyyyMMdd", Globalization.CultureInfo.InvariantCulture)
-                'If rv(0).ToString > Main.dtScore.Value.ToString("yyyyMMdd", Globalization.CultureInfo.InvariantCulture) Then Exit For
                 If rv(0).ToString > oHelper.sDateLastScore Then Exit For
-
                 cbDate.Items.Add(rv(0))
             Next
 
             cbDate.SelectedIndex = 0
-            'cbDate.SelectedIndex = cbDate.Items.IndexOf(oHelper.sDateLastScore)
-            'cbDate.SelectedItem = oHelper.sDateLastScore
-
             cbPlayers.Items.Clear()
             cbPlayers.Items.Add("All Players")
 
@@ -152,7 +144,7 @@
             For Each row As DataRowView In dv
                 If row("PayMethod") Is DBNull.Value Then row("PayMethod") = "Cash"
                 Dim sCol As String = row("Player") & "," & row("Date") & "," & row("Desc")
-                If row("Desc") = "EOY Skins" Then
+                If row("Desc").ToString.Contains("EOY Skins") Then
                     If row("Comment") Is DBNull.Value Then
                         sCol = sCol & "," & row("Detail") & "," & row("Earned") & "," & row("PayMethod") & "," & row("Comment")
                         dgPayments.Rows.Add(sCol.Split(",").ToArray)
@@ -214,11 +206,11 @@
                     End If
                     arow(col) = cell.Value
                 Next
-                arow("Date") = oHelper.dDate.ToString("yyyyMMdd")
-                arow("DatePaid") = Now.ToString("yyyyMMdd")
+                arow("Date") = row.Cells("PayDate").Value 'oHelper.dDate.ToString("yyyyMMdd")
+                arow("DatePaid") = row.Cells("PayDate").Value
                 arow("Detail") = "Payment"
 
-                'dsLeague.dtPayments.Rows.Add(arow)
+                dsLeague.dtPayments.Rows.Add(arow)
 
                 If row.Cells("Comment").Value <> "No Receipt sent" Then
                     Dim sKeys() As Object = {row.Cells("Player").Value}
@@ -245,7 +237,7 @@
                             '    semail = semail & "@vtext.com"
                             'End If
                         End If
-                    ElseIf Row.Cells("EmailText").Value = "Email" Then
+                    ElseIf row.Cells("EmailText").Value = "Email" Then
                         semail = prow("Email").ToString
                     End If
                     If semail <> "" Then
@@ -271,10 +263,10 @@
                 oHelper.status_Msg(lbStatus, Me)
                 oHelper.dgv2csv(dgPayments, sfilename)
                 'oHelper.DataTable2XML("dtScores", "Scores")
-                oHelper.DataTable2CSV(dsLeague.dtPayments, oHelper.sFilePath & "\" & Now.ToString("yyyyMMdd") & "_Payments.csv")
-                lbStatus.Text = "Finished saving payments from this screen"
-                oHelper.status_Msg(lbStatus, Me)
             End If
+            oHelper.DataTable2CSV(dsLeague.dtPayments, oHelper.sFilePath & "\Payments.csv")
+            lbStatus.Text = "Finished saving payments from this screen"
+            oHelper.status_Msg(lbStatus, Me)
         Catch ex As Exception
             MsgBox(oHelper.GetExceptionInfo(ex))
         End Try
@@ -370,6 +362,9 @@
                     dgPayments.CurrentRow.Cells("PayMethod").Value = "Cash"
                 ElseIf dgr.CurrentCell.Value = "EOY Skins" Then
                     dgPayments.CurrentRow.Cells("Amount").Value = "20"
+                    dgPayments.CurrentRow.Cells("PayMethod").Value = "Cash"
+                ElseIf dgr.CurrentCell.Value.ToString.Contains("EOY Skins Wk") Then
+                    dgPayments.CurrentRow.Cells("Amount").Value = "10"
                     dgPayments.CurrentRow.Cells("PayMethod").Value = "Cash"
                 End If
                 'if no change, then exit 

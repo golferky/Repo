@@ -10,7 +10,7 @@
     <Shape ID="DesignTable:dtPlayers" ZOrder="2" X="320" Y="135" Height="296" Width="150" AdapterExpanded="true" DataTableExpanded="true" OldAdapterHeight="0" OldDataTableHeight="0" SplitterPosition="292" />
     <Shape ID="DesignTable:dtLeagueParms" ZOrder="4" X="723" Y="183" Height="619" Width="160" AdapterExpanded="true" DataTableExpanded="true" OldAdapterHeight="0" OldDataTableHeight="0" SplitterPosition="615" />
     <Shape ID="DesignTable:dtPayments" ZOrder="1" X="553" Y="181" Height="201" Width="150" AdapterExpanded="true" DataTableExpanded="true" OldAdapterHeight="0" OldDataTableHeight="0" SplitterPosition="197" />
-    <Shape ID="DesignTable:dtScores" ZOrder="3" X="-29" Y="130" Height="866" Width="155" AdapterExpanded="true" DataTableExpanded="true" OldAdapterHeight="0" OldDataTableHeight="24" SplitterPosition="862" />
+    <Shape ID="DesignTable:dtScores" ZOrder="3" X="-29" Y="130" Height="866" Width="150" AdapterExpanded="true" DataTableExpanded="true" OldAdapterHeight="0" OldDataTableHeight="24" SplitterPosition="862" />
   </Shapes>
   <Connectors />
 </DiagramLayout>

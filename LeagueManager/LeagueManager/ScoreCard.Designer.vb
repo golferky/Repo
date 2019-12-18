@@ -582,6 +582,7 @@ Partial Class frmScoreCard
         Me.dgScores.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
         Me.dgScores.Location = New System.Drawing.Point(12, 198)
         Me.dgScores.Name = "dgScores"
+        Me.dgScores.RowHeadersVisible = False
         Me.dgScores.Size = New System.Drawing.Size(1209, 365)
         Me.dgScores.TabIndex = 0
         '

@@ -90,7 +90,8 @@ Public Class Helper
     'Public Const cSkinsFields As String = "Skins-cPat40,Closest-cPat60,$Earn-cPat40nt,$Skins-cPat40nt,$Closest-cPat40nt,#Skins-cPat40nt,#Closests-cPat60"
     Public Const cSkinsFields As String = "Skins-cPat40nt,Closest-cPat60nt,$Earn-cPat40nt,$Skins-cPat40nt,$Closest-cPat40nt,#Skins-cPat40nt,#Closests-cPat40nt"
     Public Const cStatsFields As String = "Eagles-cPat40nt,Birdies-cPat60nt,Pars-cPat40nt,Bogeys-cPat40nt,DoubleBogeys-cPat40nt,Others-cPat40nt"
-
+    Friend myprocessarray As New ArrayList
+    Private myProcess As Process
     Public Property IHdcp As Integer
         Get
             Return _iHdcp
@@ -349,14 +350,12 @@ Public Class Helper
             myStream.Close()
             CSV2DataTable = True
         Catch ex As Exception
-            'sFileInUseMessage = ex.Message
-
-            'If ex.Message.Contains("being used by another process") Then
+            If ex.Message.Contains("being used by another process") Then sFileInUseMessage = ex.Message
             '    MsgBox(String.Format("file {0} in use, try later", strFileName))
             'Else
-            '    MsgBox("Error " & ex.Message & vbCrLf & ex.StackTrace)
+            '    MsgBox(String.Format("Error {0} row {1}", strFileName, dlinecnt) & vbCrLf & ex.Message & vbCrLf & ex.StackTrace)
             'End If
-
+            Debug.Print("")
         Finally
 
         End Try
@@ -460,121 +459,81 @@ ByVal sepChar As String)
         '1-calculate handicap = (scores - par) / rounds * .8 using array in step 2)
         '2-Update handicap in dvscores for the round were processing
         '
-        '20180923-allow for combined club championship and league play dont adjust handicaps for club champ or league play
-        If bCCLeague Then
-            GetNewHdcp = row.Cells("pHdcp").Value
-            Exit Function
-        End If
-        GetNewHdcp = ""
         Dim iLast5Scores As New List(Of Decimal)
-        Dim iRoundctr = 0
         Dim iPHdcp = 0
+        Dim sMethod As String = ""
+        Dim sScore = ""
+
+        '20191216-check for incomplete scores so we can populate toolstrip only
+        Dim bincompletescore As Boolean = False
+        If CDate(sDate).ToString("yyyyMMdd") < CDate(rLeagueParmrow("PostseasonDt")).ToString("yyyyMMdd") Then
+            For Each hole As DataGridViewCell In row.Cells
+                If hole.OwningColumn.Name.StartsWith("Hole") Then
+                    'If hole.OwningColumn.Name.Length > 5 And hole.OwningColumn.Name.Replace("Hole", "").StartsWith("1") Then
+                    '    iHoleMarker = 10
+                    'Else
+                    '    iHoleMarker = 1
+                    'End If
+                    If hole.Value Is DBNull.Value Then
+                        bincompletescore = True
+                    ElseIf hole.Value = "" Then
+                        bincompletescore = True
+                    End If
+                ElseIf hole.OwningColumn.Name.Contains("Gross") Then
+                    sScore = hole.Value
+                End If
+            Next
+        Else
+            bincompletescore = True
+        End If
+
+        GetNewHdcp = ""
+        If Not bincompletescore Then
+            iLast5Scores.Add(sScore)
+            '20180923-allow for combined club championship and league play dont adjust handicaps for club champ or league play
+            If bCCLeague Then
+                GetNewHdcp = row.Cells("pHdcp").Value
+                Exit Function
+            End If
+        End If
         Try
-            Dim dvScores As New DataView(dsLeague.Tables("dtScores"))
             'dates past the regular season dont get included in handicap calculations
             Dim lignoreDates = New List(Of String)
             For Each lparm As DataRow In dsLeague.Tables("dtLeagueParms").Rows
                 lignoreDates.Add(CDate(lparm("PostSeasonDt")).ToString("yyyyMMdd"))
                 lignoreDates.Add(CDate(lparm("PostSeasonDt")).AddDays(7).ToString("yyyyMMdd"))
             Next
-            dvScores.RowFilter = String.Format("Player = '{0}' and Date < '{1}' and Method <> '' and date not in ('{2}')", row.Cells("Player").Value, sDate, String.Join("','", lignoreDates))
+
+            Dim dvScores As New DataView(dsLeague.Tables("dtScores"))
+            dvScores.RowFilter = String.Format("Player = '{0}' and Date < '{1}' and Method <> '' and date not in ('{2}')", row.Cells("Player").Value, CDate(sDate).ToString("yyyyMMdd"), String.Join("','", lignoreDates))
             dvScores.Sort = "Date desc"
+
             'this compensates for lost scores after week 1 in 2017, i have hardcoded the prev handicap on 4/11 so we dont have to go back
             'If sDate > "20170411" Then
             'dvScores.RowFilter = dvScores.RowFilter & " and Date >= '20170411'"
             'End If
             'build a total of 5 max scores in our array
-            iRoundctr = 0
-            Dim sMethod As String = ""
+            Dim iScore As Integer = 0
             For Each score As DataRowView In dvScores
                 sMethod = convDBNulltoSpaces(score("Method"))
                 If sMethod = "" Then Continue For
-                iRoundctr += 1
                 sPlayer = score("Player").ToString
                 iPHdcp = score("PHdcp").ToString
-                'Dim sScoreDate As String = score("Date")
-                'CalcHoleMarker(sScoreDate)
-                '20181004 - override calcholemarker because of cc and league in same sch
-                If sMethod = "Gross" Or sMethod = "Net" Then
-                    If score("Hole1") IsNot DBNull.Value Then
-                        iHoleMarker = 1
-                    Else
-                        iHoleMarker = 10
-                    End If
+                iScore = 0
+                If sMethod = "Net" Then iScore = iPHdcp
+                If iHoles = 9 Then
+                    iScore += If(score("Out_Gross") Is DBNull.Value, score("In_Gross"), score("Out_Gross"))
+                Else
+                    iScore += score("18_Gross")
                 End If
-                If sMethod = "Net" Then
-                    If iHoles = 9 Then
-                        If iHoleMarker = 10 Then
-                            iLast5Scores.Add(score("In_Net").ToString + iPHdcp)
-                        Else
-                            iLast5Scores.Add(score("Out_Net").ToString + iPHdcp)
-                        End If
-                    Else
-                        iLast5Scores.Add(score("18_Net").ToString + iPHdcp)
-                    End If
-                ElseIf sMethod = "Gross" Then
-                    If iHoles = 9 Then
-                        If iHoleMarker = 10 Then
-                            iLast5Scores.Add(score("In_Gross").ToString)
-                        Else
-                            iLast5Scores.Add(score("Out_Gross").ToString)
-                        End If
-                    Else
-                        iLast5Scores.Add(score("18_Gross").ToString)
-                    End If
-                    'score always uses 9 holes and front 9 gross
-                ElseIf sMethod = "Score" Then
-                    If iHoles = 9 Then
-                        If iHoleMarker = 1 Then
-                            iLast5Scores.Add(score("Out_Gross").ToString)
-                        Else
-                            iLast5Scores.Add(score("In_Gross").ToString)
-                        End If
-                    Else
-                        iLast5Scores.Add(score("18_Gross").ToString)
-                    End If
-
-                End If
-
-                If iRoundctr = 4 Then Exit For
+                iLast5Scores.Add(iScore)
+                If iLast5Scores.Count = 5 Then Exit For
                 'dont recalculate handicap for 4/11, scorebook was lost
                 'If sScoreDate = "20170411" Then
                 '    iPHdcp = GetHdcp(iLast5Scores, iRoundctr, score("Date").ToString)
                 'End If
             Next
-            'calc using screen score
 
-            Dim sScore = ""
-            'CalcHoleMarker(sDate)
-            sMethod = row.Cells("Method").Value
-            '20181004 - override calcholemarker because of cc and league in same sch
-            If sMethod = "Gross" Or sMethod = "Net" Then
-                For Each col As DataGridViewCell In row.Cells
-                    If col.OwningColumn.Name = "Hole1" Then
-                        iHoleMarker = 1
-                        Exit For
-                    ElseIf col.OwningColumn.Name = "Hole10" Then
-                        iHoleMarker = 10
-                        Exit For
-                    End If
-                Next
-
-            End If
-
-            If iHoleMarker = 1 Then
-                sScore = row.Cells("Out_Gross").Value.ToString()
-            Else
-                sScore = row.Cells("In_Gross").Value.ToString()
-            End If
-            sPlayer = row.Cells("Player").Value.ToString
-            'if the players score is blank, use the latest handicap
-            If sScore <> "" Then
-                iLast5Scores.Add(sScore)
-                iRoundctr += 1
-                IHdcp = GetHdcp(iLast5Scores, iRoundctr, sDate)
-            Else
-                IHdcp = iPHdcp
-            End If
             row.Cells("Hdcp").ToolTipText = ""
             For Each score In iLast5Scores
                 row.Cells("Hdcp").ToolTipText = row.Cells("Hdcp").ToolTipText & score & "-"
@@ -587,101 +546,101 @@ ByVal sepChar As String)
             MsgBox("Error " & ex.Message & vbCrLf & ex.StackTrace)
         End Try
     End Function
-    Function GetHdcp(ByRef ilast5Scores As List(Of Decimal), iRoundctr As String, sDate As String) As String
-        GetHdcp = ""
-        Try
-            Dim iPlayerHdcp = 0
-            Dim iPhdcp = 0
-            Dim ilowscore = 999
-            Dim ihiscore = 0
-            Dim iApr11Hdcp = 99
-            If iRoundctr > 5 Then
-                ilast5Scores = ilast5Scores.Take(0).Concat(ilast5Scores.Skip(1)).ToList
-                ihiscore = 0
-                ilowscore = 999
-            End If
-            'calculate hi and low for drop
-            For Each iscore As String In ilast5Scores
-                'is this the low score?
-                If iscore < ilowscore Then
-                    ilowscore = iscore
-                End If
-                If iscore > ihiscore Then
-                    ihiscore = iscore
-                End If
-            Next
+    'Function GetHdcp(ByRef ilast5Scores As List(Of Decimal), iRoundctr As String, sDate As String) As String
+    '    GetHdcp = ""
+    '    Try
+    '        Dim iPlayerHdcp = 0
+    '        Dim iPhdcp = 0
+    '        Dim ilowscore = 999
+    '        Dim ihiscore = 0
+    '        Dim iApr11Hdcp = 99
+    '        If iRoundctr > 5 Then
+    '            ilast5Scores = ilast5Scores.Take(0).Concat(ilast5Scores.Skip(1)).ToList
+    '            ihiscore = 0
+    '            ilowscore = 999
+    '        End If
+    '        'calculate hi and low for drop
+    '        For Each iscore As String In ilast5Scores
+    '            'is this the low score?
+    '            If iscore < ilowscore Then
+    '                ilowscore = iscore
+    '            End If
+    '            If iscore > ihiscore Then
+    '                ihiscore = iscore
+    '            End If
+    '        Next
 
-            Dim itotScores = 0
-            Dim blowdropped = False
-            Dim bhidropped = False
-            Dim iPar As Integer = 0
-            Dim iKeptScores As New List(Of Decimal)
-            'drop the high and low scores
-            For Each iscore As Integer In ilast5Scores
-                If ilast5Scores.Count = 5 Then
-                    If ilowscore <> 999 Then
-                        If iscore = ilowscore Then
-                            If Not blowdropped Then
-                                blowdropped = True
-                                Continue For
-                            End If
-                        End If
-                    End If
-                End If
-                If ilast5Scores.Count >= 4 Then
-                    If ihiscore > 0 Then
-                        If iscore = ihiscore Then
-                            If Not bhidropped Then
-                                bhidropped = True
-                                Continue For
-                            End If
-                        End If
-                    End If
-                End If
-                iKeptScores.Add(iscore)
-            Next
+    '        Dim itotScores = 0
+    '        Dim blowdropped = False
+    '        Dim bhidropped = False
+    '        Dim iPar As Integer = 0
+    '        Dim iKeptScores As New List(Of Decimal)
+    '        'drop the high and low scores
+    '        For Each iscore As Integer In ilast5Scores
+    '            If ilast5Scores.Count = 5 Then
+    '                If ilowscore <> 999 Then
+    '                    If iscore = ilowscore Then
+    '                        If Not blowdropped Then
+    '                            blowdropped = True
+    '                            Continue For
+    '                        End If
+    '                    End If
+    '                End If
+    '            End If
+    '            If ilast5Scores.Count >= 4 Then
+    '                If ihiscore > 0 Then
+    '                    If iscore = ihiscore Then
+    '                        If Not bhidropped Then
+    '                            bhidropped = True
+    '                            Continue For
+    '                        End If
+    '                    End If
+    '                End If
+    '            End If
+    '            iKeptScores.Add(iscore)
+    '        Next
 
-            'loop through to get the 3 most recent scores
-            Dim ictr As Integer = 0
-            Dim sbScoresKept As New StringBuilder
-            For Each iscore As Integer In iKeptScores
-                sbScoresKept.Append(iscore & "-")
-                itotScores += iscore
-                ictr += 1
-                'calc course par
-                Dim MyCourse() As Data.DataRow
-                Dim scourse = rLeagueParmrow("Course")
-                'iHoles = rLeagueParmrow("Holes")
-                MyCourse = dsLeague.Tables("dtCourses").Select("Name = '" & scourse & "'")
-                Dim iCoursePar = 0
-                'accumulate par for each score
-                For i As Integer = 1 To iHoles
-                    iCoursePar += MyCourse(0)("Hole" & i).ToString
-                Next
-                iPar += iCoursePar
-            Next
+    '        'loop through to get the 3 most recent scores
+    '        Dim ictr As Integer = 0
+    '        Dim sbScoresKept As New StringBuilder
+    '        For Each iscore As Integer In iKeptScores
+    '            sbScoresKept.Append(iscore & "-")
+    '            itotScores += iscore
+    '            ictr += 1
+    '            'calc course par
+    '            Dim MyCourse() As Data.DataRow
+    '            Dim scourse = rLeagueParmrow("Course")
+    '            'iHoles = rLeagueParmrow("Holes")
+    '            MyCourse = dsLeague.Tables("dtCourses").Select("Name = '" & scourse & "'")
+    '            Dim iCoursePar = 0
+    '            'accumulate par for each score
+    '            For i As Integer = 1 To iHoles
+    '                iCoursePar += MyCourse(0)("Hole" & i).ToString
+    '            Next
+    '            iPar += iCoursePar
+    '        Next
 
-            'this compensates for lost scores of week 1 in 2017
-            If ictr = 1 And iApr11Hdcp <> 99 Then
-                iPlayerHdcp = iApr11Hdcp
-                iPhdcp = iPlayerHdcp
-            Else
-                iPlayerHdcp = Math.Round((itotScores - iPar) / ictr * 0.8)
-            End If
-            'If ictr = 3 Or iRoundctr = ictr Then
-            '    'Dim myRow() As Data.DataRow
-            '    'myRow = dtScores.Select("Player = '" & sPlayer & "' and Date = '" & sDate & "'")
-            '    'myRow(0)("PHdcp") = iPhdcp
-            '    'myRow(0)("Hdcp") = iPlayerHdcp
-            'End If
+    '        'this compensates for lost scores of week 1 in 2017
+    '        If ictr = 1 And iApr11Hdcp <> 99 Then
+    '            iPlayerHdcp = iApr11Hdcp
+    '            iPhdcp = iPlayerHdcp
+    '        Else
+    '            iPlayerHdcp = Math.Round((itotScores - iPar) / ictr * 0.8)
+    '        End If
+    '        'If ictr = 3 Or iRoundctr = ictr Then
+    '        '    'Dim myRow() As Data.DataRow
+    '        '    'myRow = dtScores.Select("Player = '" & sPlayer & "' and Date = '" & sDate & "'")
+    '        '    'myRow(0)("PHdcp") = iPhdcp
+    '        '    'myRow(0)("Hdcp") = iPlayerHdcp
+    '        'End If
 
-            LOGIT("Date - " & sDate & " Player - " & sPlayer.PadRight(25) & " Prv Handicap " & iPhdcp.ToString.PadRight(2) & " Handicap " & iPlayerHdcp.ToString.PadRight(2) & " All Scores - (" & String.Join("-", ilast5Scores) & ") Scores Kept (" & String.Join("-", sbScoresKept.ToString) & ") High Score - " & ihiscore & " Low Score - " & ilowscore)
+    '        LOGIT("Date - " & sDate & " Player - " & sPlayer.PadRight(25) & " Prv Handicap " & iPhdcp.ToString.PadRight(2) & " Handicap " & iPlayerHdcp.ToString.PadRight(2) & " All Scores - (" & String.Join("-", ilast5Scores) & ") Scores Kept (" & String.Join("-", sbScoresKept.ToString) & ") High Score - " & ihiscore & " Low Score - " & ilowscore)
 
-            Return iPlayerHdcp
-        Catch ex As Exception
-            MsgBox("Error " & ex.Message & vbCrLf & ex.StackTrace)
-        End Try
-    End Function
+    '        Return iPlayerHdcp
+    '    Catch ex As Exception
+    '        MsgBox("Error " & ex.Message & vbCrLf & ex.StackTrace)
+    '    End Try
+    'End Function
     Public Sub LOGIT(ByVal sMess As String)
         Try
 
@@ -2105,10 +2064,12 @@ ByVal sepChar As String)
         LOGIT(lbStatus.Text)
         If lbStatus.Text.Contains("Finished") Then
             lbStatus.BackColor = Color.LightGreen
-            frm.Cursor = Cursors.Default
+            'frm.Cursor = Cursors.Default
+            Application.UseWaitCursor = False
         Else
             lbStatus.BackColor = Color.Red
-            frm.Cursor = Cursors.WaitCursor
+            'frm.Cursor = Cursors.WaitCursor
+            Application.UseWaitCursor = True
         End If
         Application.DoEvents()
     End Sub
@@ -2208,40 +2169,93 @@ ByVal sepChar As String)
         WaitForFile = False
         If CSV2DataTable(dt, sFile) Then
             WaitForFile = True
-            If sFile.Contains("LeagueParm") Then
-                If dDate.ToString("MM/dd/yyyy") < "20190101" Then
-                    If Not dt.Columns.Contains("PostSeasonDt") Then
-                        dt.Columns("PostSeason").ColumnName = "PostSeasonDt"
-                        For Each col In dt.Rows
-                            col("PostSeasonDt") = "09/18/2018"
-                        Next
-                    End If
-                End If
-            End If
+            'If sFile.Contains("LeagueParm") Then
+            '    If dDate.ToString("MM/dd/yyyy") < "20190101" Then
+            '        If Not dt.Columns.Contains("PostSeasonDt") Then
+            '            dt.Columns("PostSeason").ColumnName = "PostSeasonDt"
+            '            For Each col In dt.Rows
+            '                col("PostSeasonDt") = "09/18/2018"
+            '            Next
+            '        End If
+            '    End If
+            'End If
         Else
-            Dim i = 30
-            'MsgBox(String.Format("File {0} is in use, will wait up for {1} seconds to free up", sFile, i))
-            sMessage = String.Format("File {0} is in use, will wait up for {1} seconds to free up", sFile, i)
-            frm_Popup.Text = "File in Use"
-            'CreateObject("WScript.Shell").Popup(sMsg, 5, "File in Use")
-            frm_Popup.ShowDialog()
+            Dim processes As Process() = Process.GetProcesses
+            Dim i As Integer
+            For i = 0 To processes.GetUpperBound(0) - 1
+                myProcess = processes(i)
+                'if module contains an asterisk in notepadm, its been updated
+                Debug.Print(myProcess.ProcessName & "-" & myProcess.Id & "-" & myProcess.MainWindowTitle)
+                'Dim yxyxy = sFile.Substring(sFile.LastIndexOf("\") + 1)
+                If myProcess.MainWindowTitle.Contains(sFile.Substring(sFile.LastIndexOf("\") + 1)) Then
+                    Debug.Print(String.Format(myProcess.MainWindowTitle))
+                    For ii = 0 To 6
+                        If CSV2DataTable(dt, sFile) Then
+                            WaitForFile = True
+                            Exit Function
+                        End If
 
-            Do Until i = 0
-                If CSV2DataTable(dt, sFile) Then
-                    WaitForFile = True
-                    Exit Function
+                        lbstatus.Text = String.Format("Waiting for {1} seconds for file {0}", sFile, ii)
+                        status_Msg(lbstatus, frm)
+                        Threading.Thread.Sleep(1000)
+                        'MsgBox(String.Format("File {0} is in use, will wait up for {1} seconds to free up", sFile, i))
+                        If ii = 0 Then
+                            sMessage = String.Format("File {0} is in use, will wait up for {1} seconds to free up", sFile, 30)
+                        Else
+                            sMessage = String.Format("File {0} is in use, will wait up for {1} more seconds to free up", sFile, 30 - (ii * 5))
+                        End If
+                        frm_Popup.Text = "File in Use"
+                        'CreateObject("WScript.Shell").Popup(sMsg, 5, "File in Use")
+                        If ii < 6 Then frm_Popup.ShowDialog()
+                    Next ii
+                    Dim mbr = MessageBox.Show(String.Format("File {1} In use by {2}{0}Do you want to keep waiting while you close? Press <Yes> Or to Cancel this session, Press <No>", vbCrLf, sFile & ".csv", myProcess.MainWindowTitle.Split("-")(1)), "File In Use", MessageBoxButtons.YesNo)
+                    If mbr = DialogResult.No Then
+                        End
+                    End If
+                Else
+                    Continue For
                 End If
+            Next i
 
-                lbstatus.Text = String.Format("Waiting for {1} seconds for file {0}", sFile, i)
-                status_Msg(lbstatus, frm)
-                Threading.Thread.Sleep(1000)
-                i -= 1
-            Loop
             lbstatus.Text = String.Format("Finished Waiting for file {0}", sFile)
             status_Msg(lbstatus, frm)
             Exit Function
         End If
     End Function
+
+    Private Function getFileProcesses(ByVal strFile As String) As ArrayList
+        myprocessarray.Clear()
+        Dim processes As Process() = Process.GetProcesses
+        Dim i As Integer
+        For i = 0 To processes.GetUpperBound(0) - 1
+            myProcess = processes(i)
+            'Debug.Print("")
+            If myProcess.MainWindowTitle.Contains(strFile) Then
+                Debug.Print(String.Format(myProcess.MainWindowTitle))
+            Else
+                Continue For
+            End If
+            Try
+                Dim modules As ProcessModuleCollection = myProcess.Modules
+                Dim j As Integer
+                For j = 0 To modules.Count - 1
+
+                    If (modules.Item(j).FileName.ToLower.CompareTo(strFile.ToLower) = 0) Then
+                        myprocessarray.Add(myProcess)
+                        Exit For
+                    End If
+                Next j
+            Catch exception As Exception
+                'MsgBox(("Error : " & exception.Message))
+            End Try
+            If Not myProcess.HasExited Then
+
+            End If
+        Next i
+
+        Return myprocessarray
+    End Function
+
     Function getLeagParm(sScoreDate As String, lbstatus As Label, frm As Form) As String 'parmfile,good(got the league file) or roskins:rocp1:rocp2
         LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
         getLeagParm = ""
@@ -2536,7 +2550,20 @@ ByVal sepChar As String)
         End Try
 
     End Sub
-
+    Public Sub Resizedgv(dgv As DataGridView, frm As Form)
+        Dim iw As Integer = 0, ih As Integer = 0
+        For Each col As DataGridViewColumn In dgv.Columns
+            iw += col.Width
+        Next
+        For Each row As DataGridViewRow In dgv.Rows
+            ih += row.Height
+        Next
+        ' oHelper.LOGIT(String.Format("dgv {0}x{1}", iw, ih))
+        dgv.Width = iw * 1.1
+        dgv.Height = (ih + dgv.ColumnHeadersHeight) * 1.1
+        'If frm.Width > dgv.Width Then frm.Width = dgv.Width * 1.1
+        'If frm.Height > dgv.Height Then frm.Height = dgv.Height * 1.1
+    End Sub
 #Region "DGV to HTML"
     Public Function ConvertDataGridViewToHTMLWithFormatting(ByVal dgv As DataGridView, ByVal wf As Form) As String
         'LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)

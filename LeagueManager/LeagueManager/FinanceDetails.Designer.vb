@@ -34,6 +34,7 @@ Partial Class FinanceDetails
         Me.dgFinance.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
         Me.dgFinance.Location = New System.Drawing.Point(63, 60)
         Me.dgFinance.Name = "dgFinance"
+        Me.dgFinance.RowHeadersVisible = False
         Me.dgFinance.Size = New System.Drawing.Size(957, 708)
         Me.dgFinance.TabIndex = 0
         '

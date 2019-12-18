@@ -18,7 +18,12 @@ Public Class Matches
         Do While cbDates.Items(0) >= oHelper.CDateToyyyyMMdd(oHelper.rLeagueParmrow("PostSeasonDt")) ' CDate(oHelper.rLeagueParmrow("PostSeasonDt")).ToString("yyyyMMdd")
             cbDates.Items.Remove(cbDates.Items(0))
         Loop
-        cbDates.SelectedItem = Main.cbDates.SelectedItem
+        'select the date from the main screen unless it was not a match date
+        If cbDates.Items.Contains(Main.cbDates.SelectedItem) Then
+            cbDates.SelectedItem = Main.cbDates.SelectedItem
+        Else
+            cbDates.SelectedItem = cbDates.Items(0)
+        End If
         Dim sWH As String = oHelper.ScreenResize()
         If Me.Width >= sWH.Split(":")(0) Then
             Me.Width = sWH.Split(":")(0) - (sWH.Split(":")(0) * 0.1)

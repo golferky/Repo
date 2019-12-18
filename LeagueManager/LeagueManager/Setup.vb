@@ -20,7 +20,7 @@
 
     Private Sub PlayerSetup_Click(sender As System.Object, e As System.EventArgs) Handles btnPlayerSetup.Click
         'frmPlayer.Show()
-        NewPlayer.Show()
+        Player.Show()
         'reload player table after updating
     End Sub
 

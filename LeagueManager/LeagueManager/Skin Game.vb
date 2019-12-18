@@ -27,8 +27,6 @@ Public Class frmSkins
     Dim lv1 As New ListView
     'this accounts for the extra B player if needed
     Dim iextra As Integer
-    Dim cRTFGame As RTF_NET
-    Dim sRTFTemplate As String, srRTFTemplate As StreamReader
 
     Public Sub Resize_cb()
         Dim s_Src As SizeF

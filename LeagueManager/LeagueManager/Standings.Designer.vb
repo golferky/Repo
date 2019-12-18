@@ -62,6 +62,7 @@ Partial Class Standings
         Me.dgStandings.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
         Me.dgStandings.Location = New System.Drawing.Point(32, 126)
         Me.dgStandings.Name = "dgStandings"
+        Me.dgStandings.RowHeadersVisible = False
         Me.dgStandings.Size = New System.Drawing.Size(1031, 536)
         Me.dgStandings.TabIndex = 70
         '

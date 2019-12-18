@@ -59,7 +59,8 @@ Partial Class Matches
         Me.dgScores.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
         Me.dgScores.Location = New System.Drawing.Point(48, 157)
         Me.dgScores.Name = "dgScores"
-        Me.dgScores.Size = New System.Drawing.Size(659, 747)
+        Me.dgScores.RowHeadersVisible = False
+        Me.dgScores.Size = New System.Drawing.Size(659, 540)
         Me.dgScores.TabIndex = 70
         Me.dgScores.Visible = False
         '
@@ -98,7 +99,7 @@ Partial Class Matches
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(756, 958)
+        Me.ClientSize = New System.Drawing.Size(756, 744)
         Me.Controls.Add(Me.btnSave)
         Me.Controls.Add(Me.lbStatus)
         Me.Controls.Add(Me.btnExit)

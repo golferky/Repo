@@ -366,9 +366,10 @@ Partial Class Skins
             Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.dgScores.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
-        Me.dgScores.Location = New System.Drawing.Point(-5, 166)
+        Me.dgScores.Location = New System.Drawing.Point(18, 151)
         Me.dgScores.Name = "dgScores"
-        Me.dgScores.Size = New System.Drawing.Size(1417, 837)
+        Me.dgScores.RowHeadersVisible = False
+        Me.dgScores.Size = New System.Drawing.Size(1206, 570)
         Me.dgScores.TabIndex = 0
         '
         'Skins

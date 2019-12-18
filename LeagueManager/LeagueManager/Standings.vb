@@ -46,15 +46,22 @@ Public Class Standings
         dgStandings.Visible = False
         btnEmail.Visible = False
         dtSchedule = oHelper.dsLeague.Tables("dtSchedule")
-        'For Each item In Main.cbDates.Items
-        '    If item >= CDate(oHelper.rLeagueParmrow("PostSeasonDt")).ToString("yyyyMMdd") Then Continue For
-        '    cbDates.Items.Add(item)
-        'Next
         'If cbDates.Items.Contains(oHelper.dDate.ToString("yyyyMMdd")) Then cbDates.SelectedIndex = cbDates.Items.IndexOf(oHelper.dDate.ToString("yyyyMMdd"))
         lbStatus.Text = String.Format("Loading Scores")
         oHelper.status_Msg(lbStatus, Me)
         cbDates.Items.AddRange(Main.cbDates.Items.Cast(Of String).ToArray)
-        cbDates.SelectedIndex = cbDates.Items.IndexOf(oHelper.dDate.ToString("yyyyMMdd"))
+        'remove non-match dates from dates combobox
+        'cdateToyyyyMMdd converts a string from 1/1/1900 to 19000101
+        Do While cbDates.Items(0) >= oHelper.CDateToyyyyMMdd(oHelper.rLeagueParmrow("PostSeasonDt")) ' CDate(oHelper.rLeagueParmrow("PostSeasonDt")).ToString("yyyyMMdd")
+            cbDates.Items.Remove(cbDates.Items(0))
+        Loop
+        'select the date from the main screen unless it was not a match date
+        If cbDates.Items.Contains(Main.cbDates.SelectedItem) Then
+            cbDates.SelectedItem = Main.cbDates.SelectedItem
+        Else
+            cbDates.SelectedItem = cbDates.Items(0)
+        End If
+
         lbStatus.Text = String.Format("Finished Loading Scores")
         oHelper.status_Msg(lbStatus, Me)
 
@@ -81,8 +88,6 @@ Public Class Standings
             Next
             sStdDGV = sStdDGV.Substring(0, Len(sStdDGV) - 1).Replace(" ", "_")
             'build this table for points collection
-            'Dim dtPoints As DataTable = dvStandingsDGV.ToTable(True, sStdDGV.Split(",").ToArray)
-            'end 20170720 future
             'points table is for team points only
             Dim dtPoints As Data.DataTable = dtStandings.Clone
             dtPoints.TableName = "dtPoints"
@@ -137,11 +142,6 @@ Public Class Standings
                 Dim columnName As String = dtStandings.Columns(index).ColumnName
                 'oHelper.LOGIT(String.Format("processing index {0}, name {1}", index, columnName))
                 If Not cb1stHalf.Checked Then
-                    'If columnName.Contains("1st Half") Then
-                    '    dtStandings.Columns.RemoveAt(index)
-                    '    Continue For
-                    'End If
-                    ' CDate(sHalfwayDate).ToString("yyyyMMdd")
                     If columnName.Contains("/") Then
                         If CDate(columnName).ToString("yyyyMMdd") < CDate(sHalfwayDate).ToString("yyyyMMdd") Then
                             'oHelper.LOGIT(String.Format("not 1st half, removing index {0}, name {1}", index, columnName))
@@ -151,10 +151,6 @@ Public Class Standings
                     End If
                 End If
                 If Not cb2ndHalf.Checked Then
-                    'If columnName.Contains("2nd Half") Then
-                    '    dtStandings.Columns.RemoveAt(index)
-                    '    Continue For
-                    'End If
                     If columnName.Contains("/") Then
                         If CDate(columnName).ToString("yyyyMMdd") >= CDate(sHalfwayDate).ToString("yyyyMMdd") Then
                             'oHelper.LOGIT(String.Format("not 2nd half, removing index {0}, name {1}", index, columnName))
@@ -184,11 +180,6 @@ Public Class Standings
             Try
                 Dim sPrvTeam As String = "", bAplayer As Boolean = False, bBplayer As Boolean = False
                 For Each row As DataRowView In dvStandings
-                    'If row.Item("Team") <> sPrvTeam Then
-                    '    sPrvTeam = row.Item("Team")
-                    '    bAplayer = False
-                    '    bBplayer = False
-                    'End If
                     'loop through and delete subs if its not checked
                     If Not cbSubs.Checked Then
                         oHelper.dsLeague.Tables("dtPlayers").PrimaryKey = New DataColumn() {oHelper.dsLeague.Tables("dtPlayers").Columns("Name")}
@@ -229,9 +220,6 @@ Public Class Standings
                     col.ReadOnly = True                 'make all columns read only
                     If col.Name.Contains("/") Then      'is this a date column
                         .Columns(col.Name).Width = 50   'yep, make width 40
-                        'If cbHdcp.Checked Then .Columns(col.Name).Width += 10   'if hdcp, adjust by 10
-                        'If cbScore.Checked Then .Columns(col.Name).Width += 10  'if score, adjust by 10
-                        '.Columns(col.Name).HeaderText = col.Name.Substring(0, col.Name.LastIndexOf("/")) 'just use mm/dd
                     ElseIf col.Name.Contains("Half") Or col.Name.Contains("Total") Or col.Name = "Rnds" Or col.Name = "Team Points" Or col.Name = "WKY Points" Then
                         .Columns(col.Name).Width = 40
                     End If
@@ -500,22 +488,6 @@ Public Class Standings
         Try
             sEndDate = oHelper.rLeagueParmrow("EndDate")
 
-            '20180527-post season makes season 2 weeks earlier
-            '20180930-dont adjust postseason Date
-            'If oHelper.rLeagueParmrow("PostSeason").ToString.ToUpper = "Y" Then sEndDate = sEndDate.AddDays(-14)
-
-            '2019-11-23 - build using schedule from file in folder
-            'copy the schedule table 
-            'Dim dtStandings As Data.DataTable oHelper.dsLeague.Tables("dtSchedule").Clone()
-            'dtStandings.TableName = "dtStandings"
-            ''only build the schedule up thru the end date, this eliminates post season tournament from schedule
-            'For index As Integer = dtStandings.Columns.Count - 1 To 0 Step -1
-            '    Dim columnName As String = dtStandings.Columns(index).ColumnName
-            '    If columnName > sEndDate Or dtSchedule.Rows(0)(columnName) Is DBNull.Value Then
-            '        dtStandings.Columns.RemoveAt(index)
-            '    End If
-            'Next
-
             '2019-11-23 - built using schedule rebuilt for a row for each date
             Dim dtStandings As New DataTable
             dtStandings.TableName = "dtStandings"
@@ -527,25 +499,15 @@ Public Class Standings
             Next
 
             iNumWeeksSplit = dtStandings.Columns.Count / 2
-            '20180527-post season makes season 2 weeks earlier
-            'If oHelper.rLeagueParmrow("PostSeason").ToString.ToUpper = "Y" Then iNumWeeksSplit -= 1
 
             sHalfwayDate = dtStandings.Columns.Item(iNumWeeksSplit).ToString
-            '20190605 - hardcode first half date
-            'sHalfwayDate = "6/11/2019"
             With dtStandings
                 .Columns.Add("Rnds", GetType(Integer)).SetOrdinal(0)
                 .Columns.Add("Grade", GetType(String)).SetOrdinal(0)
                 .Columns.Add("Team", GetType(Integer)).SetOrdinal(0)
                 .Columns.Add("Player", GetType(String)).SetOrdinal(0)
-
-                '20190605 - hardcode first half date 
-                '.Columns.Add("Team 1st Half", GetType(String)).SetOrdinal(iNumWeeksSplit + 4)
-                '.Columns.Add("1st Half", GetType(String)).SetOrdinal(iNumWeeksSplit + 4)
-
                 .Columns.Add("Team 1st Half", GetType(String)).SetOrdinal(iNumWeeksSplit + 4)
                 .Columns.Add("1st Half", GetType(String)).SetOrdinal(iNumWeeksSplit + 4)
-
                 .Columns.Add("2nd Half", GetType(String))
                 .Columns.Add("Team 2nd Half", GetType(String))
                 .Columns.Add("Total", GetType(String))
@@ -558,10 +520,6 @@ Public Class Standings
             'If Not oHelper.dsLeague.Tables.Contains("dtScores") Then oHelper.dsLeague.Tables.Add("dtScores").ReadXml(oHelper.getLatestFile("*Scores.xml"))
             If Not oHelper.dsLeague.Tables.Contains("dtScores") Then oHelper.DataTable2CSV(oHelper.dsLeague.Tables("dtScores"), oHelper.sFilePath & "\" & Now.ToString("yyyyMMdd") & "_Scores.csv")
             Dim dvScores As New DataView(oHelper.dsLeague.Tables("dtScores"))
-            'dvScores.RowFilter = "Date >= " & sEndDate.ToString("yyyyMMdd").Substring(0, 4) & "0101"
-            'this gets a whole years worth of scores
-            'dvScores.RowFilter += String.Format("date >= {0} and date <= {1}", sEndDate.ToString("yyyyMMdd").Substring(0, 4) & "0101", sEndDate.ToString("yyyMMdd").Substring(0, 4) + 1) & "0101"
-            'dvScores.RowFilter += String.Format("date >= {0} and date <= {1}", sEndDate.ToString("yyyyMMdd").Substring(0, 4) & "0101", sEndDate.ToString("yyyMMdd"))
             dvScores.RowFilter += String.Format("date >= {0} and date <= {1}", CDate(oHelper.rLeagueParmrow("StartDate")).ToString("yyyyMMdd"), oHelper.dDate.ToString("yyyyMMdd"))
             'dvScores.Sort = "Team,Date,Grade"
             Dim sPoints = "", sTeamPoints = ""
@@ -684,13 +642,13 @@ Public Class Standings
         If e.ColumnIndex = 0 Then
             Dim cell As DataGridViewTextBoxCell = sender.currentcell
             If cell.OwningColumn.Name = "Player" Then
-                Dim mbResult As MsgBoxResult = MsgBox("List all scores for for " & cell.Value & "?", MsgBoxStyle.YesNo)
-                If mbResult = MsgBoxResult.Yes Then
-                    oHelper.bScoresbyPlayer = True
-                    oHelper.sPlayer = cell.Value
-                    Scores.Show()
-                    oHelper.bScoresbyPlayer = False
-                End If
+                'Dim mbResult As MsgBoxResult = MsgBox("List all scores for for " & cell.Value & "?", MsgBoxStyle.YesNo)
+                'If mbResult = MsgBoxResult.Yes Then
+                oHelper.bScoresbyPlayer = True
+                oHelper.sPlayer = cell.Value
+                Scores.Show()
+                oHelper.bScoresbyPlayer = False
+                'End If
             End If
         End If
 

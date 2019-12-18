@@ -170,6 +170,7 @@ Public Class frmScoreCard
             End Try
         End With
     End Function
+    'Get the previous handicap from scores table
     Function GetPHdcp() As String
         GetPHdcp = ""
         Try
@@ -391,18 +392,12 @@ Public Class frmScoreCard
             dvscores.RowFilter = String.Format("Date = {0}", oHelper.dDate.ToString("yyyyMMdd", Globalization.CultureInfo.InvariantCulture))
 
             For Each srow As DataRowView In dvscores
-                If srow("Hole1") IsNot DBNull.Value Then
-                    If IsNumeric(srow("Hole1")) Then
-                        oHelper.iHoleMarker = 1
-                        Exit For
-                    End If
-                ElseIf srow("Hole10") IsNot DBNull.Value Then
-                    If IsNumeric(srow("Hole10")) Then
-                        oHelper.iHoleMarker = 10
-                        Exit For
-                    End If
+                If srow("Out_Gross") IsNot DBNull.Value And srow("In_Gross") IsNot DBNull.Value Then Continue For
+                If oHelper.iHoles = 9 Then
+                    oHelper.iHoleMarker = 10
+                    If srow("Out_Gross") IsNot DBNull.Value Then oHelper.iHoleMarker = 1
+                    Exit For
                 End If
-                'If oHelper.iHoleMarker = 0 Then oHelper.CalcHoleMarker(oHelper.dDate.ToString("yyyyMMdd", Globalization.CultureInfo.InvariantCulture))
             Next
 
             oHelper.LOGIT(String.Format("hole marker {0}", oHelper.iHoleMarker))
@@ -516,6 +511,7 @@ Public Class frmScoreCard
                     End If
                 End If
                 oHelper.MakeCellsStrings(row)
+                row.Cells("Hdcp").Value = oHelper.GetNewHdcp(row, oHelper.dDate)
             Next
 
             'adjCTP()
@@ -1396,14 +1392,17 @@ Public Class frmScoreCard
             '20180225-fix Mouse click to expand columns
             'If e.ColumnIndex = 0 Then
             If cell.OwningColumn.Name = "Player" Then
-                Dim mbResult As MsgBoxResult = MsgBox("List all scores For For " & cell.Value & "?", MsgBoxStyle.YesNo)
-                If mbResult = MsgBoxResult.Yes Then
-                    oHelper.bScoresbyPlayer = True
-                    oHelper.sPlayer = cell.Value
-                    oHelper.IHdcp = row.Cells("Phdcp").Value
-                    Scores.Show()
-                    oHelper.bScoresbyPlayer = False
-                End If
+                oHelper.sPlayer = cell.Value
+                lbStatus.Text = String.Format("Gathering Scores for {0}", oHelper.sPlayer)
+                oHelper.status_Msg(lbStatus, Me)
+                oHelper.bScoresbyPlayer = True
+                oHelper.IHdcp = row.Cells("Phdcp").Value
+                Scores.Show()
+                oHelper.bScoresbyPlayer = False
+                lbStatus.Text = String.Format("Finished Gathering Scores for {0}", oHelper.sPlayer)
+                oHelper.status_Msg(lbStatus, Me)
+            ElseIf cell.OwningColumn.Name = "Hdcp" Then
+                MessageBox.Show(cell.ToolTipText, "Last Five Scores")
             End If
             'End If
         Catch ex As Exception
@@ -1575,14 +1574,14 @@ Public Class frmScoreCard
         oHelper.LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
         Try
             If bFormLoad Then Exit Sub
+            Dim shole = "Hole1"
+            If rbFront.Checked Then shole &= "0"
             Dim dvscores As New DataView(dsLeague.Tables("dtScores"))
             With dvscores
-                .RowFilter = String.Format("Date = '{0}' and Hole1 <> ''", cbDates.SelectedItem)
+                .RowFilter = String.Format("Date = '{0}' and {1} > 0", cbDates.SelectedItem, shole)
                 .Sort = "Date DESC"
             End With
             'if we have front nine scores and the rb is checked no reason to do anything else
-            If dvscores.Count > 0 And rbFront.Checked Then Exit Sub
-            If dvscores.Count >= 0 And rbBack.Checked Then Exit Sub
             Dim sfb As String = "Front"
             If rbBack.Checked Then sfb = "Back"
             Dim mbr = MsgBox(String.Format("Do you really want to switch scores to the {0} nine?", sfb), MsgBoxStyle.YesNo)

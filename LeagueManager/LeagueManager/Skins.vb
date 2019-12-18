@@ -61,6 +61,7 @@ Public Class Skins
 
         cbDatesPlayers.Items.AddRange(Main.cbDates.Items.Cast(Of String).ToArray)
         cbDatesPlayers.SelectedItem = oHelper.dDate.ToString("yyyyMMdd")
+
         If oHelper.iHoleMarker = 0 Then Exit Sub
         'dgScores.Visible = False
         'oHelper.MyCourse = oHelper.dsLeague.Tables("dtCourses").Select("Name = '" & oHelper.rLeagueParmrow("Course") & "'")
@@ -88,6 +89,7 @@ Public Class Skins
         'force a recalculate of skins on load
         ' btnSkins_Click(sender, e)
         oHelper.bload = False
+        oHelper.Resizedgv(dgScores, Me)
     End Sub
 
     Private Sub btnExit_Click(sender As Object, e As EventArgs) Handles btnExit.Click
@@ -165,7 +167,6 @@ Public Class Skins
         oHelper.LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
         Dim dgv = sender
         oHelper.bReorderCols = True
-        oHelper.bCalcSkins = True
         If rbColors.Checked Then
             For Each row As DataGridViewRow In dgv.rows
                 oHelper.ChangeColorsForStrokes(row)
@@ -186,7 +187,6 @@ Public Class Skins
         Next
 
         oHelper.bReorderCols = False
-        oHelper.bCalcSkins = False
         lbStatus.Text = String.Format("Finished Resorting of Column {0}", newColumn.HeaderText)
         oHelper.status_Msg(lbStatus, Me)
     End Sub
@@ -242,7 +242,6 @@ Public Class Skins
         oHelper.status_Msg(lbStatus, Me)
         'this is for change colors routine and if no scores, no sense calculating anything
         If dgScores.Rows.Count = 1 Then
-            oHelper.bCalcSkins = False
             lbStatus.Text = "Finished, No skins or CTP entered, nothing to show"
             oHelper.status_Msg(lbStatus, Me)
             Exit Sub
@@ -298,13 +297,11 @@ Public Class Skins
 
         'this is for change colors routine and if no scores, no sense calculating anything
         If dgScores.Rows.Count = 1 Then
-            oHelper.bCalcSkins = False
             lbStatus.Text = "Finished, No skins or CTP entered, nothing to show"
             oHelper.status_Msg(lbStatus, Me)
             Exit Sub
         End If
 
-        oHelper.bCalcSkins = True
         sSkinsIndexes = oHelper.FCalcSkins(dgScores)
 
         sSkinsIndexes.Sort()
@@ -406,7 +403,6 @@ Public Class Skins
                 row.DefaultCellStyle.BackColor = Color.LightGoldenrodYellow
             End If
         Next
-        oHelper.bCalcSkins = False
         tbSkins.Text = iSkinsDol
         tbPurse.Text = iSkinsDol + iCtpsDol
 
@@ -452,209 +448,6 @@ Public Class Skins
 
     End Sub
 
-    'RTF
-    Dim cRTF As RTF_NET
-    Dim swRTF As StreamWriter
-    Dim sRTFTemplate As String
-    Dim srptHeader As String = "Skins and Closest to Pin Report"
-    Const cLNMax As Short = 63
-    Const cLineLen As Short = 80
-    Const cLandscape As String = "LANDSCAPE"
-
-
-    Dim iLNCnt As Int16
-    Dim iPGCnt As Int16
-
-    Sub CreateRTF()
-
-        cRTF = New RTF_NET("<<<RTFDOCUMENT>>>", RTF_NET.PageFormat.LetterLand)
-        cRTF.WriteLine("\b\fs40\par")
-        cRTF.WriteLine("\b\fs40\par         Skins Report")
-        cRTF.WriteLine("")
-        cRTF.WriteLine(CenterIt(oHelper.dDate, cLineLen))
-        cRTF.WriteLine("")
-        cRTF.WriteLine("")
-        cRTF.WriteLine("PAGE " & "\b0" & "####PAGEREP1####              Todays Report" & "\b")
-        cRTF.WriteLine(RTFNewPage)
-        iPGCnt = 1
-        'to put a logo on the report
-        'Dim srRTFTemp = New StreamReader("c:\Documents\ReportingTemplace.rtf")
-        'sRTFTemplate = srRTFTemp.ReadToEnd
-        'srRTFTemp.Close()
-
-    End Sub
-    Sub RTFPageHeader(ByVal cRTF As RTF_NET)
-
-        Try
-            iLNCnt = 6
-            iPGCnt += 1
-            If iPGCnt > 1 Then cRTF.WriteLine(RTFNewPage)
-            cRTF.WriteLine(CenterIt("Hugh's League Skins Report", 120))
-            cRTF.WriteLine(CenterIt(String.Format("League Secretary {0}", "Sam Dinn"), 120))
-            cRTF.WriteLine(CenterIt(String.Format("Developer {0}", "Gary Scudder"), 120))
-
-            cRTF.WriteLine("\b" & CenterIt("Skins Report", cLineLen) & " Page: " & RightIt(CStr(iPGCnt), 3))
-            cRTF.WriteLine("")
-            cRTF.WriteLine("Player Name        Team 1 2 3 4 5 6 7 8 9 Gr Hc Nt #S #C $E $S $C C1 C2")
-            cRTF.WriteLine("------------------ ---- - - - - - - - - - -- -- -- -- -- -- -- -- -- --")
-            cRTF.WriteLine("\b0")
-
-        Catch ex As Exception
-
-        End Try
-    End Sub
-    Sub CreateSkinsReport()
-        'cRTF = New RTF_NET("<<<RTFDOCUMENT>>>", RTF_NET.PageFormat.LetterPort)
-        Dim lmtemp As String = "C:\LeagueManager\LM_ReportingTemplate.rtf"
-        If Not File.Exists(lmtemp) Then
-            MsgBox(String.Format("you need {0}, contact developer", lmtemp))
-            Exit Sub
-        End If
-        Dim sRTFTemplate As String
-        'Dim cRTF As RTF_NET
-        Using srRTFTemp As New StreamReader(lmtemp)
-            sRTFTemplate = srRTFTemp.ReadToEnd
-        End Using
-        Dim cRTFSkins As RTF_NET
-        cRTFSkins = New RTF_NET(sRTFTemplate, RTF_NET.PageFormat.LetterLand)
-        iLNCnt = cLNMax + 1
-        PageBreak(cRTFSkins)
-        Dim sline = "\trowd"
-
-        'create column headings
-        For Each col As DataGridViewColumn In dgScores.Columns
-            If col.Name = "Group" Or col.Name = "" Then Continue For
-            Dim icollen As Int16 = 0
-            Select Case col.HeaderText
-                Case "Player"
-                    icollen = 15
-                Case "Team"
-                    icollen = 1
-                Case Else
-                    icollen = 1
-            End Select
-            'sline += col.HeaderText & ""
-            'this automatically creates spacing causing columns not to line up
-            cRTFSkins.AddCol("", col.HeaderText, icollen, RTF_NET.DataJustify.Left)
-            'sline&= col.HeaderText
-        Next
-        'cRTFSkins.WriteFreeForm(sline)
-        'cRTF.AddCol("Player", "Name", 20, RTF_NET.DataJustify.Left)
-        'cRTF.AddCol("Team", "#", 4, RTF_NET.DataJustify.Left)
-        'cRTF.AddCol("Group", "#", 5, RTF_NET.DataJustify.Left)
-        'For i = 0 To 8
-        '    cRTF.AddCol(" ", i, 1, RTF_NET.DataJustify.Left)
-        'Next
-        ''cRTF.AddCol(" ", "Out", 3, RTF_NET.DataJustify.Right)
-        'cRTF.AddCol(" ", "Gr", 2, RTF_NET.DataJustify.Right)
-        'cRTF.AddCol(" ", "Hc", 2, RTF_NET.DataJustify.Center)
-        'cRTF.AddCol(" ", "N ", 2, RTF_NET.DataJustify.Right)
-        'cRTF.AddCol(" ", "Sk", 2, RTF_NET.DataJustify.Right)
-        'cRTF.AddCol(" ", "Cl", 2, RTF_NET.DataJustify.Right)
-        'cRTF.AddCol("$", "Er", 2, RTF_NET.DataJustify.Right)
-        'cRTF.AddCol("$", "Sk", 2, RTF_NET.DataJustify.Right)
-        'cRTF.AddCol("$", "Cl", 2, RTF_NET.DataJustify.Right)
-        'cRTF.AddCol("#", "Sk", 2, RTF_NET.DataJustify.Right)
-        'cRTF.AddCol("C", "1", 2, RTF_NET.DataJustify.Right)
-        'cRTF.AddCol("C", "2", 2, RTF_NET.DataJustify.Right)
-        'oHelper.sPlayer = "Gary Scudder"
-        'oHelper.sTeam = 9
-        'sline = ""
-        'using crtfskins.setdata is dependant on using addcol above
-        For Each row As DataGridViewRow In dgScores.Rows
-            sline = ""
-            Dim irtfcol As Int16 = 0
-            For Each col As DataGridViewCell In row.Cells
-                If col.OwningColumn.Name = "Group" Then Continue For
-                Dim icollen As Int16 = 0
-                'Player Name        Team 1 2 3 4 5 6 7 8 9 Gr Hc Nt #S #C $E $S $C C1 C2
-                If col.OwningColumn.HeaderText = "Player" Then
-                    icollen = 19
-                ElseIf col.OwningColumn.HeaderText = "Team" Then
-                    icollen = 5
-                ElseIf IsNumeric(col.OwningColumn.HeaderText) Then
-                    icollen = 2
-                Else
-                    icollen = 3
-                End If
-                Dim font As Font = row.Cells(col.OwningColumn.Name).Style.Font
-                If col.Value IsNot Nothing And col.Value IsNot DBNull.Value Then
-                    If col.OwningColumn.HeaderText.Contains("Gross") Then
-                        If col.Value < 36 Then
-                            sline &= "\cf1 " & col.Value.ToString.PadRight(icollen, " ") & "\cf0 "
-                            'cRTFSkins.SetData(irtfcol, col.Value) ' this attemtp to color red failed cRTFSkins.SetData(irtfcol, "\cf1 " & col.Value & "\cf0 ")
-                        Else
-                            sline &= col.Value.ToString.PadRight(icollen, " ")
-                            'cRTFSkins.SetData(irtfcol, col.Value)
-                        End If
-                    Else
-                        sline &= col.Value.ToString.PadRight(icollen, " ")
-                        'cRTFSkins.SetData(irtfcol, col.Value)
-                    End If
-
-                Else
-                    sline &= " ".ToString.PadRight(icollen, " ")
-                    'cRTFSkins.SetData(irtfcol, "")
-                End If
-                irtfcol += 1
-            Next
-            'AddtoRTF(sline)
-            'cRTFSkins.WriteColData()
-            cRTFSkins.WriteFreeForm(sline & "\par ")
-        Next
-
-        Dim sfn = oHelper.sReportPath & "\" & DateTime.Now.ToString("yyyyMMdd_hhmmss_") & oHelper.dDate.ToString("yyyyMMdd", Globalization.CultureInfo.InvariantCulture) & "_Skins.rtf"
-        Dim cLetter As String = "LETTER"
-        Using swRTF As New IO.StreamWriter(sfn)
-            'swRTF.WriteLine(RTFHeader(cLetter, cLandscape, 8, 1, 1152, 1, 1440))
-            swRTF.Write(cRTFSkins.CreateRTF)
-
-        End Using
-
-    End Sub
-    'Sub CreateReports(ByVal RTF As RTF_NET)
-    '    Dim sline As String = ""
-    '    Dim iPlayerCol As Int16 = 30
-    '    Dim dSubTotBal As Decimal = 0.00
-    '    sline = sline & Space(iPlayerCol - sline.Length) & RTF.RightIt(dSubTotBal.ToString("#,##0.00;(#,##.00);0.00"), 30)
-    '    For Each row As DataGridViewRow In dgScores.Rows
-    '        Dim irtfcol As Int16 = 0
-    '        For Each col As DataGridViewCell In row.Cells
-    '            If col.Value IsNot DBNull.Value Then RTF.SetData(irtfcol, col.Value)
-    '        Next
-    '        RTF.WriteColData()
-    '    Next
-    '    Dim sfn = oHelper.sReportPath & "\" & DateTime.Now.ToString("yyyyMMdd_hhmmss_") & oHelper.dDate.ToString("yyyyMMdd", Globalization.CultureInfo.InvariantCulture) & "_Skins.rtf"
-    '    Using swRTF As New IO.StreamWriter(sfn)
-    '        swRTF.Write(RTF.CreateRTF)
-    '    End Using
-
-    'End Sub
-    Sub PageBreak(ByVal cRTF As RTF_NET)
-        If iLNCnt > cLNMax Then
-            RTFPageHeader(cRTF)
-        End If
-        iLNCnt = 5
-        iLNCnt += 1
-
-    End Sub
-    Sub AddtoRTF(ByVal theLine As String)
-        Try
-            Dim sfn = oHelper.sReportPath & "\" & DateTime.Now.ToString("yyyyMMdd_hhmmss_") & oHelper.dDate.ToString("yyyyMMdd", Globalization.CultureInfo.InvariantCulture) & "_Skins.rtf"
-            Using swRTF As New IO.StreamWriter(sfn)
-                If theLine.StartsWith("{rtf") Or
-                        (theLine.StartsWith("}") And theLine.Length = 1) Or
-                        theLine.StartsWith("\b") Then
-                    swRTF.WriteLine(theLine)
-                Else
-                    swRTF.WriteLine(LeftIt(theLine, cLineLen) & RTFCrlf())
-                End If
-            End Using
-
-        Catch ex As Exception
-
-        End Try
-    End Sub
     Sub SaveScores()
         oHelper.LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
         Try

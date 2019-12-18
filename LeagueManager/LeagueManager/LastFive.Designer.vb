@@ -55,6 +55,7 @@ Partial Class LastFive
         Me.dgLast5.Location = New System.Drawing.Point(35, 152)
         Me.dgLast5.Margin = New System.Windows.Forms.Padding(2)
         Me.dgLast5.Name = "dgLast5"
+        Me.dgLast5.RowHeadersVisible = False
         Me.dgLast5.RowTemplate.Height = 33
         Me.dgLast5.Size = New System.Drawing.Size(532, 843)
         Me.dgLast5.TabIndex = 17

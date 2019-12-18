@@ -3,9 +3,6 @@
 *************************************************************************************************
 * yyyymmdd - Priority - Complexity -  Module        Code Package    Description
 * ----------------------------------------------------------------- ------------------------------------------------------------------------------------------------------------
-* 20191213 - L        - Easy        - Main                          add a panel to show latest changes with this version
-* 20191213 - H        - Med to Hard - ScheduleBuilder               Build Schedule change for Byes(Website printyourbrackets/11teamroundrobin.html) https://www.printyourbrackets.com/images/11-round-robin.pdf
-* 20191115 - M        - Easy to Med - Main							Redesign Setup Menus-League, Player, Course
 * 20190904 - M        - Med to Hard - Helper(fgetPlayer)			allow for special characters in name
 * 20190830 - M        - Med to Hard - Several						Add Email Option for reports (standings,scorescard,skins,schedule,etc)
 * 20190820 - M        - Med to Hard - scorecard						cant create a player from initials bs
@@ -43,6 +40,9 @@
 *************************************************************************************************
 * yyyymmdd - Priority - Complexity -  Module        Release         Description
 * --------   --------	-----------	  -------------	--------------- ----------------------------------------------------------------------------------------------	
+* 20191213 - L        - Easy        - Main                          add a panel to show latest changes with this version
+* 20191213 - H        - Med to Hard - ScheduleBuilder               Build Schedule change for Byes(Website printyourbrackets/11teamroundrobin.html) https://www.printyourbrackets.com/images/11-round-robin.pdf
+* 20191115 - M        - Easy to Med - Main							Redesign Setup Menus-League, Player, Course
 * 20190820 - M        - Med to Hard - scorecard						crash when saving blank scrorecard screen
 * 20191210 - M        - Easy to Med - Several    					Sonny email
 * 20191210 - M        - Easy to Med - Several    					Standardize date sorting

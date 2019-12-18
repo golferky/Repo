@@ -7,10 +7,11 @@ Public Class Scores
     Dim dtScoreCard As DataTable
     Dim sStatsDesc As String() = {"Eagles", "Birdies", "Pars", "Bogeys", "DoubleBogeys", "Others"}
     Dim sScoreOnlyDesc As String() = {"Rnds", "F9", "B9"}
+    Dim sWH As String = ""
     Private Sub Scores_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         oHelper = Main.oHelper
         BldScoresDataGridFromFile()
-        Dim sWH As String = oHelper.ScreenResize()
+        sWH = oHelper.ScreenResize()
         If Me.Width >= sWH.Split(":")(0) Then
             Me.Width = sWH.Split(":")(0) - (sWH.Split(":")(0) * 0.1)
         Else
@@ -21,6 +22,21 @@ Public Class Scores
         Else
             Me.Height = sWH.Split(":")(1)
         End If
+        oHelper.Resizedgv(dgScores, Me)
+        'Dim iw As Integer = 0, ih As Integer = 0
+        'For Each col As DataGridViewColumn In dgScores.Columns
+        '    iw += col.Width
+        'Next
+        'For Each row As DataGridViewRow In dgScores.Rows
+        '    ih += row.Height
+        'Next
+        '' oHelper.LOGIT(String.Format("dgScores {0}x{1}", iw, ih))
+        'dgScores.Width = iw
+        'dgScores.Height = ih
+        'If Me.Width > dgScores.Width Then Me.Width = dgScores.Width * 1.1
+        'If Me.Height > dgScores.Height Then Me.Height = dgScores.Height * 1.1
+
+        'Me.Text &= String.Format(" Form {0}x{1}-Grid{2}x{3} ", Me.Width, Me.Height, dgScores.Width, dgScores.Height)
         If Not Debugger.IsAttached Then
             Dim sfn = oHelper.sReportPath & "\" & String.Format(DateTime.Now.ToString("yyyyMMdd_hhmmss_{0}_") & "ScoresAll.csv", oHelper.sPlayer)
             oHelper.dgv2csv(dgScores, sfn)
@@ -31,13 +47,11 @@ Public Class Scores
             swhtml.WriteLine(sHtml)
             swhtml.Close()
         End If
-        rs.FindAllControls(Me)
+        ' rs.FindAllControls(Me)
     End Sub
 
     Sub BldScoresDataGridFromFile()
         Try
-            Me.Cursor = Cursors.WaitCursor
-            Application.DoEvents()
             oHelper.LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
             '10/1/2017 add code to pull in all scores for a given player
             'check frmScoreCard for event
@@ -51,7 +65,7 @@ Public Class Scores
             dvScores.RowFilter = String.Format("Player = '{0}' and Method in ({1}) ", oHelper.sPlayer, "'Score','Gross','Net'")
 
             'dvScores.RowFilter = dvScores.RowFilter
-            Me.Text = "Scores for Player-" & oHelper.sPlayer
+            'Me.Text = "Scores for Player-" & oHelper.sPlayer
             oHelper.iHoles = oHelper.dsLeague.Tables("dtLeagueParms").Rows(0).Item("Holes")
             oHelper.iHoleMarker = 1
             dvScores.Sort = "Date Desc"
@@ -316,6 +330,7 @@ Public Class Scores
                     oHelper.SBPChangeColorsForStrokes(row)
                 Next
                 oHelper.bColors = False
+
             Catch ex As Exception
                 Dim x = ""
             End Try
@@ -323,8 +338,6 @@ Public Class Scores
         Catch ex As Exception
             MsgBox(oHelper.GetExceptionInfo(ex))
         End Try
-        Me.Cursor = Cursors.Default
-        Application.DoEvents()
     End Sub
     Sub ChangeFont(row As DataGridViewRow)
         Dim cell As DataGridViewCell = Nothing
@@ -602,16 +615,12 @@ Public Class Scores
         Try
             Dim newColumn As DataGridViewColumn = sender.Columns(e.ColumnIndex)
             oHelper.bScoresbyPlayer = True
-            Me.Cursor = Cursors.WaitCursor
-            Application.DoEvents()
             Dim dgv = sender
             For Each row As DataGridViewRow In dgv.rows
                 'row.Height = 30
                 oHelper.ChangeColorsForStrokes(row)
             Next
             oHelper.bScoresbyPlayer = False
-            Me.Cursor = Cursors.Default
-            Application.DoEvents()
         Catch ex As Exception
             MsgBox(oHelper.GetExceptionInfo(ex))
         End Try
@@ -637,6 +646,7 @@ Public Class Scores
         Try
             rs.ResizeAllControls(Me)
             oHelper.LOGIT(String.Format("Form Height {0} Width {1}", Me.Height, Me.Width))
+            Me.Text = String.Format("Scores for Player {4}- Form {0}x{1}-Grid{2}x{3} ", Me.Width, Me.Height, dgScores.Width, dgScores.Height, oHelper.sPlayer)
         Catch ex As Exception
 
         End Try

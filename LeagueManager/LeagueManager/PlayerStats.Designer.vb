@@ -60,6 +60,7 @@ Partial Class frmPlayerStats
         Me.dgPlayers.DefaultCellStyle = DataGridViewCellStyle2
         Me.dgPlayers.Location = New System.Drawing.Point(23, 64)
         Me.dgPlayers.Name = "dgPlayers"
+        Me.dgPlayers.RowHeadersVisible = False
         Me.dgPlayers.Size = New System.Drawing.Size(186, 745)
         Me.dgPlayers.TabIndex = 11
         '

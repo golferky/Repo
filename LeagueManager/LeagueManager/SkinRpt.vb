@@ -22,7 +22,7 @@ Public Class SkinRpt
     'Dim iExpenses = 0
     'Dim bfirst As Boolean = False
     Dim oHelper As LeagueManager.Helper
-    Dim cFields As String = "Date-s,$CO,$E,SP,NS,$SC,$SP,LOS,CP,NC,$CC,$CP,$C1C,$C1P,$C2C,$C2P,LOF1,LOF2,LOB1,LOB2,LOK"
+    Const cFields As String = "Date-s,$CO,$E,SP,NS,$SC,$SP,LOS,CP,NC,$CC,$CP,$C1C,$C1P,$C2C,$C2P,LOF1,LOF2,LOB1,LOB2,LOK"
     Const Datecon As String = "Date"
     Const MoneyCollected As String = "$CO"
     Const MoneyPaidOut As String = "$E"
@@ -111,8 +111,6 @@ Public Class SkinRpt
             calcAmount(dtr, row)
         Next
 
-        'newcalcAmount(dtr)
-
         'build the datagrid from the table
         'build grid columns and set column sizes
         For Each col As DataColumn In dtr.Columns
@@ -144,6 +142,38 @@ Public Class SkinRpt
                 row.Cells(Datecon).Style.BackColor = Color.LightBlue
             End If
         Next
+        Dim al = New List(Of String)
+        al.Add("MoneyCollected-$CO")
+        al.Add("MoneyPaidOut-$E")
+        al.Add("SkinPlayers-SP")
+        al.Add("NumberOfSkins-NS")
+        al.Add("MoneyCollectedforSkins-$SC")
+        al.Add("MoneyPaidOutforSkins-$SP")
+        al.Add("MoneyCarriedOverforSkins-LOS")
+        al.Add("ClosesttothePinPlayers-CP")
+        al.Add("NumberOfClosesttothePins-NC")
+        al.Add("MoneyCollectedforClosesttothePins-$CC")
+        al.Add("MoneyPaidOutforClosesttothePins-$CP")
+        al.Add("MoneyCollectedforClosesttothePin1-$C1C")
+        al.Add("MoneyPaidOutforClosesttothePin1-$C1P")
+        al.Add("MoneyCollectedforClosesttothePin2-$C2C")
+        al.Add("MoneyPaidOutforClosesttothePin2-$C2P")
+        al.Add("MoneyCarriedoverforClosesttothePin1Front9-LOF1")
+        al.Add("MoneyCarriedoverforClosesttothePin2Front9-LOF2")
+        al.Add("MoneyCarriedoverforClosesttothePin1Back9-LOF1")
+        al.Add("MoneyCarriedoverforClosesttothePin2Back9-LOF2")
+        al.Add("MoneyCarriedoverforKitty-LOK")
+
+        lvAbbr.View = View.Details
+        lvAbbr.Columns.Clear()
+        lvAbbr.Columns.Add("Abbr", 50)
+        lvAbbr.Columns.Add("Description", 250)
+        lvAbbr.Items.Clear()
+        For Each item In al
+            Dim lvi As ListViewItem = lvAbbr.Items.Add(item.Split("-")(1))
+            lvi.SubItems.Add(item.Split("-")(0))
+        Next
+
         Me.Text = Me.Text & " - " & Main.cbLeagues.SelectedItem
         lbStatus.Text = ""
 
@@ -176,13 +206,6 @@ Public Class SkinRpt
                 Dim sB9ctp2 = 0
 
                 If savedrow IsNot Nothing Then
-                    'For Each fld As DataColumn In dtr.Columns
-                    '    If fld.ColumnName.StartsWith("LO") Then
-                    '        If savedrow(fld.ColumnName) > 0 Then
-                    '            dr(fld.ColumnName) = savedrow(fld.ColumnName)
-                    '        End If
-                    '    End If
-                    'Next
                     sKitty = savedrow(MoneyCarriedoverforKitty)
                     sSkins = savedrow(MoneyCarriedOverforSkins)
                     sF9ctp1 = savedrow(MoneyCarriedoverforClosesttothePin1Front9)
@@ -269,30 +292,6 @@ Public Class SkinRpt
 
     End Sub
 
-    Sub newcalcAmount(dtr As DataTable)
-
-        Try
-            Dim dt As New DataTable
-            dt.Columns.Add(Datecon)
-            dt.Columns.Add("Count")
-            Dim query = (From dr In (From d In oHelper.dsLeague.Tables("dtScores").AsEnumerable Select New With {.date = d(Datecon)}) Select dr.date Distinct)
-            For Each colName As String In query
-                Dim cName = colName
-                Dim cCount = (From row In oHelper.dsLeague.Tables("dtScores").Rows Select row Where row(Datecon).ToString = cName).Count
-                dt.Rows.Add(colName, cCount)
-            Next
-
-            'Dim amountGrpByDates = From row In oHelper.dsLeague.Tables("dtScores") $Earn	$Skins	$Closest	#Skins	CTP_1	CTP_2
-
-            '                       Group row By dateGroup = New With {Key .Date = row.Field(Of Integer)(Datecon)} Into Group
-            '                       Select New With {Key .Dates = dateGroup, .SumAmount = Group.Sum(Function(x) x.Field(Of Decimal)(Datecon))}
-            Dim xx = ""
-
-        Catch ex As Exception
-
-        End Try
-
-    End Sub
     Public Function SumAmts(fld As String, sdate As String) As Decimal
         SumAmts = 0
         Try
@@ -309,12 +308,14 @@ Public Class SkinRpt
             Dim row As DataGridViewRow = sender.currentrow
             '20180225-fix Mouse click to expand columns
             If e.ColumnIndex = 0 Then
-                If cell.OwningColumn.Name = "Player" Then
-                    Dim mbResult As MsgBoxResult = MsgBox("List Skins/CTP For each week" & cell.Value.ToString.Replace("* ", "") & "?", MsgBoxStyle.YesNo)
-                    If mbResult = MsgBoxResult.Yes Then
-                        oHelper.sPlayer = cell.Value.ToString.Replace("* ", "")
-                        FinanceDetails.Show()
-                    End If
+                If cell.OwningColumn.Name = "Date" Then
+                    oHelper.dDate = Date.ParseExact(cell.Value, "yyyyMMdd", System.Globalization.DateTimeFormatInfo.InvariantInfo)
+                    Skins.Show()
+                    'Dim mbResult As MsgBoxResult = MsgBox(String.Format("List Skins/CTP for week {0} ?", cell.Value.ToString), MsgBoxStyle.YesNo)
+                    'If mbResult = MsgBoxResult.Yes Then
+                    '    oHelper.dDate = Date.ParseExact(cell.Value, "yyyyMMdd", System.Globalization.DateTimeFormatInfo.InvariantInfo)
+                    '    Skins.Show()
+                    'End If
                 End If
             End If
         Catch ex As Exception

@@ -159,6 +159,22 @@
 
     End Sub
 
+    Private Sub dgLast5_CellMouseDoubleClick(sender As Object, e As DataGridViewCellMouseEventArgs) Handles dgLast5.CellMouseDoubleClick
+        If e.ColumnIndex = 0 Then
+            Dim cell As DataGridViewTextBoxCell = sender.currentcell
+            If cell.OwningColumn.Name = "Player" Then
+                oHelper.sPlayer = cell.Value.ToString.Substring(0, cell.Value.ToString.IndexOf("("))
+                lbStatus.Text = String.Format("Gathering Scores for {0}", oHelper.sPlayer)
+                oHelper.status_Msg(lbStatus, Me)
+                oHelper.bScoresbyPlayer = True
+                Scores.ShowDialog()
+                oHelper.bScoresbyPlayer = False
+                lbStatus.Text = String.Format("Finished Gathering Scores for {0}", oHelper.sPlayer)
+                oHelper.status_Msg(lbStatus, Me)
+            End If
+        End If
+    End Sub
+
     Private Sub LastFive_Resize(sender As Object, e As EventArgs) Handles MyBase.Resize
         'rs.ResizeAllControls(Me)
     End Sub

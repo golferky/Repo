@@ -1,8 +1,9 @@
 ﻿'*************************************************************************************************
 Imports System.IO.Packaging
 Imports LeagueManager.FileLayout
+
 Public Class Main
-    Dim cVersion = "Version : 2019.12.13"
+    Dim cVersion = "Version : 2019.12.16"
     Public oHelper As Helper
     Private dsLeague As New dsLeague
     Dim bload As Boolean = True
@@ -15,6 +16,7 @@ Public Class Main
     Public iScreenHeight As Integer
     Public sWorkingYear As String
     Dim toolTipHdcp As New ToolTip
+    Dim schanges As String = ""
 
     Private Sub Main_Load(sender As System.Object, e As System.EventArgs) Handles MyBase.Load
         Try
@@ -30,20 +32,15 @@ Public Class Main
             Else
                 Me.StartPosition = FormStartPosition.CenterScreen
             End If
-            toolTipHdcp = oHelper.toolTipHdcp
-            toolTipHdcp.AutoPopDelay = 5000
-            toolTipHdcp.InitialDelay = 10
-            toolTipHdcp.ReshowDelay = 500
-            ' Force the ToolTip text to be displayed whether or not the form is active.
-            toolTipHdcp.ShowAlways = True
-            ''' Set up the ToolTip text for the datagridviewcell.
-            Dim schanges As String = ""
-            schanges &= vbCrLf & "Change font on schedulebuilder grid"
-            schanges &= vbCrLf & "Payments Screen-loading(top line missing)"
-            schanges &= vbCrLf & "Build Schedule change for Byes"
-            schanges &= vbCrLf & "Fixed issue with blank Scores on Last 5"
-            toolTipHdcp.SetToolTip(Me, String.Format("Changes: {0}{1}", vbCrLf, schanges))
-
+            'tooltip if needed
+            'toolTipHdcp = oHelper.toolTipHdcp
+            'toolTipHdcp.AutoPopDelay = 5000
+            'toolTipHdcp.InitialDelay = 10
+            'toolTipHdcp.ReshowDelay = 500
+            '' Force the ToolTip text to be displayed whether or not the form is active.
+            'toolTipHdcp.ShowAlways = True
+            '' Set up the ToolTip text for the datagridviewcell.
+            'toolTipHdcp.SetToolTip(Me, String.Format("Changes: {0}{1}", vbCrLf, schanges))
 
             'Me.Location = Point.Add(Screen.PrimaryScreen.Bounds.Location, New Size(Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Height))
             'Dim primaryScreen = Screen.PrimaryScreen
@@ -63,11 +60,17 @@ Public Class Main
             '        dialogue.ShowDialog()
             '    End Using
             'Next
-
+            Me.Enabled = False
             Me.Show()
-            'Genschedule()
+            'Genschedule()  TabControl2.TabPages.Add("Test")
+            'Dim tp = TabControl2.TabPages(TabControl2.TabPages.Count - 1)
+            'Dim b = New Button()
+            'b.Text = "My Button"
+            'tp.Controls.Add(b)
+            'AddHandler b.Click, AddressOf MyButton_Click
 
             Application.EnableVisualStyles()
+
             lblProcessMsg.Text = "Loading League Tables..."
             oHelper.status_Msg(lblProcessMsg, Me)
             iScreenWidth = Screen.PrimaryScreen.Bounds.Width
@@ -166,6 +169,19 @@ Public Class Main
             lblProcessMsg.Text = String.Format("Finished Loading League INI from {0},", sDocs)
             oHelper.status_Msg(lblProcessMsg, Me)
 
+            lblProcessMsg.Text = String.Format("Loading Changelog from {0},", oHelper.sFilePath)
+            oHelper.status_Msg(lblProcessMsg, Me)
+            Using sr As New IO.StreamReader(oHelper.sFilePath & "\Changelog.txt", False)
+                schanges &= sr.ReadToEnd
+            End Using
+            'schanges &= vbCrLf & "Change font on schedulebuilder grid"
+            'schanges &= vbCrLf & "Payments Screen-loading(top line missing)"
+            'schanges &= vbCrLf & "Build Schedule change for Byes"
+            'schanges &= vbCrLf & "Fixed issue with blank Scores on Last 5"
+
+            lblProcessMsg.Text = String.Format("Finished Loading Changelog from {0},", oHelper.sFilePath)
+            oHelper.status_Msg(lblProcessMsg, Me)
+
             Me.Text = Me.Text & " " & String.Format("{0}", cVersion)
 
             lbMonitor.Text = String.Format("{0}, Resolution {1} x {2}, Menu {3} x {4}", My.Computer.Name, iScreenWidth, iScreenHeight, Me.Width, Me.Height)
@@ -233,16 +249,16 @@ Public Class Main
                 bwait = True
                 Do While bwait
                     If Not oHelper.WaitForFile(dsLeague.Tables(sfile), sLatestFile, lblProcessMsg, Me) Then
-                        Dim mbr = MessageBox.Show(String.Format("File In use {0}Press <OK> To close file And proceed Or <Cancel>", vbCrLf, sParmFile), sParmFile, MessageBoxButtons.OKCancel)
-                        If mbr = DialogResult.Cancel Then
-                            End
-                        End If
+                        'Dim mbr = MessageBox.Show(String.Format("File In use {0}Press <OK> To close file And proceed Or <Cancel>", vbCrLf, sParmFile), sParmFile, MessageBoxButtons.OKCancel)
+                        'If mbr = DialogResult.Cancel Then
+                        '    End
+                        'End If
                     Else
                         bwait = False
                     End If
                 Loop
                 tspb.ProgressBar.Value += 1
-                tssl.Text = String.Format("Loading file {0} Of {1}", tspb.ProgressBar.Value, ofiles.Count)
+                tssl.Text = String.Format("Loading file {0} Of {1}", tspb.ProgressBar.Value, ofiles.Split(",").Count)
                 'tspb.ProgressBar.Refresh()
                 Application.DoEvents()
             Next
@@ -290,7 +306,7 @@ Public Class Main
             oHelper.status_Msg(lblProcessMsg, Me)
             'oHelper.bloghelper = False
             oHelper.iHoles = oHelper.rLeagueParmrow("Holes")
-
+            Me.Enabled = True
         Catch ex As InvalidCastException
             Dim iexc = ""
         End Try
@@ -302,6 +318,7 @@ Public Class Main
         '    WaitForFile = oHelper.getLatestFile(String.Format("*{0}.csv", file))
         'End If
         WaitForFile = oHelper.getLatestFile(String.Format("*{0}.csv", file))
+
         If WaitForFile = "" Then
             Dim mbr = MessageBox.Show(String.Format("File {1} missing{0} Press <OK> To move file And proceed Or <Cancel>", vbCrLf, file), file, MessageBoxButtons.OKCancel)
             If mbr = DialogResult.Cancel Then End
@@ -757,12 +774,16 @@ Public Class Main
         frmPlayerStats.Show()
     End Sub
 
-    Private Sub btnSkinGame_Click(sender As Object, e As EventArgs) Handles btnSkinGame.Click
+    Private Sub btnSkinGame_Click(sender As Object, e As EventArgs)
         frmSkins.Show()
     End Sub
 
-    Private Sub btnEnterScores_Click(sender As Object, e As EventArgs) Handles btnEnterScores.Click
+    Private Sub btnEnterScores_Click(sender As Object, e As EventArgs)
         frmEnterScore.Show()
+    End Sub
+
+    Private Sub AboutToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles AboutToolStripMenuItem.Click
+        MsgBox(schanges, MsgBoxStyle.Information, "Change Log")
     End Sub
 End Class
 Public Class Team

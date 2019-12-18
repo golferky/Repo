@@ -2776,6 +2776,8 @@ Partial Public Class dsLeague
         
         Private columnDuesPaid As Global.System.Data.DataColumn
         
+        Private columnRound As Global.System.Data.DataColumn
+        
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")>  _
         Public Sub New()
@@ -3204,6 +3206,14 @@ Partial Public Class dsLeague
         End Property
         
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")>  _
+        Public ReadOnly Property RoundColumn() As Global.System.Data.DataColumn
+            Get
+                Return Me.columnRound
+            End Get
+        End Property
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0"),  _
          Global.System.ComponentModel.Browsable(false)>  _
         Public ReadOnly Property Count() As Integer
@@ -3289,9 +3299,10 @@ Partial Public Class dsLeague
                     ByVal Team_Points As Decimal,  _
                     ByVal Opponent As String,  _
                     ByVal Partner As String,  _
-                    ByVal DuesPaid As String) As dtScoresRow
+                    ByVal DuesPaid As String,  _
+                    ByVal Round As String) As dtScoresRow
             Dim rowdtScoresRow As dtScoresRow = CType(Me.NewRow,dtScoresRow)
-            Dim columnValuesArray() As Object = New Object() {League, Method, Team, Grade, Player, _Date, Group, Status, Hole1, Hole2, Hole3, Hole4, Hole5, Hole6, Hole7, Hole8, Hole9, Out, Out_Gross, Out_Net, Hole10, Hole11, Hole12, Hole13, Hole14, Hole15, Hole16, Hole17, Hole18, _In, In_Gross, In_Net, _18_Gross, _18_Net, Hdcp, PHdcp, Skins, Closest, __Earn, __Skins, __Closest, ___Skins, CTP_1, CTP_2, Points, Team_Points, Opponent, Partner, DuesPaid}
+            Dim columnValuesArray() As Object = New Object() {League, Method, Team, Grade, Player, _Date, Group, Status, Hole1, Hole2, Hole3, Hole4, Hole5, Hole6, Hole7, Hole8, Hole9, Out, Out_Gross, Out_Net, Hole10, Hole11, Hole12, Hole13, Hole14, Hole15, Hole16, Hole17, Hole18, _In, In_Gross, In_Net, _18_Gross, _18_Net, Hdcp, PHdcp, Skins, Closest, __Earn, __Skins, __Closest, ___Skins, CTP_1, CTP_2, Points, Team_Points, Opponent, Partner, DuesPaid, Round}
             rowdtScoresRow.ItemArray = columnValuesArray
             Me.Rows.Add(rowdtScoresRow)
             Return rowdtScoresRow
@@ -3369,6 +3380,7 @@ Partial Public Class dsLeague
             Me.columnOpponent = MyBase.Columns("Opponent")
             Me.columnPartner = MyBase.Columns("Partner")
             Me.columnDuesPaid = MyBase.Columns("DuesPaid")
+            Me.columnRound = MyBase.Columns("Round")
         End Sub
         
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
@@ -3490,6 +3502,8 @@ Partial Public Class dsLeague
             MyBase.Columns.Add(Me.columnPartner)
             Me.columnDuesPaid = New Global.System.Data.DataColumn("DuesPaid", GetType(String), Nothing, Global.System.Data.MappingType.Element)
             MyBase.Columns.Add(Me.columnDuesPaid)
+            Me.columnRound = New Global.System.Data.DataColumn("Round", GetType(String), Nothing, Global.System.Data.MappingType.Element)
+            MyBase.Columns.Add(Me.columnRound)
             Me.Constraints.Add(New Global.System.Data.UniqueConstraint("Constraint1", New Global.System.Data.DataColumn() {Me.columnPlayer, Me.columnDate}, true))
             Me.columnPlayer.AllowDBNull = false
             Me.columnDate.AllowDBNull = false
@@ -6839,6 +6853,21 @@ Partial Public Class dsLeague
         
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")>  _
+        Public Property Round() As String
+            Get
+                Try 
+                    Return CType(Me(Me.tabledtScores.RoundColumn),String)
+                Catch e As Global.System.InvalidCastException
+                    Throw New Global.System.Data.StrongTypingException("The value for column 'Round' in table 'dtScores' is DBNull.", e)
+                End Try
+            End Get
+            Set
+                Me(Me.tabledtScores.RoundColumn) = value
+            End Set
+        End Property
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")>  _
         Public Function IsLeagueNull() As Boolean
             Return Me.IsNull(Me.tabledtScores.LeagueColumn)
         End Function
@@ -7399,6 +7428,18 @@ Partial Public Class dsLeague
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")>  _
         Public Sub SetDuesPaidNull()
             Me(Me.tabledtScores.DuesPaidColumn) = Global.System.Convert.DBNull
+        End Sub
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")>  _
+        Public Function IsRoundNull() As Boolean
+            Return Me.IsNull(Me.tabledtScores.RoundColumn)
+        End Function
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")>  _
+        Public Sub SetRoundNull()
+            Me(Me.tabledtScores.RoundColumn) = Global.System.Convert.DBNull
         End Sub
     End Class
     
