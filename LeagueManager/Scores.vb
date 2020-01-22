@@ -7,27 +7,52 @@ Public Class Scores
     Dim dtScoreCard As DataTable
     Dim sStatsDesc As String() = {"Eagles", "Birdies", "Pars", "Bogeys", "DoubleBogeys", "Others"}
     Dim sScoreOnlyDesc As String() = {"Rnds", "F9", "B9"}
+    Dim sWH As String = ""
     Private Sub Scores_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         oHelper = Main.oHelper
         BldScoresDataGridFromFile()
-        Dim sWH As String = oHelper.ScreenResize()
-        Me.Width = sWH.Split(":")(0)
-        Me.Height = sWH.Split(":")(1)
-        Dim sfn = oHelper.sReportPath & "\" & String.Format(DateTime.Now.ToString("yyyyMMdd_hhmmss_{0}_") & "ScoresAll.csv", oHelper.sPlayer)
-        oHelper.dgv2csv(dgScores, sfn)
-        '20190822 - new html
-        Dim sHtml As String = oHelper.Create_Html_From_DGV(dgScores)
-        sHtml = oHelper.ConvertDataGridViewToHTMLWithFormatting(dgScores, Me)
-        Dim swhtml As New IO.StreamWriter(sfn.Replace(".csv", ".html"), False)
-        swhtml.WriteLine(sHtml)
-        swhtml.Close()
-        '    rs.FindAllControls(Me)
+        sWH = oHelper.ScreenResize()
+        If Me.Width >= sWH.Split(":")(0) Then
+            Me.Width = sWH.Split(":")(0) - (sWH.Split(":")(0) * 0.1)
+        Else
+            'Me.Width = sWH.Split(":")(0)
+        End If
+        If Me.Height >= sWH.Split(":")(1) Then
+            Me.Height = sWH.Split(":")(1) - (sWH.Split(":")(1) * 0.1)
+        Else
+            'Me.Height = sWH.Split(":")(1)
+        End If
+        oHelper.Resizedgv(dgScores, Me)
+        oHelper.bDots = False
+        'Dim iw As Integer = 0, ih As Integer = 0
+        'For Each col As DataGridViewColumn In dgScores.Columns
+        '    iw += col.Width
+        'Next
+        'For Each row As DataGridViewRow In dgScores.Rows
+        '    ih += row.Height
+        'Next
+        '' oHelper.LOGIT(String.Format("dgScores {0}x{1}", iw, ih))
+        'dgScores.Width = iw
+        'dgScores.Height = ih
+        'If Me.Width > dgScores.Width Then Me.Width = dgScores.Width * 1.1
+        'If Me.Height > dgScores.Height Then Me.Height = dgScores.Height * 1.1
+
+        'Me.Text &= String.Format(" Form {0}x{1}-Grid{2}x{3} ", Me.Width, Me.Height, dgScores.Width, dgScores.Height)
+        If Not Debugger.IsAttached Then
+            Dim sfn = oHelper.sReportPath & "\" & String.Format(DateTime.Now.ToString("yyyyMMdd_hhmmss_{0}_") & "ScoresAll.csv", oHelper.sPlayer)
+            oHelper.dgv2csv(dgScores, sfn)
+            '20190822 - new html
+            Dim sHtml As String = oHelper.Create_Html_From_DGV(dgScores)
+            sHtml = oHelper.ConvertDataGridViewToHTMLWithFormatting(dgScores, Me)
+            Dim swhtml As New IO.StreamWriter(sfn.Replace(".csv", ".html"), False)
+            swhtml.WriteLine(sHtml)
+            swhtml.Close()
+        End If
+        ' rs.FindAllControls(Me)
     End Sub
 
     Sub BldScoresDataGridFromFile()
         Try
-            Me.Cursor = Cursors.WaitCursor
-            Application.DoEvents()
             oHelper.LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
             '10/1/2017 add code to pull in all scores for a given player
             'check frmScoreCard for event
@@ -36,9 +61,12 @@ Public Class Scores
 
             'scores by player only keeps 9 holes for some leagues
             Dim dvScores As New DataView(oHelper.dsLeague.Tables("dtScores"))
-            dvScores.RowFilter = "Player = '" & oHelper.sPlayer & "'"
-            dvScores.RowFilter = dvScores.RowFilter
-            Me.Text = "Scores for Player-" & oHelper.sPlayer
+            Dim xx = String.Format("Player = '{0}' and Method in ({1}) ", oHelper.sPlayer, "'Score','Gross','Net'")
+
+            dvScores.RowFilter = String.Format("Player = '{0}' and Method in ({1}) ", oHelper.sPlayer, "'Score','Gross','Net'")
+
+            'dvScores.RowFilter = dvScores.RowFilter
+            'Me.Text = "Scores for Player-" & oHelper.sPlayer
             oHelper.iHoles = oHelper.dsLeague.Tables("dtLeagueParms").Rows(0).Item("Holes")
             oHelper.iHoleMarker = 1
             dvScores.Sort = "Date Desc"
@@ -52,7 +80,7 @@ Public Class Scores
             For Each fld In sArray
                 If fld.Contains("#Closests") Then
                     For i = oHelper.iHoleMarker To (oHelper.iHoleMarker - 1) + 9
-                        If oHelper.MyCourse(0)("Hole" & i) = 3 Then
+                        If oHelper.thisCourse("Hole" & i) = 3 Then
                             sArray.Add("CTP " & ictpctr & "-cPat40nt")
                             ictpctr += 1
                         End If
@@ -63,6 +91,7 @@ Public Class Scores
             Next
             sArray.Add("Points-40-true-false-ml")
             sArray.Add("Team_Points-50-true-false-ml")
+            '2019-12-22-need to add code for stableford
             sArray.Add("Opponent-170-true-false-ml")
             'player column not needed, its in the heading 
             If oHelper.bScoresbyPlayer Then
@@ -301,8 +330,26 @@ Public Class Scores
                         Next
                     End If
                     oHelper.SBPChangeColorsForStrokes(row)
+                    '20200121-blank out opponent for post season
+                    For Each lprow As DataRow In oHelper.dsLeague.Tables("dtLeagueParms").Rows
+                        Dim x = CDate(lprow("StartDate")).ToString("yyyyMMdd").Substring(0, 4)
+                        If CDate(lprow("StartDate")).ToString("yyyyMMdd").Substring(0, 4) <> row.Cells("Date").Value.Substring(0, 4) Then
+                            Continue For
+                        End If
+                        x = CDate(lprow("PostSeasonDt")).ToString("yyyyMMdd")
+                        If row.Cells("Date").Value >= CDate(lprow("PostSeasonDt")).ToString("yyyyMMdd") Then
+                            row.Cells("Opponent").Value = ""
+                        End If
+                    Next
+
+                    If row.Cells("Skins").Value.ToString.ToUpper = "TRUE" Then row.Cells("Skins").Value = "Y"
+                    If row.Cells("Skins").Value.ToString.ToUpper = "FALSE" Then row.Cells("Skins").Value = "N"
+
+                    If row.Cells("Closest").Value.ToString.ToUpper = "TRUE" Then row.Cells("Closest").Value = "Y"
+                    If row.Cells("Closest").Value.ToString.ToUpper = "FALSE" Then row.Cells("Closest").Value = "N"
                 Next
                 oHelper.bColors = False
+
             Catch ex As Exception
                 Dim x = ""
             End Try
@@ -310,8 +357,6 @@ Public Class Scores
         Catch ex As Exception
             MsgBox(oHelper.GetExceptionInfo(ex))
         End Try
-        Me.Cursor = Cursors.Default
-        Application.DoEvents()
     End Sub
     Sub ChangeFont(row As DataGridViewRow)
         Dim cell As DataGridViewCell = Nothing
@@ -334,7 +379,7 @@ Public Class Scores
                 Dim cell As DataGridViewCell = row.Cells("Hole" & i)
                 If IsNumeric(row.Cells("Hole" & i).Value) Then
                     If row.Cells("Hole" & i).Value > 0 Then
-                        Dim iPar As Integer = oHelper.MyCourse(0)("Hole" & i).ToString
+                        Dim iPar As Integer = oHelper.thisCourse("Hole" & i).ToString
                         Dim iScore As String = row.Cells("Hole" & i).Value
                         If Not row.Cells("Date").Value.ToString.Contains("ToPar") Then
                             If cell.Value < iPar Then cell.Style.BackColor = Color.Red
@@ -353,18 +398,18 @@ Public Class Scores
                 End If
             Next
             If IsNumeric(row.Cells("Out_Gross").Value) Then
-                If row.Cells("Out_Gross").Value < oHelper.MyCourse(0)("Out").ToString Then row.Cells("Out_Gross").Style.BackColor = Color.Red
+                If row.Cells("Out_Gross").Value < oHelper.thisCourse("Out").ToString Then row.Cells("Out_Gross").Style.BackColor = Color.Red
             End If
             If IsNumeric(row.Cells("Out_Net").Value) Then
-                If row.Cells("Out_Net").Value < oHelper.MyCourse(0)("Out").ToString Then row.Cells("Out_Net").Style.BackColor = Color.Red
+                If row.Cells("Out_Net").Value < oHelper.thisCourse("Out").ToString Then row.Cells("Out_Net").Style.BackColor = Color.Red
             End If
 
             If IsNumeric(row.Cells("In_Gross").Value) Then
-                If row.Cells("In_Gross").Value < oHelper.MyCourse(0)("In").ToString Then row.Cells("In_Gross").Style.BackColor = Color.Red
+                If row.Cells("In_Gross").Value < oHelper.thisCourse("In").ToString Then row.Cells("In_Gross").Style.BackColor = Color.Red
             End If
 
             If IsNumeric(row.Cells("In_Net").Value) Then
-                If row.Cells("In_Net").Value < oHelper.MyCourse(0)("In").ToString Then row.Cells("In_Net").Style.BackColor = Color.Red
+                If row.Cells("In_Net").Value < oHelper.thisCourse("In").ToString Then row.Cells("In_Net").Style.BackColor = Color.Red
             End If
 
         Catch ex As Exception
@@ -441,7 +486,7 @@ Public Class Scores
             If Not row("Hole" & i) > 0 Then Exit Sub
             d2dec = CInt(row("Hole" & i)) / CInt(row(IIf(i < 10, "F9", "B9")))
             row("Hole" & i) = d2dec.ToString("#.0")
-            d2dec -= oHelper.MyCourse(0)("Hole" & i).ToString
+            d2dec -= oHelper.thisCourse("Hole" & i).ToString
             'this updates the ytd topar
             drToPar("Hole" & i) = d2dec.ToString("#.0")
         Catch ex As Exception
@@ -512,7 +557,7 @@ Public Class Scores
                     row("Hole" & i) = CInt(row("Hole" & i)) + iscore
 
                     'add to stats rows
-                    Dim istart = oHelper.MyCourse(0)("Hole" & i).ToString - 2 'start with `
+                    Dim istart = oHelper.thisCourse("Hole" & i).ToString - 2 'start with `
                     Try
                         For x = 0 To sStatsDesc.Length - 1
                             If iscore = istart Then
@@ -589,16 +634,12 @@ Public Class Scores
         Try
             Dim newColumn As DataGridViewColumn = sender.Columns(e.ColumnIndex)
             oHelper.bScoresbyPlayer = True
-            Me.Cursor = Cursors.WaitCursor
-            Application.DoEvents()
             Dim dgv = sender
             For Each row As DataGridViewRow In dgv.rows
                 'row.Height = 30
                 oHelper.ChangeColorsForStrokes(row)
             Next
             oHelper.bScoresbyPlayer = False
-            Me.Cursor = Cursors.Default
-            Application.DoEvents()
         Catch ex As Exception
             MsgBox(oHelper.GetExceptionInfo(ex))
         End Try
@@ -622,8 +663,11 @@ Public Class Scores
     Private Sub Scores_Resize(sender As Object, e As EventArgs) Handles MyBase.Resize
         oHelper.LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
         Try
-            rs.ResizeAllControls(Me)
+            '    rs.ResizeAllControls(Me)
             oHelper.LOGIT(String.Format("Form Height {0} Width {1}", Me.Height, Me.Width))
+            'Me.Text = String.Format("Scores for Player {4}-Screen {5}x{6} Form {0}x{1}-Grid {2}x{3} ", Me.Width, Me.Height, dgScores.Width, dgScores.Height, oHelper.sPlayer, Main.iScreenWidth, Main.iScreenHeight)
+            Me.Text = String.Format("Player {8} - Form {7}-{0}, Resolution {1} x {2}, Menu {3} x {4}, Grid {5} x {6}", My.Computer.Name, Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Width, Me.Width, Me.Height, dgScores.Width, dgScores.Height, Me.Name, oHelper.sPlayer)
+
         Catch ex As Exception
 
         End Try

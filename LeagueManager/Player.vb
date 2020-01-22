@@ -1,88 +1,24 @@
-﻿Imports System.IO
-Public Class frmPlayer
+﻿Public Class Player
     Dim oHelper As New Helper
     Dim stable = "dtPlayers"
     Dim sOldCellValue = ""
-    Dim bError = False
-    Private Sub frmPlayer_Load(sender As System.Object, e As System.EventArgs) Handles MyBase.Load
+    Private Sub Player_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         oHelper = Main.oHelper
-        '20180110-old code using xml
-        'DsLeague.ReadXml(oHelper.getLatestFile("*Players.xml"))
-        'write the xml so we can read it back in for xsd
-        Dim sfilename = oHelper.sFilePath & "\" & DateTime.Now.ToString("yyyyMMdd_hhmmss_") & "Players.xml"
-        oHelper.dsLeague.Tables(stable).WriteXml(sfilename, XmlWriteMode.WriteSchema)
-        DsLeague.ReadXml(sfilename)
-        DsLeague.dtPlayers.PrimaryKey = New DataColumn() {DsLeague.Tables("dtPlayers").Columns("Name")}
-
-        DsLeague.dtPlayers.DefaultView.Sort = "Team Asc, Grade Asc"
-        System.IO.File.Delete(sfilename)
-        rebind()
-        'oHelper.SortCompare(DtPlayersDataGridView, e)
+        rbAll.Checked = True
     End Sub
-    Private Sub dtPlayersBindingNavigatorSaveItem_Click(sender As Object, e As EventArgs) Handles DtPlayersBindingNavigatorSaveItem.Click
-        Try
-            Me.Validate()
-            If Not bError Then
-                DtPlayersBindingSource.EndEdit()
-                'DsLeague.WriteXml(oHelper.sFilePath & "\" & DateTime.Now.ToString("yyyyMMdd_") & "Players.xml", XmlWriteMode.WriteSchema)
-                If oHelper.dsLeague.Tables.Contains(stable) Then oHelper.dsLeague.Tables.Remove(stable)
-                oHelper.DataTable2CSV(DsLeague.Tables(stable), oHelper.sFilePath & "\" & Now.ToString("yyyyMMdd") & "_Players.csv")
-            End If
-        Catch ex As Exception
-            'MsgBox(oHelper.GetExceptionInfo(ex))
-            MsgBox(ex.Message)
-        End Try
+    Private Sub rbRegulars_CheckedChanged(sender As Object, e As EventArgs) Handles rbRegulars.CheckedChanged
+        Dim BindingSource = New BindingSource()
+        BindingSource.DataSource = oHelper.dsLeague.Tables(stable)
+        BindingSource.Filter = "Team > 0 "
+        DtPlayersDataGridView.DataSource = BindingSource
     End Sub
 
-    Private Sub frmPlayer_FormClosing(sender As Object, e As FormClosingEventArgs) Handles MyBase.FormClosing
-        If e.CloseReason = CloseReason.UserClosing Then
-            Dim result = MsgBox("Are you sure you want to quit without saving?", MsgBoxStyle.YesNo)
-            If result = MsgBoxResult.Yes Then
-                Me.Dispose()
-            Else
-                e.Cancel = True
-            End If
-
-        End If
+    Private Sub rbAll_CheckedChanged(sender As Object, e As EventArgs) Handles rbAll.CheckedChanged
+        Dim BindingSource = New BindingSource()
+        BindingSource.DataSource = oHelper.dsLeague.Tables(stable)
+        BindingSource.Filter = ""
+        DtPlayersDataGridView.DataSource = BindingSource
     End Sub
-    'this sub is initiated if there us an error on a row change
-    Private Sub DtPlayersDataGridView_DataError(sender As Object, e As DataGridViewDataErrorEventArgs) Handles DtPlayersDataGridView.DataError
-        MsgBox(String.Format(e.Exception.Message & vbCrLf & "Changing back to {0}", sOldCellValue))
-        bError = True
-    End Sub
-    'Private Sub dtPlayersDataGridView_KeyPress(sender As Object, e As KeyPressEventArgs) Handles DtPlayersDataGridView.KeyPress
-    '    oHelper.LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
-    '    Try
-    '        For Each row As DataGridViewRow In DtPlayersDataGridView.Rows
-    '            If row.Selected Then Exit Sub
-    '        Next
-    '        Dim sOldCellValue As String = ""
-    '        Dim dgr As DataGridView = sender
-    '        'If dgr.CurrentCell.Value = sOldCellValue Then Exit Sub
-    '        Dim sCurrColName = dgr.CurrentCell.OwningColumn.Name
-    '        Dim R As DataGridViewRow = dgr.CurrentRow
-    '        Dim dgc As DataGridViewCell = sender.currentcell
-    '        If Not dgc.ReadOnly Then
-    '            Try
-    '                'save old value in case we fail an edit
-    '                sOldCellValue = dgc.Value
-    '                dgc.Value = ""
-    '                oHelper.bDGSError = False
-    '                'If sCurrColName = "Player" Then oHelper.fGetPlayer(dgc.Value, dgr)
-    '                If oHelper.bDGSError Then oHelper.bDGSError = False
-    '            Catch ex As Exception
-    '                MsgBox("Error " & ex.Message & vbCrLf & ex.StackTrace)
-    '            End Try
-    '        End If
-    '    Catch ex As Exception
-    '        MsgBox(oHelper.GetExceptionInfo(ex))
-    '    End Try
-
-    'End Sub
-    'Private Sub dtPlayersDataGridView_KeyDown(sender As Object, e As KeyEventArgs) Handles DtPlayersDataGridView.KeyDown
-    '    Dim dgc As DataGridViewCell = sender.currentcell
-    '    sOldCellValue = dgc.Value
-    'End Sub
     Private Sub dtPlayersDataGridView_CellBeginEdit(sender As Object, e As DataGridViewCellCancelEventArgs) Handles DtPlayersDataGridView.CellBeginEdit
         oHelper.LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
 
@@ -91,53 +27,39 @@ Public Class frmPlayer
         End If
 
     End Sub
-
     Private Sub dtPlayersDataGridView_CellEndEdit(sender As System.Object, e As System.Windows.Forms.DataGridViewCellEventArgs) Handles DtPlayersDataGridView.CellEndEdit
 
         Dim dgc As DataGridViewCell = sender.currentcell
         If dgc.OwningColumn.HeaderText = "Name" Then
-            Dim sov = dgc.Value
-            Dim sgp = oHelper.fGetPlayer(dgc.Value, sender)
-            If sgp.Contains(":New") Then
-                dgc.Value = sOldCellValue
-                Dim BindingSource = New BindingSource()
-                BindingSource.DataSource = DsLeague.dtPlayers
-                DtPlayersDataGridView.DataSource = BindingSource
-                Dim aRow As DataRow
-                aRow = DsLeague.dtPlayers.NewRow
-                aRow("Name") = sgp.Split(":")(0) 'Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(sNameInfo)
-                DsLeague.dtPlayers.Rows.Add(aRow)
-                BindingSource.ResetBindings(False)
-            End If
 
-            If sov = sgp Then
-                dgc.Value = sOldCellValue
-            Else
-                dgc.Value = sgp
+            If dgc.Value <> sOldCellValue Then
+                Dim result = MsgBox(String.Format("Do you want to rename player {0} to {1} in all files?", sOldCellValue, dgc.Value), MsgBoxStyle.YesNo)
+                If result = MsgBoxResult.Yes Then
+                    Dim dvScores As New DataView(oHelper.dsLeague.Tables("dtScores"))
+                    dvScores.RowFilter = String.Format("Player = '{0}'", sOldCellValue)
+                    For Each score As DataRowView In dvScores
+                        score("Player") = dgc.Value
+                        oHelper.LOGIT(String.Format("Updated Score {0}", score("Date")))
+                    Next
+                    oHelper.DataTable2CSV(oHelper.dsLeague.Tables("dtScores"), oHelper.sFilePath & "\Scores.csv")
+                    oHelper.LOGIT(String.Format("Updating {0}\Scores.csv", oHelper.sFilePath))
+                    Dim dvPmts As New DataView(oHelper.dsLeague.Tables("dtPayments"))
+                    dvPmts.RowFilter = String.Format("Player = '{0}'", sOldCellValue)
+                    For Each pmt As DataRowView In dvPmts
+                        pmt("Player") = dgc.Value
+                        oHelper.LOGIT(String.Format("Updated Payment {0}", pmt("Date")))
+                    Next
+                    oHelper.DataTable2CSV(oHelper.dsLeague.Tables("dtPayments"), oHelper.sFilePath & "\Payments.csv")
+                    oHelper.LOGIT(String.Format("Updating {0}\Payments.csv", oHelper.sFilePath))
+                    'DtPlayersBindingSource.EndEdit()
+                    oHelper.DataTable2CSV(oHelper.dsLeague.Tables("dtPlayers"), oHelper.sFilePath & "\Players.csv")
+                    oHelper.LOGIT(String.Format("Updating {0}\Players.csv", oHelper.sFilePath))
+                Else
+                    dgc.Value = sOldCellValue
+                End If
             End If
         End If
 
     End Sub
-    Private Sub dtPlayersDataGridView_SortCompare(sender As Object, e As DataGridViewSortCompareEventArgs) Handles DtPlayersDataGridView.SortCompare
-        oHelper.SortCompare(sender, e)
-    End Sub
-    Sub rebind()
-        Dim BindingSource = New BindingSource()
-        BindingSource.DataSource = DsLeague.dtPlayers
-        DtPlayersDataGridView.DataSource = BindingSource
-    End Sub
 
-    Private Sub rbRegulars_CheckedChanged(sender As Object, e As EventArgs) Handles rbRegulars.CheckedChanged
-        Dim BindingSource = New BindingSource()
-        BindingSource.DataSource = DsLeague.dtPlayers
-        BindingSource.Filter = "Team > 0 "
-        DtPlayersDataGridView.DataSource = BindingSource
-    End Sub
-
-    Private Sub rbAll_CheckedChanged(sender As Object, e As EventArgs) Handles rbAll.CheckedChanged
-        Dim BindingSource = New BindingSource()
-        BindingSource.DataSource = DsLeague.dtPlayers
-        BindingSource.Filter = ""
-        DtPlayersDataGridView.DataSource = BindingSource
-    End Sub
 End Class

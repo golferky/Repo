@@ -15,9 +15,20 @@
             dsLeague = oHelper.dsLeague
             oHelper.LOGIT(Reflection.MethodBase.GetCurrentMethod().Name & " -------------------------")
 
-            Dim sWH As String = oHelper.ScreenResize("1150", "650")
-            Me.Width = sWH.Split(":")(0)
-            Me.Height = sWH.Split(":")(1)
+            'Dim sWH As String = oHelper.ScreenResize("1150", "650")
+            'Me.Width = sWH.Split(":")(0)
+            'Me.Height = sWH.Split(":")(1)
+            Dim sWH As String = oHelper.ScreenResize()
+            If Me.Width >= sWH.Split(":")(0) Then
+                Me.Width = sWH.Split(":")(0) - (sWH.Split(":")(0) * 0.1)
+            Else
+                ' Me.Width = sWH.Split(":")(0)
+            End If
+            If Me.Height >= sWH.Split(":")(1) Then
+                Me.Height = sWH.Split(":")(1) - (sWH.Split(":")(1) * 0.1)
+            Else
+                'Me.Height = sWH.Split(":")(1)
+            End If
 
             'dsLeague.Tables("dtPayments").PrimaryKey = New DataColumn() {dsLeague.Tables("dtPayments").Columns("Date"), dsLeague.Tables("dtPayments").Columns("Player"), dsLeague.Tables("dtPayments").Columns("Desc")}
 
@@ -30,26 +41,20 @@
                     dtschedule.Rows.Remove(row)
                     Continue For
                 End If
-                Dim wkdate As Date = row("Date")
-                Dim reformatted As String = wkdate.ToString("yyyyMMdd", Globalization.CultureInfo.InvariantCulture)
-                row("Date") = reformatted
+                'Dim wkdate As Date = row("Date")
+                'Dim reformatted As String = wkdate.ToString("yyyyMMdd", Globalization.CultureInfo.InvariantCulture)
+                row("Date") = CDate(row("Date")).ToString("yyyyMMdd")
             Next
 
             cbDate.Items.Clear()
             cbDate.Items.Add("All Dates")
             Dim dvsch As New DataView(dtschedule)
             For Each rv As DataRowView In dvsch
-                'check the sch date against the last score date
-                '20190314-only load dates < today plus one more score
-                Dim x = Main.dtScore.Value.ToString("yyyyMMdd", Globalization.CultureInfo.InvariantCulture)
-                If rv(0).ToString > Main.dtScore.Value.ToString("yyyyMMdd", Globalization.CultureInfo.InvariantCulture) Then Exit For
+                If rv(0).ToString > oHelper.sDateLastScore Then Exit For
                 cbDate.Items.Add(rv(0))
             Next
 
             cbDate.SelectedIndex = 0
-            'cbDate.SelectedIndex = cbDate.Items.IndexOf(oHelper.sDateLastScore)
-            'cbDate.SelectedItem = oHelper.sDateLastScore
-
             cbPlayers.Items.Clear()
             cbPlayers.Items.Add("All Players")
 
@@ -59,7 +64,7 @@
             For Each row In dsLeague.Tables("dtPlayers").Rows
                 Dim dv As New DataView(dsLeague.dtPayments)
                 dv.RowFilter = String.Format("Player in('{0}') and Detail in ('Payment')", row("Name"))
-                dv.RowFilter = dv.RowFilter & String.Format(" AND Date >= '{0}' AND Date <= '{1}'", Main.dtRSStart.Value.ToString("yyyyMMdd"), Main.tbPSEnd.Text)
+                'dv.RowFilter = dv.RowFilter & String.Format(" AND Date >= '{0}' AND Date <= '{1}'", CDate(oHelper.rLeagueParmrow("StartDate")).ToString("yyyyMMdd"), CDate(oHelper.rLeagueParmrow("EndDate")).ToString("yyyyMMdd"))
                 If dv.Count > 0 Then
                     cbPlayers.Items.Add(row("Name"))
                     cbPlayers.Sorted = True
@@ -111,13 +116,15 @@
             oHelper.status_Msg(lbStatus, Me)
 
             If dgPayments.RowCount > 0 Then
-                Dim mbr = MsgBox("Do you want to save Payments below before you reload this screen", MsgBoxStyle.YesNo)
-                If mbr = MsgBoxResult.No Then
-                    lbStatus.Text = " Payments not saved"
-                    lbStatus.BackColor = Color.LightGreen
-                    oHelper.bDGSError = False
-                Else
-                    SavePayments()
+                If dgPayments.Rows(0).Cells("Player").Value <> "" Then
+                    Dim mbr = MsgBox("Do you want to save Payments below before you reload this screen", MsgBoxStyle.YesNo)
+                    If mbr = MsgBoxResult.No Then
+                        lbStatus.Text = " Payments not saved"
+                        lbStatus.BackColor = Color.LightGreen
+                        oHelper.bDGSError = False
+                    Else
+                        SavePayments()
+                    End If
                 End If
 
             End If
@@ -126,18 +133,18 @@
             '20190319 - columns built in designer
             Dim dv As New DataView(dsLeague.dtPayments)
             dv.RowFilter = "Detail in('Payment','Charge') "
-                    If cbPlayers.SelectedItem <> "All Players" Then dv.RowFilter = dv.RowFilter & String.Format("AND Player = '{0}'", cbPlayers.SelectedItem)
-            If cbDate.SelectedItem <> "All Dates" Then
-                dv.RowFilter = dv.RowFilter & String.Format("AND Date = '{0}'", cbDate.SelectedItem)
-            Else
-                dv.RowFilter = dv.RowFilter & String.Format(" AND Date >= '{0}' AND Date <= '{1}'", Main.dtRSStart.Value.ToString("yyyyMMdd"), Main.tbPSEnd.Text)
-            End If
+            If cbPlayers.SelectedItem <> "All Players" Then dv.RowFilter &= String.Format("AND Player = '{0}'", cbPlayers.SelectedItem)
+            If cbDate.SelectedItem <> "All Dates" Then dv.RowFilter &= String.Format("AND Date = '{0}'", cbDate.SelectedItem)
+            'Else
+            'dv.RowFilter = dv.RowFilter & String.Format(" AND Date >= '{0}' AND Date <= '{1}'", Main.dtRSStart.Value.ToString("yyyyMMdd"), Main.tbPSEnd.Text)
+            'dv.RowFilter = dv.RowFilter & String.Format(" AND Date >= '{0}' AND Date <= '{1}'", CDate(oHelper.rLeagueParmrow("StartDate")).ToString("yyyyMMdd"), CDate(oHelper.rLeagueParmrow("EndDate")).ToString("yyyyMMdd"))
+            'End If
             dgPayments.Rows.Clear()
 
             For Each row As DataRowView In dv
                 If row("PayMethod") Is DBNull.Value Then row("PayMethod") = "Cash"
                 Dim sCol As String = row("Player") & "," & row("Date") & "," & row("Desc")
-                If row("Desc") = "EOY Skins" Then
+                If row("Desc").ToString.Contains("EOY Skins") Then
                     If row("Comment") Is DBNull.Value Then
                         sCol = sCol & "," & row("Detail") & "," & row("Earned") & "," & row("PayMethod") & "," & row("Comment")
                         dgPayments.Rows.Add(sCol.Split(",").ToArray)
@@ -152,9 +159,32 @@
                     sCol = sCol & "," & row("Detail") & "," & row("Earned") & "," & row("PayMethod") & "," & row("Comment")
                     dgPayments.Rows.Add(sCol.Split(",").ToArray)
                 ElseIf row("Detail") = "Charge" Then
-                    sCol = sCol &  "," & row("Detail")  & "," & row("Earned") & "," & row("PayMethod") & "," & row("Comment")
+                    sCol = sCol & "," & row("Detail") & "," & row("Earned") & "," & row("PayMethod") & "," & row("Comment")
                     dgPayments.Rows.Add(sCol.Split(",").ToArray)
                 End If
+
+                Dim sKeys() As Object = {row("Player")}
+                Dim arow As DataRow = dsLeague.Tables("dtPlayers").Rows.Find(sKeys)
+                '20190327-this should never happen
+                If arow Is Nothing Then
+                    MsgBox(String.Format("Player doesnt exist {0}.  contact developer", sKeys(0)))
+                    Exit Sub
+                Else
+                    Dim dcb As New DataGridViewComboBoxCell
+                    dcb = dgPayments.CurrentRow.Cells("EmailText")
+                    dcb.Items.Clear()
+                    dcb.Items.Add("None")
+                    If arow("Email") IsNot DBNull.Value Then
+                        dcb.Items.Add("Email")
+                        semail = arow("Email")
+                    End If
+                    If arow("Phone") IsNot DBNull.Value Then
+                        dcb.Items.Add("Text")
+                        sphone = arow("Phone")
+                    End If
+
+                End If
+
             Next
 
             Dim x = dgPayments.RowCount
@@ -199,11 +229,11 @@
                     End If
                     arow(col) = cell.Value
                 Next
-                arow("Date") = oHelper.dDate.ToString("yyyyMMdd")
-                arow("DatePaid") = Now.ToString("yyyyMMdd")
+                arow("Date") = row.Cells("PayDate").Value 'oHelper.dDate.ToString("yyyyMMdd")
+                arow("DatePaid") = row.Cells("PayDate").Value
                 arow("Detail") = "Payment"
 
-                'dsLeague.dtPayments.Rows.Add(arow)
+                dsLeague.dtPayments.Rows.Add(arow)
 
                 If row.Cells("Comment").Value <> "No Receipt sent" Then
                     Dim sKeys() As Object = {row.Cells("Player").Value}
@@ -230,7 +260,7 @@
                             '    semail = semail & "@vtext.com"
                             'End If
                         End If
-                    ElseIf Row.Cells("EmailText").Value = "Email" Then
+                    ElseIf row.Cells("EmailText").Value = "Email" Then
                         semail = prow("Email").ToString
                     End If
                     If semail <> "" Then
@@ -249,14 +279,15 @@
                 End If
 
             Next
-
-            'oHelper.CopyDataGridViewToClipboard(dgLast5)
-            Dim sfilename = oHelper.sFilePath & "\" & DateTime.Now.ToString("yyyyMMdd_hhmmss_") & "Pymts.csv"
-            lbStatus.Text = String.Format("Creating spreadsheet({0}) of payments from this screen...", sfilename)
-            oHelper.status_Msg(lbStatus, Me)
-            oHelper.dgv2csv(dgPayments, sfilename)
-            'oHelper.DataTable2XML("dtScores", "Scores")
-            oHelper.DataTable2CSV(dsLeague.dtPayments, oHelper.sFilePath & "\" & Now.ToString("yyyyMMdd") & "_Payments.csv")
+            If Not Debugger.IsAttached Then
+                'oHelper.CopyDataGridViewToClipboard(dgLast5)
+                Dim sfilename = oHelper.sFilePath & "\" & DateTime.Now.ToString("yyyyMMdd_hhmmss_") & "Pymts.csv"
+                lbStatus.Text = String.Format("Creating spreadsheet({0}) of payments from this screen...", sfilename)
+                oHelper.status_Msg(lbStatus, Me)
+                oHelper.dgv2csv(dgPayments, sfilename)
+                'oHelper.DataTable2XML("dtScores", "Scores")
+            End If
+            oHelper.DataTable2CSV(dsLeague.dtPayments, oHelper.sFilePath & "\Payments.csv")
             lbStatus.Text = "Finished saving payments from this screen"
             oHelper.status_Msg(lbStatus, Me)
         Catch ex As Exception
@@ -267,8 +298,8 @@
     Private Sub dgPayments_DataError(sender As System.Object, e As System.Windows.Forms.DataGridViewDataErrorEventArgs) Handles dgPayments.DataError
         'MsgBox(e.Exception.Message)
 
-        Try
-            dgPayments.EndEdit()
+            Try
+            'dgPayments.EndEdit()
             '    MsgBox(e.Context.ToString)
         Catch ex As Exception
             '    MsgBox(ex.Message)
@@ -355,6 +386,9 @@
                 ElseIf dgr.CurrentCell.Value = "EOY Skins" Then
                     dgPayments.CurrentRow.Cells("Amount").Value = "20"
                     dgPayments.CurrentRow.Cells("PayMethod").Value = "Cash"
+                ElseIf dgr.CurrentCell.Value.ToString.Contains("EOY Skins Wk") Then
+                    dgPayments.CurrentRow.Cells("Amount").Value = "10"
+                    dgPayments.CurrentRow.Cells("PayMethod").Value = "Cash"
                 End If
                 'if no change, then exit 
                 If dgr.CurrentCell.Value = sOldCellValue Then Exit Sub
@@ -406,6 +440,7 @@
     Private Sub dgPayments_RowLeave(sender As Object, e As DataGridViewCellEventArgs) Handles dgPayments.RowLeave
 
     End Sub
+
 #Region "Not_Used"
 #End Region
 

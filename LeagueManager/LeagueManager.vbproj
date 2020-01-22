@@ -1,5 +1,5 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
-<Project ToolsVersion="4.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+<Project ToolsVersion="12.0" DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">x86</Platform>
@@ -13,7 +13,7 @@
     <AssemblyName>LeagueManager</AssemblyName>
     <FileAlignment>512</FileAlignment>
     <MyType>WindowsForms</MyType>
-    <TargetFrameworkVersion>v4.0</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <TargetFrameworkProfile>
     </TargetFrameworkProfile>
     <IsWebBootstrapper>false</IsWebBootstrapper>
@@ -42,6 +42,7 @@
     <DocumentationFile>
     </DocumentationFile>
     <NoWarn>41999,42016,42017,42018,42019,42020,42021,42022,42032,42036</NoWarn>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|x86' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -54,6 +55,7 @@
     </DocumentationFile>
     <NoWarn>41999,42016,42017,42018,42019,42020,42021,42022,42032,42036</NoWarn>
     <UseVSHostingProcess>false</UseVSHostingProcess>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup>
     <OptionExplicit>On</OptionExplicit>
@@ -77,16 +79,18 @@
     <PlatformTarget>x64</PlatformTarget>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
     <UseVSHostingProcess>false</UseVSHostingProcess>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)' == 'Release|AnyCPU'">
     <DefineTrace>true</DefineTrace>
-    <OutputPath>..\..\..\LeagueManager\</OutputPath>
+    <OutputPath>C:\LeagueManager\</OutputPath>
     <Optimize>true</Optimize>
     <NoWarn>41999,42016,42017,42018,42019,42020,42021,42022,42032,42036</NoWarn>
     <DebugType>none</DebugType>
     <PlatformTarget>AnyCPU</PlatformTarget>
     <UseVSHostingProcess>false</UseVSHostingProcess>
     <CodeAnalysisRuleSet>MinimumRecommendedRules.ruleset</CodeAnalysisRuleSet>
+    <Prefer32Bit>false</Prefer32Bit>
   </PropertyGroup>
   <PropertyGroup>
     <ApplicationManifest>My Project\app.manifest</ApplicationManifest>
@@ -155,6 +159,12 @@
     <Compile Include="LastFive.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="LeagueSetup.Designer.vb">
+      <DependentUpon>LeagueSetup.vb</DependentUpon>
+    </Compile>
+    <Compile Include="LeagueSetup.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Matches.Designer.vb">
       <DependentUpon>Matches.vb</DependentUpon>
     </Compile>
@@ -167,10 +177,22 @@
     <Compile Include="NewPlayer.vb">
       <SubType>Form</SubType>
     </Compile>
+    <Compile Include="ScoreCard.Designer.vb">
+      <DependentUpon>ScoreCard.vb</DependentUpon>
+    </Compile>
+    <Compile Include="ScoreCard.vb">
+      <SubType>Form</SubType>
+    </Compile>
     <Compile Include="Payments.Designer.vb">
       <DependentUpon>Payments.vb</DependentUpon>
     </Compile>
     <Compile Include="Payments.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="oldPlayer.Designer.vb">
+      <DependentUpon>oldPlayer.vb</DependentUpon>
+    </Compile>
+    <Compile Include="oldPlayer.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="Player.Designer.vb">
@@ -197,6 +219,12 @@
       <DependentUpon>Scores.vb</DependentUpon>
     </Compile>
     <Compile Include="Scores.vb">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Setup.Designer.vb">
+      <DependentUpon>Setup.vb</DependentUpon>
+    </Compile>
+    <Compile Include="Setup.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="SkinRpt.Designer.vb">
@@ -229,10 +257,10 @@
     <Compile Include="Team.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="LeagueSetup.Designer.vb">
-      <DependentUpon>LeagueSetup.vb</DependentUpon>
+    <Compile Include="OldLeagueSetup.Designer.vb">
+      <DependentUpon>OldLeagueSetup.vb</DependentUpon>
     </Compile>
-    <Compile Include="LeagueSetup.vb">
+    <Compile Include="OldLeagueSetup.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="lvSort.vb">
@@ -273,12 +301,10 @@
     <Compile Include="PlayerStats.vb">
       <SubType>Form</SubType>
     </Compile>
-    <Compile Include="RTFCodes.vb" />
-    <Compile Include="RTF_NET.vb" />
-    <Compile Include="ScoreCard.Designer.vb">
-      <DependentUpon>ScoreCard.vb</DependentUpon>
+    <Compile Include="ScoreCardOnly.Designer.vb">
+      <DependentUpon>ScoreCardOnly.vb</DependentUpon>
     </Compile>
-    <Compile Include="ScoreCard.vb">
+    <Compile Include="ScoreCardOnly.vb">
       <SubType>Form</SubType>
     </Compile>
     <Compile Include="SelectPlayers.Designer.vb">
@@ -353,14 +379,23 @@
     <EmbeddedResource Include="LastFive.resx">
       <DependentUpon>LastFive.vb</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="LeagueSetup.resx">
+      <DependentUpon>LeagueSetup.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Matches.resx">
       <DependentUpon>Matches.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="NewPlayer.resx">
       <DependentUpon>NewPlayer.vb</DependentUpon>
     </EmbeddedResource>
+    <EmbeddedResource Include="ScoreCard.resx">
+      <DependentUpon>ScoreCard.vb</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Payments.resx">
       <DependentUpon>Payments.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="oldPlayer.resx">
+      <DependentUpon>oldPlayer.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Player.resx">
       <DependentUpon>Player.vb</DependentUpon>
@@ -373,6 +408,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Scores.resx">
       <DependentUpon>Scores.vb</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Setup.resx">
+      <DependentUpon>Setup.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="SkinRpt.resx">
       <DependentUpon>SkinRpt.vb</DependentUpon>
@@ -393,8 +431,8 @@
       <DependentUpon>Handicap.vb</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
-    <EmbeddedResource Include="LeagueSetup.resx">
-      <DependentUpon>LeagueSetup.vb</DependentUpon>
+    <EmbeddedResource Include="OldLeagueSetup.resx">
+      <DependentUpon>OldLeagueSetup.vb</DependentUpon>
       <SubType>Designer</SubType>
     </EmbeddedResource>
     <EmbeddedResource Include="Partners.resx">
@@ -403,8 +441,8 @@
     <EmbeddedResource Include="PlayerStats.resx">
       <DependentUpon>PlayerStats.vb</DependentUpon>
     </EmbeddedResource>
-    <EmbeddedResource Include="ScoreCard.resx">
-      <DependentUpon>ScoreCard.vb</DependentUpon>
+    <EmbeddedResource Include="ScoreCardOnly.resx">
+      <DependentUpon>ScoreCardOnly.vb</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Scoring.resx">
       <DependentUpon>Scoring.vb</DependentUpon>

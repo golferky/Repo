@@ -116,7 +116,7 @@ Public Class Finance
             Else
                 'this code checks to see if a player participated in EOY skins
                 Dim dvs As New DataView(oHelper.dsLeague.Tables("dtPayments"))
-                dvs.RowFilter = String.Format("Desc = '{0}' And Detail = '{1}' And Date >= '{2}'", "EOY Skins", "Payment", sdate)
+                dvs.RowFilter = String.Format("Desc in ({0}) And Detail = '{1}' And Date >= '{2}' And Date <= '{3}'", "'EOY Skins','EOY Skins Wk1','EOY Skins Wk2'", "Payment", sdate, sdate.Replace("0101", "1231"))
                 Dim dt = dvs.ToTable
                 dt.PrimaryKey = New DataColumn() {dt.Columns("Player")}
                 Dim sKeys() As Object = {row("Player")}
@@ -127,11 +127,20 @@ Public Class Finance
             dgFinance.Rows.Add(row.ItemArray)
         Next
         For Each row As DataGridViewRow In dgFinance.Rows
-            Dim splayer = row.Cells("Player").Value
-            If splayer IsNot Nothing Then
-                If splayer.StartsWith("* ") Then
-                    row.Cells("Player").Value = splayer.Replace("* ", "")
-                    row.Cells("Player").Style.BackColor = Color.LightBlue
+            If row.Cells("Player").Value IsNot Nothing Then
+                Dim splayer = row.Cells("Player").Value.ToString.Replace("* ", "")
+                Dim x = oHelper.dsLeague.Tables("dtPlayers").PrimaryKey
+                If splayer IsNot Nothing Then
+                    If row.Cells("Player").Value.StartsWith("* ") Then
+                        row.Cells("Player").Value = splayer
+                        Dim sKeys() As Object = {splayer}
+                        Dim prow As DataRow = oHelper.dsLeague.Tables("dtPlayers").Rows.Find(sKeys)
+                        If prow IsNot Nothing Then
+                            If prow("Team") IsNot DBNull.Value Then
+                                row.Cells("Player").Style.BackColor = Color.LightBlue
+                            End If
+                        End If
+                    End If
                 End If
             End If
         Next
@@ -214,11 +223,11 @@ Public Class Finance
             '20180225-fix Mouse click to expand columns
             If e.ColumnIndex = 0 Then
                 If cell.OwningColumn.Name = "Player" Then
-                    Dim mbResult As MsgBoxResult = MsgBox("List detailed finances For " & cell.Value.ToString.Replace("* ", "") & "?", MsgBoxStyle.YesNo)
-                    If mbResult = MsgBoxResult.Yes Then
-                        oHelper.sPlayer = cell.Value.ToString.Replace("* ", "")
-                        FinanceDetails.Show()
-                    End If
+                    'Dim mbResult As MsgBoxResult = MsgBox("List detailed finances For " & cell.Value.ToString.Replace("* ", "") & "?", MsgBoxStyle.YesNo)
+                    'If mbResult = MsgBoxResult.Yes Then
+                    oHelper.sPlayer = cell.Value.ToString.Replace("* ", "")
+                    FinanceDetails.Show()
+                    'End If
                 End If
             End If
         Catch ex As Exception

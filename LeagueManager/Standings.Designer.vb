@@ -1,9 +1,9 @@
-﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()> _
+﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()>
 Partial Class Standings
     Inherits System.Windows.Forms.Form
 
     'Form overrides dispose to clean up the component list.
-    <System.Diagnostics.DebuggerNonUserCode()> _
+    <System.Diagnostics.DebuggerNonUserCode()>
     Protected Overrides Sub Dispose(ByVal disposing As Boolean)
         Try
             If disposing AndAlso components IsNot Nothing Then
@@ -20,11 +20,12 @@ Partial Class Standings
     'NOTE: The following procedure is required by the Windows Form Designer
     'It can be modified using the Windows Form Designer.  
     'Do not modify it using the code editor.
-    <System.Diagnostics.DebuggerStepThrough()> _
+    <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
-        Me.btnStandings = New System.Windows.Forms.Button()
         Me.dgStandings = New System.Windows.Forms.DataGridView()
         Me.gbOptions = New System.Windows.Forms.GroupBox()
+        Me.cbDates = New System.Windows.Forms.ComboBox()
+        Me.Label2 = New System.Windows.Forms.Label()
         Me.cbExcel = New System.Windows.Forms.CheckBox()
         Me.lbStatus = New System.Windows.Forms.Label()
         Me.GroupBox1 = New System.Windows.Forms.GroupBox()
@@ -40,11 +41,11 @@ Partial Class Standings
         Me.cbScore = New System.Windows.Forms.CheckBox()
         Me.cbTeam = New System.Windows.Forms.CheckBox()
         Me.cbSubs = New System.Windows.Forms.CheckBox()
-        Me.btnExit = New System.Windows.Forms.Button()
         Me.btnEmail = New System.Windows.Forms.Button()
         Me.cbTotalPts = New System.Windows.Forms.CheckBox()
         Me.cbIndPts = New System.Windows.Forms.CheckBox()
         Me.GroupBox2 = New System.Windows.Forms.GroupBox()
+        Me.btnDisplay = New System.Windows.Forms.Button()
         CType(Me.dgStandings, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.gbOptions.SuspendLayout()
         Me.GroupBox1.SuspendLayout()
@@ -52,16 +53,6 @@ Partial Class Standings
         Me.gbCell.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
         Me.SuspendLayout()
-        '
-        'btnStandings
-        '
-        Me.btnStandings.Location = New System.Drawing.Point(959, 2)
-        Me.btnStandings.Margin = New System.Windows.Forms.Padding(2)
-        Me.btnStandings.Name = "btnStandings"
-        Me.btnStandings.Size = New System.Drawing.Size(106, 37)
-        Me.btnStandings.TabIndex = 69
-        Me.btnStandings.Text = "Show Standings"
-        Me.btnStandings.UseVisualStyleBackColor = True
         '
         'dgStandings
         '
@@ -71,11 +62,14 @@ Partial Class Standings
         Me.dgStandings.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
         Me.dgStandings.Location = New System.Drawing.Point(32, 126)
         Me.dgStandings.Name = "dgStandings"
-        Me.dgStandings.Size = New System.Drawing.Size(1032, 536)
+        Me.dgStandings.RowHeadersVisible = False
+        Me.dgStandings.Size = New System.Drawing.Size(1031, 536)
         Me.dgStandings.TabIndex = 70
         '
         'gbOptions
         '
+        Me.gbOptions.Controls.Add(Me.cbDates)
+        Me.gbOptions.Controls.Add(Me.Label2)
         Me.gbOptions.Controls.Add(Me.cbExcel)
         Me.gbOptions.Controls.Add(Me.lbStatus)
         Me.gbOptions.Controls.Add(Me.GroupBox1)
@@ -89,10 +83,27 @@ Partial Class Standings
         Me.gbOptions.TabStop = False
         Me.gbOptions.Text = "Display Options"
         '
+        'cbDates
+        '
+        Me.cbDates.FormattingEnabled = True
+        Me.cbDates.Location = New System.Drawing.Point(699, 45)
+        Me.cbDates.Name = "cbDates"
+        Me.cbDates.Size = New System.Drawing.Size(81, 21)
+        Me.cbDates.TabIndex = 78
+        '
+        'Label2
+        '
+        Me.Label2.AutoSize = True
+        Me.Label2.Location = New System.Drawing.Point(696, 23)
+        Me.Label2.Name = "Label2"
+        Me.Label2.Size = New System.Drawing.Size(61, 13)
+        Me.Label2.TabIndex = 77
+        Me.Label2.Text = "Score Date"
+        '
         'cbExcel
         '
         Me.cbExcel.AutoSize = True
-        Me.cbExcel.Location = New System.Drawing.Point(551, 29)
+        Me.cbExcel.Location = New System.Drawing.Point(570, 33)
         Me.cbExcel.Name = "cbExcel"
         Me.cbExcel.Size = New System.Drawing.Size(52, 17)
         Me.cbExcel.TabIndex = 76
@@ -103,7 +114,7 @@ Partial Class Standings
         'lbStatus
         '
         Me.lbStatus.AutoSize = True
-        Me.lbStatus.Location = New System.Drawing.Point(495, 59)
+        Me.lbStatus.Location = New System.Drawing.Point(513, 72)
         Me.lbStatus.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
         Me.lbStatus.Name = "lbStatus"
         Me.lbStatus.Size = New System.Drawing.Size(37, 13)
@@ -114,7 +125,7 @@ Partial Class Standings
         '
         Me.GroupBox1.Controls.Add(Me.cb1stHalf)
         Me.GroupBox1.Controls.Add(Me.cb2ndHalf)
-        Me.GroupBox1.Location = New System.Drawing.Point(260, 19)
+        Me.GroupBox1.Location = New System.Drawing.Point(279, 23)
         Me.GroupBox1.Name = "GroupBox1"
         Me.GroupBox1.Size = New System.Drawing.Size(112, 79)
         Me.GroupBox1.TabIndex = 74
@@ -149,7 +160,7 @@ Partial Class Standings
         '
         Me.gbPoints.Controls.Add(Me.rbCum)
         Me.gbPoints.Controls.Add(Me.rbWeekly)
-        Me.gbPoints.Location = New System.Drawing.Point(378, 19)
+        Me.gbPoints.Location = New System.Drawing.Point(397, 23)
         Me.gbPoints.Name = "gbPoints"
         Me.gbPoints.Size = New System.Drawing.Size(111, 79)
         Me.gbPoints.TabIndex = 72
@@ -188,7 +199,7 @@ Partial Class Standings
         Me.gbCell.Controls.Add(Me.cbTeam)
         Me.gbCell.Location = New System.Drawing.Point(6, 19)
         Me.gbCell.Name = "gbCell"
-        Me.gbCell.Size = New System.Drawing.Size(248, 79)
+        Me.gbCell.Size = New System.Drawing.Size(267, 79)
         Me.gbCell.TabIndex = 74
         Me.gbCell.TabStop = False
         Me.gbCell.Text = "Cell Contents"
@@ -252,22 +263,12 @@ Partial Class Standings
         Me.cbSubs.AutoSize = True
         Me.cbSubs.Checked = True
         Me.cbSubs.CheckState = System.Windows.Forms.CheckState.Checked
-        Me.cbSubs.Location = New System.Drawing.Point(495, 29)
+        Me.cbSubs.Location = New System.Drawing.Point(514, 33)
         Me.cbSubs.Name = "cbSubs"
         Me.cbSubs.Size = New System.Drawing.Size(50, 17)
         Me.cbSubs.TabIndex = 3
         Me.cbSubs.Text = "Subs"
         Me.cbSubs.UseVisualStyleBackColor = True
-        '
-        'btnExit
-        '
-        Me.btnExit.Location = New System.Drawing.Point(959, 87)
-        Me.btnExit.Margin = New System.Windows.Forms.Padding(2)
-        Me.btnExit.Name = "btnExit"
-        Me.btnExit.Size = New System.Drawing.Size(106, 37)
-        Me.btnExit.TabIndex = 73
-        Me.btnExit.Text = "Exit"
-        Me.btnExit.UseVisualStyleBackColor = True
         '
         'btnEmail
         '
@@ -310,17 +311,28 @@ Partial Class Standings
         Me.GroupBox2.TabStop = False
         Me.GroupBox2.Text = "Optional Columns"
         '
+        'btnDisplay
+        '
+        Me.btnDisplay.Location = New System.Drawing.Point(959, 11)
+        Me.btnDisplay.Margin = New System.Windows.Forms.Padding(2)
+        Me.btnDisplay.Name = "btnDisplay"
+        Me.btnDisplay.Size = New System.Drawing.Size(106, 37)
+        Me.btnDisplay.TabIndex = 76
+        Me.btnDisplay.Text = "ReDisplay Standings"
+        Me.btnDisplay.UseVisualStyleBackColor = True
+        '
         'Standings
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(1350, 729)
+        Me.AutoScroll = True
+        Me.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch
+        Me.ClientSize = New System.Drawing.Size(1094, 729)
+        Me.Controls.Add(Me.btnDisplay)
         Me.Controls.Add(Me.GroupBox2)
         Me.Controls.Add(Me.btnEmail)
-        Me.Controls.Add(Me.btnExit)
         Me.Controls.Add(Me.gbOptions)
         Me.Controls.Add(Me.dgStandings)
-        Me.Controls.Add(Me.btnStandings)
         Me.Name = "Standings"
         Me.Text = "Standings"
         CType(Me.dgStandings, System.ComponentModel.ISupportInitialize).EndInit()
@@ -337,7 +349,6 @@ Partial Class Standings
         Me.ResumeLayout(False)
 
     End Sub
-    Friend WithEvents btnStandings As Button
     Friend WithEvents dgStandings As DataGridView
     Friend WithEvents gbOptions As GroupBox
     Friend WithEvents cbHdcp As CheckBox
@@ -348,7 +359,6 @@ Partial Class Standings
     Friend WithEvents rbCum As RadioButton
     Friend WithEvents rbWeekly As RadioButton
     Friend WithEvents cbTeam As CheckBox
-    Friend WithEvents btnExit As Button
     Friend WithEvents cb2ndHalf As CheckBox
     Friend WithEvents cb1stHalf As CheckBox
     Friend WithEvents cbOpp As CheckBox
@@ -360,4 +370,7 @@ Partial Class Standings
     Friend WithEvents cbIndPts As CheckBox
     Friend WithEvents GroupBox2 As GroupBox
     Friend WithEvents cbExcel As CheckBox
+    Friend WithEvents cbDates As ComboBox
+    Friend WithEvents Label2 As Label
+    Friend WithEvents btnDisplay As Button
 End Class

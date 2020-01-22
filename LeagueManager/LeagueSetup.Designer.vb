@@ -1,5 +1,5 @@
 ﻿<Global.Microsoft.VisualBasic.CompilerServices.DesignerGenerated()>
-Partial Class frmLeagueSetup
+Partial Class LeagueSetup
     Inherits System.Windows.Forms.Form
 
     'Form overrides dispose to clean up the component list.
@@ -23,367 +23,55 @@ Partial Class frmLeagueSetup
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
         Me.components = New System.ComponentModel.Container()
-        Dim NameLabel As System.Windows.Forms.Label
-        Dim SecretaryLabel As System.Windows.Forms.Label
-        Dim FormatLabel As System.Windows.Forms.Label
-        Dim CostLabel As System.Windows.Forms.Label
-        Dim TeamsLabel As System.Windows.Forms.Label
-        Dim PayPlacesLabel As System.Windows.Forms.Label
-        Dim StartDateLabel As System.Windows.Forms.Label
-        Dim EndDateLabel As System.Windows.Forms.Label
-        Dim HdcpScoresLabel As System.Windows.Forms.Label
-        Dim HdcpFormatLabel As System.Windows.Forms.Label
-        Dim CarryLastYearsLabel As System.Windows.Forms.Label
-        Dim MaxHdcpLabel As System.Windows.Forms.Label
-        Dim Par3MaxLabel As System.Windows.Forms.Label
-        Dim Par4MaxLabel As System.Windows.Forms.Label
-        Dim Par5MaxLabel As System.Windows.Forms.Label
-        Dim CourseLabel As System.Windows.Forms.Label
-        Dim HolesLabel As System.Windows.Forms.Label
-        Dim Start9Label As System.Windows.Forms.Label
-        Dim MethodLabel As System.Windows.Forms.Label
-        Dim SkinsLabel As System.Windows.Forms.Label
-        Dim ClosestLabel As System.Windows.Forms.Label
-        Dim SplitSeasonLabel As System.Windows.Forms.Label
-        Dim PostSeasonLabel As System.Windows.Forms.Label
-        Dim EmailLabel As System.Windows.Forms.Label
-        Dim EmailPasswordLabel As System.Windows.Forms.Label
-        Dim SkinFmtLabel As System.Windows.Forms.Label
-        Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(frmLeagueSetup))
-        Me.DtLeagueParmsBindingNavigator = New System.Windows.Forms.BindingNavigator(Me.components)
-        Me.BindingNavigatorAddNewItem = New System.Windows.Forms.ToolStripButton()
         Me.DtLeagueParmsBindingSource = New System.Windows.Forms.BindingSource(Me.components)
         Me.DsLeague = New LeagueManager.dsLeague()
-        Me.BindingNavigatorCountItem = New System.Windows.Forms.ToolStripLabel()
-        Me.BindingNavigatorDeleteItem = New System.Windows.Forms.ToolStripButton()
-        Me.BindingNavigatorMoveFirstItem = New System.Windows.Forms.ToolStripButton()
-        Me.BindingNavigatorMovePreviousItem = New System.Windows.Forms.ToolStripButton()
-        Me.BindingNavigatorSeparator = New System.Windows.Forms.ToolStripSeparator()
-        Me.BindingNavigatorPositionItem = New System.Windows.Forms.ToolStripTextBox()
-        Me.BindingNavigatorSeparator1 = New System.Windows.Forms.ToolStripSeparator()
-        Me.BindingNavigatorMoveNextItem = New System.Windows.Forms.ToolStripButton()
-        Me.BindingNavigatorMoveLastItem = New System.Windows.Forms.ToolStripButton()
-        Me.BindingNavigatorSeparator2 = New System.Windows.Forms.ToolStripSeparator()
-        Me.DtLeagueParmsBindingNavigatorSaveItem = New System.Windows.Forms.ToolStripButton()
-        Me.NameTextBox = New System.Windows.Forms.TextBox()
-        Me.SecretaryTextBox = New System.Windows.Forms.TextBox()
-        Me.FormatTextBox = New System.Windows.Forms.TextBox()
-        Me.CostTextBox = New System.Windows.Forms.TextBox()
-        Me.TeamsTextBox = New System.Windows.Forms.TextBox()
-        Me.PayPlacesTextBox = New System.Windows.Forms.TextBox()
-        Me.StartDateTextBox = New System.Windows.Forms.TextBox()
-        Me.EndDateTextBox = New System.Windows.Forms.TextBox()
-        Me.HdcpScoresTextBox = New System.Windows.Forms.TextBox()
-        Me.HdcpFormatTextBox = New System.Windows.Forms.TextBox()
-        Me.CarryLastYearsTextBox = New System.Windows.Forms.TextBox()
-        Me.MaxHdcpTextBox = New System.Windows.Forms.TextBox()
-        Me.Par3MaxTextBox = New System.Windows.Forms.TextBox()
-        Me.Par4MaxTextBox = New System.Windows.Forms.TextBox()
-        Me.Par5MaxTextBox = New System.Windows.Forms.TextBox()
-        Me.CourseTextBox = New System.Windows.Forms.TextBox()
-        Me.HolesTextBox = New System.Windows.Forms.TextBox()
-        Me.Start9TextBox = New System.Windows.Forms.TextBox()
-        Me.MethodTextBox = New System.Windows.Forms.TextBox()
-        Me.SkinsTextBox = New System.Windows.Forms.TextBox()
-        Me.ClosestTextBox = New System.Windows.Forms.TextBox()
-        Me.SplitSeasonTextBox = New System.Windows.Forms.TextBox()
-        Me.PostSeasonDtTextBox = New System.Windows.Forms.TextBox()
-        Me.EmailTextBox = New System.Windows.Forms.TextBox()
-        Me.EmailPasswordTextBox = New System.Windows.Forms.TextBox()
-        Me.SkinFmtTextBox = New System.Windows.Forms.TextBox()
-        NameLabel = New System.Windows.Forms.Label()
-        SecretaryLabel = New System.Windows.Forms.Label()
-        FormatLabel = New System.Windows.Forms.Label()
-        CostLabel = New System.Windows.Forms.Label()
-        TeamsLabel = New System.Windows.Forms.Label()
-        PayPlacesLabel = New System.Windows.Forms.Label()
-        StartDateLabel = New System.Windows.Forms.Label()
-        EndDateLabel = New System.Windows.Forms.Label()
-        HdcpScoresLabel = New System.Windows.Forms.Label()
-        HdcpFormatLabel = New System.Windows.Forms.Label()
-        CarryLastYearsLabel = New System.Windows.Forms.Label()
-        MaxHdcpLabel = New System.Windows.Forms.Label()
-        Par3MaxLabel = New System.Windows.Forms.Label()
-        Par4MaxLabel = New System.Windows.Forms.Label()
-        Par5MaxLabel = New System.Windows.Forms.Label()
-        CourseLabel = New System.Windows.Forms.Label()
-        HolesLabel = New System.Windows.Forms.Label()
-        Start9Label = New System.Windows.Forms.Label()
-        MethodLabel = New System.Windows.Forms.Label()
-        SkinsLabel = New System.Windows.Forms.Label()
-        ClosestLabel = New System.Windows.Forms.Label()
-        SplitSeasonLabel = New System.Windows.Forms.Label()
-        PostSeasonLabel = New System.Windows.Forms.Label()
-        EmailLabel = New System.Windows.Forms.Label()
-        EmailPasswordLabel = New System.Windows.Forms.Label()
-        SkinFmtLabel = New System.Windows.Forms.Label()
-        CType(Me.DtLeagueParmsBindingNavigator, System.ComponentModel.ISupportInitialize).BeginInit()
-        Me.DtLeagueParmsBindingNavigator.SuspendLayout()
+        Me.DataGridViewTextBoxColumn1 = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.DataGridViewTextBoxColumn2 = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.DataGridViewTextBoxColumn3 = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.DataGridViewTextBoxColumn4 = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.DataGridViewTextBoxColumn5 = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.DataGridViewTextBoxColumn6 = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.DataGridViewTextBoxColumn7 = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.DataGridViewTextBoxColumn8 = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.DataGridViewTextBoxColumn9 = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.DataGridViewTextBoxColumn10 = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.DataGridViewTextBoxColumn11 = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.DataGridViewTextBoxColumn12 = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.DataGridViewTextBoxColumn13 = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.DataGridViewTextBoxColumn14 = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.DataGridViewTextBoxColumn15 = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.DataGridViewTextBoxColumn16 = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.DataGridViewTextBoxColumn17 = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.DataGridViewTextBoxColumn18 = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.DataGridViewTextBoxColumn19 = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.DataGridViewTextBoxColumn20 = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.DataGridViewTextBoxColumn21 = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.DataGridViewTextBoxColumn22 = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.DataGridViewTextBoxColumn23 = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.DataGridViewTextBoxColumn24 = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.DataGridViewTextBoxColumn25 = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.DataGridViewTextBoxColumn26 = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.DataGridViewTextBoxColumn27 = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.DataGridViewTextBoxColumn28 = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.DataGridViewTextBoxColumn29 = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.DataGridViewTextBoxColumn30 = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.DataGridViewTextBoxColumn31 = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.DataGridViewTextBoxColumn32 = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.DataGridViewTextBoxColumn33 = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.DataGridViewTextBoxColumn34 = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.DataGridViewTextBoxColumn35 = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.DataGridViewTextBoxColumn36 = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.DataGridViewTextBoxColumn37 = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.DataGridViewTextBoxColumn38 = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.dgvNL = New System.Windows.Forms.DataGridView()
+        Me.btnCopy = New System.Windows.Forms.Button()
+        Me.GroupBox1 = New System.Windows.Forms.GroupBox()
+        Me.RadioButton1 = New System.Windows.Forms.RadioButton()
         CType(Me.DtLeagueParmsBindingSource, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.DsLeague, System.ComponentModel.ISupportInitialize).BeginInit()
+        CType(Me.dgvNL, System.ComponentModel.ISupportInitialize).BeginInit()
+        Me.GroupBox1.SuspendLayout()
         Me.SuspendLayout()
-        '
-        'NameLabel
-        '
-        NameLabel.AutoSize = True
-        NameLabel.Location = New System.Drawing.Point(22, 57)
-        NameLabel.Name = "NameLabel"
-        NameLabel.Size = New System.Drawing.Size(38, 13)
-        NameLabel.TabIndex = 7
-        NameLabel.Text = "Name:"
-        '
-        'SecretaryLabel
-        '
-        SecretaryLabel.AutoSize = True
-        SecretaryLabel.Location = New System.Drawing.Point(22, 83)
-        SecretaryLabel.Name = "SecretaryLabel"
-        SecretaryLabel.Size = New System.Drawing.Size(55, 13)
-        SecretaryLabel.TabIndex = 9
-        SecretaryLabel.Text = "Secretary:"
-        '
-        'FormatLabel
-        '
-        FormatLabel.AutoSize = True
-        FormatLabel.Location = New System.Drawing.Point(22, 163)
-        FormatLabel.Name = "FormatLabel"
-        FormatLabel.Size = New System.Drawing.Size(42, 13)
-        FormatLabel.TabIndex = 11
-        FormatLabel.Text = "Format:"
-        '
-        'CostLabel
-        '
-        CostLabel.AutoSize = True
-        CostLabel.Location = New System.Drawing.Point(22, 189)
-        CostLabel.Name = "CostLabel"
-        CostLabel.Size = New System.Drawing.Size(31, 13)
-        CostLabel.TabIndex = 13
-        CostLabel.Text = "Cost:"
-        '
-        'TeamsLabel
-        '
-        TeamsLabel.AutoSize = True
-        TeamsLabel.Location = New System.Drawing.Point(22, 215)
-        TeamsLabel.Name = "TeamsLabel"
-        TeamsLabel.Size = New System.Drawing.Size(42, 13)
-        TeamsLabel.TabIndex = 15
-        TeamsLabel.Text = "Teams:"
-        '
-        'PayPlacesLabel
-        '
-        PayPlacesLabel.AutoSize = True
-        PayPlacesLabel.Location = New System.Drawing.Point(22, 241)
-        PayPlacesLabel.Name = "PayPlacesLabel"
-        PayPlacesLabel.Size = New System.Drawing.Size(63, 13)
-        PayPlacesLabel.TabIndex = 17
-        PayPlacesLabel.Text = "Pay Places:"
-        '
-        'StartDateLabel
-        '
-        StartDateLabel.AutoSize = True
-        StartDateLabel.Location = New System.Drawing.Point(22, 267)
-        StartDateLabel.Name = "StartDateLabel"
-        StartDateLabel.Size = New System.Drawing.Size(58, 13)
-        StartDateLabel.TabIndex = 19
-        StartDateLabel.Text = "Start Date:"
-        '
-        'EndDateLabel
-        '
-        EndDateLabel.AutoSize = True
-        EndDateLabel.Location = New System.Drawing.Point(22, 293)
-        EndDateLabel.Name = "EndDateLabel"
-        EndDateLabel.Size = New System.Drawing.Size(55, 13)
-        EndDateLabel.TabIndex = 21
-        EndDateLabel.Text = "End Date:"
-        '
-        'HdcpScoresLabel
-        '
-        HdcpScoresLabel.AutoSize = True
-        HdcpScoresLabel.Location = New System.Drawing.Point(22, 319)
-        HdcpScoresLabel.Name = "HdcpScoresLabel"
-        HdcpScoresLabel.Size = New System.Drawing.Size(72, 13)
-        HdcpScoresLabel.TabIndex = 23
-        HdcpScoresLabel.Text = "Hdcp Scores:"
-        '
-        'HdcpFormatLabel
-        '
-        HdcpFormatLabel.AutoSize = True
-        HdcpFormatLabel.Location = New System.Drawing.Point(22, 345)
-        HdcpFormatLabel.Name = "HdcpFormatLabel"
-        HdcpFormatLabel.Size = New System.Drawing.Size(71, 13)
-        HdcpFormatLabel.TabIndex = 25
-        HdcpFormatLabel.Text = "Hdcp Format:"
-        '
-        'CarryLastYearsLabel
-        '
-        CarryLastYearsLabel.AutoSize = True
-        CarryLastYearsLabel.Location = New System.Drawing.Point(22, 371)
-        CarryLastYearsLabel.Name = "CarryLastYearsLabel"
-        CarryLastYearsLabel.Size = New System.Drawing.Size(87, 13)
-        CarryLastYearsLabel.TabIndex = 27
-        CarryLastYearsLabel.Text = "Carry Last Years:"
-        '
-        'MaxHdcpLabel
-        '
-        MaxHdcpLabel.AutoSize = True
-        MaxHdcpLabel.Location = New System.Drawing.Point(22, 397)
-        MaxHdcpLabel.Name = "MaxHdcpLabel"
-        MaxHdcpLabel.Size = New System.Drawing.Size(59, 13)
-        MaxHdcpLabel.TabIndex = 29
-        MaxHdcpLabel.Text = "Max Hdcp:"
-        '
-        'Par3MaxLabel
-        '
-        Par3MaxLabel.AutoSize = True
-        Par3MaxLabel.Location = New System.Drawing.Point(22, 423)
-        Par3MaxLabel.Name = "Par3MaxLabel"
-        Par3MaxLabel.Size = New System.Drawing.Size(52, 13)
-        Par3MaxLabel.TabIndex = 31
-        Par3MaxLabel.Text = "Par3Max:"
-        '
-        'Par4MaxLabel
-        '
-        Par4MaxLabel.AutoSize = True
-        Par4MaxLabel.Location = New System.Drawing.Point(22, 449)
-        Par4MaxLabel.Name = "Par4MaxLabel"
-        Par4MaxLabel.Size = New System.Drawing.Size(52, 13)
-        Par4MaxLabel.TabIndex = 33
-        Par4MaxLabel.Text = "Par4Max:"
-        '
-        'Par5MaxLabel
-        '
-        Par5MaxLabel.AutoSize = True
-        Par5MaxLabel.Location = New System.Drawing.Point(22, 475)
-        Par5MaxLabel.Name = "Par5MaxLabel"
-        Par5MaxLabel.Size = New System.Drawing.Size(52, 13)
-        Par5MaxLabel.TabIndex = 35
-        Par5MaxLabel.Text = "Par5Max:"
-        '
-        'CourseLabel
-        '
-        CourseLabel.AutoSize = True
-        CourseLabel.Location = New System.Drawing.Point(22, 501)
-        CourseLabel.Name = "CourseLabel"
-        CourseLabel.Size = New System.Drawing.Size(43, 13)
-        CourseLabel.TabIndex = 37
-        CourseLabel.Text = "Course:"
-        '
-        'HolesLabel
-        '
-        HolesLabel.AutoSize = True
-        HolesLabel.Location = New System.Drawing.Point(22, 527)
-        HolesLabel.Name = "HolesLabel"
-        HolesLabel.Size = New System.Drawing.Size(37, 13)
-        HolesLabel.TabIndex = 39
-        HolesLabel.Text = "Holes:"
-        '
-        'Start9Label
-        '
-        Start9Label.AutoSize = True
-        Start9Label.Location = New System.Drawing.Point(22, 553)
-        Start9Label.Name = "Start9Label"
-        Start9Label.Size = New System.Drawing.Size(38, 13)
-        Start9Label.TabIndex = 41
-        Start9Label.Text = "Start9:"
-        '
-        'MethodLabel
-        '
-        MethodLabel.AutoSize = True
-        MethodLabel.Location = New System.Drawing.Point(22, 579)
-        MethodLabel.Name = "MethodLabel"
-        MethodLabel.Size = New System.Drawing.Size(46, 13)
-        MethodLabel.TabIndex = 43
-        MethodLabel.Text = "Method:"
-        '
-        'SkinsLabel
-        '
-        SkinsLabel.AutoSize = True
-        SkinsLabel.Location = New System.Drawing.Point(22, 605)
-        SkinsLabel.Name = "SkinsLabel"
-        SkinsLabel.Size = New System.Drawing.Size(36, 13)
-        SkinsLabel.TabIndex = 45
-        SkinsLabel.Text = "Skins:"
-        '
-        'ClosestLabel
-        '
-        ClosestLabel.AutoSize = True
-        ClosestLabel.Location = New System.Drawing.Point(22, 631)
-        ClosestLabel.Name = "ClosestLabel"
-        ClosestLabel.Size = New System.Drawing.Size(44, 13)
-        ClosestLabel.TabIndex = 47
-        ClosestLabel.Text = "Closest:"
-        '
-        'SplitSeasonLabel
-        '
-        SplitSeasonLabel.AutoSize = True
-        SplitSeasonLabel.Location = New System.Drawing.Point(22, 657)
-        SplitSeasonLabel.Name = "SplitSeasonLabel"
-        SplitSeasonLabel.Size = New System.Drawing.Size(69, 13)
-        SplitSeasonLabel.TabIndex = 49
-        SplitSeasonLabel.Text = "Split Season:"
-        '
-        'PostSeasonLabel
-        '
-        PostSeasonLabel.AutoSize = True
-        PostSeasonLabel.Location = New System.Drawing.Point(22, 683)
-        PostSeasonLabel.Name = "PostSeasonLabel"
-        PostSeasonLabel.Size = New System.Drawing.Size(84, 13)
-        PostSeasonLabel.TabIndex = 51
-        PostSeasonLabel.Text = "Post Season Dt:"
-        '
-        'EmailLabel
-        '
-        EmailLabel.AutoSize = True
-        EmailLabel.Location = New System.Drawing.Point(22, 111)
-        EmailLabel.Name = "EmailLabel"
-        EmailLabel.Size = New System.Drawing.Size(35, 13)
-        EmailLabel.TabIndex = 53
-        EmailLabel.Text = "Email:"
-        '
-        'EmailPasswordLabel
-        '
-        EmailPasswordLabel.AutoSize = True
-        EmailPasswordLabel.Location = New System.Drawing.Point(22, 137)
-        EmailPasswordLabel.Name = "EmailPasswordLabel"
-        EmailPasswordLabel.Size = New System.Drawing.Size(84, 13)
-        EmailPasswordLabel.TabIndex = 54
-        EmailPasswordLabel.Text = "Email Password:"
-        '
-        'SkinFmtLabel
-        '
-        SkinFmtLabel.AutoSize = True
-        SkinFmtLabel.Location = New System.Drawing.Point(23, 709)
-        SkinFmtLabel.Name = "SkinFmtLabel"
-        SkinFmtLabel.Size = New System.Drawing.Size(51, 13)
-        SkinFmtLabel.TabIndex = 52
-        SkinFmtLabel.Text = "Skin Fmt:"
-        '
-        'DtLeagueParmsBindingNavigator
-        '
-        Me.DtLeagueParmsBindingNavigator.AddNewItem = Me.BindingNavigatorAddNewItem
-        Me.DtLeagueParmsBindingNavigator.BindingSource = Me.DtLeagueParmsBindingSource
-        Me.DtLeagueParmsBindingNavigator.CountItem = Me.BindingNavigatorCountItem
-        Me.DtLeagueParmsBindingNavigator.DeleteItem = Me.BindingNavigatorDeleteItem
-        Me.DtLeagueParmsBindingNavigator.ImageScalingSize = New System.Drawing.Size(40, 40)
-        Me.DtLeagueParmsBindingNavigator.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.BindingNavigatorMoveFirstItem, Me.BindingNavigatorMovePreviousItem, Me.BindingNavigatorSeparator, Me.BindingNavigatorPositionItem, Me.BindingNavigatorCountItem, Me.BindingNavigatorSeparator1, Me.BindingNavigatorMoveNextItem, Me.BindingNavigatorMoveLastItem, Me.BindingNavigatorSeparator2, Me.BindingNavigatorAddNewItem, Me.BindingNavigatorDeleteItem, Me.DtLeagueParmsBindingNavigatorSaveItem})
-        Me.DtLeagueParmsBindingNavigator.Location = New System.Drawing.Point(0, 0)
-        Me.DtLeagueParmsBindingNavigator.MoveFirstItem = Me.BindingNavigatorMoveFirstItem
-        Me.DtLeagueParmsBindingNavigator.MoveLastItem = Me.BindingNavigatorMoveLastItem
-        Me.DtLeagueParmsBindingNavigator.MoveNextItem = Me.BindingNavigatorMoveNextItem
-        Me.DtLeagueParmsBindingNavigator.MovePreviousItem = Me.BindingNavigatorMovePreviousItem
-        Me.DtLeagueParmsBindingNavigator.Name = "DtLeagueParmsBindingNavigator"
-        Me.DtLeagueParmsBindingNavigator.PositionItem = Me.BindingNavigatorPositionItem
-        Me.DtLeagueParmsBindingNavigator.Size = New System.Drawing.Size(436, 47)
-        Me.DtLeagueParmsBindingNavigator.TabIndex = 6
-        Me.DtLeagueParmsBindingNavigator.Text = "BindingNavigator1"
-        '
-        'BindingNavigatorAddNewItem
-        '
-        Me.BindingNavigatorAddNewItem.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
-        Me.BindingNavigatorAddNewItem.Image = CType(resources.GetObject("BindingNavigatorAddNewItem.Image"), System.Drawing.Image)
-        Me.BindingNavigatorAddNewItem.Name = "BindingNavigatorAddNewItem"
-        Me.BindingNavigatorAddNewItem.RightToLeftAutoMirrorImage = True
-        Me.BindingNavigatorAddNewItem.Size = New System.Drawing.Size(44, 44)
-        Me.BindingNavigatorAddNewItem.Text = "Add new"
         '
         'DtLeagueParmsBindingSource
         '
@@ -395,407 +83,336 @@ Partial Class frmLeagueSetup
         Me.DsLeague.DataSetName = "dsLeague"
         Me.DsLeague.SchemaSerializationMode = System.Data.SchemaSerializationMode.IncludeSchema
         '
-        'BindingNavigatorCountItem
+        'DataGridViewTextBoxColumn1
         '
-        Me.BindingNavigatorCountItem.Name = "BindingNavigatorCountItem"
-        Me.BindingNavigatorCountItem.Size = New System.Drawing.Size(35, 44)
-        Me.BindingNavigatorCountItem.Text = "of {0}"
-        Me.BindingNavigatorCountItem.ToolTipText = "Total number of items"
+        Me.DataGridViewTextBoxColumn1.DataPropertyName = "Name"
+        Me.DataGridViewTextBoxColumn1.HeaderText = "Name"
+        Me.DataGridViewTextBoxColumn1.Name = "DataGridViewTextBoxColumn1"
         '
-        'BindingNavigatorDeleteItem
+        'DataGridViewTextBoxColumn2
         '
-        Me.BindingNavigatorDeleteItem.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
-        Me.BindingNavigatorDeleteItem.Image = CType(resources.GetObject("BindingNavigatorDeleteItem.Image"), System.Drawing.Image)
-        Me.BindingNavigatorDeleteItem.Name = "BindingNavigatorDeleteItem"
-        Me.BindingNavigatorDeleteItem.RightToLeftAutoMirrorImage = True
-        Me.BindingNavigatorDeleteItem.Size = New System.Drawing.Size(44, 44)
-        Me.BindingNavigatorDeleteItem.Text = "Delete"
+        Me.DataGridViewTextBoxColumn2.DataPropertyName = "Secretary"
+        Me.DataGridViewTextBoxColumn2.HeaderText = "Secretary"
+        Me.DataGridViewTextBoxColumn2.Name = "DataGridViewTextBoxColumn2"
         '
-        'BindingNavigatorMoveFirstItem
+        'DataGridViewTextBoxColumn3
         '
-        Me.BindingNavigatorMoveFirstItem.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
-        Me.BindingNavigatorMoveFirstItem.Image = CType(resources.GetObject("BindingNavigatorMoveFirstItem.Image"), System.Drawing.Image)
-        Me.BindingNavigatorMoveFirstItem.Name = "BindingNavigatorMoveFirstItem"
-        Me.BindingNavigatorMoveFirstItem.RightToLeftAutoMirrorImage = True
-        Me.BindingNavigatorMoveFirstItem.Size = New System.Drawing.Size(44, 44)
-        Me.BindingNavigatorMoveFirstItem.Text = "Move first"
+        Me.DataGridViewTextBoxColumn3.DataPropertyName = "Format"
+        Me.DataGridViewTextBoxColumn3.HeaderText = "Format"
+        Me.DataGridViewTextBoxColumn3.Name = "DataGridViewTextBoxColumn3"
         '
-        'BindingNavigatorMovePreviousItem
+        'DataGridViewTextBoxColumn4
         '
-        Me.BindingNavigatorMovePreviousItem.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
-        Me.BindingNavigatorMovePreviousItem.Image = CType(resources.GetObject("BindingNavigatorMovePreviousItem.Image"), System.Drawing.Image)
-        Me.BindingNavigatorMovePreviousItem.Name = "BindingNavigatorMovePreviousItem"
-        Me.BindingNavigatorMovePreviousItem.RightToLeftAutoMirrorImage = True
-        Me.BindingNavigatorMovePreviousItem.Size = New System.Drawing.Size(44, 44)
-        Me.BindingNavigatorMovePreviousItem.Text = "Move previous"
+        Me.DataGridViewTextBoxColumn4.DataPropertyName = "Cost"
+        Me.DataGridViewTextBoxColumn4.HeaderText = "Cost"
+        Me.DataGridViewTextBoxColumn4.Name = "DataGridViewTextBoxColumn4"
         '
-        'BindingNavigatorSeparator
+        'DataGridViewTextBoxColumn5
         '
-        Me.BindingNavigatorSeparator.Name = "BindingNavigatorSeparator"
-        Me.BindingNavigatorSeparator.Size = New System.Drawing.Size(6, 47)
+        Me.DataGridViewTextBoxColumn5.DataPropertyName = "Teams"
+        Me.DataGridViewTextBoxColumn5.HeaderText = "Teams"
+        Me.DataGridViewTextBoxColumn5.Name = "DataGridViewTextBoxColumn5"
         '
-        'BindingNavigatorPositionItem
+        'DataGridViewTextBoxColumn6
         '
-        Me.BindingNavigatorPositionItem.AccessibleName = "Position"
-        Me.BindingNavigatorPositionItem.AutoSize = False
-        Me.BindingNavigatorPositionItem.Name = "BindingNavigatorPositionItem"
-        Me.BindingNavigatorPositionItem.Size = New System.Drawing.Size(50, 23)
-        Me.BindingNavigatorPositionItem.Text = "0"
-        Me.BindingNavigatorPositionItem.ToolTipText = "Current position"
+        Me.DataGridViewTextBoxColumn6.DataPropertyName = "PayPlaces"
+        Me.DataGridViewTextBoxColumn6.HeaderText = "PayPlaces"
+        Me.DataGridViewTextBoxColumn6.Name = "DataGridViewTextBoxColumn6"
         '
-        'BindingNavigatorSeparator1
+        'DataGridViewTextBoxColumn7
         '
-        Me.BindingNavigatorSeparator1.Name = "BindingNavigatorSeparator1"
-        Me.BindingNavigatorSeparator1.Size = New System.Drawing.Size(6, 47)
+        Me.DataGridViewTextBoxColumn7.DataPropertyName = "StartDate"
+        Me.DataGridViewTextBoxColumn7.HeaderText = "StartDate"
+        Me.DataGridViewTextBoxColumn7.Name = "DataGridViewTextBoxColumn7"
         '
-        'BindingNavigatorMoveNextItem
+        'DataGridViewTextBoxColumn8
         '
-        Me.BindingNavigatorMoveNextItem.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
-        Me.BindingNavigatorMoveNextItem.Image = CType(resources.GetObject("BindingNavigatorMoveNextItem.Image"), System.Drawing.Image)
-        Me.BindingNavigatorMoveNextItem.Name = "BindingNavigatorMoveNextItem"
-        Me.BindingNavigatorMoveNextItem.RightToLeftAutoMirrorImage = True
-        Me.BindingNavigatorMoveNextItem.Size = New System.Drawing.Size(44, 44)
-        Me.BindingNavigatorMoveNextItem.Text = "Move next"
+        Me.DataGridViewTextBoxColumn8.DataPropertyName = "EndDate"
+        Me.DataGridViewTextBoxColumn8.HeaderText = "EndDate"
+        Me.DataGridViewTextBoxColumn8.Name = "DataGridViewTextBoxColumn8"
         '
-        'BindingNavigatorMoveLastItem
+        'DataGridViewTextBoxColumn9
         '
-        Me.BindingNavigatorMoveLastItem.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
-        Me.BindingNavigatorMoveLastItem.Image = CType(resources.GetObject("BindingNavigatorMoveLastItem.Image"), System.Drawing.Image)
-        Me.BindingNavigatorMoveLastItem.Name = "BindingNavigatorMoveLastItem"
-        Me.BindingNavigatorMoveLastItem.RightToLeftAutoMirrorImage = True
-        Me.BindingNavigatorMoveLastItem.Size = New System.Drawing.Size(44, 44)
-        Me.BindingNavigatorMoveLastItem.Text = "Move last"
+        Me.DataGridViewTextBoxColumn9.DataPropertyName = "HdcpScores"
+        Me.DataGridViewTextBoxColumn9.HeaderText = "HdcpScores"
+        Me.DataGridViewTextBoxColumn9.Name = "DataGridViewTextBoxColumn9"
         '
-        'BindingNavigatorSeparator2
+        'DataGridViewTextBoxColumn10
         '
-        Me.BindingNavigatorSeparator2.Name = "BindingNavigatorSeparator2"
-        Me.BindingNavigatorSeparator2.Size = New System.Drawing.Size(6, 47)
+        Me.DataGridViewTextBoxColumn10.DataPropertyName = "HdcpFormat"
+        Me.DataGridViewTextBoxColumn10.HeaderText = "HdcpFormat"
+        Me.DataGridViewTextBoxColumn10.Name = "DataGridViewTextBoxColumn10"
         '
-        'DtLeagueParmsBindingNavigatorSaveItem
+        'DataGridViewTextBoxColumn11
         '
-        Me.DtLeagueParmsBindingNavigatorSaveItem.DisplayStyle = System.Windows.Forms.ToolStripItemDisplayStyle.Image
-        Me.DtLeagueParmsBindingNavigatorSaveItem.Image = CType(resources.GetObject("DtLeagueParmsBindingNavigatorSaveItem.Image"), System.Drawing.Image)
-        Me.DtLeagueParmsBindingNavigatorSaveItem.Name = "DtLeagueParmsBindingNavigatorSaveItem"
-        Me.DtLeagueParmsBindingNavigatorSaveItem.Size = New System.Drawing.Size(44, 44)
-        Me.DtLeagueParmsBindingNavigatorSaveItem.Text = "Save Data"
+        Me.DataGridViewTextBoxColumn11.DataPropertyName = "CarryLastYears"
+        Me.DataGridViewTextBoxColumn11.HeaderText = "CarryLastYears"
+        Me.DataGridViewTextBoxColumn11.Name = "DataGridViewTextBoxColumn11"
         '
-        'NameTextBox
+        'DataGridViewTextBoxColumn12
         '
-        Me.NameTextBox.DataBindings.Add(New System.Windows.Forms.Binding("Text", Me.DtLeagueParmsBindingSource, "Name", True))
-        Me.NameTextBox.Location = New System.Drawing.Point(115, 54)
-        Me.NameTextBox.Name = "NameTextBox"
-        Me.NameTextBox.Size = New System.Drawing.Size(122, 20)
-        Me.NameTextBox.TabIndex = 8
+        Me.DataGridViewTextBoxColumn12.DataPropertyName = "MaxHdcp"
+        Me.DataGridViewTextBoxColumn12.HeaderText = "MaxHdcp"
+        Me.DataGridViewTextBoxColumn12.Name = "DataGridViewTextBoxColumn12"
         '
-        'SecretaryTextBox
+        'DataGridViewTextBoxColumn13
         '
-        Me.SecretaryTextBox.DataBindings.Add(New System.Windows.Forms.Binding("Text", Me.DtLeagueParmsBindingSource, "Secretary", True))
-        Me.SecretaryTextBox.Location = New System.Drawing.Point(115, 80)
-        Me.SecretaryTextBox.Name = "SecretaryTextBox"
-        Me.SecretaryTextBox.Size = New System.Drawing.Size(122, 20)
-        Me.SecretaryTextBox.TabIndex = 10
+        Me.DataGridViewTextBoxColumn13.DataPropertyName = "Par3Max"
+        Me.DataGridViewTextBoxColumn13.HeaderText = "Par3Max"
+        Me.DataGridViewTextBoxColumn13.Name = "DataGridViewTextBoxColumn13"
         '
-        'FormatTextBox
-        '
-        Me.FormatTextBox.DataBindings.Add(New System.Windows.Forms.Binding("Text", Me.DtLeagueParmsBindingSource, "Format", True))
-        Me.FormatTextBox.Location = New System.Drawing.Point(115, 160)
-        Me.FormatTextBox.Name = "FormatTextBox"
-        Me.FormatTextBox.Size = New System.Drawing.Size(85, 20)
-        Me.FormatTextBox.TabIndex = 12
+        'DataGridViewTextBoxColumn14
         '
-        'CostTextBox
-        '
-        Me.CostTextBox.DataBindings.Add(New System.Windows.Forms.Binding("Text", Me.DtLeagueParmsBindingSource, "Cost", True))
-        Me.CostTextBox.Location = New System.Drawing.Point(115, 186)
-        Me.CostTextBox.Name = "CostTextBox"
-        Me.CostTextBox.Size = New System.Drawing.Size(30, 20)
-        Me.CostTextBox.TabIndex = 14
+        Me.DataGridViewTextBoxColumn14.DataPropertyName = "Par4Max"
+        Me.DataGridViewTextBoxColumn14.HeaderText = "Par4Max"
+        Me.DataGridViewTextBoxColumn14.Name = "DataGridViewTextBoxColumn14"
         '
-        'TeamsTextBox
-        '
-        Me.TeamsTextBox.DataBindings.Add(New System.Windows.Forms.Binding("Text", Me.DtLeagueParmsBindingSource, "Teams", True))
-        Me.TeamsTextBox.Location = New System.Drawing.Point(115, 212)
-        Me.TeamsTextBox.Name = "TeamsTextBox"
-        Me.TeamsTextBox.Size = New System.Drawing.Size(30, 20)
-        Me.TeamsTextBox.TabIndex = 16
+        'DataGridViewTextBoxColumn15
         '
-        'PayPlacesTextBox
-        '
-        Me.PayPlacesTextBox.DataBindings.Add(New System.Windows.Forms.Binding("Text", Me.DtLeagueParmsBindingSource, "PayPlaces", True))
-        Me.PayPlacesTextBox.Location = New System.Drawing.Point(115, 238)
-        Me.PayPlacesTextBox.Name = "PayPlacesTextBox"
-        Me.PayPlacesTextBox.Size = New System.Drawing.Size(30, 20)
-        Me.PayPlacesTextBox.TabIndex = 18
+        Me.DataGridViewTextBoxColumn15.DataPropertyName = "Par5Max"
+        Me.DataGridViewTextBoxColumn15.HeaderText = "Par5Max"
+        Me.DataGridViewTextBoxColumn15.Name = "DataGridViewTextBoxColumn15"
         '
-        'StartDateTextBox
-        '
-        Me.StartDateTextBox.DataBindings.Add(New System.Windows.Forms.Binding("Text", Me.DtLeagueParmsBindingSource, "StartDate", True))
-        Me.StartDateTextBox.Location = New System.Drawing.Point(115, 264)
-        Me.StartDateTextBox.Name = "StartDateTextBox"
-        Me.StartDateTextBox.Size = New System.Drawing.Size(63, 20)
-        Me.StartDateTextBox.TabIndex = 20
+        'DataGridViewTextBoxColumn16
         '
-        'EndDateTextBox
-        '
-        Me.EndDateTextBox.DataBindings.Add(New System.Windows.Forms.Binding("Text", Me.DtLeagueParmsBindingSource, "EndDate", True))
-        Me.EndDateTextBox.Location = New System.Drawing.Point(115, 290)
-        Me.EndDateTextBox.Name = "EndDateTextBox"
-        Me.EndDateTextBox.Size = New System.Drawing.Size(63, 20)
-        Me.EndDateTextBox.TabIndex = 22
+        Me.DataGridViewTextBoxColumn16.DataPropertyName = "Course"
+        Me.DataGridViewTextBoxColumn16.HeaderText = "Course"
+        Me.DataGridViewTextBoxColumn16.Name = "DataGridViewTextBoxColumn16"
         '
-        'HdcpScoresTextBox
-        '
-        Me.HdcpScoresTextBox.DataBindings.Add(New System.Windows.Forms.Binding("Text", Me.DtLeagueParmsBindingSource, "HdcpScores", True))
-        Me.HdcpScoresTextBox.Location = New System.Drawing.Point(115, 316)
-        Me.HdcpScoresTextBox.Name = "HdcpScoresTextBox"
-        Me.HdcpScoresTextBox.Size = New System.Drawing.Size(30, 20)
-        Me.HdcpScoresTextBox.TabIndex = 24
+        'DataGridViewTextBoxColumn17
         '
-        'HdcpFormatTextBox
-        '
-        Me.HdcpFormatTextBox.DataBindings.Add(New System.Windows.Forms.Binding("Text", Me.DtLeagueParmsBindingSource, "HdcpFormat", True))
-        Me.HdcpFormatTextBox.Location = New System.Drawing.Point(115, 342)
-        Me.HdcpFormatTextBox.Name = "HdcpFormatTextBox"
-        Me.HdcpFormatTextBox.Size = New System.Drawing.Size(30, 20)
-        Me.HdcpFormatTextBox.TabIndex = 26
+        Me.DataGridViewTextBoxColumn17.DataPropertyName = "Holes"
+        Me.DataGridViewTextBoxColumn17.HeaderText = "Holes"
+        Me.DataGridViewTextBoxColumn17.Name = "DataGridViewTextBoxColumn17"
         '
-        'CarryLastYearsTextBox
-        '
-        Me.CarryLastYearsTextBox.DataBindings.Add(New System.Windows.Forms.Binding("Text", Me.DtLeagueParmsBindingSource, "CarryLastYears", True))
-        Me.CarryLastYearsTextBox.Location = New System.Drawing.Point(115, 368)
-        Me.CarryLastYearsTextBox.Name = "CarryLastYearsTextBox"
-        Me.CarryLastYearsTextBox.Size = New System.Drawing.Size(30, 20)
-        Me.CarryLastYearsTextBox.TabIndex = 28
+        'DataGridViewTextBoxColumn18
         '
-        'MaxHdcpTextBox
-        '
-        Me.MaxHdcpTextBox.DataBindings.Add(New System.Windows.Forms.Binding("Text", Me.DtLeagueParmsBindingSource, "MaxHdcp", True))
-        Me.MaxHdcpTextBox.Location = New System.Drawing.Point(115, 394)
-        Me.MaxHdcpTextBox.Name = "MaxHdcpTextBox"
-        Me.MaxHdcpTextBox.Size = New System.Drawing.Size(30, 20)
-        Me.MaxHdcpTextBox.TabIndex = 30
+        Me.DataGridViewTextBoxColumn18.DataPropertyName = "Start9"
+        Me.DataGridViewTextBoxColumn18.HeaderText = "Start9"
+        Me.DataGridViewTextBoxColumn18.Name = "DataGridViewTextBoxColumn18"
         '
-        'Par3MaxTextBox
-        '
-        Me.Par3MaxTextBox.DataBindings.Add(New System.Windows.Forms.Binding("Text", Me.DtLeagueParmsBindingSource, "Par3Max", True))
-        Me.Par3MaxTextBox.Location = New System.Drawing.Point(115, 420)
-        Me.Par3MaxTextBox.Name = "Par3MaxTextBox"
-        Me.Par3MaxTextBox.Size = New System.Drawing.Size(30, 20)
-        Me.Par3MaxTextBox.TabIndex = 32
+        'DataGridViewTextBoxColumn19
         '
-        'Par4MaxTextBox
-        '
-        Me.Par4MaxTextBox.DataBindings.Add(New System.Windows.Forms.Binding("Text", Me.DtLeagueParmsBindingSource, "Par4Max", True))
-        Me.Par4MaxTextBox.Location = New System.Drawing.Point(115, 446)
-        Me.Par4MaxTextBox.Name = "Par4MaxTextBox"
-        Me.Par4MaxTextBox.Size = New System.Drawing.Size(30, 20)
-        Me.Par4MaxTextBox.TabIndex = 34
-        '
-        'Par5MaxTextBox
-        '
-        Me.Par5MaxTextBox.DataBindings.Add(New System.Windows.Forms.Binding("Text", Me.DtLeagueParmsBindingSource, "Par5Max", True))
-        Me.Par5MaxTextBox.Location = New System.Drawing.Point(115, 472)
-        Me.Par5MaxTextBox.Name = "Par5MaxTextBox"
-        Me.Par5MaxTextBox.Size = New System.Drawing.Size(30, 20)
-        Me.Par5MaxTextBox.TabIndex = 36
-        '
-        'CourseTextBox
-        '
-        Me.CourseTextBox.DataBindings.Add(New System.Windows.Forms.Binding("Text", Me.DtLeagueParmsBindingSource, "Course", True))
-        Me.CourseTextBox.Location = New System.Drawing.Point(115, 498)
-        Me.CourseTextBox.Name = "CourseTextBox"
-        Me.CourseTextBox.Size = New System.Drawing.Size(122, 20)
-        Me.CourseTextBox.TabIndex = 38
-        '
-        'HolesTextBox
-        '
-        Me.HolesTextBox.DataBindings.Add(New System.Windows.Forms.Binding("Text", Me.DtLeagueParmsBindingSource, "Holes", True))
-        Me.HolesTextBox.Location = New System.Drawing.Point(115, 524)
-        Me.HolesTextBox.Name = "HolesTextBox"
-        Me.HolesTextBox.Size = New System.Drawing.Size(30, 20)
-        Me.HolesTextBox.TabIndex = 40
-        '
-        'Start9TextBox
-        '
-        Me.Start9TextBox.DataBindings.Add(New System.Windows.Forms.Binding("Text", Me.DtLeagueParmsBindingSource, "Start9", True))
-        Me.Start9TextBox.Location = New System.Drawing.Point(115, 550)
-        Me.Start9TextBox.Name = "Start9TextBox"
-        Me.Start9TextBox.Size = New System.Drawing.Size(30, 20)
-        Me.Start9TextBox.TabIndex = 42
-        '
-        'MethodTextBox
-        '
-        Me.MethodTextBox.DataBindings.Add(New System.Windows.Forms.Binding("Text", Me.DtLeagueParmsBindingSource, "Method", True))
-        Me.MethodTextBox.Location = New System.Drawing.Point(115, 576)
-        Me.MethodTextBox.Name = "MethodTextBox"
-        Me.MethodTextBox.Size = New System.Drawing.Size(63, 20)
-        Me.MethodTextBox.TabIndex = 44
-        '
-        'SkinsTextBox
-        '
-        Me.SkinsTextBox.DataBindings.Add(New System.Windows.Forms.Binding("Text", Me.DtLeagueParmsBindingSource, "Skins", True))
-        Me.SkinsTextBox.Location = New System.Drawing.Point(115, 602)
-        Me.SkinsTextBox.Name = "SkinsTextBox"
-        Me.SkinsTextBox.Size = New System.Drawing.Size(30, 20)
-        Me.SkinsTextBox.TabIndex = 46
-        '
-        'ClosestTextBox
-        '
-        Me.ClosestTextBox.DataBindings.Add(New System.Windows.Forms.Binding("Text", Me.DtLeagueParmsBindingSource, "Closest", True))
-        Me.ClosestTextBox.Location = New System.Drawing.Point(115, 628)
-        Me.ClosestTextBox.Name = "ClosestTextBox"
-        Me.ClosestTextBox.Size = New System.Drawing.Size(30, 20)
-        Me.ClosestTextBox.TabIndex = 48
-        '
-        'SplitSeasonTextBox
-        '
-        Me.SplitSeasonTextBox.DataBindings.Add(New System.Windows.Forms.Binding("Text", Me.DtLeagueParmsBindingSource, "SplitSeason", True))
-        Me.SplitSeasonTextBox.Location = New System.Drawing.Point(115, 654)
-        Me.SplitSeasonTextBox.Name = "SplitSeasonTextBox"
-        Me.SplitSeasonTextBox.Size = New System.Drawing.Size(30, 20)
-        Me.SplitSeasonTextBox.TabIndex = 50
-        '
-        'PostSeasonDtTextBox
-        '
-        Me.PostSeasonDtTextBox.DataBindings.Add(New System.Windows.Forms.Binding("Text", Me.DtLeagueParmsBindingSource, "PostSeasonDt", True))
-        Me.PostSeasonDtTextBox.Location = New System.Drawing.Point(115, 680)
-        Me.PostSeasonDtTextBox.Name = "PostSeasonDtTextBox"
-        Me.PostSeasonDtTextBox.Size = New System.Drawing.Size(63, 20)
-        Me.PostSeasonDtTextBox.TabIndex = 52
-        '
-        'EmailTextBox
-        '
-        Me.EmailTextBox.DataBindings.Add(New System.Windows.Forms.Binding("Text", Me.DtLeagueParmsBindingSource, "Email", True))
-        Me.EmailTextBox.Location = New System.Drawing.Point(115, 108)
-        Me.EmailTextBox.Name = "EmailTextBox"
-        Me.EmailTextBox.Size = New System.Drawing.Size(157, 20)
-        Me.EmailTextBox.TabIndex = 54
-        '
-        'EmailPasswordTextBox
-        '
-        Me.EmailPasswordTextBox.DataBindings.Add(New System.Windows.Forms.Binding("Text", Me.DtLeagueParmsBindingSource, "EmailPassword", True))
-        Me.EmailPasswordTextBox.Location = New System.Drawing.Point(115, 134)
-        Me.EmailPasswordTextBox.Name = "EmailPasswordTextBox"
-        Me.EmailPasswordTextBox.Size = New System.Drawing.Size(134, 20)
-        Me.EmailPasswordTextBox.TabIndex = 55
-        '
-        'SkinFmtTextBox
-        '
-        Me.SkinFmtTextBox.DataBindings.Add(New System.Windows.Forms.Binding("Text", Me.DtLeagueParmsBindingSource, "SkinFmt", True))
-        Me.SkinFmtTextBox.Location = New System.Drawing.Point(115, 709)
-        Me.SkinFmtTextBox.Name = "SkinFmtTextBox"
-        Me.SkinFmtTextBox.Size = New System.Drawing.Size(76, 20)
-        Me.SkinFmtTextBox.TabIndex = 53
-        '
-        'frmLeagueSetup
+        Me.DataGridViewTextBoxColumn19.DataPropertyName = "Method"
+        Me.DataGridViewTextBoxColumn19.HeaderText = "Method"
+        Me.DataGridViewTextBoxColumn19.Name = "DataGridViewTextBoxColumn19"
+        '
+        'DataGridViewTextBoxColumn20
+        '
+        Me.DataGridViewTextBoxColumn20.DataPropertyName = "Skins"
+        Me.DataGridViewTextBoxColumn20.HeaderText = "Skins"
+        Me.DataGridViewTextBoxColumn20.Name = "DataGridViewTextBoxColumn20"
+        '
+        'DataGridViewTextBoxColumn21
+        '
+        Me.DataGridViewTextBoxColumn21.DataPropertyName = "Closest"
+        Me.DataGridViewTextBoxColumn21.HeaderText = "Closest"
+        Me.DataGridViewTextBoxColumn21.Name = "DataGridViewTextBoxColumn21"
+        '
+        'DataGridViewTextBoxColumn22
+        '
+        Me.DataGridViewTextBoxColumn22.DataPropertyName = "SplitSeason"
+        Me.DataGridViewTextBoxColumn22.HeaderText = "SplitSeason"
+        Me.DataGridViewTextBoxColumn22.Name = "DataGridViewTextBoxColumn22"
+        '
+        'DataGridViewTextBoxColumn23
+        '
+        Me.DataGridViewTextBoxColumn23.DataPropertyName = "PostSeasonDt"
+        Me.DataGridViewTextBoxColumn23.HeaderText = "PostSeasonDt"
+        Me.DataGridViewTextBoxColumn23.Name = "DataGridViewTextBoxColumn23"
+        '
+        'DataGridViewTextBoxColumn24
+        '
+        Me.DataGridViewTextBoxColumn24.DataPropertyName = "SkinFmt"
+        Me.DataGridViewTextBoxColumn24.HeaderText = "SkinFmt"
+        Me.DataGridViewTextBoxColumn24.Name = "DataGridViewTextBoxColumn24"
+        '
+        'DataGridViewTextBoxColumn25
+        '
+        Me.DataGridViewTextBoxColumn25.DataPropertyName = "Email"
+        Me.DataGridViewTextBoxColumn25.HeaderText = "Email"
+        Me.DataGridViewTextBoxColumn25.Name = "DataGridViewTextBoxColumn25"
+        '
+        'DataGridViewTextBoxColumn26
+        '
+        Me.DataGridViewTextBoxColumn26.DataPropertyName = "EmailPassword"
+        Me.DataGridViewTextBoxColumn26.HeaderText = "EmailPassword"
+        Me.DataGridViewTextBoxColumn26.Name = "DataGridViewTextBoxColumn26"
+        '
+        'DataGridViewTextBoxColumn27
+        '
+        Me.DataGridViewTextBoxColumn27.DataPropertyName = "RolledOverSkins"
+        Me.DataGridViewTextBoxColumn27.HeaderText = "RolledOverSkins"
+        Me.DataGridViewTextBoxColumn27.Name = "DataGridViewTextBoxColumn27"
+        '
+        'DataGridViewTextBoxColumn28
+        '
+        Me.DataGridViewTextBoxColumn28.DataPropertyName = "RolledOverCTP"
+        Me.DataGridViewTextBoxColumn28.HeaderText = "RolledOverCTP"
+        Me.DataGridViewTextBoxColumn28.Name = "DataGridViewTextBoxColumn28"
+        '
+        'DataGridViewTextBoxColumn29
+        '
+        Me.DataGridViewTextBoxColumn29.DataPropertyName = "RolledOverDate"
+        Me.DataGridViewTextBoxColumn29.HeaderText = "RolledOverDate"
+        Me.DataGridViewTextBoxColumn29.Name = "DataGridViewTextBoxColumn29"
+        '
+        'DataGridViewTextBoxColumn30
+        '
+        Me.DataGridViewTextBoxColumn30.DataPropertyName = "ExtraMoney"
+        Me.DataGridViewTextBoxColumn30.HeaderText = "ExtraMoney"
+        Me.DataGridViewTextBoxColumn30.Name = "DataGridViewTextBoxColumn30"
+        '
+        'DataGridViewTextBoxColumn31
+        '
+        Me.DataGridViewTextBoxColumn31.DataPropertyName = "ScoresLocked"
+        Me.DataGridViewTextBoxColumn31.HeaderText = "ScoresLocked"
+        Me.DataGridViewTextBoxColumn31.Name = "DataGridViewTextBoxColumn31"
+        '
+        'DataGridViewTextBoxColumn32
+        '
+        Me.DataGridViewTextBoxColumn32.DataPropertyName = "RolledOverCTP1"
+        Me.DataGridViewTextBoxColumn32.HeaderText = "RolledOverCTP1"
+        Me.DataGridViewTextBoxColumn32.Name = "DataGridViewTextBoxColumn32"
+        '
+        'DataGridViewTextBoxColumn33
+        '
+        Me.DataGridViewTextBoxColumn33.DataPropertyName = "RolledOverCTP2"
+        Me.DataGridViewTextBoxColumn33.HeaderText = "RolledOverCTP2"
+        Me.DataGridViewTextBoxColumn33.Name = "DataGridViewTextBoxColumn33"
+        '
+        'DataGridViewTextBoxColumn34
+        '
+        Me.DataGridViewTextBoxColumn34.DataPropertyName = "RolledOverCTP3"
+        Me.DataGridViewTextBoxColumn34.HeaderText = "RolledOverCTP3"
+        Me.DataGridViewTextBoxColumn34.Name = "DataGridViewTextBoxColumn34"
+        '
+        'DataGridViewTextBoxColumn35
+        '
+        Me.DataGridViewTextBoxColumn35.DataPropertyName = "RolledOverCTP4"
+        Me.DataGridViewTextBoxColumn35.HeaderText = "RolledOverCTP4"
+        Me.DataGridViewTextBoxColumn35.Name = "DataGridViewTextBoxColumn35"
+        '
+        'DataGridViewTextBoxColumn36
+        '
+        Me.DataGridViewTextBoxColumn36.DataPropertyName = "RolledOverCTP5"
+        Me.DataGridViewTextBoxColumn36.HeaderText = "RolledOverCTP5"
+        Me.DataGridViewTextBoxColumn36.Name = "DataGridViewTextBoxColumn36"
+        '
+        'DataGridViewTextBoxColumn37
+        '
+        Me.DataGridViewTextBoxColumn37.DataPropertyName = "Byes"
+        Me.DataGridViewTextBoxColumn37.HeaderText = "Byes"
+        Me.DataGridViewTextBoxColumn37.Name = "DataGridViewTextBoxColumn37"
+        '
+        'DataGridViewTextBoxColumn38
+        '
+        Me.DataGridViewTextBoxColumn38.DataPropertyName = "DayofWeek"
+        Me.DataGridViewTextBoxColumn38.HeaderText = "DayofWeek"
+        Me.DataGridViewTextBoxColumn38.Name = "DataGridViewTextBoxColumn38"
+        '
+        'dgvNL
+        '
+        Me.dgvNL.Anchor = CType((((System.Windows.Forms.AnchorStyles.Top Or System.Windows.Forms.AnchorStyles.Bottom) _
+            Or System.Windows.Forms.AnchorStyles.Left) _
+            Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
+        Me.dgvNL.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
+        Me.dgvNL.Location = New System.Drawing.Point(24, 149)
+        Me.dgvNL.Name = "dgvNL"
+        Me.dgvNL.Size = New System.Drawing.Size(1273, 205)
+        Me.dgvNL.TabIndex = 0
+        '
+        'btnCopy
+        '
+        Me.btnCopy.Location = New System.Drawing.Point(24, 64)
+        Me.btnCopy.Name = "btnCopy"
+        Me.btnCopy.Size = New System.Drawing.Size(107, 23)
+        Me.btnCopy.TabIndex = 1
+        Me.btnCopy.Text = "Copy Last years"
+        Me.btnCopy.UseVisualStyleBackColor = True
+        '
+        'GroupBox1
+        '
+        Me.GroupBox1.Controls.Add(Me.RadioButton1)
+        Me.GroupBox1.Location = New System.Drawing.Point(297, 28)
+        Me.GroupBox1.Name = "GroupBox1"
+        Me.GroupBox1.Size = New System.Drawing.Size(500, 100)
+        Me.GroupBox1.TabIndex = 3
+        Me.GroupBox1.TabStop = False
+        Me.GroupBox1.Text = "New Year Setups"
+        Me.GroupBox1.Visible = False
+        '
+        'RadioButton1
+        '
+        Me.RadioButton1.AutoSize = True
+        Me.RadioButton1.Location = New System.Drawing.Point(19, 20)
+        Me.RadioButton1.Name = "RadioButton1"
+        Me.RadioButton1.Size = New System.Drawing.Size(77, 17)
+        Me.RadioButton1.TabIndex = 0
+        Me.RadioButton1.TabStop = True
+        Me.RadioButton1.Text = "Calc Dates"
+        Me.RadioButton1.UseVisualStyleBackColor = True
+        '
+        'LeagueSetup
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(436, 799)
-        Me.Controls.Add(EmailPasswordLabel)
-        Me.Controls.Add(Me.EmailPasswordTextBox)
-        Me.Controls.Add(EmailLabel)
-        Me.Controls.Add(Me.EmailTextBox)
-        Me.Controls.Add(SkinFmtLabel)
-        Me.Controls.Add(Me.SkinFmtTextBox)
-        Me.Controls.Add(NameLabel)
-        Me.Controls.Add(Me.NameTextBox)
-        Me.Controls.Add(SecretaryLabel)
-        Me.Controls.Add(Me.SecretaryTextBox)
-        Me.Controls.Add(FormatLabel)
-        Me.Controls.Add(Me.FormatTextBox)
-        Me.Controls.Add(CostLabel)
-        Me.Controls.Add(Me.CostTextBox)
-        Me.Controls.Add(TeamsLabel)
-        Me.Controls.Add(Me.TeamsTextBox)
-        Me.Controls.Add(PayPlacesLabel)
-        Me.Controls.Add(Me.PayPlacesTextBox)
-        Me.Controls.Add(StartDateLabel)
-        Me.Controls.Add(Me.StartDateTextBox)
-        Me.Controls.Add(EndDateLabel)
-        Me.Controls.Add(Me.EndDateTextBox)
-        Me.Controls.Add(HdcpScoresLabel)
-        Me.Controls.Add(Me.HdcpScoresTextBox)
-        Me.Controls.Add(HdcpFormatLabel)
-        Me.Controls.Add(Me.HdcpFormatTextBox)
-        Me.Controls.Add(CarryLastYearsLabel)
-        Me.Controls.Add(Me.CarryLastYearsTextBox)
-        Me.Controls.Add(MaxHdcpLabel)
-        Me.Controls.Add(Me.MaxHdcpTextBox)
-        Me.Controls.Add(Par3MaxLabel)
-        Me.Controls.Add(Me.Par3MaxTextBox)
-        Me.Controls.Add(Par4MaxLabel)
-        Me.Controls.Add(Me.Par4MaxTextBox)
-        Me.Controls.Add(Par5MaxLabel)
-        Me.Controls.Add(Me.Par5MaxTextBox)
-        Me.Controls.Add(CourseLabel)
-        Me.Controls.Add(Me.CourseTextBox)
-        Me.Controls.Add(HolesLabel)
-        Me.Controls.Add(Me.HolesTextBox)
-        Me.Controls.Add(Start9Label)
-        Me.Controls.Add(Me.Start9TextBox)
-        Me.Controls.Add(MethodLabel)
-        Me.Controls.Add(Me.MethodTextBox)
-        Me.Controls.Add(SkinsLabel)
-        Me.Controls.Add(Me.SkinsTextBox)
-        Me.Controls.Add(ClosestLabel)
-        Me.Controls.Add(Me.ClosestTextBox)
-        Me.Controls.Add(SplitSeasonLabel)
-        Me.Controls.Add(Me.SplitSeasonTextBox)
-        Me.Controls.Add(PostSeasonLabel)
-        Me.Controls.Add(Me.PostSeasonDtTextBox)
-        Me.Controls.Add(Me.DtLeagueParmsBindingNavigator)
-        Me.Icon = CType(resources.GetObject("$this.Icon"), System.Drawing.Icon)
-        Me.Name = "frmLeagueSetup"
-        Me.Text = "LeagueSetup"
-        CType(Me.DtLeagueParmsBindingNavigator, System.ComponentModel.ISupportInitialize).EndInit()
-        Me.DtLeagueParmsBindingNavigator.ResumeLayout(False)
-        Me.DtLeagueParmsBindingNavigator.PerformLayout()
+        Me.ClientSize = New System.Drawing.Size(1326, 427)
+        Me.Controls.Add(Me.GroupBox1)
+        Me.Controls.Add(Me.btnCopy)
+        Me.Controls.Add(Me.dgvNL)
+        Me.Name = "LeagueSetup"
+        Me.Text = "League Setup"
         CType(Me.DtLeagueParmsBindingSource, System.ComponentModel.ISupportInitialize).EndInit()
         CType(Me.DsLeague, System.ComponentModel.ISupportInitialize).EndInit()
+        CType(Me.dgvNL, System.ComponentModel.ISupportInitialize).EndInit()
+        Me.GroupBox1.ResumeLayout(False)
+        Me.GroupBox1.PerformLayout()
         Me.ResumeLayout(False)
-        Me.PerformLayout()
 
     End Sub
-    Friend WithEvents DsLeague As dsLeague
     Friend WithEvents DtLeagueParmsBindingSource As BindingSource
-    Friend WithEvents DtLeagueParmsBindingNavigator As BindingNavigator
-    Friend WithEvents BindingNavigatorAddNewItem As ToolStripButton
-    Friend WithEvents BindingNavigatorCountItem As ToolStripLabel
-    Friend WithEvents BindingNavigatorDeleteItem As ToolStripButton
-    Friend WithEvents BindingNavigatorMoveFirstItem As ToolStripButton
-    Friend WithEvents BindingNavigatorMovePreviousItem As ToolStripButton
-    Friend WithEvents BindingNavigatorSeparator As ToolStripSeparator
-    Friend WithEvents BindingNavigatorPositionItem As ToolStripTextBox
-    Friend WithEvents BindingNavigatorSeparator1 As ToolStripSeparator
-    Friend WithEvents BindingNavigatorMoveNextItem As ToolStripButton
-    Friend WithEvents BindingNavigatorMoveLastItem As ToolStripButton
-    Friend WithEvents BindingNavigatorSeparator2 As ToolStripSeparator
-    Friend WithEvents DtLeagueParmsBindingNavigatorSaveItem As ToolStripButton
-    Friend WithEvents NameTextBox As TextBox
-    Friend WithEvents SecretaryTextBox As TextBox
-    Friend WithEvents FormatTextBox As TextBox
-    Friend WithEvents CostTextBox As TextBox
-    Friend WithEvents TeamsTextBox As TextBox
-    Friend WithEvents PayPlacesTextBox As TextBox
-    Friend WithEvents StartDateTextBox As TextBox
-    Friend WithEvents EndDateTextBox As TextBox
-    Friend WithEvents HdcpScoresTextBox As TextBox
-    Friend WithEvents HdcpFormatTextBox As TextBox
-    Friend WithEvents CarryLastYearsTextBox As TextBox
-    Friend WithEvents MaxHdcpTextBox As TextBox
-    Friend WithEvents Par3MaxTextBox As TextBox
-    Friend WithEvents Par4MaxTextBox As TextBox
-    Friend WithEvents Par5MaxTextBox As TextBox
-    Friend WithEvents CourseTextBox As TextBox
-    Friend WithEvents HolesTextBox As TextBox
-    Friend WithEvents Start9TextBox As TextBox
-    Friend WithEvents MethodTextBox As TextBox
-    Friend WithEvents SkinsTextBox As TextBox
-    Friend WithEvents ClosestTextBox As TextBox
-    Friend WithEvents SplitSeasonTextBox As TextBox
-    Friend WithEvents PostSeasonDtTextBox As TextBox
-    Friend WithEvents EmailTextBox As TextBox
-    Friend WithEvents EmailPasswordTextBox As TextBox
-    Friend WithEvents SkinFmtTextBox As TextBox
+    Friend WithEvents DsLeague As dsLeague
+    Friend WithEvents DataGridViewTextBoxColumn1 As DataGridViewTextBoxColumn
+    Friend WithEvents DataGridViewTextBoxColumn2 As DataGridViewTextBoxColumn
+    Friend WithEvents DataGridViewTextBoxColumn3 As DataGridViewTextBoxColumn
+    Friend WithEvents DataGridViewTextBoxColumn4 As DataGridViewTextBoxColumn
+    Friend WithEvents DataGridViewTextBoxColumn5 As DataGridViewTextBoxColumn
+    Friend WithEvents DataGridViewTextBoxColumn6 As DataGridViewTextBoxColumn
+    Friend WithEvents DataGridViewTextBoxColumn7 As DataGridViewTextBoxColumn
+    Friend WithEvents DataGridViewTextBoxColumn8 As DataGridViewTextBoxColumn
+    Friend WithEvents DataGridViewTextBoxColumn9 As DataGridViewTextBoxColumn
+    Friend WithEvents DataGridViewTextBoxColumn10 As DataGridViewTextBoxColumn
+    Friend WithEvents DataGridViewTextBoxColumn11 As DataGridViewTextBoxColumn
+    Friend WithEvents DataGridViewTextBoxColumn12 As DataGridViewTextBoxColumn
+    Friend WithEvents DataGridViewTextBoxColumn13 As DataGridViewTextBoxColumn
+    Friend WithEvents DataGridViewTextBoxColumn14 As DataGridViewTextBoxColumn
+    Friend WithEvents DataGridViewTextBoxColumn15 As DataGridViewTextBoxColumn
+    Friend WithEvents DataGridViewTextBoxColumn16 As DataGridViewTextBoxColumn
+    Friend WithEvents DataGridViewTextBoxColumn17 As DataGridViewTextBoxColumn
+    Friend WithEvents DataGridViewTextBoxColumn18 As DataGridViewTextBoxColumn
+    Friend WithEvents DataGridViewTextBoxColumn19 As DataGridViewTextBoxColumn
+    Friend WithEvents DataGridViewTextBoxColumn20 As DataGridViewTextBoxColumn
+    Friend WithEvents DataGridViewTextBoxColumn21 As DataGridViewTextBoxColumn
+    Friend WithEvents DataGridViewTextBoxColumn22 As DataGridViewTextBoxColumn
+    Friend WithEvents DataGridViewTextBoxColumn23 As DataGridViewTextBoxColumn
+    Friend WithEvents DataGridViewTextBoxColumn24 As DataGridViewTextBoxColumn
+    Friend WithEvents DataGridViewTextBoxColumn25 As DataGridViewTextBoxColumn
+    Friend WithEvents DataGridViewTextBoxColumn26 As DataGridViewTextBoxColumn
+    Friend WithEvents DataGridViewTextBoxColumn27 As DataGridViewTextBoxColumn
+    Friend WithEvents DataGridViewTextBoxColumn28 As DataGridViewTextBoxColumn
+    Friend WithEvents DataGridViewTextBoxColumn29 As DataGridViewTextBoxColumn
+    Friend WithEvents DataGridViewTextBoxColumn30 As DataGridViewTextBoxColumn
+    Friend WithEvents DataGridViewTextBoxColumn31 As DataGridViewTextBoxColumn
+    Friend WithEvents DataGridViewTextBoxColumn32 As DataGridViewTextBoxColumn
+    Friend WithEvents DataGridViewTextBoxColumn33 As DataGridViewTextBoxColumn
+    Friend WithEvents DataGridViewTextBoxColumn34 As DataGridViewTextBoxColumn
+    Friend WithEvents DataGridViewTextBoxColumn35 As DataGridViewTextBoxColumn
+    Friend WithEvents DataGridViewTextBoxColumn36 As DataGridViewTextBoxColumn
+    Friend WithEvents DataGridViewTextBoxColumn37 As DataGridViewTextBoxColumn
+    Friend WithEvents DataGridViewTextBoxColumn38 As DataGridViewTextBoxColumn
+    Friend WithEvents dgvNL As DataGridView
+    Friend WithEvents btnCopy As Button
+    Friend WithEvents GroupBox1 As GroupBox
+    Friend WithEvents RadioButton1 As RadioButton
 End Class

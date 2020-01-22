@@ -1,38 +1,89 @@
-﻿Public Class frmLeagueSetup
-    Dim oHelper As Helper
-    Dim stable = "dtLeagueParms"
-    Private Sub frmLeagueSetup_Load(sender As System.Object, e As System.EventArgs) Handles MyBase.Load
-        oHelper = Main.oHelper
-        'write the xml so we can read it back in for xsd
-        'If Not oHelper.CSV2DataTable(oHelper.dsLeague.Tables("dtLeagueParms"), oHelper.getLatestFile("*LeagueParms.csv")) Then
-        '    MsgBox(String.Format("File in use, close file and restart {0} {1}", vbCrLf, oHelper.getLatestFile("*LeagueParms.csv")))
-        '    End
-        'End If
-        Dim sfilename = oHelper.sFilePath & "\" & DateTime.Now.ToString("yyyyMMdd_hhmmss_") & "LeagueParms.xml"
-        'Dim sfilename = oHelper.getLatestFile("*LeagueParms.csv")
-        oHelper.dsLeague.Tables(stable).WriteXml(sfilename, XmlWriteMode.WriteSchema)
-        DsLeague.ReadXml(sfilename)
-        System.IO.File.Delete(sfilename)
-        '20180110-old code using xml
-        'DsLeague.ReadXml(oHelper.getLatestFile("*LeagueParms.xml"))
+﻿Public Class LeagueSetup
+    Dim H As Helper
+    Private Sub NewLeague_Load(sender As Object, e As EventArgs) Handles MyBase.Load
+        H = Main.oHelper
     End Sub
-    'Private Sub dtPlayersBindingNavigatorSaveItem_Click(sender As Object, e As EventArgs) Handles DtLeagueParmsBindingNavigatorSaveItem.Click
-    Private Sub dtLeagueParmsBindingNavigatorSaveItem_Click(sender As Object, e As EventArgs) Handles DtLeagueParmsBindingNavigatorSaveItem.Click
-        Me.Validate()
-        DtLeagueParmsBindingSource.EndEdit()
-        'create a file name for a temp xml
-        Dim sfilename = oHelper.sFilePath & "\" & DateTime.Now.ToString("yyyyMMdd_hhmmss_") & "LeagueParms.xml"
-        'write the temp xml file
-        DsLeague.Tables(stable).WriteXml(sfilename, XmlWriteMode.WriteSchema)
-        'remove the helper table from the main dataset
-        oHelper.dsLeague.Tables.Remove(stable)
-        'read it back into the main dataset
-        oHelper.dsLeague.ReadXml(sfilename)
-        'delete the temp file
-        System.IO.File.Delete(sfilename)
-        'now create the csv from it
-        oHelper.DataTable2CSV(DsLeague.Tables(stable), oHelper.sFilePath & "\" & Now.ToString("yyyyMMdd") & "_LeagueParms.csv")
-        'DsLeague.WriteXml(oHelper.sFilePath & "\" & DateTime.Now.ToString("yyyyMMdd_") & "LeagueParms.xml", XmlWriteMode.WriteSchema)
+    Public Sub PasteData(ByRef dgv As DataGridView)
+        Dim tArr() As String
+        Dim arT() As String
+        Dim i, ii As Integer
+        Dim c, cc, r As Integer
+
+        tArr = Clipboard.GetText().Split(Environment.NewLine)
+
+        r = dgv.SelectedCells(0).RowIndex
+        c = dgv.SelectedCells(0).ColumnIndex
+        For i = 0 To tArr.Length - 1
+            arT = tArr(i).Split(vbTab)
+            cc = c
+            For ii = 0 To arT.Length - 1
+                With dgv.Item(cc, r)
+                    .Value = arT(ii).TrimStart
+                End With
+                cc = cc + 1
+            Next
+            r = r + 1
+        Next
+
     End Sub
 
+    Private Sub dgvNL_MouseClick(sender As Object, e As MouseEventArgs) Handles dgvNL.MouseClick
+        'If e.Button = Windows.Forms.MouseButtons.Right Then
+        '    If sender.currentcell.value = "" Then
+        '        PasteData(dgvNL)
+        '    Else
+        '        Clipboard.SetText(dgvNL(e.columnindex, e.rowindex))
+        '    End If
+        'End If
+    End Sub
+
+    Private Sub btnCopy_Click(sender As Object, e As EventArgs) Handles btnCopy.Click
+        Dim sHolidays = H.getHolidayList(Now.Year)
+        Dim sTuesHol As New List(Of Date)
+        For Each sholiday In sHolidays
+            If sholiday.DayOfWeek = DayOfWeek.Tuesday Then
+                sTuesHol.Add(sholiday)
+            End If
+        Next
+
+        Dim sLatestRow As DataRow = Nothing
+        Dim sYear As String = "0000"
+        For Each row As DataRow In H.dsLeague.Tables("dtLeagueParms").Rows
+            If CDate(row("StartDate")).ToString("yyyyMMdd") > sYear Then
+                sLatestRow = row
+                sYear = CDate(row("StartDate")).ToString("yyyyMMdd")
+                Continue For
+            End If
+        Next
+        H.dsLeague.Tables("dtLeagueParms").ImportRow(sLatestRow)
+        'Dim newrow = H.dsLeague.Tables("dtLeagueParms").NewRow
+        ''newrow = sLatestRow
+        'For Each cell As DataColumn In sLatestRow.Table.Columns
+        '    newrow(cell.ColumnName) = cell
+        '    'If
+        '    'newrow("StartDate") = "01/01/2000"
+        'Next
+        'H.dsLeague.Tables("dtLeagueParms").Rows.Add(newrow)
+        'dgvNL.DataSource = H.dsLeague.Tables("dtLeagueParms")
+        'Dim sYear As String = "0000"
+        'Dim rptr As Integer = 0
+        'For Each row As DataGridViewRow In dgvNL.Rows
+        '    If CDate(row.Cells("StartDate").Value).ToString("yyyyMMdd") > sYear Then
+        '        sYear = CDate(row.Cells("StartDate").Value).ToString("yyyyMMdd").ToString.Substring(0, 4)
+        '        rptr = row.Index
+        '        Continue For
+        '    End If
+        'Next
+        'For Each cell As DataGridViewCell In dgvNL.Rows(rptr).Cells
+        '    dgvNL.Rows(dgvNL.RowCount - 1).Cells(cell.OwningColumn.Name).Value = cell.Value
+        'Next
+
+
+    End Sub
+
+    Private Sub LeagueSetup_FormClosing(sender As Object, e As FormClosingEventArgs) Handles MyBase.FormClosing
+        H.DataTable2CSV(H.dsLeague.Tables("dtLeagueParms"), H.sFilePath & "\LeagueParms.csv")
+        H.LOGIT(String.Format("Updated {0}\LeagueParms.csv", H.sFilePath))
+
+    End Sub
 End Class

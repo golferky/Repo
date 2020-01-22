@@ -54,7 +54,7 @@ Partial Class ScheduleBuilder
         '
         Me.dgSchedule.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
         Me.dgSchedule.Location = New System.Drawing.Point(22, 487)
-        Me.dgSchedule.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
+        Me.dgSchedule.Margin = New System.Windows.Forms.Padding(2)
         Me.dgSchedule.Name = "dgSchedule"
         Me.dgSchedule.RowHeadersWidth = 82
         Me.dgSchedule.RowTemplate.Height = 33
@@ -85,7 +85,7 @@ Partial Class ScheduleBuilder
         '
         Me.cbPR.AutoSize = True
         Me.cbPR.Location = New System.Drawing.Point(16, 93)
-        Me.cbPR.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
+        Me.cbPR.Margin = New System.Windows.Forms.Padding(2)
         Me.cbPR.Name = "cbPR"
         Me.cbPR.Size = New System.Drawing.Size(103, 17)
         Me.cbPR.TabIndex = 7
@@ -97,7 +97,7 @@ Partial Class ScheduleBuilder
         '
         Me.cbSplitRounds.AutoSize = True
         Me.cbSplitRounds.Location = New System.Drawing.Point(16, 30)
-        Me.cbSplitRounds.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
+        Me.cbSplitRounds.Margin = New System.Windows.Forms.Padding(2)
         Me.cbSplitRounds.Name = "cbSplitRounds"
         Me.cbSplitRounds.Size = New System.Drawing.Size(85, 17)
         Me.cbSplitRounds.TabIndex = 8
@@ -108,7 +108,7 @@ Partial Class ScheduleBuilder
         '
         Me.cbPET.AutoSize = True
         Me.cbPET.Location = New System.Drawing.Point(6, 36)
-        Me.cbPET.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
+        Me.cbPET.Margin = New System.Windows.Forms.Padding(2)
         Me.cbPET.Name = "cbPET"
         Me.cbPET.Size = New System.Drawing.Size(103, 17)
         Me.cbPET.TabIndex = 9
@@ -118,7 +118,7 @@ Partial Class ScheduleBuilder
         'btnExit
         '
         Me.btnExit.Location = New System.Drawing.Point(62, 191)
-        Me.btnExit.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
+        Me.btnExit.Margin = New System.Windows.Forms.Padding(2)
         Me.btnExit.Name = "btnExit"
         Me.btnExit.Size = New System.Drawing.Size(116, 25)
         Me.btnExit.TabIndex = 10
@@ -138,7 +138,7 @@ Partial Class ScheduleBuilder
         'btnEmail
         '
         Me.btnEmail.Location = New System.Drawing.Point(62, 84)
-        Me.btnEmail.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
+        Me.btnEmail.Margin = New System.Windows.Forms.Padding(2)
         Me.btnEmail.Name = "btnEmail"
         Me.btnEmail.Size = New System.Drawing.Size(116, 25)
         Me.btnEmail.TabIndex = 12
@@ -149,7 +149,7 @@ Partial Class ScheduleBuilder
         '
         Me.cbPS.AutoSize = True
         Me.cbPS.Location = New System.Drawing.Point(16, 61)
-        Me.cbPS.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
+        Me.cbPS.Margin = New System.Windows.Forms.Padding(2)
         Me.cbPS.Name = "cbPS"
         Me.cbPS.Size = New System.Drawing.Size(86, 17)
         Me.cbPS.TabIndex = 13
@@ -159,7 +159,7 @@ Partial Class ScheduleBuilder
         'tbStart
         '
         Me.tbStart.Location = New System.Drawing.Point(21, 44)
-        Me.tbStart.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
+        Me.tbStart.Margin = New System.Windows.Forms.Padding(2)
         Me.tbStart.Name = "tbStart"
         Me.tbStart.Size = New System.Drawing.Size(77, 20)
         Me.tbStart.TabIndex = 14
@@ -167,7 +167,7 @@ Partial Class ScheduleBuilder
         'tbEnd
         '
         Me.tbEnd.Location = New System.Drawing.Point(145, 44)
-        Me.tbEnd.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
+        Me.tbEnd.Margin = New System.Windows.Forms.Padding(2)
         Me.tbEnd.Name = "tbEnd"
         Me.tbEnd.Size = New System.Drawing.Size(77, 20)
         Me.tbEnd.TabIndex = 15
@@ -176,7 +176,7 @@ Partial Class ScheduleBuilder
         '
         Me.dgTeams.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
         Me.dgTeams.Location = New System.Drawing.Point(652, 20)
-        Me.dgTeams.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
+        Me.dgTeams.Margin = New System.Windows.Forms.Padding(2)
         Me.dgTeams.Name = "dgTeams"
         Me.dgTeams.RowHeadersWidth = 82
         Me.dgTeams.RowTemplate.Height = 33
@@ -189,9 +189,9 @@ Partial Class ScheduleBuilder
         Me.gbControls.Controls.Add(Me.cbPR)
         Me.gbControls.Controls.Add(Me.cbPS)
         Me.gbControls.Location = New System.Drawing.Point(268, 44)
-        Me.gbControls.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
+        Me.gbControls.Margin = New System.Windows.Forms.Padding(2)
         Me.gbControls.Name = "gbControls"
-        Me.gbControls.Padding = New System.Windows.Forms.Padding(2, 2, 2, 2)
+        Me.gbControls.Padding = New System.Windows.Forms.Padding(2)
         Me.gbControls.Size = New System.Drawing.Size(136, 122)
         Me.gbControls.TabIndex = 17
         Me.gbControls.TabStop = False
@@ -202,19 +202,20 @@ Partial Class ScheduleBuilder
         Me.gbPR.Controls.Add(Me.cbPRRS)
         Me.gbPR.Controls.Add(Me.cbPRAW)
         Me.gbPR.Location = New System.Drawing.Point(468, 235)
-        Me.gbPR.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
+        Me.gbPR.Margin = New System.Windows.Forms.Padding(2)
         Me.gbPR.Name = "gbPR"
-        Me.gbPR.Padding = New System.Windows.Forms.Padding(2, 2, 2, 2)
+        Me.gbPR.Padding = New System.Windows.Forms.Padding(2)
         Me.gbPR.Size = New System.Drawing.Size(136, 122)
         Me.gbPR.TabIndex = 18
         Me.gbPR.TabStop = False
         Me.gbPR.Text = "Position Round Controls"
+        Me.gbPR.Visible = False
         '
         'cbPRRS
         '
         Me.cbPRRS.AutoSize = True
         Me.cbPRRS.Location = New System.Drawing.Point(16, 30)
-        Me.cbPRRS.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
+        Me.cbPRRS.Margin = New System.Windows.Forms.Padding(2)
         Me.cbPRRS.Name = "cbPRRS"
         Me.cbPRRS.Size = New System.Drawing.Size(68, 17)
         Me.cbPRRS.TabIndex = 8
@@ -225,7 +226,7 @@ Partial Class ScheduleBuilder
         '
         Me.cbPRAW.AutoSize = True
         Me.cbPRAW.Location = New System.Drawing.Point(16, 61)
-        Me.cbPRAW.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
+        Me.cbPRAW.Margin = New System.Windows.Forms.Padding(2)
         Me.cbPRAW.Name = "cbPRAW"
         Me.cbPRAW.Size = New System.Drawing.Size(77, 17)
         Me.cbPRAW.TabIndex = 9
@@ -238,13 +239,13 @@ Partial Class ScheduleBuilder
         Me.GroupBox1.Controls.Add(Me.tbRounds)
         Me.GroupBox1.Controls.Add(Me.cbPET)
         Me.GroupBox1.Location = New System.Drawing.Point(468, 44)
-        Me.GroupBox1.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
+        Me.GroupBox1.Margin = New System.Windows.Forms.Padding(2)
         Me.GroupBox1.Name = "GroupBox1"
-        Me.GroupBox1.Padding = New System.Windows.Forms.Padding(2, 2, 2, 2)
+        Me.GroupBox1.Padding = New System.Windows.Forms.Padding(2)
         Me.GroupBox1.Size = New System.Drawing.Size(136, 164)
         Me.GroupBox1.TabIndex = 19
         Me.GroupBox1.TabStop = False
-        Me.GroupBox1.Text = "Split Season Controls(future)"
+        Me.GroupBox1.Text = "Split Season Controls"
         '
         'lbRounds
         '
@@ -259,7 +260,7 @@ Partial Class ScheduleBuilder
         'tbRounds
         '
         Me.tbRounds.Location = New System.Drawing.Point(24, 84)
-        Me.tbRounds.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
+        Me.tbRounds.Margin = New System.Windows.Forms.Padding(2)
         Me.tbRounds.Name = "tbRounds"
         Me.tbRounds.Size = New System.Drawing.Size(47, 20)
         Me.tbRounds.TabIndex = 15
@@ -267,7 +268,7 @@ Partial Class ScheduleBuilder
         'btnCalcSch
         '
         Me.btnCalcSch.Location = New System.Drawing.Point(62, 136)
-        Me.btnCalcSch.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
+        Me.btnCalcSch.Margin = New System.Windows.Forms.Padding(2)
         Me.btnCalcSch.Name = "btnCalcSch"
         Me.btnCalcSch.Size = New System.Drawing.Size(116, 25)
         Me.btnCalcSch.TabIndex = 17
@@ -293,7 +294,7 @@ Partial Class ScheduleBuilder
         Me.Controls.Add(Me.Label2)
         Me.Controls.Add(Me.Label1)
         Me.Controls.Add(Me.dgSchedule)
-        Me.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
+        Me.Margin = New System.Windows.Forms.Padding(2)
         Me.Name = "ScheduleBuilder"
         Me.Text = "ScheduleBuilder"
         CType(Me.dgSchedule, System.ComponentModel.ISupportInitialize).EndInit()

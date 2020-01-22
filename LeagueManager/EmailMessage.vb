@@ -1,39 +1,33 @@
 ﻿Imports System.Net.Mail
 Public Class EmailMessage
     Dim ohelper As Helper
-    Dim toAddresses = New List(Of String)
 
     Private Sub EmailMessage_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         ohelper = Main.oHelper
-        'Dim cbToAddresses As New List(Of String)  '{"garyrscudder@gmail.com", "garyrscudder@gmail.com"}
-        For Each player In ohelper.dsLeague.Tables("dtPlayers").Rows
-            If player("Name").ToString.Contains("Carr") Then
-                Dim x = player("Name")
-            End If
-
-            If ohelper.convDBNulltoSpaces(player("Email")).Trim <> "" Then
-                'If player("Name") = "Gary Scudder" Then 'Or player("Name") = "Greg Lemker" Then
-                tbToAddresses.Text &= player("Email") & Environment.NewLine
-                ohelper.LOGIT(String.Format("Email to {0}", player("Email")))
-                'End If
-            End If
-        Next
+        cbRegulars.Checked = True
 
     End Sub
+
     Private Sub BtnSend_Click(sender As Object, e As EventArgs) Handles btnSend.Click
 
-        Dim mbr = MsgBox(String.Format("are you ready to send emails to these {0} players?", tbToAddresses.Text.Split(Environment.NewLine).Count), MsgBoxStyle.YesNo)
+        Dim mbr = MsgBox(String.Format("are you ready to send emails to these {0} players?", DtPlayersDataGridView.SelectedRows.Count), MsgBoxStyle.YesNo)
         If mbr <> MsgBoxResult.Yes Then Exit Sub
 
         'Dim attachs() As String = {"d:\temp_Excell226.xlsx", "d:\temp_Excell224.xlsx", "d:\temp_Excell225.xlsx"}
         'Dim attachs() As String = {semailfile}
-        Dim attachs() As String = {tbAttach.Text}
+        Dim attachs() As String = Nothing
+        If tbAttach.Text <> "" Then attachs = {tbAttach.Text}
         Dim subject As String = tbSubject.Text
         Dim body As String = tbMessage.Text
         Dim bresult = False
-        If tbToAddresses.Lines.Count > 0 Then
-            toAddresses.Addrange(tbToAddresses.Lines.ToList)
-            bresult = ohelper.GGmail.SendMail(toAddresses, subject, body, attachs)
+
+        Dim srecipients As New List(Of String)
+        For Each playerrow As DataGridViewRow In DtPlayersDataGridView.SelectedRows
+            srecipients.Add(playerrow.Cells("Email").Value)
+        Next
+
+        If srecipients.Count > 0 Then
+            bresult = ohelper.GGmail.SendMail(srecipients, subject, body, attachs)
             If bresult Then
                 MsgBox("mails sent successfully", MsgBoxStyle.Information)
             Else
@@ -48,10 +42,6 @@ Public Class EmailMessage
         End
     End Sub
 
-    Private Sub TbToAddresses_TextChanged(sender As Object, e As EventArgs) Handles tbToAddresses.TextChanged
-
-    End Sub
-
     Private Sub BtnAttach_Click(sender As Object, e As EventArgs) Handles btnAttach.Click
         Dim OpenFileDialog As New OpenFileDialog
         OpenFileDialog.InitialDirectory = ""
@@ -61,4 +51,45 @@ Public Class EmailMessage
         If OpenFileDialog.FileName <> "" Then tbAttach.Text = OpenFileDialog.FileName
     End Sub
 
+    Private Sub cbRegulars_CheckedChanged(sender As Object, e As EventArgs) Handles cbRegulars.CheckedChanged
+        'LoadUsers()
+        Dim BindingSource = New BindingSource()
+        Dim dt = ohelper.dsLeague.Tables("dtPlayers").Copy
+        BindingSource.DataSource = dt
+        BindingSource.Filter = "Email <> ''"
+        If cbRegulars.Checked Then BindingSource.Filter &= "and Team > 0"
+        DtPlayersDataGridView.DataSource = BindingSource
+        ohelper.Resizedgv(DtPlayersDataGridView, Me)
+        For Each playerrow As DataGridViewRow In DtPlayersDataGridView.Rows
+            Dim splyr = ohelper.dsLeague.Tables("dtPlayers").Rows.Find(playerrow.Cells(0).Value)
+            If Not splyr("Team") IsNot DBNull.Value Then playerrow.Cells(0).Style.BackColor = Color.LightBlue
+        Next
+
+    End Sub
+
+    Private Sub DtPlayersDataGridView_MouseDoubleClick(sender As Object, e As MouseEventArgs) Handles DtPlayersDataGridView.MouseDoubleClick
+        For Each dr In DtPlayersDataGridView.SelectedRows
+            DtPlayersDataGridView.Rows.Remove(dr)
+        Next
+    End Sub
+
+    Private Sub btnRefresh_Click(sender As Object, e As EventArgs) Handles btnRefresh.Click
+        cbRegulars_CheckedChanged(sender, e)
+    End Sub
+    Private Sub Emailmessage_Resize(sender As Object, e As EventArgs) Handles MyBase.Resize
+        Main.oHelper.LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
+        Try
+            '    rs.ResizeAllControls(Me)
+            'Me.Text = String.Format("Emailmessage -Screen {5}x{6} Form {0}x{1}-Grid {2}x{3} ", Me.Width, Me.Height, DtPlayersDataGridView.Width, DtPlayersDataGridView.Height, Main.oHelper.sPlayer, Main.iScreenWidth, Main.iScreenHeight)
+            Me.Text = String.Format("Form {7}-{0}, Resolution {1} x {2}, Menu {3} x {4}, Grid {5} x {6}", My.Computer.Name, Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Width, Me.Width, Me.Height, DtPlayersDataGridView.Width, DtPlayersDataGridView.Height, Me.Name)
+
+            Main.oHelper.LOGIT(String.Format("Form Height {0} Width {1}", Me.Height, Me.Width))
+        Catch ex As Exception
+
+        End Try
+    End Sub
+
+    Private Sub DtPlayersDataGridView_Resize(sender As Object, e As EventArgs) Handles DtPlayersDataGridView.Resize
+        Emailmessage_Resize(sender, e)
+    End Sub
 End Class

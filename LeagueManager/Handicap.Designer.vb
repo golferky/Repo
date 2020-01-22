@@ -34,6 +34,7 @@ Partial Class frmHandicap
         Me.btnShowAllPlayers = New System.Windows.Forms.Button()
         Me.Label1 = New System.Windows.Forms.Label()
         Me.txtLeagueName = New System.Windows.Forms.TextBox()
+        Me.lv1 = New System.Windows.Forms.ListView()
         Me.SuspendLayout()
         '
         'cbHPlayer
@@ -146,11 +147,21 @@ Partial Class frmHandicap
         Me.txtLeagueName.Size = New System.Drawing.Size(107, 20)
         Me.txtLeagueName.TabIndex = 32
         '
+        'lv1
+        '
+        Me.lv1.HideSelection = False
+        Me.lv1.Location = New System.Drawing.Point(11, 252)
+        Me.lv1.Name = "lv1"
+        Me.lv1.Size = New System.Drawing.Size(498, 151)
+        Me.lv1.TabIndex = 33
+        Me.lv1.UseCompatibleStateImageBehavior = False
+        '
         'frmHandicap
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(584, 600)
+        Me.Controls.Add(Me.lv1)
         Me.Controls.Add(Me.txtLeagueName)
         Me.Controls.Add(Me.Label1)
         Me.Controls.Add(Me.btnShowAllPlayers)
@@ -180,4 +191,5 @@ Partial Class frmHandicap
     Friend WithEvents btnShowAllPlayers As System.Windows.Forms.Button
     Friend WithEvents Label1 As Label
     Friend WithEvents txtLeagueName As TextBox
+    Friend WithEvents lv1 As ListView
 End Class

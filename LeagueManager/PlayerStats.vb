@@ -4,8 +4,8 @@
     Dim rs As New Resizer
 
     Private Sub frmPlayerStats_Load(sender As System.Object, e As System.EventArgs) Handles MyBase.Load
-        Me.Cursor = Cursors.WaitCursor
-        Application.DoEvents()
+        'Me.Cursor = Cursors.WaitCursor
+        'Application.DoEvents()
         'testing only
         'oHelper.sPlayer = "Gary Scudder"
         oHelper.bScoresbyPlayer = True

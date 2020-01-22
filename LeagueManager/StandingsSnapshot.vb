@@ -1,15 +1,37 @@
 ﻿Public Class StandingsSnapshot
-    Dim ohelper As New Helper
-    Dim dvTeam As New DataView
-    Dim dtTeam As DataTable
+    Private ohelper As New Helper
+    Private dvTeam As New DataView
+    Private dtTeam As DataTable
+    Private dvscores As DataView
+    Private sFromDate As String
+    Private sToDate As String
+    Private iTeam As String = ""
+    Private aPlayer As String = ""
+    Private iRnds As Integer = 0
 
     Private Sub StandingsSnapshot_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         ohelper = Main.oHelper
         ohelper.LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
-        LoadDGV(dgTeams, "1")
-        LoadDGV(dgTeams2, "2")
+        For Each item In Main.cbDates.Items
+            If item >= CDate(ohelper.rLeagueParmrow("PostSeasonDt")).ToString("yyyyMMdd") Then Continue For
+            cbDates.Items.Add(item)
+        Next
+        If cbDates.Items.Contains(ohelper.dDate.ToString("yyyyMMdd")) Then cbDates.SelectedIndex = cbDates.Items.IndexOf(ohelper.dDate.ToString("yyyyMMdd"))
+        Dim sWH As String = ohelper.ScreenResize()
+        If Me.Width >= sWH.Split(":")(0) Then
+            Me.Width = sWH.Split(":")(0) - (sWH.Split(":")(0) * 0.1)
+            'Else
+            '    Me.Width = sWH.Split(":")(0)
+        End If
+        If Me.Height >= sWH.Split(":")(1) Then
+            Me.Height = sWH.Split(":")(1) - (sWH.Split(":")(1) * 0.1)
+            'Else
+            '    Me.Height = sWH.Split(":")(1)
+        End If
+
     End Sub
-    Sub LoadDGV(dgTeams As DataGridView, sHalf As String)
+
+    Public Sub LoadDGV(dgTeams As DataGridView)
         ohelper.LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
 
         Try
@@ -41,19 +63,6 @@
                 ohelper.AddColumnToDGV(dgTeams, "Points", 5, 50)
 
                 'create array from above defined fields we want out of scorecard
-                Dim iTeam = "", aPlayer = "", iRnds As Integer = 0
-                Dim dvscores As New DataView(ohelper.dsLeague.Tables("dtScores"))
-                Dim wksdate As Date = ohelper.rLeagueParmrow("StartDate")
-                Dim wkedate As Date = ohelper.dDate
-                iRnds = DateDiff("w", wksdate, wkedate)
-                If ohelper.rLeagueParmrow("SplitSeason") = "Y" Then iRnds /= 2
-                If sHalf = "2" Then
-                    wksdate = wksdate.AddDays((iRnds - 1) * 7)
-                Else
-                    wkedate = wksdate.AddDays((iRnds - 2) * 7)
-                End If
-                Dim sToDate As String = wkedate.ToString("yyyyMMdd", Globalization.CultureInfo.InvariantCulture)
-                Dim sFromDate As String = wksdate.ToString("yyyyMMdd", Globalization.CultureInfo.InvariantCulture)
                 For Each row As DataRow In dtTeam.Rows
                     'combine a and b players into 1 row 
                     If iTeam <> "" Then
@@ -62,12 +71,17 @@
                             row("APlayer") = aPlayer
                             Dim srowfilter = String.Format("Team = {0} AND Date >= '{1}' AND Date <= '{2}'", iTeam, sFromDate, sToDate)
                             ohelper.LOGIT(String.Format("rowfilter={0}", srowfilter))
+                            Dim dPoints As Decimal = 0
                             dvscores.RowFilter = srowfilter
-                            For Each drow As DataRowView In dvscores
-                                If drow("Team_Points") Is DBNull.Value Then drow("Team_Points") = "0"
-                            Next
-                            Dim dPoints As Decimal = dvscores.ToTable.Compute("SUM(Points)", "")
-                            dPoints += dvscores.ToTable.Compute("SUM(Team_Points)", "")
+                            If dvscores.Count > 0 Then
+                                For Each drow As DataRowView In dvscores
+                                    If drow("Team_Points") Is DBNull.Value Then
+                                        drow("Team_Points") = "0"
+                                    End If
+                                Next
+                                dPoints += dvscores.ToTable.Compute("SUM(Points)", "")
+                                dPoints += dvscores.ToTable.Compute("SUM(Points)", "")
+                            End If
                             row("Points") = dPoints.ToString("##.0")
                             .Rows.Add(row.ItemArray)
                         Else
@@ -81,9 +95,10 @@
                     End If
                 Next
                 .Width += 10
-                .Height += .Rows.Count * .Rows(0).Height
+                .Height += (.Rows.Count * .Rows(0).Height)
                 .Sort(dgTeams.Columns("Points"), System.ComponentModel.ListSortDirection.Descending)
             End With
+
         Catch ex As Exception
             MsgBox("Error " & ex.Message & vbCrLf & ex.StackTrace)
         End Try
@@ -99,7 +114,39 @@
         End Try
 
     End Sub
-    Private Sub BtnExit_Click(sender As Object, e As EventArgs) Handles btnExit.Click
-        Me.Close()
+    Private Sub BtnExit_Click(sender As Object, e As EventArgs)
+
     End Sub
+
+    Private Sub cbDates_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cbDates.SelectedIndexChanged
+
+        dvscores = New DataView(ohelper.dsLeague.Tables("dtScores"))
+        'this changes the date back to mm/dd/yyyy
+        ohelper.dDate = Date.ParseExact(cbDates.SelectedItem, "yyyyMMdd", System.Globalization.DateTimeFormatInfo.InvariantInfo)
+
+        iRnds = cbDates.Items.Count - cbDates.SelectedIndex
+        Dim ihalf = (cbDates.Items.Count / 2)
+        sFromDate = cbDates.Items(cbDates.Items.Count - 1)
+
+        If iRnds > ihalf Then
+            gb2ndHalf.Visible = True
+            iRnds = ihalf
+            sToDate = cbDates.Items((cbDates.Items.Count - 1) - (ihalf - 1))
+            LoadDGV(dgTeams)
+            'iRnds = ihalf - cbDates.SelectedIndex
+            sFromDate = cbDates.Items(ihalf - 1)
+            sToDate = cbDates.Items(cbDates.SelectedIndex)
+            LoadDGV(dgTeams2)
+        Else
+            gb2ndHalf.Visible = False
+            sToDate = cbDates.SelectedItem
+            LoadDGV(dgTeams)
+        End If
+        If Me.Height < dgTeams.Height + 150 Then Me.Height *= 1.1
+        If gb1stHalf.Height <= dgTeams.Height Then
+            gb1stHalf.Height *= 1.1
+            gb2ndHalf.Height *= 1.1
+        End If
+    End Sub
+
 End Class

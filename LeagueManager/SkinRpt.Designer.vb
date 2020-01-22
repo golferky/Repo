@@ -24,15 +24,18 @@ Partial Class SkinRpt
     Private Sub InitializeComponent()
         Me.dgSkins = New System.Windows.Forms.DataGridView()
         Me.lbStatus = New System.Windows.Forms.Label()
+        Me.lvAbbr = New System.Windows.Forms.ListView()
+        Me.Label1 = New System.Windows.Forms.Label()
         CType(Me.dgSkins, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
         'dgSkins
         '
         Me.dgSkins.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
-        Me.dgSkins.Location = New System.Drawing.Point(12, 68)
+        Me.dgSkins.Location = New System.Drawing.Point(28, 68)
         Me.dgSkins.Name = "dgSkins"
-        Me.dgSkins.Size = New System.Drawing.Size(1164, 799)
+        Me.dgSkins.RowHeadersVisible = False
+        Me.dgSkins.Size = New System.Drawing.Size(890, 618)
         Me.dgSkins.TabIndex = 0
         '
         'lbStatus
@@ -44,11 +47,32 @@ Partial Class SkinRpt
         Me.lbStatus.TabIndex = 1
         Me.lbStatus.Text = "Label1"
         '
+        'lvAbbr
+        '
+        Me.lvAbbr.HideSelection = False
+        Me.lvAbbr.Location = New System.Drawing.Point(924, 68)
+        Me.lvAbbr.Name = "lvAbbr"
+        Me.lvAbbr.Size = New System.Drawing.Size(305, 377)
+        Me.lvAbbr.TabIndex = 2
+        Me.lvAbbr.UseCompatibleStateImageBehavior = False
+        '
+        'Label1
+        '
+        Me.Label1.AutoSize = True
+        Me.Label1.Location = New System.Drawing.Point(1002, 52)
+        Me.Label1.Name = "Label1"
+        Me.Label1.Size = New System.Drawing.Size(71, 13)
+        Me.Label1.TabIndex = 3
+        Me.Label1.Text = "Abberviations"
+        '
         'SkinRpt
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(1188, 905)
+        Me.AutoScroll = True
+        Me.ClientSize = New System.Drawing.Size(1241, 833)
+        Me.Controls.Add(Me.Label1)
+        Me.Controls.Add(Me.lvAbbr)
         Me.Controls.Add(Me.lbStatus)
         Me.Controls.Add(Me.dgSkins)
         Me.Name = "SkinRpt"
@@ -61,4 +85,6 @@ Partial Class SkinRpt
 
     Friend WithEvents dgSkins As DataGridView
     Friend WithEvents lbStatus As Label
+    Friend WithEvents lvAbbr As ListView
+    Friend WithEvents Label1 As Label
 End Class

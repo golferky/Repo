@@ -187,7 +187,7 @@
             If bHdcp Then
                 For i = CInt(iHoleMarker) To CInt(iHoleMarker) - 1 + 9
                     Try
-                        If oHelper.MyCourse(0)("H" & i) <= Score("PHdcp") - iLowHdcp Then
+                        If oHelper.thisCourse("H" & i) <= Score("PHdcp") - iLowHdcp Then
                             lvRec.SubItems.Item(i).BackColor = Color.BlanchedAlmond
                         End If
                     Catch ex As Exception
@@ -197,7 +197,7 @@
 
                 'For i = 10 To oHelper.iHoles
                 '    If oHelper.iHoles > 9 Then
-                '        If oHelper.MyCourse(0)("H" & i) <= Score("PHdcp") - iLowHdcp Then
+                '        If oHelper.thisCourse("H" & i) <= Score("PHdcp") - iLowHdcp Then
                 '            lvRec.SubItems.Item(i).BackColor = Color.BlanchedAlmond
                 '        End If
                 '    End If
@@ -285,16 +285,16 @@
                 lvRec.SubItems.Add(subItem) '
                 'calculate hole by hole score
                 For i As Integer = 1 To dtlp.Rows(0).Item("Holes").ToString
-                    iPar += oHelper.MyCourse(0).Item("Hole" & i)
+                    iPar += oHelper.thisCourse.Item("Hole" & i)
                     subItem = New ListViewItem.ListViewSubItem
                     subItem.Name = "Hole" & i
                     subItem.Text = score("Hole" & i)
                     lvRec.SubItems.Add(subItem)
 
-                    If score("Hole" & i) < oHelper.MyCourse(0).Item("Hole" & i) Then
+                    If score("Hole" & i) < oHelper.thisCourse.Item("Hole" & i) Then
                         lvRec.SubItems.Item("Hole" & i).ForeColor = Color.Red
                         lvRec.SubItems.Item("Hole" & i).Font = New Font("Arial", 10, FontStyle.Bold)
-                    ElseIf score("Hole" & i) < oHelper.MyCourse(0).Item("Hole" & i) - 1 Then
+                    ElseIf score("Hole" & i) < oHelper.thisCourse.Item("Hole" & i) - 1 Then
                         lvRec.SubItems.Item("Hole" & i).ForeColor = Color.DarkRed
                         lvRec.SubItems.Item("Hole" & i).Font = New Font("Arial", 15, FontStyle.Bold)
                     End If
@@ -302,10 +302,10 @@
                     'check stroke index
                     Dim isi = 0
 
-                    If dtlp.Rows(0).Item("Holes") = 9 And Not oHelper.MyCourse(0).Item("H" & i + oHelper.iHoleMarker) Mod 2 Then
-                        isi = Math.Round((oHelper.MyCourse(0).Item("H" & i + oHelper.iHoleMarker) + 1) / 2, 0)
+                    If dtlp.Rows(0).Item("Holes") = 9 And Not oHelper.thisCourse.Item("H" & i + oHelper.iHoleMarker) Mod 2 Then
+                        isi = Math.Round((oHelper.thisCourse.Item("H" & i + oHelper.iHoleMarker) + 1) / 2, 0)
                     Else
-                        isi = oHelper.MyCourse(0).Item("H" & i + oHelper.iHoleMarker)
+                        isi = oHelper.thisCourse.Item("H" & i + oHelper.iHoleMarker)
                     End If
                     If isi <= iPlayerHdcp Then
                         If score("Method") = "Net" Then

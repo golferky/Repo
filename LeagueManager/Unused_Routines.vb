@@ -787,7 +787,7 @@
                                 iScores(ihptr - 1) += iadjscore
                             End If
                             Dim icnt = 2
-                            Dim spar = .MyCourse(0)("Hole" & ihptr)
+                            Dim spar = .thisCourse("Hole" & ihptr)
                             For i = 0 To iStats.Count - 1
                                 If iadjscore <= spar - icnt Then
                                     iStats(i) += 1

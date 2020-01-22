@@ -23,7 +23,6 @@ Partial Class Skins
     <System.Diagnostics.DebuggerStepThrough()>
     Private Sub InitializeComponent()
         Dim resources As System.ComponentModel.ComponentResourceManager = New System.ComponentModel.ComponentResourceManager(GetType(Skins))
-        Me.btnSkins = New System.Windows.Forms.Button()
         Me.cbDatesPlayers = New System.Windows.Forms.ComboBox()
         Me.btnExit = New System.Windows.Forms.Button()
         Me.lbPS = New System.Windows.Forms.Label()
@@ -62,30 +61,21 @@ Partial Class Skins
         CType(Me.dgScores, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
-        'btnSkins
-        '
-        Me.btnSkins.Location = New System.Drawing.Point(1009, 12)
-        Me.btnSkins.Name = "btnSkins"
-        Me.btnSkins.Size = New System.Drawing.Size(104, 25)
-        Me.btnSkins.TabIndex = 80
-        Me.btnSkins.Text = "Calc Skins"
-        Me.btnSkins.UseVisualStyleBackColor = True
-        '
         'cbDatesPlayers
         '
         Me.cbDatesPlayers.FormattingEnabled = True
         Me.cbDatesPlayers.Location = New System.Drawing.Point(828, 32)
-        Me.cbDatesPlayers.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
+        Me.cbDatesPlayers.Margin = New System.Windows.Forms.Padding(2)
         Me.cbDatesPlayers.Name = "cbDatesPlayers"
         Me.cbDatesPlayers.Size = New System.Drawing.Size(115, 21)
         Me.cbDatesPlayers.TabIndex = 77
         '
         'btnExit
         '
-        Me.btnExit.Location = New System.Drawing.Point(1009, 93)
-        Me.btnExit.Margin = New System.Windows.Forms.Padding(2, 2, 2, 2)
+        Me.btnExit.Location = New System.Drawing.Point(828, 116)
+        Me.btnExit.Margin = New System.Windows.Forms.Padding(2)
         Me.btnExit.Name = "btnExit"
-        Me.btnExit.Size = New System.Drawing.Size(106, 25)
+        Me.btnExit.Size = New System.Drawing.Size(117, 25)
         Me.btnExit.TabIndex = 75
         Me.btnExit.Text = "Exit"
         Me.btnExit.UseVisualStyleBackColor = True
@@ -165,9 +155,9 @@ Partial Class Skins
         '
         'btnSave
         '
-        Me.btnSave.Location = New System.Drawing.Point(1009, 52)
+        Me.btnSave.Location = New System.Drawing.Point(828, 75)
         Me.btnSave.Name = "btnSave"
-        Me.btnSave.Size = New System.Drawing.Size(104, 25)
+        Me.btnSave.Size = New System.Drawing.Size(115, 25)
         Me.btnSave.TabIndex = 85
         Me.btnSave.Text = "Save"
         Me.btnSave.UseVisualStyleBackColor = True
@@ -376,9 +366,10 @@ Partial Class Skins
             Or System.Windows.Forms.AnchorStyles.Left) _
             Or System.Windows.Forms.AnchorStyles.Right), System.Windows.Forms.AnchorStyles)
         Me.dgScores.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
-        Me.dgScores.Location = New System.Drawing.Point(-5, 166)
+        Me.dgScores.Location = New System.Drawing.Point(18, 151)
         Me.dgScores.Name = "dgScores"
-        Me.dgScores.Size = New System.Drawing.Size(1417, 837)
+        Me.dgScores.RowHeadersVisible = False
+        Me.dgScores.Size = New System.Drawing.Size(1206, 570)
         Me.dgScores.TabIndex = 0
         '
         'Skins
@@ -393,7 +384,6 @@ Partial Class Skins
         Me.Controls.Add(Me.GroupBox1)
         Me.Controls.Add(Me.lbStatus)
         Me.Controls.Add(Me.GroupBox3)
-        Me.Controls.Add(Me.btnSkins)
         Me.Controls.Add(Me.cbDatesPlayers)
         Me.Controls.Add(Me.btnExit)
         Me.Controls.Add(Me.lbPS)
@@ -413,8 +403,6 @@ Partial Class Skins
         Me.PerformLayout()
 
     End Sub
-
-    Friend WithEvents btnSkins As Button
     Friend WithEvents cbDatesPlayers As ComboBox
     Friend WithEvents btnExit As Button
     Friend WithEvents lbPS As Label

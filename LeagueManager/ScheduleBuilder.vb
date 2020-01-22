@@ -8,8 +8,10 @@ Public Class ScheduleBuilder
     'put here cause 2 subs use these
     Dim iNumWeeksSplit As Integer = 0
     Dim sHalfwayDate As String = 0
+    'future move to league parm
     Dim sPositionRound As String = "N"
-    Dim sPlayEachTeam As String = "N"
+    Dim sPlayEachTeam As String = "Y"
+
     Dim iWeeks As Integer
     Dim iRnds As Integer
     Dim sPS As List(Of String)
@@ -28,28 +30,43 @@ Public Class ScheduleBuilder
 
         oHelper = Main.oHelper
         oHelper.LOGIT(Reflection.MethodBase.GetCurrentMethod().Name & " -------------------------")
+        lbStatus.Text = ""
+        If tbStart.Text < oHelper.dDate.ToString("yyyyMMdd") Then
+            cbSplitRounds.Enabled = False
+            cbPS.Enabled = False
+            cbPET.Enabled = False
+            cbPR.Enabled = False
+            tbRounds.Enabled = False
+        End If
+
         If oHelper.rLeagueParmrow("SplitSeason") = "Y" Then cbSplitRounds.Checked = True
         If oHelper.rLeagueParmrow("PostSeasonDt").ToString IsNot DBNull.Value Then cbPS.Checked = True
-        If sPlayEachTeam = "Y" Then cbPET.Checked = True
+        If sPlayEachTeam = "Y" Then
+            tbRounds.Visible = True
+            lbRounds.Visible = True
+            cbPET.Checked = True
+        End If
         If sPositionRound = "Y" Then
             cbPR.Checked = True
+            gbPR.Visible = True
         End If
-        gbPR.Visible = False
-        lbStatus.Text = ""
+        'change to use league parm future for all 4 controls
+        tbRounds.Text = "2"
         dgSchedule.Visible = False
-        tbRounds.Visible = False
-        lbRounds.Visible = False
 
         'dvScheduler = New DataView(dtScheduler)
         'dtScheduler = BuilddtScheduler()
-        Dim dstdate As DateTime = oHelper.dsLeague.Tables("dtSchedule").Columns(0).ColumnName
+        'Dim dstdate As DateTime = oHelper.dsLeague.Tables("dtSchedule").Columns(1).ColumnName & "/" & oHelper.dDate.ToString("yyyyMMdd").Substring(0, 4)
+        Dim dstdate As DateTime = CDate(oHelper.rLeagueParmrow("StartDate"))
         tbStart.Text = dstdate.ToString("yyyyMMdd", Globalization.CultureInfo.InvariantCulture)
 
-        Dim denddate = dstdate.AddDays((oHelper.dsLeague.Tables("dtSchedule").Columns.Count - 1) * 7)
+        'Dim denddate = dstdate.AddDays((oHelper.dsLeague.Tables("dtSchedule").Columns.Count - 1) * 7)
+        Dim denddate As DateTime = CDate(oHelper.rLeagueParmrow("EndDate"))
         tbEnd.Text = denddate.ToString("yyyyMMdd", Globalization.CultureInfo.InvariantCulture)
 
         iWeeks = DateDiff("w", dstdate, denddate)
         iRnds = iWeeks / oHelper.rLeagueParmrow("Teams")
+
         With dgTeams
             .RowHeadersVisible = False
             .Visible = True
@@ -128,7 +145,10 @@ Public Class ScheduleBuilder
         Try
             oHelper.LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
             dgSchedule.Visible = True
-
+            Dim sfilename As String = Main.cbLeagues.SelectedItem.ToString.Substring(Main.cbLeagues.SelectedItem.ToString.IndexOf("(") + 1, 4) &
+                               "_" & Main.cbLeagues.SelectedItem.ToString.Substring(0, Main.cbLeagues.SelectedItem.ToString.IndexOf("(") - 1) & "_Schedule.csv"
+            Dim dt = New DataTable
+            oHelper.CSV2DataTable(dt, oHelper.sFilePath & "\" & sfilename)
             sPS = New List(Of String)
             With dgSchedule
                 '.Columns.Clear()
@@ -137,15 +157,16 @@ Public Class ScheduleBuilder
                 .RowHeadersVisible = False
                 .Width = 30
                 '.Columns.Clear()
-                .DataSource = oHelper.dsLeague.Tables("dtSchedule")
+                .DataSource = dt
                 .ColumnHeadersDefaultCellStyle.Font = New Font("Tahoma", 8, FontStyle.Bold)
-                .DefaultCellStyle.Font = New Font("Tahoma", 12)
+                .DefaultCellStyle.Font = New Font("Tahoma", 8)
                 'adjust columns for each field being added
                 Dim i = 1
                 For Each col As DataGridViewTextBoxColumn In .Columns
                     'col.ReadOnly = True            'make all columns read only
                     'If col.Name.Contains("/") Then      'is this a date column
                     .Columns(col.Name).Width = 45  'yep, make width 40
+                    oHelper.LOGIT(String.Format("col {0} ", col.Name))
                     .Columns(col.Name).HeaderText = col.Name.Substring(0, col.Name.LastIndexOf("/")) 'just use mm/dd
                     .Columns(col.Name).DefaultCellStyle.BackColor = Color.White
                     .Width += .Columns(col.Name).Width
@@ -157,10 +178,12 @@ Public Class ScheduleBuilder
                                 .Columns(col.Name).DefaultCellStyle.BackColor = Color.LightBlue
                                 i = 0
                             End If
+                        Else
+                            .Columns(col.Name).DefaultCellStyle.BackColor = Color.LightPink
                         End If
                     End If
                     If cbPS.Checked Then
-                        If col.Index > iWeeks - 2 Then
+                        If col.Index > .Columns.Count - 3 Then
                             .Columns(col.Name).DefaultCellStyle.BackColor = Color.Orange
                             sPS.Add(col.Name)
                         End If
@@ -176,6 +199,7 @@ Public Class ScheduleBuilder
                 .Width -= 20
 
             End With
+
             '20190824-create html of schedule
             'oHelper.CreateHtmlFromDGV(dgSchedule, "Schedule", Me, lbStatus)
 
@@ -184,68 +208,6 @@ Public Class ScheduleBuilder
         End Try
 
     End Sub
-
-    Function BuilddtScheduler() As DataTable
-        Return BuilddtScheduler(False)
-    End Function
-    Function BuilddtScheduler(email As Boolean) As DataTable
-        BuilddtScheduler = Nothing
-        Try
-            'copy the schedule table 
-            Dim dtScheduler As DataTable = oHelper.dsLeague.Tables("dtSchedule").Clone()
-
-            Dim dstdate As DateTime = dtScheduler.Columns(0).ColumnName
-            tbStart.Text = dstdate.ToString("yyyyMMdd", Globalization.CultureInfo.InvariantCulture)
-
-            Dim denddate = dstdate.AddDays((dtScheduler.Columns.Count - 1) * 7)
-            tbEnd.Text = denddate.ToString("yyyyMMdd", Globalization.CultureInfo.InvariantCulture)
-
-            iWeeks = DateDiff("w", dstdate, denddate)
-            iRnds = iWeeks / oHelper.rLeagueParmrow("Teams")
-
-            With dtSchedule
-                '.TableName = "dtScheduler"
-                'create tables columns based on rounds 
-                For i = iRnds To 0 Step -1
-                    Dim iround As Integer = CInt(oHelper.rLeagueParmrow("Teams") - 1) * (i + 1)
-                    If iround > iWeeks Then iround = iWeeks
-                    If cbPR.Checked Then .Columns.Add(String.Format("Round {0}", i + 1), GetType(String)).SetOrdinal(iround - 1)
-                Next
-                Try
-                    'fill the rows with the matches
-                    For Each sch As DataRow In oHelper.dsLeague.Tables("dtSchedule").Rows
-                        Dim drow As DataRow
-                        drow = .NewRow
-                        For Each match As DataColumn In oHelper.dsLeague.Tables("dtSchedule").Columns
-                            drow(match.ColumnName) = sch(match.ColumnName)
-                        Next
-                        .Rows.Add(drow)
-                    Next
-
-                    'Dim brow As DataRow
-                    'brow = .NewRow
-                    'For Each match As DataColumn In oHelper.dsLeague.Tables("dtSchedule").Columns
-                    '    brow(match.ColumnName) = ""
-                    'Next
-                    '.Rows.Add(brow)
-
-                Catch ex As Exception
-
-                End Try
-            End With
-
-
-            'dtScheduler.DefaultView.Sort = "Team"
-            Return dtScheduler.DefaultView.ToTable
-        Catch ex As Exception
-            If ex.Message.ToUpper.Contains("CANNOT OPEN THE FILE") Then
-                MsgBox("File is in use, close it and retry" & vbCrLf & oHelper.sFilePath & "Scores.csv" Or "-Players.csv")
-            Else
-                MsgBox("Error " & ex.Message & vbCrLf & ex.StackTrace)
-            End If
-        End Try
-    End Function
-
     Sub CenterGroupBoxText(Groupbox As GroupBox)
         Dim label As New Label
         label.Text = Groupbox.Text
@@ -259,63 +221,75 @@ Public Class ScheduleBuilder
 
     Private Sub dgScheduler_CellMouseDoubleClick(sender As Object, e As DataGridViewCellMouseEventArgs) Handles dgSchedule.CellMouseDoubleClick
         oHelper.LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
-
-        Dim mbr As MsgBoxResult = MsgBox(String.Format("Do you want to flag this week {0} as a rainout or skip?", dgSchedule.Columns(e.ColumnIndex).Name, MsgBoxStyle.YesNo))
+        Dim mbr As MsgBoxResult = MsgBox(String.Format("Do you want to flag this week {0} as a rainout or skip?", dgSchedule.Columns(e.ColumnIndex).Name), MsgBoxStyle.YesNo)
         If mbr = MsgBoxResult.No Then Exit Sub
+
         lbStatus.Text = String.Format("Skipping Column {0}", dgSchedule.Columns(e.ColumnIndex).Name)
         oHelper.status_Msg(lbStatus, Me)
         Dim iCurrCol As Integer = e.ColumnIndex
-        Dim iweeks As Integer = dgSchedule.ColumnCount
-        If cbPS.Checked Then iweeks -= 2
-        'shift all data over 1 column
-        For i = iweeks - 1 To iCurrCol Step -1
-            For Each row As DataGridViewRow In dgSchedule.Rows
-                If i = iCurrCol Then
-                    row.Cells(i).Value = DBNull.Value
-                Else
-                    row.Cells(i).Value = row.Cells(i - 1).Value
+        Dim iadddays As Int16 = 7
+        If cbPS.Checked Then iadddays += 14
+        tbEnd.Text = Date.ParseExact(tbEnd.Text, "yyyyMMdd", System.Globalization.DateTimeFormatInfo.InvariantInfo).AddDays(iadddays).ToString("yyyyMMdd")
+        Dim aRow As DataRow
+        aRow = oHelper.dsLeague.Tables("dtSchedule").NewRow
+        aRow("Date") = tbEnd.Text
+        oHelper.dsLeague.Tables("dtSchedule").Rows.Add(aRow)
+
+        For i = oHelper.dsLeague.Tables("dtSchedule").Rows.Count - 2 To 0 Step -1
+            For Each col As DataColumn In oHelper.dsLeague.Tables("dtSchedule").Columns
+                If col.ColumnName = dgSchedule.Columns(iCurrCol).Name Then Exit For
+                If col.ColumnName <> "Date" Then
+                    oHelper.dsLeague.Tables("dtSchedule").Rows(i + 1)(col.ColumnName) = oHelper.dsLeague.Tables("dtSchedule").Rows(i)(col.ColumnName)
                 End If
             Next
         Next
 
+        For Each row In oHelper.dsLeague.Tables("dtSchedule").Rows
+            If row("Date") = CDate(dgSchedule.Columns(iCurrCol).Name).ToString("yyyyMMdd") Then
+                oHelper.dsLeague.Tables("dtSchedule").Rows.Remove(row)
+                Exit For
+            End If
+        Next
+
         lbStatus.Text = String.Format("Finished Skipping Column {0}", dgSchedule.Columns(e.ColumnIndex).Name)
         oHelper.status_Msg(lbStatus, Me)
+        Dim dt As New DataTable
 
-        oHelper.DataTable2CSV(oHelper.dsLeague.Tables("dtSchedule"), oHelper.sFilePath & "\" & Now.ToString("yyyyMMdd") & "_Hugh's_Schedule.csv")
-        lbStatus.Text = "Finished saving Schedule"
+        For Each row As DataRow In oHelper.dsLeague.Tables("dtSchedule").Rows
+            Dim sdate As String = Date.ParseExact(row("Date"), "yyyyMMdd", System.Globalization.DateTimeFormatInfo.InvariantInfo)
+            dt.Columns.Add(sdate)
+        Next
+
+        For i = 1 To oHelper.dsLeague.Tables("dtSchedule").Columns.Count - 1
+            Dim newrow As DataRow
+            newrow = dt.NewRow
+            For Each row As DataRow In oHelper.dsLeague.Tables("dtSchedule").Rows
+                Dim sdate As String = Date.ParseExact(row("Date"), "yyyyMMdd", System.Globalization.DateTimeFormatInfo.InvariantInfo)
+                newrow(sdate) = row(i)
+            Next
+            dt.Rows.Add(newrow)
+        Next
+
+        Main.rebuildDates(oHelper.dsLeague.Tables("dtSchedule"))
+        Dim sfilename As String = Main.cbLeagues.SelectedItem.ToString.Substring(Main.cbLeagues.SelectedItem.ToString.IndexOf("(") + 1, 4) &
+                               "_" & Main.cbLeagues.SelectedItem.ToString.Substring(0, Main.cbLeagues.SelectedItem.ToString.IndexOf("(") - 1) & "_Schedule.csv"
+        'col.ColumnName 
+        '2019-12-07 - Update league parm with new dates
+        oHelper.rLeagueParmrow("EndDate") = CDate(oHelper.rLeagueParmrow("EndDate")).AddDays(7).ToString("MM/dd/yyyy")
+        oHelper.rLeagueParmrow("PostSeasonDt") = CDate(oHelper.rLeagueParmrow("PostSeasonDt")).AddDays(7).ToString("MM/dd/yyyy")
+        oHelper.DataTable2CSV(oHelper.dsLeague.Tables("dtLeagueParms"), oHelper.sFilePath & "\LeagueParms.csv")
+        lbStatus.Text = "Updated League Parm post season date"
         oHelper.status_Msg(lbStatus, Me)
 
-        'If MousePosition.Y < 0 Then
-        'If sender.mouseenteredcelladdress < 0 Then
-        '    Exit Sub
-        'End If
-
-        'If e.ColumnIndex = 0 Then
-        '    Dim cell As DataGridViewTextBoxCell = sender.currentcell
-        '    If cell.OwningColumn.Name = "Player" Then
-        '        Dim mbResult As MsgBoxResult = MsgBox("List all scores for for " & cell.Value & "?", MsgBoxStyle.YesNo)
-        '        If mbResult = MsgBoxResult.Yes Then
-        '            oHelper.bScoresbyPlayer = True
-        '            oHelper.sPlayer = cell.Value
-        '            Scores.Show()
-        '            oHelper.bScoresbyPlayer = False
-        '        End If
-        '    End If
-        'End If
+        oHelper.DataTable2CSV(dt, oHelper.sFilePath & "\" & sfilename)
+        lbStatus.Text = "Finished saving Schedule"
+        oHelper.status_Msg(lbStatus, Me)
+        'this restores the screen with the new schedule
+        oHelper.CSV2DataTable(dt, oHelper.sFilePath & "\" & sfilename)
+        doScheduler()
 
     End Sub
 
-    Function getPts(sPts) As Decimal
-        getPts = 0.0
-        If sPts Is DBNull.Value Then Exit Function
-        If sPts.Contains("-") Then
-            Dim aPts As New List(Of String)(sPts.ToString.Split("-"))
-            getPts += CDbl(aPts(0))
-            If aPts.Count > 0 Then getPts += CDbl(aPts(1))
-        Else
-            getPts = sPts
-        End If
-    End Function
     Private Sub dgSchedule_Resize(sender As Object, e As EventArgs) Handles MyBase.Resize
         'rs.ResizeAllControls(Me)
     End Sub
@@ -396,11 +370,14 @@ Public Class ScheduleBuilder
         End Try
     End Sub
     Private Sub cbSplitRounds_CheckedChanged(sender As Object, e As EventArgs) Handles cbSplitRounds.CheckedChanged
-        If Not bload Then doScheduler()
+        If bload Then Exit Sub
+        doScheduler()
+
     End Sub
 
     Private Sub cbPS_CheckedChanged(sender As Object, e As EventArgs) Handles cbPS.CheckedChanged
-        If Not bload Then doScheduler()
+        If bload Then Exit Sub
+        doScheduler()
     End Sub
 
     Private Sub cbPR_CheckedChanged(sender As Object, e As EventArgs) Handles cbPR.CheckedChanged
@@ -427,17 +404,20 @@ Public Class ScheduleBuilder
     End Sub
 
     Private Sub cbPET_CheckedChanged(sender As Object, e As EventArgs) Handles cbPET.CheckedChanged
-        If cbPET.Checked Then
-            tbRounds.Visible = True
-            lbRounds.Visible = True
-        Else
-            tbRounds.Visible = False
-            lbRounds.Visible = False
+        If Not bload Then
+            If cbPET.Checked Then
+                tbRounds.Visible = True
+                lbRounds.Visible = True
+            Else
+                tbRounds.Visible = False
+                lbRounds.Visible = False
+            End If
         End If
 
     End Sub
 
     Private Sub tbRounds_TextChanged(sender As Object, e As EventArgs) Handles tbRounds.TextChanged
+        If bload Then Exit Sub
         Dim mbResult As MsgBoxResult
         If Not IsNumeric(tbRounds.Text) Then
             mbResult = MsgBox(String.Format("Rounds must be numeric > 0, you entered {0}...try again", tbRounds.Text), MsgBoxStyle.OkCancel)
@@ -459,5 +439,9 @@ Public Class ScheduleBuilder
 
     Private Sub BtnCalcSch_Click(sender As Object, e As EventArgs) Handles btnCalcSch.Click
         doScheduler()
+    End Sub
+
+    Private Sub dgSchedule_RowHeaderMouseClick(sender As Object, e As DataGridViewCellMouseEventArgs) Handles dgSchedule.RowHeaderMouseClick
+        Dim x = ""
     End Sub
 End Class

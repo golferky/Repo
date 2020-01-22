@@ -23,14 +23,6 @@ Partial Class Payments
     <System.Diagnostics.DebuggerStepThrough()> _
     Private Sub InitializeComponent()
         Me.dgPayments = New System.Windows.Forms.DataGridView()
-        Me.Player = New System.Windows.Forms.DataGridViewComboBoxColumn()
-        Me.PayDate = New System.Windows.Forms.DataGridViewTextBoxColumn()
-        Me.Description = New System.Windows.Forms.DataGridViewComboBoxColumn()
-        Me.Detail = New System.Windows.Forms.DataGridViewTextBoxColumn()
-        Me.Amount = New System.Windows.Forms.DataGridViewTextBoxColumn()
-        Me.PayMethod = New System.Windows.Forms.DataGridViewComboBoxColumn()
-        Me.EmailText = New System.Windows.Forms.DataGridViewComboBoxColumn()
-        Me.Comment = New System.Windows.Forms.DataGridViewTextBoxColumn()
         Me.cbPlayers = New System.Windows.Forms.ComboBox()
         Me.Label1 = New System.Windows.Forms.Label()
         Me.Label2 = New System.Windows.Forms.Label()
@@ -39,6 +31,14 @@ Partial Class Payments
         Me.btnLoad = New System.Windows.Forms.Button()
         Me.btnExit = New System.Windows.Forms.Button()
         Me.btnSave = New System.Windows.Forms.Button()
+        Me.Player = New System.Windows.Forms.DataGridViewComboBoxColumn()
+        Me.PayDate = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.Description = New System.Windows.Forms.DataGridViewComboBoxColumn()
+        Me.Detail = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.Amount = New System.Windows.Forms.DataGridViewTextBoxColumn()
+        Me.PayMethod = New System.Windows.Forms.DataGridViewComboBoxColumn()
+        Me.EmailText = New System.Windows.Forms.DataGridViewComboBoxColumn()
+        Me.Comment = New System.Windows.Forms.DataGridViewTextBoxColumn()
         CType(Me.dgPayments, System.ComponentModel.ISupportInitialize).BeginInit()
         Me.SuspendLayout()
         '
@@ -46,12 +46,90 @@ Partial Class Payments
         '
         Me.dgPayments.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
         Me.dgPayments.Columns.AddRange(New System.Windows.Forms.DataGridViewColumn() {Me.Player, Me.PayDate, Me.Description, Me.Detail, Me.Amount, Me.PayMethod, Me.EmailText, Me.Comment})
-        Me.dgPayments.Location = New System.Drawing.Point(52, 352)
+        Me.dgPayments.Location = New System.Drawing.Point(26, 121)
+        Me.dgPayments.Margin = New System.Windows.Forms.Padding(2)
         Me.dgPayments.Name = "dgPayments"
         Me.dgPayments.RowHeadersWidth = 30
         Me.dgPayments.RowTemplate.Height = 23
-        Me.dgPayments.Size = New System.Drawing.Size(1287, 1412)
+        Me.dgPayments.Size = New System.Drawing.Size(796, 527)
         Me.dgPayments.TabIndex = 0
+        '
+        'cbPlayers
+        '
+        Me.cbPlayers.FormattingEnabled = True
+        Me.cbPlayers.Location = New System.Drawing.Point(26, 35)
+        Me.cbPlayers.Margin = New System.Windows.Forms.Padding(2)
+        Me.cbPlayers.Name = "cbPlayers"
+        Me.cbPlayers.Size = New System.Drawing.Size(152, 21)
+        Me.cbPlayers.TabIndex = 1
+        '
+        'Label1
+        '
+        Me.Label1.AutoSize = True
+        Me.Label1.Location = New System.Drawing.Point(26, 19)
+        Me.Label1.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
+        Me.Label1.Name = "Label1"
+        Me.Label1.Size = New System.Drawing.Size(36, 13)
+        Me.Label1.TabIndex = 2
+        Me.Label1.Text = "Player"
+        '
+        'Label2
+        '
+        Me.Label2.AutoSize = True
+        Me.Label2.Location = New System.Drawing.Point(242, 19)
+        Me.Label2.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
+        Me.Label2.Name = "Label2"
+        Me.Label2.Size = New System.Drawing.Size(61, 13)
+        Me.Label2.TabIndex = 4
+        Me.Label2.Text = "Score Date"
+        '
+        'cbDate
+        '
+        Me.cbDate.FormattingEnabled = True
+        Me.cbDate.Location = New System.Drawing.Point(242, 35)
+        Me.cbDate.Margin = New System.Windows.Forms.Padding(2)
+        Me.cbDate.Name = "cbDate"
+        Me.cbDate.Size = New System.Drawing.Size(81, 21)
+        Me.cbDate.TabIndex = 3
+        '
+        'lbStatus
+        '
+        Me.lbStatus.AutoSize = True
+        Me.lbStatus.Location = New System.Drawing.Point(24, 106)
+        Me.lbStatus.Margin = New System.Windows.Forms.Padding(2, 0, 2, 0)
+        Me.lbStatus.Name = "lbStatus"
+        Me.lbStatus.Size = New System.Drawing.Size(0, 13)
+        Me.lbStatus.TabIndex = 5
+        '
+        'btnLoad
+        '
+        Me.btnLoad.Location = New System.Drawing.Point(374, 35)
+        Me.btnLoad.Margin = New System.Windows.Forms.Padding(2)
+        Me.btnLoad.Name = "btnLoad"
+        Me.btnLoad.Size = New System.Drawing.Size(69, 22)
+        Me.btnLoad.TabIndex = 6
+        Me.btnLoad.Text = "Load List"
+        Me.btnLoad.UseVisualStyleBackColor = True
+        '
+        'btnExit
+        '
+        Me.btnExit.Location = New System.Drawing.Point(565, 35)
+        Me.btnExit.Margin = New System.Windows.Forms.Padding(2)
+        Me.btnExit.Name = "btnExit"
+        Me.btnExit.Size = New System.Drawing.Size(69, 22)
+        Me.btnExit.TabIndex = 7
+        Me.btnExit.Text = "Exit"
+        Me.btnExit.UseVisualStyleBackColor = True
+        '
+        'btnSave
+        '
+        Me.btnSave.Location = New System.Drawing.Point(468, 35)
+        Me.btnSave.Margin = New System.Windows.Forms.Padding(2)
+        Me.btnSave.Name = "btnSave"
+        Me.btnSave.Size = New System.Drawing.Size(69, 22)
+        Me.btnSave.TabIndex = 8
+        Me.btnSave.Text = "Save "
+        Me.btnSave.UseVisualStyleBackColor = True
         '
         'Player
         '
@@ -98,80 +176,12 @@ Partial Class Payments
         Me.Comment.Name = "Comment"
         Me.Comment.Width = 250
         '
-        'cbPlayers
-        '
-        Me.cbPlayers.FormattingEnabled = True
-        Me.cbPlayers.Location = New System.Drawing.Point(52, 67)
-        Me.cbPlayers.Name = "cbPlayers"
-        Me.cbPlayers.Size = New System.Drawing.Size(300, 33)
-        Me.cbPlayers.TabIndex = 1
-        '
-        'Label1
-        '
-        Me.Label1.AutoSize = True
-        Me.Label1.Location = New System.Drawing.Point(52, 36)
-        Me.Label1.Name = "Label1"
-        Me.Label1.Size = New System.Drawing.Size(73, 25)
-        Me.Label1.TabIndex = 2
-        Me.Label1.Text = "Player"
-        '
-        'Label2
-        '
-        Me.Label2.AutoSize = True
-        Me.Label2.Location = New System.Drawing.Point(485, 36)
-        Me.Label2.Name = "Label2"
-        Me.Label2.Size = New System.Drawing.Size(57, 25)
-        Me.Label2.TabIndex = 4
-        Me.Label2.Text = "Date"
-        '
-        'cbDate
-        '
-        Me.cbDate.FormattingEnabled = True
-        Me.cbDate.Location = New System.Drawing.Point(485, 67)
-        Me.cbDate.Name = "cbDate"
-        Me.cbDate.Size = New System.Drawing.Size(150, 33)
-        Me.cbDate.TabIndex = 3
-        '
-        'lbStatus
-        '
-        Me.lbStatus.AutoSize = True
-        Me.lbStatus.Location = New System.Drawing.Point(47, 204)
-        Me.lbStatus.Name = "lbStatus"
-        Me.lbStatus.Size = New System.Drawing.Size(0, 25)
-        Me.lbStatus.TabIndex = 5
-        '
-        'btnLoad
-        '
-        Me.btnLoad.Location = New System.Drawing.Point(749, 67)
-        Me.btnLoad.Name = "btnLoad"
-        Me.btnLoad.Size = New System.Drawing.Size(138, 42)
-        Me.btnLoad.TabIndex = 6
-        Me.btnLoad.Text = "Load List"
-        Me.btnLoad.UseVisualStyleBackColor = True
-        '
-        'btnExit
-        '
-        Me.btnExit.Location = New System.Drawing.Point(1130, 67)
-        Me.btnExit.Name = "btnExit"
-        Me.btnExit.Size = New System.Drawing.Size(138, 42)
-        Me.btnExit.TabIndex = 7
-        Me.btnExit.Text = "Exit"
-        Me.btnExit.UseVisualStyleBackColor = True
-        '
-        'btnSave
-        '
-        Me.btnSave.Location = New System.Drawing.Point(935, 67)
-        Me.btnSave.Name = "btnSave"
-        Me.btnSave.Size = New System.Drawing.Size(138, 42)
-        Me.btnSave.TabIndex = 8
-        Me.btnSave.Text = "Save "
-        Me.btnSave.UseVisualStyleBackColor = True
-        '
         'Payments
         '
-        Me.AutoScaleDimensions = New System.Drawing.SizeF(12.0!, 25.0!)
+        Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
-        Me.ClientSize = New System.Drawing.Size(1388, 1887)
+        Me.AutoScroll = True
+        Me.ClientSize = New System.Drawing.Size(850, 725)
         Me.Controls.Add(Me.btnSave)
         Me.Controls.Add(Me.btnExit)
         Me.Controls.Add(Me.btnLoad)
@@ -181,6 +191,7 @@ Partial Class Payments
         Me.Controls.Add(Me.Label1)
         Me.Controls.Add(Me.cbPlayers)
         Me.Controls.Add(Me.dgPayments)
+        Me.Margin = New System.Windows.Forms.Padding(2)
         Me.Name = "Payments"
         Me.Text = "Payments"
         CType(Me.dgPayments, System.ComponentModel.ISupportInitialize).EndInit()

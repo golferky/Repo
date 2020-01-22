@@ -6,6 +6,7 @@
         BldScoresDataGridFromFile()
         '    rs.FindAllControls(Me)
         Me.Text = Me.Text & " - " & Main.cbLeagues.SelectedItem
+        oHelper.Resizedgv(dgFinance, Me)
     End Sub
     Sub BldScoresDataGridFromFile()
         Try

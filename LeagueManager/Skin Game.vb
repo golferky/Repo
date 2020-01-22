@@ -27,8 +27,6 @@ Public Class frmSkins
     Dim lv1 As New ListView
     'this accounts for the extra B player if needed
     Dim iextra As Integer
-    Dim cRTFGame As RTF_NET
-    Dim sRTFTemplate As String, srRTFTemplate As StreamReader
 
     Public Sub Resize_cb()
         Dim s_Src As SizeF
@@ -628,7 +626,7 @@ Public Class frmSkins
         Dim iSkinPercentage As String = 0.5
         'pull only scores from the course/date selected
         dvScores = New DataView(edt)
-        dvScores.RowFilter = "Date = '" & cbDate.SelectedItem.ToString.Split("-")(0) & "'" & " And Skins = 'y'"
+        dvScores.RowFilter = "Date = '" & cbDate.SelectedItem.ToString.Split("-")(0) & "'" & " And Skins = 'Y'"
         'determine how many holes played 9/18
         'If Main.oHelper.iHoles > 9 Then
         '    imaxHoles = 18

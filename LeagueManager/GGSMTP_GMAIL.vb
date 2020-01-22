@@ -65,7 +65,9 @@ Public Class GGSMTP_GMAIL
         Dim SMTP As New SmtpClient(Temp_SMTPSERVER)
         Mail.Subject = Subject
         Mail.From = New MailAddress(Temp_GmailAccount)
+        SMTP.UseDefaultCredentials = False
         SMTP.Credentials = New System.Net.NetworkCredential(Temp_GmailAccount, Temp_GmailPassword) '<-- Password Here
+        SMTP.EnableSsl = True
         Mail.To.Clear()
         'For i As Int16 = 0 To ToAddressies.Length - 1
         '    Mail.To.Add(ToAddressies(i))
