@@ -73,6 +73,9 @@ Public Class Helper
     Public dExtraCTPB1 As Decimal
     Public dExtraCTPB2 As Decimal
     Public dtWklySkins As DataTable
+    Public dtnewWklySkins As DataTable
+    Public sMACDBVersion As String = ""
+
     'fields with (Number) are key fields
     'field-width-read only-tabstop-MiddleRight
     Public Const cPat20 = "25-false-true-mr"
@@ -200,7 +203,7 @@ Public Class Helper
 
             Dim Builder As New OleDbConnectionStringBuilder With
             {
-                .Provider = "Microsoft.ACE.OLEDB.12.0",
+                .Provider = sMACDBVersion,
                 .DataSource = sFilePath 'Application.StartupPath & IO.Path.DirectorySeparatorChar
             }
 
@@ -2427,8 +2430,115 @@ ByVal sepChar As String)
 
         End Try
     End Function
-    Sub recalcLeftOvers()
+    ', SUM(IIF(Skins = 'TRUE' or Skins = 'True', 1, 0)) as SkinPlayers
+    Public Function tallysumif(fld As String, cflds As String, ofld As String) As String
+        Dim cfld As String = ""
+        For Each cflditem In cflds.Split(",")
+            cfld &= fld & String.Format(" = '{0} ' OR ", cflditem)
+        Next
+        cfld = cfld.Substring(0, cfld.LastIndexOf(" OR"))
+        tallysumif = String.Format("SUM(IIF({0}, 1 , 0)) as {1}", cfld, ofld)
+
+    End Function
+    Sub newCalcLeftovers()
         Try
+
+            'calculate leftoverskins and fill text boxes with this weeks amounts
+            LOGIT(String.Format("calculate leftoverskins/ctps And fill text boxes with this weeks amounts"))
+
+            If File.Exists("c:\temp\temp.txt") Then
+                File.Delete("c:\temp\temp.txt")
+            End If
+
+            Dim sFrom = CDate(rLeagueParmrow("StartDate")).ToString("yyyyMMdd")
+            Dim sTo = CDate(rLeagueParmrow("PostSeasonDt")).AddDays(7).ToString("yyyyMMdd")
+            DataTable2CSV(dsLeague.Tables("dtScores"), "c:\temp\temp.txt")
+            'Dim cn As New OleDbConnection("Provider=Microsoft.Jet.OLEDB.4.0;Data Source=C:\temp;Extended Properties='text;HDR=Yes;FMT=Delimited';")
+            Dim cn As New OleDbConnection(String.Format("Provider={0};Data Source=C:\temp;Extended Properties='text;HDR=Yes;FMT=Delimited';", sMACDBVersion))
+            'Dim dt As New DataTable("Skins")
+            'Dim sWhere = String.Format("Where date >= {0} and date < {1} and [$Skins] > 0 Group By date", sFrom, sTo)
+            Dim sWhere = String.Format("Where date >= {0} and date < {1} Group By date", sFrom, sTo)
+            Dim x = tallysumif(skin, "TRUE,True", "SkinPlayers")
+            Dim xx As String = String.Format("{0}", x)
+            Debug.Print("")
+            'https://stackoverflow.com/questions/22990229/count-iif-access-query
+            Dim strsql As String = String.Format _
+            ("SELECT Date
+            , COUNT(*) as Total
+            , SUM(IIF(Skins = 'TRUE' or Skins = 'True', 1, 0)) as SkinPlayers
+            , SUM(IIF(Closest = 'TRUE' or Closest = 'True', 1, 0)) as CTPPlayers
+            , IIF(SUM(Hole1) > 0,'Front','Back') as FrontBack 
+
+            , SUM([#Skins]) as wSkins
+            , SUM([$Skins]) as wskinsearned 
+            , IIF(wskinsearned > 0,wskinsearned,0) as skinsearned
+            , (IIF(Date < {0}, {1}, 7)) * SUM(IIF(Skins = 'TRUE' OR Skins = 'True', 1, 0)) - IIF(SUM([$Skins]) > 0, SUM([$Skins]),0) as wskinsextra
+
+            , IIF(SUM(Hole1) > 0,(IIF(Date < {0}, 1, 3)) * SUM(IIF(Closest = 'TRUE' OR Closest = 'True', 1, 0)) / 2, 0) as ctpf1collected 
+            , IIF(SUM(Hole1) > 0,(IIF(Date < {0}, 1, 3)) * SUM(IIF(Closest = 'TRUE' OR Closest = 'True', 1, 0)) / 2, 0) as ctpf2collected 
+            , IIF(SUM(Hole10) > 0,(IIF(Date < {0}, 1, 3)) * SUM(IIF(Closest = 'TRUE' OR Closest = 'True', 1, 0)) / 2, 0) as ctpb1collected 
+            , IIF(SUM(Hole10) > 0,(IIF(Date < {0}, 1, 3)) * SUM(IIF(Closest = 'TRUE' OR Closest = 'True', 1, 0)) / 2, 0) as ctpb2collected 
+
+            , IIF(SUM(Hole1) > 0,SUM([CTP_1]), 0) as wctpf1earned
+            , IIF(SUM(Hole1) > 0,SUM([CTP_2]), 0) as wctpf2earned
+            , IIF(SUM(Hole10) > 0,SUM([CTP_1]), 0) as wctpb1earned
+            , IIF(SUM(Hole10) > 0,SUM([CTP_2]), 0) as wctpb2earned
+
+            , IIF(wSkins > 0,wSkins,0) as Skins
+            , (IIF(Date < {0}, {1}, 7)) * SUM(IIF(Skins = 'TRUE' OR Skins = 'True', 1, 0)) as skinscollected
+            , IIF(wskinsextra > 0,wskinsextra,0) as skinsextra
+
+            , IIF(wctpf1earned > 0, wctpf1earned,0) as ctpf1earned
+            , ctpf1collected - ctpf1earned as ctpf1extra
+            , IIF(wctpf2earned > 0, wctpf2earned,0) as ctpf2earned
+            , ctpf2collected - ctpf2earned as ctpf2extra
+
+            , IIF(wctpb1earned > 0, wctpb1earned,0) as ctpb1earned
+            , ctpb1collected - ctpb1earned as ctpb1extra
+            , IIF(wctpb2earned > 0, wctpb2earned,0) as ctpb2earned
+            , ctpb2collected - ctpb2earned as ctpb2extra
+
+            FROM [temp.txt]",
+             CDate(rLeagueParmrow("PostSeasonDt")).ToString("yyyyMMdd"), rLeagueParmrow(skin)
+)
+
+            'strsql = String.Format _
+            '("SELECT Date
+            ', IIF(SUM([$Skins]) > 0,SUM([$Skins]),0) as SkinsExtra
+            'FROM [temp.txt]",
+            ' CDate(rLeagueParmrow("PostSeasonDt")).ToString("yyyyMMdd"), rLeagueParmrow(skin)
+            ')
+
+            strsql += vbCrLf &
+            String.Format("WHERE Date >= {0} And Date <= {1}", sFrom, sTo)
+            strsql += vbCrLf & "GROUP BY Date"
+            dtnewWklySkins = New DataTable("SkinsInfo")
+            Dim da As New OleDbDataAdapter(strsql, cn)
+            da.Fill(dtnewWklySkins)
+            dtnewWklySkins.PrimaryKey = New DataColumn() {dtnewWklySkins.Columns("Date")}
+
+            Dim dt1 As New DataTable("Points")
+            Dim strsql1 As String = String.Format _
+            (
+                "SELECT Team
+                , SUM(Points) as Points
+                , SUM([Team_Points]) as TeamPoints 
+                , SUM([Team_Points]) + SUM(Points) as TotalPoints 
+                FROM [temp.txt] WHERE Date >= {0} and Date < {1} 
+                GROUP BY Team",
+                CDate(rLeagueParmrow("StartDate")).ToString("yyyyMMdd"), CDate(rLeagueParmrow("PostSeasonDt")).ToString("yyyyMMdd")
+            )
+            da = New OleDbDataAdapter(strsql1, cn)
+            da.Fill(dt1)
+            Debug.Print("")
+        Catch ex As Exception
+
+        End Try
+
+    End Sub
+    Sub CalcLeftOvers()
+        Try
+            newCalcLeftovers()
             dtWklySkins = New DataTable
             dtWklySkins.Columns.Add("Date")
             For Each fld As String In {skinscol, skinsearn, skinsextr, ctpf1col, ctpf1earn, ctpf1extr, ctpf2col, ctpf2earn, ctpf2extr, ctpb1col, ctpb1earn, ctpb1extr, ctpb2col, ctpb2earn, ctpb2extr, kitty}
@@ -2557,7 +2667,6 @@ ByVal sepChar As String)
         Catch ex As Exception
 
         End Try
-
     End Sub
     Public Sub Resizedgv(dgv As DataGridView, frm As Form)
         Dim iw As Integer = 0, ih As Integer = 0

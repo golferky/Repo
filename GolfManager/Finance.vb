@@ -20,7 +20,7 @@ Public Class Finance
     Dim bfirst As Boolean = False
     Dim oHelper As Helper
     Private Sub Finance_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        '20180928 to use interop excel for worksheets
+        '20180928 to use interop excel for worksheets, add reference Microsoft.Office.Interop.Excel
         '        Dim oXL As Microsoft.Office.Interop.Excel.Application
         '        Dim oYB As Microsoft.Office.Interop.Excel.Workbooks
         '        Dim oWB As Microsoft.Office.Interop.Excel.Workbook

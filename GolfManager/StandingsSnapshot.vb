@@ -114,9 +114,6 @@
         End Try
 
     End Sub
-    Private Sub BtnExit_Click(sender As Object, e As EventArgs)
-
-    End Sub
 
     Private Sub cbDates_SelectedIndexChanged(sender As Object, e As EventArgs) Handles cbDates.SelectedIndexChanged
 

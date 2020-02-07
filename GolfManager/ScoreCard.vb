@@ -3,34 +3,6 @@
 Imports GolfManager.Constants
 Imports GolfManager.Helper
 Public Class ScoreCard
-    'Public CTP1 As String = "CTP_1"
-    Public CTP2 As String = "CTP_2"
-    Public earned As String = "$Earn"
-    Public skinamt As String = "$Skins"
-    Public skinnum As String = "#Skins"
-    Public skins As String = "Skins"
-    Public closest As String = "Closest"
-    Public closestamt As String = "$Closest"
-    Public skinscol As String = "SkinsCollected"
-    Public skinsearn As String = "SkinsEarned"
-    Public skinsextr As String = "SkinsExtra"
-    Public ctpf1col As String = "CTPF1Collected"
-    Public ctpf1earn As String = "CTPF1Earned"
-    Public ctpf1extr As String = "CTPF1Extra"
-    Public ctpf2col As String = "CTPF2Collected"
-    Public ctpf2earn As String = "CTPF2Earned"
-    Public ctpf2extr As String = "CTPF2Extra"
-    Public ctpb1col As String = "CTPB1Collected"
-    Public ctpb1earn As String = "CTPB1Earned"
-    Public ctpb1extr As String = "CTPB1Extra"
-    Public ctpb2col As String = "CTPB2Collected"
-    Public ctpb2earn As String = "CTPB2Earned"
-    Public ctpb2extr As String = "CTPB2Extra"
-    Public kitty As String = "Kitty"
-    Public points As String = "Points"
-    Public teampoints As String = "Team_Points"
-    Public datecon As String = "Date"
-    Public Clear As String = "Clear"
 
     Dim oHelper As New Helper
     Dim bFormLoad As Boolean = True
@@ -41,11 +13,12 @@ Public Class ScoreCard
     Dim sLowRows = New List(Of String)
     Dim bstrokehole As Boolean = False
     Dim thisweeksSkinsCTPS As DataRow
+    Dim lastweeksSkinsCTPS As DataRow
     Dim bshowpaint As Boolean = False
 
     Private Sub ScoreCard_Load(sender As Object, e As EventArgs) Handles MyBase.Load
-        oHelper.LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
         oHelper = Main.oHelper
+        oHelper.LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
         DsLeague = oHelper.dsLeague
         dgScores.RowTemplate.Height = 23
         dgScores.DefaultCellStyle.Font = New Font("Tahoma", 9)
@@ -162,9 +135,9 @@ Public Class ScoreCard
             oHelper.bAllHolesEntered = False
             Dim dgr As DataGridView = dgScores
             Dim sCurrColName = dgr.CurrentCell.OwningColumn.Name
-            If sCurrColName = skins Or sCurrColName = closest Then
+            If sCurrColName = skin Or sCurrColName = closest Then
                 Exit Sub
-            ElseIf sCurrColName = clear Then
+            ElseIf sCurrColName = Clear Then
                 dgr.CurrentCell.Value = sOldCellValue
                 Exit Sub
             End If
@@ -663,9 +636,9 @@ Public Class ScoreCard
             xlskins = FCalcSkins(dgScores)
             Debug.Print("")
             lskins = New List(Of String)
-            For Each skin In xlskins
-                If Not skin.Contains("|") Then
-                    lskins.Add(skin)
+            For Each indskin In xlskins
+                If Not indskin.Contains("|") Then
+                    lskins.Add(indskin)
                 End If
             Next
             Dim deachskin As Decimal = 0
@@ -682,8 +655,8 @@ Public Class ScoreCard
             Next
             'add to skins dollars
             For Each row As DataGridViewRow In dgScores.Rows
-                For Each skin In lskins
-                    If skin.Split("-")(1) = row.Index Then
+                For Each indskin In lskins
+                    If indskin.Split("-")(1) = row.Index Then
                         'row.Cells(skinnum).Value = NewmakeCellAmt(row.Cells(skinnum)) + 1
                         row.Cells(skinnum).Value = makeCellAmt(row.Cells(skinnum)) + 1
                         row.Cells(skinamt).Value = makeCellAmt(row.Cells(skinnum)) * CInt(tbEachSkin.Text)
@@ -785,10 +758,10 @@ Public Class ScoreCard
                 End If
 
                 Dim binskins As String = "N"
-                If dgScores.Rows(i).Cells(skins).FormattedValueType.Name = "Boolean" Then
-                    If dgScores.Rows(i).Cells(skins).Value = True Then binskins = "Y"
+                If dgScores.Rows(i).Cells(skin).FormattedValueType.Name = "Boolean" Then
+                    If dgScores.Rows(i).Cells(skin).Value = True Then binskins = "Y"
                 Else
-                    binskins = dgScores.Rows(i).Cells(skins).Value
+                    binskins = dgScores.Rows(i).Cells(skin).Value
                 End If
 
                 If binskins = "Y" Then
@@ -929,7 +902,7 @@ Public Class ScoreCard
             recreateCheckBoxesasTextBoxes(sColumn.DataPropertyName, sColumn.Index)
 
             oHelper.LOGIT(String.Format("recreate the skins/ctp as checkboxes"))
-            sColumn = (From c In Me.dgScores.Columns Select c Where c.DataPropertyName = skins).SingleOrDefault
+            sColumn = (From c In Me.dgScores.Columns Select c Where c.DataPropertyName = skin).SingleOrDefault
             recreateTextBoxesasCheckBoxes(sColumn.DataPropertyName, sColumn.Index)
             sColumn = (From c In Me.dgScores.Columns Select c Where c.DataPropertyName = closest).SingleOrDefault
             recreateTextBoxesasCheckBoxes(sColumn.DataPropertyName, sColumn.Index)
@@ -1005,32 +978,45 @@ Public Class ScoreCard
 #Region "Calculate CTPs/Skins"
             oHelper.LOGIT(String.Format("Calc # CTPS"))
             cbMarkPaid.Checked = False
-            '20200109-change header text to contain hole number
-            oHelper.iNumClosests = 0
-            For i = oHelper.iHoleMarker To (oHelper.iHoleMarker - 1) + 9
-                If oHelper.thisCourse("Hole" & i) = 3 Then
-                    dgScores.Columns("CTP_" & oHelper.iNumClosests + 1).HeaderText = String.Format("CTP# {0}", i)
-                    oHelper.iNumClosests += 1
-                End If
-            Next
-            'calculate leftoverskins and fill text boxes with this weeks amounts
-            oHelper.LOGIT(String.Format("calculate leftoverskins/ctps And fill text boxes with this weeks amounts"))
-            oHelper.recalcLeftOvers()
             'oHelper.calcTeamsPoints()
             Dim sKeys() As Object = {cbDates.SelectedItem}
-            thisweeksSkinsCTPS = oHelper.dtWklySkins.Rows.Find(sKeys)
-            If cbDates.SelectedIndex > 0 Then
-                sKeys = {cbDates.SelectedIndex - 1}
+            thisweeksSkinsCTPS = oHelper.dtnewWklySkins.Rows.Find(sKeys)
+            Dim bfirstweek As Boolean = True
+            If cbDates.Items.Count > 1 And cbDates.SelectedIndex < cbDates.Items.Count - 1 Then
+                sKeys = {cbDates.Items(cbDates.SelectedIndex + 1)}
+                lastweeksSkinsCTPS = oHelper.dtnewWklySkins.Rows.Find(sKeys)
+                bfirstweek = False
+                'Else
+                'lastweeksSkinsCTPS = thisweeksSkinsCTPS
+                'For Each col As DataColumn In oHelper.dtnewWklySkins.Columns
+                '    If col.ColumnName <> "Date" Then
+                '        lastweeksSkinsCTPS(col.ColumnName) = 0
+                '    End If
+                'Next
             End If
+
+            'For Each col As DataColumn In oHelper.dtnewWklySkins.Columns
+            '    If col.ColumnName <> "Date" Then
+            '        thisweeksSkinsCTPS(col.ColumnName) = 0
+            '    End If
+            'Next
+
             With oHelper
                 tbCP1.Text = thisweeksSkinsCTPS(ctpf1col) + thisweeksSkinsCTPS(ctpb1col)
-                tbCP2.Text = thisweeksSkinsCTPS(ctpf2col) + thisweeksSkinsCTPS(ctpb1col)
-                tbPCP1.Text = oHelper.dLastWeeksCTPB1
-                tbPCP2.Text = oHelper.dLastWeeksCTPB2
+                tbCP2.Text = thisweeksSkinsCTPS(ctpf2col) + thisweeksSkinsCTPS(ctpb2col)
+                If bfirstweek Then
+                    tbPCP1.Text = 0
+                    tbPCP2.Text = 0
+                    tbPSkins.Text = 0
+                Else
+                    tbPCP1.Text = lastweeksSkinsCTPS(ctpf1extr) + lastweeksSkinsCTPS(ctpb1extr)
+                    tbPCP2.Text = lastweeksSkinsCTPS(ctpf2extr) + lastweeksSkinsCTPS(ctpb2extr)
+                    tbPSkins.Text = lastweeksSkinsCTPS(skinsextr)
+                End If
+
                 tbCP1Tot.Text = CDec(tbPCP1.Text) + CDec(tbCP1.Text)
                 tbCP2Tot.Text = CDec(tbPCP2.Text) + CDec(tbCP2.Text)
 
-                tbPSkins.Text = oHelper.dLastWeeksSkins
                 tbSkins.Text = thisweeksSkinsCTPS(skinscol)
                 tbSkinTot.Text = CInt(tbPSkins.Text) + CInt(tbSkins.Text)
                 tbNumSkins.Text = thisweeksSkinsCTPS(skinsextr)
@@ -1047,7 +1033,7 @@ Public Class ScoreCard
             Dim iRow = 0
             Dim ictp1 = 0, ictp2 = 0
             For Each row As DataRowView In DtScoresBindingSource
-                setSkinsCTPs(row, skins, iRow)
+                setSkinsCTPs(row, skin, iRow)
                 setSkinsCTPs(row, closest, iRow)
                 iRow += 1
                 If IsNumeric(row(CTP1)) Then
@@ -1160,8 +1146,13 @@ Public Class ScoreCard
                 End If
             Next
 #End Region
+
 #Region "Calculate this weeks CTP/Skins from Gridview"
             oHelper.LOGIT(String.Format("Calculate this weeks skins/ctps from Gridview"))
+            For Each fld As String In {skinscol, skinsearn, ctpf1col, ctpf1earn, ctpf2col, ctpf2earn, ctpb1col, ctpb1earn, ctpb2col, ctpb2earn}
+                thisweeksSkinsCTPS(fld) = 0
+            Next
+
             For Each row As DataGridViewRow In dgScores.Rows
                 If row.Cells(closest).Value = True Then
                     Dim damt As Decimal = If(cbDates.SelectedItem < CDate(oHelper.rLeagueParmrow("PostSeasonDt")).ToString("yyyyMMdd"), 1, "3")
@@ -1185,7 +1176,7 @@ Public Class ScoreCard
                         thisweeksSkinsCTPS(ctpb2earn) += makeCellAmt(row.Cells(CTP2))
                     End If
                 End If
-                If row.Cells(skins).Value = True Then
+                If row.Cells(skin).Value = True Then
                     Dim damt As Decimal = If(cbDates.SelectedItem < CDate(oHelper.rLeagueParmrow("PostSeasonDt")).ToString("yyyyMMdd"), 2, "7")
                     thisweeksSkinsCTPS(skinscol) += damt
                     thisweeksSkinsCTPS(skinsearn) += makeCellAmt(row.Cells(skinamt))
@@ -1217,12 +1208,9 @@ Public Class ScoreCard
             With oHelper
                 tbCP1.Text = thisweeksSkinsCTPS(ctpf1col) + thisweeksSkinsCTPS(ctpb1col)
                 tbCP2.Text = thisweeksSkinsCTPS(ctpf2col) + thisweeksSkinsCTPS(ctpb2col)
-                tbPCP1.Text = oHelper.dLastWeeksCTPB1
-                tbPCP2.Text = oHelper.dLastWeeksCTPB2
                 tbCP1Tot.Text = CDec(tbPCP1.Text) + CDec(tbCP1.Text)
                 tbCP2Tot.Text = CDec(tbPCP2.Text) + CDec(tbCP2.Text)
 
-                tbPSkins.Text = oHelper.dLastWeeksSkins
                 tbSkins.Text = thisweeksSkinsCTPS(skinscol)
                 tbSkinTot.Text = CInt(tbPSkins.Text) + CInt(tbSkins.Text)
                 tbNumSkins.Text = thisweeksSkinsCTPS(skinsextr)
@@ -1303,7 +1291,7 @@ Public Class ScoreCard
                 'make column name = property name
                 .Name = .DataPropertyName
                 .SortMode = DataGridViewColumnSortMode.NotSortable
-                If .Name = skins Or .Name = closest Then
+                If .Name = skin Or .Name = closest Then
                     .ValueType = GetType(System.Boolean)
                 End If
             End With
@@ -1675,33 +1663,33 @@ Public Class ScoreCard
                 'End If
 
                 Dim x = ""
-                    'dgScores.EndEdit()
-                    '20190403-this is needed to update the checkbox as marked
-                    ''20200109-fix skins/ctp resets
-                ElseIf dgc.OwningColumn.Name = skins Then
-                    Dim damt As Decimal = If(cbDates.SelectedItem < CDate(oHelper.rLeagueParmrow("PostSeasonDt")).ToString("yyyyMMdd"), oHelper.rLeagueParmrow(skins), "7")
-                    If Not CbSwap() Then
-                        damt *= -1
-                    End If
+                'dgScores.EndEdit()
+                '20190403-this is needed to update the checkbox as marked
+                ''20200109-fix skins/ctp resets
+            ElseIf dgc.OwningColumn.Name = skin Then
+                Dim damt As Decimal = If(cbDates.SelectedItem < CDate(oHelper.rLeagueParmrow("PostSeasonDt")).ToString("yyyyMMdd"), oHelper.rLeagueParmrow(skin), "7")
+                If Not CbSwap() Then
+                    damt *= -1
+                End If
 
-                    tbSkins.Text += damt
-                    tbSkinTot.Text += damt
-                    tbPurse.Text += damt
-                    resetSkins()
+                tbSkins.Text += damt
+                tbSkinTot.Text += damt
+                tbPurse.Text += damt
+                resetSkins()
 
-                ElseIf dgc.OwningColumn.Name = closest Then
-                    Dim damt As Decimal = If(cbDates.SelectedItem < CDate(oHelper.rLeagueParmrow("PostSeasonDt")).ToString("yyyyMMdd"), 1, "3") / 2
-                    If Not CbSwap() Then
-                        damt *= -1
-                    End If
+            ElseIf dgc.OwningColumn.Name = closest Then
+                Dim damt As Decimal = If(cbDates.SelectedItem < CDate(oHelper.rLeagueParmrow("PostSeasonDt")).ToString("yyyyMMdd"), 1, "3") / 2
+                If Not CbSwap() Then
+                    damt *= -1
+                End If
 
-                    tbCP1.Text += damt
-                    tbCP1Tot.Text += damt
-                    tbCP2.Text += damt
-                    tbCP2Tot.Text += damt
-                    tbPurse.Text += damt
-                ElseIf dgc.OwningColumn.Name.Contains("CTP_") Then
-                    Dim dgcb As DataGridViewCheckBoxCell = dgScores.Rows(e.RowIndex).Cells(closest)
+                tbCP1.Text += damt
+                tbCP1Tot.Text += damt
+                tbCP2.Text += damt
+                tbCP2Tot.Text += damt
+                tbPurse.Text += damt
+            ElseIf dgc.OwningColumn.Name.Contains("CTP_") Then
+                Dim dgcb As DataGridViewCheckBoxCell = dgScores.Rows(e.RowIndex).Cells(closest)
                 Dim x = ""
                 If dgcb.Value <> "True" Then
                     MessageBox.Show(String.Format("Cant give {0} a closest, hes not in Closests", oHelper.sPlayer), "Player Not in CTPs", MessageBoxButtons.OK, MessageBoxIcon.Hand)
@@ -1716,9 +1704,9 @@ Public Class ScoreCard
                 dgScores.Columns(sColumn.DataPropertyName).HeaderText = sColumn.HeaderText
                 For Each row As DataGridViewRow In dgScores.Rows
                     If row.Index = sender.currentrow.index Then
-                        Dim iamt As Integer = If(sColumn.DataPropertyName = ctp1, CInt(tbCP1.Text), CInt(tbCP2.Text))
+                        Dim iamt As Integer = If(sColumn.DataPropertyName = CTP1, CInt(tbCP1.Text), CInt(tbCP2.Text))
                         row.Cells(sColumn.DataPropertyName).Value = iamt
-                        row.Cells(closestamt).Value = makeCellAmt(row.Cells(ctp1)) + makeCellAmt(row.Cells(ctp2))
+                        row.Cells(closestamt).Value = makeCellAmt(row.Cells(CTP1)) + makeCellAmt(row.Cells(CTP2))
                         row.Cells(earned).Value = makeCellAmt(row.Cells(skinamt)) + makeCellAmt(row.Cells(closestamt))
                     Else
                         row.Cells(sColumn.DataPropertyName).Value = DBNull.Value
@@ -1773,7 +1761,7 @@ Public Class ScoreCard
                 End If
                 Return dgScores.CurrentCell.Value
             Else
-                If dgScores.CurrentRow.Cells(skins).Value <> False And IsNumeric(dgScores.CurrentRow.Cells(skinamt).Value) Then
+                If dgScores.CurrentRow.Cells(skin).Value <> False And IsNumeric(dgScores.CurrentRow.Cells(skinamt).Value) Then
                     If MessageBox.Show(String.Format("{0} won a skin{1}Do you want to reset this players skin money", oHelper.sPlayer, vbCrLf), "Skin Money Winner!", MessageBoxButtons.YesNo, MessageBoxIcon.Hand) = DialogResult.Yes Then
                         dgScores.CurrentCell.Value = False
                         dgScores.CurrentCell.Style.BackColor = Color.White

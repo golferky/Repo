@@ -1,6 +1,7 @@
 ﻿'*************************************************************************************************
 'Imports System.IO.Packaging
 'Imports LeagueManager.FileLayout
+Imports Microsoft.Win32
 Imports GolfManager.Helper
 Public Class Main
     Dim cVersion = "Version : 2020.01.30"
@@ -194,6 +195,25 @@ Public Class Main
             '    MsgBox(String.Format("File in use, close file and restart {0} {1}", vbCrLf, oHelper.getLatestFile("*LeagueParms.csv")))
             '    End
             'End If
+
+            Dim AccessDBAsValue As String = String.Empty
+            Dim rkACDBKey As RegistryKey = Registry.LocalMachine.OpenSubKey("SOFTWARE\Classes")
+            If rkACDBKey IsNot Nothing Then
+
+                For Each subKeyName As String In rkACDBKey.GetSubKeyNames()
+
+                    If subKeyName.Contains("Microsoft.ACE.OLEDB") Then
+                        If Not subKeyName.Contains("Errors") Then
+                            oHelper.sMACDBVersion = subKeyName
+                        End If
+                    End If
+                Next
+            End If
+            If oHelper.sMACDBVersion = "" Then
+                MessageBox.Show(String.Format("no version of Microsoft Access DB found{0}Contact developer", vbCrLf))
+                End
+            End If
+
             bwait = True
             sParmFile = oHelper.getLatestFile("*LeagueParms.csv")
             oHelper.LOGIT(String.Format("Loaded league file {0}", sParmFile))
@@ -574,7 +594,7 @@ Public Class Main
                 Exit For
             End If
         Next
-
+        oHelper.newCalcLeftovers()
     End Sub
     Sub rebuildDates(dtschedule As DataTable)
         Dim dv As New DataView(dtschedule)

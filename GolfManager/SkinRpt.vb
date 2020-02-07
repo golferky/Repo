@@ -334,22 +334,22 @@ Public Class SkinRpt
             oHelper.LOGIT(ex.Message & "-" & ex.StackTrace.Substring(ex.StackTrace.IndexOf(":line")) & "-" & fld)
         End Try
     End Function
-    Private Sub dgSkins_CellMouseDoubleClick(sender As Object, e As DataGridViewCellMouseEventArgs) Handles dgSkins.CellMouseDoubleClick
-        oHelper.LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
-        Try
-            Dim cell As DataGridViewTextBoxCell = sender.currentcell
-            Dim row As DataGridViewRow = sender.currentrow
-            '20180225-fix Mouse click to expand columns
-            If e.ColumnIndex = 0 Then
-                If cell.OwningColumn.Name = "Date" Then
-                    oHelper.dDate = Date.ParseExact(cell.Value, "yyyyMMdd", System.Globalization.DateTimeFormatInfo.InvariantInfo)
-                    Skins.Show()
-                End If
-            End If
-        Catch ex As Exception
+    'Private Sub dgSkins_CellMouseDoubleClick(sender As Object, e As DataGridViewCellMouseEventArgs) Handles dgSkins.CellMouseDoubleClick
+    '    oHelper.LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
+    '    Try
+    '        Dim cell As DataGridViewTextBoxCell = sender.currentcell
+    '        Dim row As DataGridViewRow = sender.currentrow
+    '        '20180225-fix Mouse click to expand columns
+    '        If e.ColumnIndex = 0 Then
+    '            If cell.OwningColumn.Name = "Date" Then
+    '                oHelper.dDate = Date.ParseExact(cell.Value, "yyyyMMdd", System.Globalization.DateTimeFormatInfo.InvariantInfo)
+    '                Skins.Show()
+    '            End If
+    '        End If
+    '    Catch ex As Exception
 
-        End Try
-    End Sub
+    '    End Try
+    'End Sub
     Private Sub dgSkins_SortCompare(sender As Object, e As DataGridViewSortCompareEventArgs) Handles dgSkins.SortCompare
 
         Try

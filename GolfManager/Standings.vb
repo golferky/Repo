@@ -442,7 +442,6 @@ Public Class Standings
                         Dim i = 1
                         sline = ",,,,"
                         For Each col As DataColumn In oHelper.dsLeague.Tables("dtSchedule").Columns
-                            oHelper.LOGIT(String.Format("i = {0} - {1}", i, oHelper.rLeagueParmrow("Teams")))
                             If i = oHelper.rLeagueParmrow("Teams") Then
                                 i = 1
                                 ii += 1
