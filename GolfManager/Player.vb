@@ -42,9 +42,8 @@ Public Class Player
             'Else
             '    e.Cancel = True
             'End If
-            If oHelper.dsLeague.Tables.Contains(stable) Then oHelper.dsLeague.Tables.Remove(stable)
+            'If oHelper.dsLeague.Tables.Contains(stable) Then oHelper.dsLeague.Tables.Remove(stable)
             oHelper.DataTable2CSV(DsLeague.Tables(stable), oHelper.sFilePath & "\Players.csv")
-
         End If
     End Sub
     'this sub is initiated if there us an error on a row change

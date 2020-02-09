@@ -4,7 +4,7 @@
 Imports Microsoft.Win32
 Imports GolfManager.Helper
 Public Class Main
-    Dim cVersion = "Version : 2020.01.30"
+    Dim cVersion = "Version : 2020.02.09"
     Public oHelper As New Helper
     Private dsLeague As New dsLeague
     Dim bload As Boolean = True
