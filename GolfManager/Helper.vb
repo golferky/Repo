@@ -116,6 +116,7 @@ Public Class Helper
     Public Function UpdateINI() As Boolean
         UpdateINI = False
         Try
+
             Using sw As New IO.StreamWriter(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments) & "\Leaguemanager.ini", False)
 
                 sw.WriteLine("LeagueName=" & sLeagueName)
@@ -166,7 +167,7 @@ Public Class Helper
                     'mail.Attachments()
                 End With
 
-                .Credentials = New Net.NetworkCredential("garyrscudder@gmail.com", "4St-SCQ-Jt6-tB6")
+                .Credentials = New Net.NetworkCredential("garyrscudder@gmail.com", "8@L0hV&5Oim%LTlh3KD%")
                 .Port = 587
                 .Host = "smtp.gmail.com"
                 .EnableSsl = True
@@ -349,8 +350,14 @@ Public Class Helper
                         aRow(i) = sAry(i)
                     End If
                 Next
-
                 dt.Rows.Add(aRow)
+
+                'Try
+                '    dt.Rows.Add(aRow)
+                'Catch ex As Exception
+                '    If Debugger.IsAttached Then Debug.Print("")
+
+                'End Try
             Loop
             myStream.Close()
             CSV2DataTable = True
@@ -571,7 +578,7 @@ ByVal sepChar As String)
                 iParTot += score.Split("-")(1)
             Next
 
-            IHdcp = ((iScoreTot / iLast5Scores.Count) - (iParTot / iLast5Scores.Count)) * 0.8
+            IHdcp = IIf(iLast5Scores.Count = 0, 99, ((iScoreTot / iLast5Scores.Count) - (iParTot / iLast5Scores.Count)) * 0.8)
             Return IHdcp
 
         Catch ex As Exception
@@ -673,7 +680,7 @@ ByVal sepChar As String)
 
             If bloghelper Then
                 If Debugger.IsAttached Then
-                    Debug.WriteLine(sMess)
+                    Debug.WriteLine(DateTime.Now.ToString("yyyy-MM-dd HH:mm:ss | ") & sMess)
                     Exit Sub
                 End If
                 If Not Directory.Exists(sFilePath & "\Logs\") Then Directory.CreateDirectory(sFilePath & "\Logs\")
@@ -705,36 +712,27 @@ ByVal sepChar As String)
     End Sub
     Sub CalcHoleMarker(sDate As String)
         Try
-            If sDate = CDate(rLeagueParmrow("PostSeasonDt")).ToString("yyyyMMdd") Then
-                iHoleMarker = 1
-                Exit Sub
-            ElseIf sDate = CDate(rLeagueParmrow("PostSeasonDt")).AddDays(7).ToString("yyyyMMdd") Then
-                iHoleMarker = 10
-                Exit Sub
-            End If
-            Dim sStartMonth As String = CDate(rLeagueParmrow("StartDate")).Month 'rLeagueParmrow("startDate").ToString.Substring(0, rLeagueParmrow("startDate").ToString.IndexOf("/")).PadLeft(2, "0")
-            If sDate.Substring(0, 4) < CDate(rLeagueParmrow("StartDate")).Year Then
-                For Each r As DataRow In dsLeague.Tables("dtLeagueParms").Rows
-                    If CDate(r("StartDate")).Year = sDate.Substring(0, 4) Then
-                        sStartMonth = CDate(r("StartDate")).Month
-                        Exit For
+            Dim sStartMonth As Int16 = 0
+            For Each r As DataRow In dsLeague.Tables("dtLeagueParms").Rows
+                If CDate(r("StartDate")).Year = sDate.Substring(0, 4) Then
+                    sStartMonth = CDate(r("StartDate")).Month
+                    If r("Start9") = "F" Then
+                        iHoleMarker = 1
+                    Else
+                        iHoleMarker = 10
                     End If
-                Next
-            End If
-            'odd holes are on the back if the starting hole is front
-            If (sDate.ToString.Substring(4, 2) - sStartMonth) Mod 2 = 0 Then
-                If rLeagueParmrow("Start9") = "F" Then
+                    Exit For
+                End If
+            Next
+            Dim scurrMonth As Int16 = CInt(sDate.Substring(4, 2))
+            Do While sStartMonth < scurrMonth
+                If iHoleMarker = 10 Then
                     iHoleMarker = 1
                 Else
                     iHoleMarker = 10
                 End If
-            Else
-                If rLeagueParmrow("Start9") = "F" Then
-                    iHoleMarker = 10
-                Else
-                    iHoleMarker = 1
-                End If
-            End If
+                sStartMonth += 1
+            Loop
 
         Catch ex As Exception
             MsgBox("Error " & ex.Message & vbCrLf & ex.StackTrace)
@@ -886,10 +884,14 @@ ByVal sepChar As String)
 
             'dvplayers has a players matching initials
             If dvPlayers.Count = 0 Then
+                If dgv.Name = "DtPlayersDataGridView" Then
+                    fGetPlayer = fixPlayer(sNameInfo & ":New")
+                    Exit Function
+                End If
                 Dim sResult As MsgBoxResult
                 sResult = MsgBox("Player not found " & sNameInfo & vbCrLf & " Do you want to create a player?", MsgBoxStyle.YesNo)
                 If sResult = MsgBoxResult.Yes Then
-                    Player.ShowDialog()
+                    'Player.ShowDialog()
                     fGetPlayer = sPlayer
                     Exit Function
                 Else
@@ -1241,61 +1243,74 @@ ByVal sepChar As String)
         Next
     End Sub
     Sub getMatchPts(dg As DataGridView, index As Integer)
-        Dim ipNet = 0
-        Dim ioNet = 0
-        '20180325
-        Dim s9Played As String = "Out_Net"
-        If iHoleMarker <> 1 Then s9Played = "In_Net"
-        ipNet = FixNullScore(dg.Rows(index + 0).Cells(s9Played).Value.ToString)
-        ioNet = FixNullScore(dg.Rows(index + 2).Cells(s9Played).Value.ToString)
-        '20180325-bye opponent
-        Dim xxx = Matches.sByeOpponent
-        If Matches.sByeOpponent = dg.Rows(index + 0).Cells("Team").Value Then
-            dg.Rows(index + 0).Cells("Points").Style.BackColor = Color.LightGreen
-            dg.Rows(index + 0).Cells("Points").Value = 1
-            dg.Rows(index + 0).Cells("Team_Points").Style.BackColor = Color.LightGreen
-            dg.Rows(index + 0).Cells("Team_Points").Value = 1
-            dg.Rows(index + 0).Cells("Opponent").Value = "Bye"
+        Try
 
-            dg.Rows(index + 2).Cells("Points").Style.BackColor = Color.LightGreen
-            dg.Rows(index + 2).Cells("Points").Value = 1
-            dg.Rows(index + 2).Cells("Team_Points").Style.BackColor = Color.LightGreen
-            dg.Rows(index + 2).Cells("Opponent").Value = "Bye"
-            bByeFound = True
-            Exit Sub
-        End If
-        sPlayer = dg.Rows(index).Cells("Player").Value
-        ColorWinners(dg, index, ipNet, ioNet)
-        ipNet = FixNullScore(dg.Rows(index + 1).Cells(s9Played).Value.ToString)
-        ioNet = FixNullScore(dg.Rows(index + 3).Cells(s9Played).Value.ToString)
-        ColorWinners(dg, index + 1, ipNet, ioNet)
-        ipNet += FixNullScore(dg.Rows(index + 0).Cells(s9Played).Value.ToString)
-        ioNet += FixNullScore(dg.Rows(index + 2).Cells(s9Played).Value.ToString)
-        If ipNet > ioNet Then
-            dg.Rows(index + 2).Cells("Team_Points").Style.BackColor = Color.LightGreen
-            dg.Rows(index + 2).Cells("Team_Points").Value = 1
-        ElseIf ipNet < ioNet Then
-            dg.Rows(index + 0).Cells("Team_Points").Style.BackColor = Color.LightGreen
-            dg.Rows(index + 0).Cells("Team_Points").Value = 1
-        Else
-            dg.Rows(index + 0).Cells("Team_Points").Style.BackColor = Color.Yellow
-            dg.Rows(index + 2).Cells("Team_Points").Style.BackColor = Color.Yellow
-            dg.Rows(index + 0).Cells("Team_Points").Value = 0.5
-            dg.Rows(index + 2).Cells("Team_Points").Value = 0.5
-        End If
+            Dim ipNet = 0
+            Dim ioNet = 0
+            '20180325
+            Dim s9Played As String = "Out_Net"
+            If iHoleMarker <> 1 Then s9Played = "In_Net"
+            ipNet = FixNullScore(dg.Rows(index + 0).Cells(s9Played).Value.ToString)
+            ioNet = FixNullScore(dg.Rows(index + 2).Cells(s9Played).Value.ToString)
+            '20180325-bye opponent
+            Dim xxx = Matches.sByeOpponent
+            If Matches.sByeOpponent = dg.Rows(index + 0).Cells("Team").Value Then
+                dg.Rows(index + 0).Cells("Points").Style.BackColor = Color.LightGreen
+                dg.Rows(index + 0).Cells("Points").Value = 1
+                dg.Rows(index + 0).Cells("Team_Points").Style.BackColor = Color.LightGreen
+                dg.Rows(index + 0).Cells("Team_Points").Value = 1
+                dg.Rows(index + 0).Cells("Opponent").Value = "Bye"
+
+                dg.Rows(index + 2).Cells("Points").Style.BackColor = Color.LightGreen
+                dg.Rows(index + 2).Cells("Points").Value = 1
+                dg.Rows(index + 2).Cells("Team_Points").Style.BackColor = Color.LightGreen
+                dg.Rows(index + 2).Cells("Opponent").Value = "Bye"
+                bByeFound = True
+                Exit Sub
+            End If
+            sPlayer = dg.Rows(index).Cells("Player").Value
+            ColorWinners(dg, index, ipNet, ioNet)
+            ipNet = FixNullScore(dg.Rows(index + 1).Cells(s9Played).Value.ToString)
+            ioNet = FixNullScore(dg.Rows(index + 3).Cells(s9Played).Value.ToString)
+            ColorWinners(dg, index + 1, ipNet, ioNet)
+            ipNet += FixNullScore(dg.Rows(index + 0).Cells(s9Played).Value.ToString)
+            ioNet += FixNullScore(dg.Rows(index + 2).Cells(s9Played).Value.ToString)
+            If ipNet > ioNet Then
+                dg.Rows(index + 2).Cells("Team_Points").Style.BackColor = Color.LightGreen
+                dg.Rows(index + 2).Cells("Team_Points").Value = 1
+                dg.Rows(index + 0).Cells("Team_Points").Style.BackColor = dg.Rows(index + 0).Cells("Method").Style.BackColor
+                dg.Rows(index + 0).Cells("Team_Points").Value = 0
+            ElseIf ipNet < ioNet Then
+                dg.Rows(index + 0).Cells("Team_Points").Style.BackColor = Color.LightGreen
+                dg.Rows(index + 0).Cells("Team_Points").Value = 1
+                dg.Rows(index + 2).Cells("Team_Points").Style.BackColor = dg.Rows(index + 2).Cells("Method").Style.BackColor
+                dg.Rows(index + 2).Cells("Team_Points").Value = 0
+            Else
+                dg.Rows(index + 0).Cells("Team_Points").Style.BackColor = Color.Yellow
+                dg.Rows(index + 2).Cells("Team_Points").Style.BackColor = Color.Yellow
+                dg.Rows(index + 0).Cells("Team_Points").Value = 0.5
+                dg.Rows(index + 2).Cells("Team_Points").Value = 0.5
+            End If
+        Catch ex As Exception
+            MsgBox("Error " & ex.Message & vbCrLf & ex.StackTrace)
+        End Try
     End Sub
     'ip = player points, oo = opponents points
     Sub ColorWinners(dg As DataGridView, index As Integer, ipNet As Int16, ioNet As Int16)
         If ipNet > ioNet Then
             dg.Rows(index + 2).Cells("Points").Style.BackColor = Color.LightGreen
             dg.Rows(index + 2).Cells("Points").Value = 1
+            dg.Rows(index + 2).Cells("Opponent").Style.BackColor = dg.Rows(index + 2).Cells("Method").Style.BackColor
             dg.Rows(index + 0).Cells("Points").Value = 0
             dg.Rows(index + 0).Cells("Opponent").Style.BackColor = Color.LightGreen
+            dg.Rows(index + 0).Cells("Points").Style.BackColor = dg.Rows(index + 0).Cells("Method").Style.BackColor
         ElseIf ipNet < ioNet Then
             dg.Rows(index + 0).Cells("Points").Style.BackColor = Color.LightGreen
             dg.Rows(index + 0).Cells("Points").Value = 1
+            dg.Rows(index + 0).Cells("Opponent").Style.BackColor = dg.Rows(index + 0).Cells("Method").Style.BackColor
             dg.Rows(index + 2).Cells("Points").Value = 0
             dg.Rows(index + 2).Cells("Opponent").Style.BackColor = Color.LightGreen
+            dg.Rows(index + 2).Cells("Points").Style.BackColor = dg.Rows(index + 2).Cells("Method").Style.BackColor
         Else
             dg.Rows(index + 0).Cells("Points").Style.BackColor = Color.Yellow
             dg.Rows(index + 2).Cells("Points").Style.BackColor = Color.Yellow
@@ -1782,12 +1797,16 @@ ByVal sepChar As String)
                 For iTeam = 1 To CInt(rLeagueParmrow("Teams"))
                     sTeam = iTeam
                     'save this players Partner
-                    ip# = UpdatePartnerInScore(getPlayer(sTeam, "A"), "", sdate, ip#)
-                    ip# = UpdatePartnerInScore(getPlayer(sTeam, "B"), "", sdate, ip#)
+                    sPlayer = getPlayer(sTeam, "A") & ",A"
+                    ip# = UpdatePartnerInScore(sPlayer, "A", sdate, ip#)
+                    sPlayer = getPlayer(sTeam, "B") & ",B"
+                    ip# = UpdatePartnerInScore(sPlayer, "B", sdate, ip#)
                 Next
                 getMatchScores = True
                 Exit Function
             End If
+            'regular season
+            Dim sOPlayer As String = ""
             If sdate <= CDate(rLeagueParmrow("EndDate")).ToString("yyyyMMdd") Then
                 Dim imatches As Int16 = rLeagueParmrow("Teams") / 2
                 For iMatch = 1 To imatches
@@ -1795,14 +1814,23 @@ ByVal sepChar As String)
                     'right side of match
                     sTeam = sMatch.Split("v")(1)
                     If sTeam <> "Bye" Then
-                        ip# = UpdatePartnerInScore(getPlayer(sTeam, "A"), getPlayer(sMatch.Split("v")(0), "A"), sdate, ip#)
-                        ip# = UpdatePartnerInScore(getPlayer(sTeam, "B"), getPlayer(sMatch.Split("v")(0), "B"), sdate, ip#)
+                        'ip# is the index of dgscores grid row
+                        sPlayer = getPlayer(sTeam, "A") & ",A"
+                        sOPlayer = getPlayer(sMatch.Split("v")(0), "A") & ",A"
+                        ip# = UpdatePartnerInScore(sPlayer, sOPlayer, sdate, ip#)
+                        sPlayer = getPlayer(sTeam, "B") & ",B"
+                        sOPlayer = getPlayer(sMatch.Split("v")(0), "B") & ",B"
+                        ip# = UpdatePartnerInScore(sPlayer, sOPlayer, sdate, ip#)
                     End If
                     'left side of match
                     sTeam = sMatch.Split("v")(0)
                     If sTeam <> "Bye" Then
-                        ip# = UpdatePartnerInScore(getPlayer(sTeam, "A"), getPlayer(sMatch.Split("v")(1), "A"), sdate, ip#)
-                        ip# = UpdatePartnerInScore(getPlayer(sTeam, "B"), getPlayer(sMatch.Split("v")(1), "B"), sdate, ip#)
+                        sPlayer = getPlayer(sTeam, "A") & ",A"
+                        sOPlayer = getPlayer(sMatch.Split("v")(1), "A") & ",A"
+                        ip# = UpdatePartnerInScore(sPlayer, sOPlayer, sdate, ip#)
+                        sPlayer = getPlayer(sTeam, "B") & ",B"
+                        sOPlayer = getPlayer(sMatch.Split("v")(1), "B") & ",B"
+                        ip# = UpdatePartnerInScore(sPlayer, sOPlayer, sdate, ip#)
                     End If
                 Next
             End If
@@ -1825,33 +1853,40 @@ ByVal sepChar As String)
         If dvScores.Count > 0 Then
             getPlayer = dvScores(0)("Player")
         Else
-            MsgBox(String.Format("Team {0} is missing an {1} player, fix player file and try again", sTeam, sGrade))
+            'this code checks to see if a player participated in EOY skins
+            Dim dvp As New DataView(dsLeague.Tables("dtPlayers"))
+            dvp.RowFilter = String.Format("Team = '{0}' And Grade = '{1}'", sTeam, sGrade)
+            If dvp.Count <> 1 Then
+                MsgBox(String.Format("Team {0} is missing an {1} player, fix player file and try again", sTeam, sGrade))
+            End If
+            getPlayer = dvp(0)("Name")
         End If
 
     End Function
     Private Function UpdatePartnerInScore(sthisPlayer As String, sOpponent As String, sDate As String, ip As Short) As Int16
-        Dim sKey() As Object = {sthisPlayer, sDate}
+        Dim sKey() As Object = {sthisPlayer.Split(",")(0), sDate}
         Dim drow = dsLeague.Tables("dtScores").Rows.Find(sKey)
         Dim dvscores As New DataView(dsLeague.Tables("dtScores"))
+        'drow is nothing if this is a new score
         If drow Is Nothing Then
-            'this finds the players partner
-            Dim srowfilter = String.Format("Player <> '{0}' AND Date = '{1}' AND Team = '{2}'", sPlayer, sDate, sTeam)
-            dvscores.RowFilter = srowfilter
-            If dvscores.Count = 0 Then
-                Dim rowView As DataRowView = dvscores.AddNew
-                ' Change values in the DataRow.
-                rowView("League") = sLeagueName
-                rowView("Player") = sthisPlayer
-                rowView("Group") = 0
-                rowView("Team") = sTeam
-                rowView("Date") = sDate
-                rowView("Partner") = CStr(ip).PadLeft(2, "0")
-                rowView("Opponent") = sOpponent
-                rowView.EndEdit()
-            Else
-                dvscores(0)("Partner") = CStr(ip).PadLeft(2, "0")
-                dvscores(0)("Opponent") = sOpponent
-            End If
+            Dim rowView As DataRowView = dvscores.AddNew
+            ' Change values in the DataRow.
+            rowView("League") = sLeagueName
+            rowView("Player") = sthisPlayer.Split(",")(0)
+            rowView("Grade") = sthisPlayer.Split(",")(1)
+            rowView("Group") = 0
+            rowView("Team") = sTeam
+            rowView("Date") = sDate
+            rowView("Partner") = CStr(ip).PadLeft(2, "0")
+            rowView("Opponent") = sOpponent
+            rowView.EndEdit()
+            ''this finds the players partner
+            'Dim srowfilter = String.Format("Player <> '{0}' AND Date = '{1}' AND Team = '{2}'", sthisPlayer, sDate, sTeam)
+            'dvscores.RowFilter = srowfilter
+            'If dvscores.Count > 0 Then
+            '    dvscores(0)("Partner") = CStr(ip).PadLeft(2, "0")
+            '    dvscores(0)("Opponent") = sOpponent
+            'End If
         Else
             drow("Partner") = CStr(ip).PadLeft(2, "0")
             drow("Opponent") = sOpponent
@@ -1918,80 +1953,151 @@ ByVal sepChar As String)
         End Try
 
     End Sub
-    Function FCalcSkins(dgScores As DataGridView) As List(Of String)
+    Function FCalcLowScore(dvScores As DataView, hole As String) As String
         LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
-        'this code goes through the listview and highlights the lowest value on each hole and fron 9, back 9 and total
-        FCalcSkins = Nothing
+        FCalcLowScore = ""
         Try
-            FCalcSkins = New List(Of String)
             Dim ilowrow As New List(Of String)
-            'adjust for handicap fields in listview
-            'loop through each column finding the lowest scores
-            'Get low 9's and 18 hole
-            '20171014 - use holemarker to control which 9 or 18 you process
-            For ii = iHoleMarker To iHoleMarker + iHoles - 1 'lv1.Items(0).SubItems.Count - 1
-                Dim ilowscore = 99
-                'calculate a column saving low score
-                For i = 0 To dgScores.RowCount - 1
-                    If dgScores.Rows(i).Cells("Player").Value = sTotalColumn Then Continue For
-                    sPlayer = dgScores.Rows(i).Cells("Player").Value
-                    If dgScores.Rows(i).Cells("PHdcp").Value.ToString <> "" Then
-                        IHdcp = dgScores.Rows(i).Cells("PHdcp").Value
-                    Else
-                        If iHoleMarker = 1 Then
-                            IHdcp = dgScores.Rows(i).Cells("Out_Gross").Value - dgScores.Rows(i).Cells("Out_Net").Value
-                        Else
-                            IHdcp = dgScores.Rows(i).Cells("In_Gross").Value - dgScores.Rows(i).Cells("In_Net").Value
+            Dim ilowscore = 99
+            'calculate a column saving low score
+            For i = 0 To dvScores.Count - 1
+                Dim sGross As Object = Nothing
+                Dim sNet As Object = Nothing
+                Dim x = dvScores(i)(Constants.Player)
+                If dvScores(i)(Constants.Player) = sTotalColumn Then Continue For
+                sPlayer = dvScores(i)(Constants.Player)
+                If IsNumeric(dvScores(i)("PHdcp")) Then
+                    IHdcp = dvScores(i)("PHdcp")
+                Else
+                    IHdcp = sGross - sNet
+                    dvScores(i)("PHdcp") = IHdcp
+                End If
+                Dim y = dvScores(i)(skin)
+                If sIn(dvScores(i)(skin).ToString.ToUpper, "Y,TRUE", True) Then
+                    'If dgScores.Rows(i).Cells("Hole" & hole).Value IsNot DBNull.Value Then
+                    If IsNumeric(dvScores(i)("Hole" & hole)) Then
+                        Dim iscore As String = dvScores(i)("Hole" & hole)
+                        'this means its a scorecard
+                        '2020-01-15- 20180529 Ben Wright played 1 hole
+                        If dvScores(i)("Method") = "Gross" And rLeagueParmrow("SkinFmt") = "Handicap" Then
+                            Dim isi As Int16 = CalcStrokeIndex(hole)
+                            If CInt(dvScores(i)("pHdcp")) >= isi Then
+                                'check stroke index
+                                iscore -= 1
+                                If CInt(dvScores(i)("pHdcp") - iHoles) >= isi Then iscore -= 1
+                            End If
                         End If
-                        dgScores.Rows(i).Cells("PHdcp").Value = IHdcp
-                    End If
-                    If dgScores.Rows(i).Cells("Skins").Value = "Y" Then
-                        If dgScores.Rows(i).Cells("Hole" & ii).Value IsNot DBNull.Value Then
-                            Dim iscore As String = RemoveSpcChar(dgScores.Rows(i).Cells("Hole" & ii).Value)
-                            If IsNumeric(iscore) Then
-                                If iscore < ilowscore Then
-                                    ilowscore = iscore
-                                    ilowrow = New List(Of String)
-                                    ilowrow.Add(i)
-                                ElseIf iscore = ilowscore Then
-                                    ilowrow.Add(i)
-                                End If
+
+                        If IsNumeric(iscore) Then
+                            If iscore < ilowscore Then
+                                ilowscore = iscore
+                                ilowrow = New List(Of String)
+                                ilowrow.Add(i)
+                            ElseIf iscore = ilowscore Then
+                                ilowrow.Add(i)
                             End If
                         End If
                     End If
-                Next
-
-                If ilowrow.Count = 1 Then
-                    Dim score As Integer = ilowrow(0)
-                    dgScores.Rows(score).Cells("Hole" & ii).Style.BackColor = Color.Gold
-                    dgScores.Rows(score).Cells("Player").Style.BackColor = Color.Gold
-                    dgScores.Rows(score).Cells("$Skins").Style.BackColor = Color.Gold
-                    FCalcSkins.Add(score)
-                Else
-                    'Dim myFont As New Font("BahnSchrift Condensed", 12, FontStyle.Strikeout)
-                    Dim myFont As New Font("Britannica Bold", 12, FontStyle.Strikeout)
-                    'Dim myFont As New Font("Tahoma", 12, FontStyle.Strikeout)
-                    For Each player In ilowrow
-                        dgScores.Rows(player).Cells("Hole" & ii).Style.Font = myFont
-                        dgScores.Rows(player).Cells("Hole" & ii).Style.BackColor = Color.Yellow
-                        '20190630 number for doesnt show as strikethrough
-                        'If dgScores.Rows(player).Cells("Hole" & ii).Value = "4" Then
-                        '    dgScores.Rows(player).Cells("Hole" & ii).Value = "4"
-                        'End If
-                        'If dgScores.Rows(player).Cells("Hole" & ii).Style.Font.Strikeout Then
-                        '    oHelper.LOGIT("Strikeout true")
-                        'Else
-                        '    oHelper.LOGIT("Strikeout false")
-                        'End If
-                        LOGIT(String.Format("setting skins tie for hole {0} {1}", ii, dgScores.Rows(player).Cells("Player").Value))
-                    Next
                 End If
+            Next
+            For Each score In ilowrow
+                FCalcLowScore &= score & "|"
+            Next
+            FCalcLowScore = FCalcLowScore.TrimEnd("|")
+            'If ilowrow.Count = 1 Then FCalcLowScore = ilowrow(0)
+
+        Catch ex As Exception
+            MsgBox("Error " & ex.Message & vbCrLf & ex.StackTrace)
+        End Try
+    End Function
+    Function FCalcSkins(dvScores As DataView) As List(Of String)
+        LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
+        'this code goes through the listview and highlights the lowest value on each hole and fron 9, back 9 and total
+        FCalcSkins = New List(Of String)
+        Try
+            For ii = iHoleMarker To iHoleMarker + iHoles - 1
+                Dim ilowscore As String = FCalcLowScore(dvScores, ii)
+                If ilowscore <> "" Then FCalcSkins.Add(ii & "-" & ilowscore)
             Next
         Catch ex As Exception
             MsgBox("Error " & ex.Message & vbCrLf & ex.StackTrace)
         End Try
 
     End Function
+    'Function FCalcSkins(dgScores As DataGridView) As List(Of String)
+    '    LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
+    '    'this code goes through the gridview and highlights the lowest value on each hole and fron 9, back 9 and total
+    '    FCalcSkins = Nothing
+    '    Try
+    '        FCalcSkins = New List(Of String)
+    '        Dim ilowrow As New List(Of String)
+    '        'adjust for handicap fields in listview
+    '        'loop through each column finding the lowest scores
+    '        'Get low 9's and 18 hole
+    '        '20171014 - use holemarker to control which 9 or 18 you process
+    '        For ii = iHoleMarker To iHoleMarker + iHoles - 1 'lv1.Items(0).SubItems.Count - 1
+    '            Dim ilowscore = 99
+    '            'calculate a column saving low score
+    '            For i = 0 To dgScores.RowCount - 1
+    '                If dgScores.Rows(i).Cells("Player").Value = sTotalColumn Then Continue For
+    '                sPlayer = dgScores.Rows(i).Cells("Player").Value
+    '                If dgScores.Rows(i).Cells("PHdcp").Value.ToString <> "" Then
+    '                    IHdcp = dgScores.Rows(i).Cells("PHdcp").Value
+    '                Else
+    '                    If iHoleMarker = 1 Then
+    '                        IHdcp = dgScores.Rows(i).Cells("Out_Gross").Value - dgScores.Rows(i).Cells("Out_Net").Value
+    '                    Else
+    '                        IHdcp = dgScores.Rows(i).Cells("In_Gross").Value - dgScores.Rows(i).Cells("In_Net").Value
+    '                    End If
+    '                    dgScores.Rows(i).Cells("PHdcp").Value = IHdcp
+    '                End If
+    '                If dgScores.Rows(i).Cells("Skins").Value = "Y" Then
+    '                    If dgScores.Rows(i).Cells("Hole" & ii).Value IsNot DBNull.Value Then
+    '                        Dim iscore As String = RemoveSpcChar(dgScores.Rows(i).Cells("Hole" & ii).Value)
+    '                        If IsNumeric(iscore) Then
+    '                            If iscore < ilowscore Then
+    '                                ilowscore = iscore
+    '                                ilowrow = New List(Of String)
+    '                                ilowrow.Add(i)
+    '                            ElseIf iscore = ilowscore Then
+    '                                ilowrow.Add(i)
+    '                            End If
+    '                        End If
+    '                    End If
+    '                End If
+    '            Next
+
+    '            If ilowrow.Count = 1 Then
+    '                Dim score As Integer = ilowrow(0)
+    '                dgScores.Rows(score).Cells("Hole" & ii).Style.BackColor = Color.Gold
+    '                dgScores.Rows(score).Cells("Player").Style.BackColor = Color.Gold
+    '                dgScores.Rows(score).Cells("$Skins").Style.BackColor = Color.Gold
+    '                FCalcSkins.Add(score)
+    '            Else
+    '                'Dim myFont As New Font("BahnSchrift Condensed", 12, FontStyle.Strikeout)
+    '                Dim myFont As New Font("Britannica Bold", 12, FontStyle.Strikeout)
+    '                'Dim myFont As New Font("Tahoma", 12, FontStyle.Strikeout)
+    '                For Each player In ilowrow
+    '                    dgScores.Rows(player).Cells("Hole" & ii).Style.Font = myFont
+    '                    dgScores.Rows(player).Cells("Hole" & ii).Style.BackColor = Color.Yellow
+    '                    '20190630 number for doesnt show as strikethrough
+    '                    'If dgScores.Rows(player).Cells("Hole" & ii).Value = "4" Then
+    '                    '    dgScores.Rows(player).Cells("Hole" & ii).Value = "4"
+    '                    'End If
+    '                    'If dgScores.Rows(player).Cells("Hole" & ii).Style.Font.Strikeout Then
+    '                    '    oHelper.LOGIT("Strikeout true")
+    '                    'Else
+    '                    '    oHelper.LOGIT("Strikeout false")
+    '                    'End If
+    '                    LOGIT(String.Format("setting skins tie for hole {0} {1}", ii, dgScores.Rows(player).Cells("Player").Value))
+    '                Next
+    '            End If
+    '        Next
+    '    Catch ex As Exception
+    '        MsgBox("Error " & ex.Message & vbCrLf & ex.StackTrace)
+    '    End Try
+
+    'End Function
     Function Create_Html_From_DGV(dt As DataGridView) As String
         LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
         'Building an HTML string.
@@ -2516,6 +2622,29 @@ ByVal sepChar As String)
             Dim da As New OleDbDataAdapter(strsql, cn)
             da.Fill(dtnewWklySkins)
             dtnewWklySkins.PrimaryKey = New DataColumn() {dtnewWklySkins.Columns("Date")}
+            Dim wkctpb1co As Decimal = 0
+            Dim wkctpb2co As Decimal = 0
+            Dim wkctpf1co As Decimal = 0
+            Dim wkctpf2co As Decimal = 0
+            For Each row In dtnewWklySkins.Rows
+                row(ctpb1extr) += wkctpb1co
+                wkctpb1co = row(ctpb1extr)
+                row(ctpb2extr) += wkctpb2co
+                wkctpb2co = row(ctpb2extr)
+                row(ctpf1extr) += wkctpf1co
+                wkctpf1co = row(ctpf1extr)
+                row(ctpf2extr) += wkctpf2co
+                wkctpf2co = row(ctpf2extr)
+            Next
+            Dim drow = dtnewWklySkins.Rows(dtnewWklySkins.Rows.Count - 1)
+            drow(ctpb1extr) += wkctpb1co
+            wkctpb1co = drow(ctpb1extr)
+            drow(ctpb2extr) += wkctpb2co
+            wkctpb2co = drow(ctpb2extr)
+            drow(ctpf1extr) += wkctpf1co
+            wkctpf1co = drow(ctpf1extr)
+            drow(ctpf2extr) += wkctpf2co
+            wkctpf2co = drow(ctpf2extr)
 
             Dim dt1 As New DataTable("Points")
             Dim strsql1 As String = String.Format _
@@ -3284,6 +3413,23 @@ ByVal sepChar As String)
     Function GetInt(o As Object) As Integer
         If IsDBNull(o) Then Return 0 Else Return CInt(o)
     End Function
+    Function sIn(sfld As String, s2Compare As String, bcontains As Boolean) As Boolean
+        sIn = False
+        Dim sflds = s2Compare.Split(",")
+        For Each fld As String In s2Compare.Split(",")
+            If bcontains Then
+                If sfld.Contains(fld) Then
+                    sIn = True
+                    Exit Function
+                End If
+            Else
+                If sfld = fld Then
+                    sIn = True
+                    Exit Function
+                End If
+            End If
+        Next
+    End Function
     'Public Function fCreateScoreCardDT() As DataTable
     '    fCreateScoreCardDT = Nothing
     '    fCreateScoreCardDT = New DataTable
@@ -3343,4 +3489,141 @@ CType(System.DateTime.Now.Ticks Mod System.Int32.MaxValue, Integer))
     Public Function CDateToyyyyMMdd(sDate)
         CDateToyyyyMMdd = CDate(sDate).ToString("yyyyMMdd")
     End Function
+    Sub UpdatePmts()
+        iHoles = rLeagueParmrow("Holes")
+
+        '20200605 - create an Earned money table for use to insure payments get updated
+        Dim dtr As New Data.DataTable
+        dtr.Columns.Add(Constants.datecon)
+        dtr.Columns.Add(Constants.Player)
+        dtr.Columns.Add("Desc")
+        dtr.Columns.Add("Detail")
+        dtr.Columns.Add("Earned", GetType(Decimal))
+        dtr.Columns.Add("DatePaid")
+        dtr.Columns.Add("Comment")
+        dtr.Columns.Add("PayMethod")
+
+        dtr.PrimaryKey = New DataColumn() {dtr.Columns(Constants.Player), dtr.Columns(Constants.datecon), dtr.Columns("Desc"), dtr.Columns(Constants.Detail)}
+        dtr.DefaultView.Sort = "Player Asc"
+
+        Dim dvscores = New DataView(dsLeague.Tables("dtScores"))
+        dvscores.Sort = "Date"
+        'dvscores.RowFilter = String.Format("Date < {0} and $Earn > 0", oHelper.sDateLastScore)
+        Dim scoredates = New List(Of String)
+        Dim wkdate As String = ""
+        For Each row In dvscores
+            If row(Constants.datecon) <> wkdate Then
+                scoredates.Add(row(Constants.datecon))
+                wkdate = row(Constants.datecon)
+            End If
+        Next
+
+        Dim dvlp = New DataView(dsLeague.Tables("dtLeagueParms"))
+        Dim sDetail As String = ""
+        Dim sDesc As String = ""
+
+        For Each sDate In scoredates
+            LOGIT(String.Format("Date={0}", sDate))
+            Dim sdescadd1 As String = ""
+            Dim sdescadd2 As String = ""
+            For Each lp In dvlp
+                If sDate.Substring(0, 4) = CDate(lp("StartDate")).ToString("yyyyMMdd").Substring(0, 4) Then
+                    If sDate > CDate(lp("EndDate")).ToString("yyyyMMdd") Then
+                        sdescadd1 = "EOY "
+                        If sDate < CDate(lp("PostSeasonDt")).AddDays(7).ToString("yyyyMMdd") Then
+                            sdescadd2 = "s 1"
+                        Else
+                            sdescadd2 = "s 2"
+                        End If
+                    End If
+                End If
+            Next
+            'check gross/net scores only
+            Dim dv = New DataView(dsLeague.Tables("dtScores"))
+            dv.RowFilter = String.Format("Date = {0}", sDate)
+            CalcThisHoleMarker(sDate, dv)
+            'xlskins will contain lowest scores for each hole
+            Dim xlskins = FCalcSkins(dv)
+            'loop through each lowest scores looking for ties, if ties(|) then ignore it
+            'lskins contains each hole and the player index in the score dataview
+            Dim lSkins = New List(Of String)
+            For Each indskin In xlskins
+                If Not indskin.Contains("|") Then
+                    Debug.Print(dv(indskin.Split("-")(1))(Constants.Player))
+                    Debug.Print(indskin.Split("-")(0))
+                    sDetail = String.Format("#{0}", indskin.Split("-")(0))
+                    sDesc = sdescadd1 & Constants.skinpmt & sdescadd2
+
+                    Dim sKeys() As Object = {dv(indskin.Split("-")(1))(Constants.Player), sDate, sDesc, sDetail}
+                    Dim dr = dsLeague.Tables("dtPayments").Rows.Find(sKeys)
+                    If dr IsNot Nothing Then
+                        Continue For
+                    End If
+                    Dim sPlayerIndex As String = indskin.Split("-")(1)
+                    Dim sHole As String = indskin.Split("-")(0)
+                    Dim sNetScore As String = dv(sPlayerIndex)("Hole" & sHole)
+                    '2020-01-15- 20180529 Ben Wright played 1 hole
+                    If dv(sPlayerIndex)("Method") = "Gross" And rLeagueParmrow("SkinFmt") = "Handicap" Then
+                        Dim isi As Int16 = CalcStrokeIndex(sHole)
+                        If CInt(dv(sPlayerIndex)("pHdcp")) >= isi Then
+                            'check stroke index
+                            sNetScore -= 1
+                            If CInt(dv(sPlayerIndex)("pHdcp") - iHoles) >= isi Then sNetScore -= 1
+                        End If
+                    End If
+                    Debug.Print(String.Format("Skin Correction Date-{0},Player-{1},Hole-{2}", sKeys(1), sKeys(0), sKeys(3)))
+                    Dim arow = dsLeague.Tables("dtPayments").NewRow
+                    arow(Constants.datecon) = sDate
+                    arow(Constants.Player) = dv(sPlayerIndex)(Constants.Player)
+                    arow("Desc") = sDesc
+                    arow(Constants.Detail) = sDetail
+                    arow(Constants.Earnedcon) = dv(sPlayerIndex)(Constants.skinamt)
+                    arow("Comment") = String.Format("Score={0}", sNetScore)
+                    dsLeague.Tables("dtPayments").Rows.Add(arow)
+                End If
+            Next
+
+            dv.RowFilter &= " and $Closest > 0 "
+            'ctps
+
+            For Each row In dv
+                Dim ipar3cnt = 1
+                For i = iHoleMarker To (iHoleMarker - 1) + 9
+                    If thisCourse("Hole" & i) = 3 Then
+                        If row(String.Format("CTP_{0}", ipar3cnt)) IsNot DBNull.Value Then
+                            If ipar3cnt = 1 And sdescadd1 <> "" Then
+                                sDesc = sdescadd1 & Constants.CTP & sdescadd2.Substring(1, 2)
+                            ElseIf ipar3cnt = 2 And sdescadd1 <> "" Then
+                                sDesc = sdescadd1 & Constants.CTP & sdescadd2.Substring(1, 2)
+                            Else
+                                sDesc = Constants.CTP
+                            End If
+                            sDetail = String.Format("#{0}", i)
+                            Dim sCTPKeys() As Object = {row(Constants.Player), sDate, sDesc, sDetail}
+                            Dim drCTP = dsLeague.Tables("dtPayments").Rows.Find(sCTPKeys)
+                            If drCTP IsNot Nothing Then
+                                Exit For
+                            End If
+
+                            Debug.Print(String.Format("CTP_{3} {1} Correction Date-{0},Player-{1},Hole-{2}", sCTPKeys(1), sCTPKeys(0), sCTPKeys(3), ipar3cnt))
+                            Dim arow = dsLeague.Tables("dtPayments").NewRow
+                            arow(Constants.datecon) = sDate
+                            arow(Constants.Player) = row(Constants.Player)
+                            arow("Desc") = sDesc
+                            arow(Constants.Detail) = sDetail
+                            arow(Constants.Earnedcon) = row(Constants.CTP & "_" & ipar3cnt)
+                            arow("Comment") = ""
+                            dsLeague.Tables("dtPayments").Rows.Add(arow)
+                        End If
+                        ipar3cnt += 1
+                    End If
+                Next
+
+            Next
+
+            Debug.Print("")
+        Next
+        DataTable2CSV(dsLeague.Tables("dtPayments"), sFilePath & "\Payments.csv")
+
+    End Sub
 End Class

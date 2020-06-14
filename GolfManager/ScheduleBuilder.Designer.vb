@@ -175,7 +175,7 @@ Partial Class ScheduleBuilder
         'dgTeams
         '
         Me.dgTeams.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize
-        Me.dgTeams.Location = New System.Drawing.Point(652, 20)
+        Me.dgTeams.Location = New System.Drawing.Point(559, 11)
         Me.dgTeams.Margin = New System.Windows.Forms.Padding(2)
         Me.dgTeams.Name = "dgTeams"
         Me.dgTeams.RowHeadersWidth = 82
@@ -201,7 +201,7 @@ Partial Class ScheduleBuilder
         '
         Me.gbPR.Controls.Add(Me.cbPRRS)
         Me.gbPR.Controls.Add(Me.cbPRAW)
-        Me.gbPR.Location = New System.Drawing.Point(468, 235)
+        Me.gbPR.Location = New System.Drawing.Point(408, 235)
         Me.gbPR.Margin = New System.Windows.Forms.Padding(2)
         Me.gbPR.Name = "gbPR"
         Me.gbPR.Padding = New System.Windows.Forms.Padding(2)
@@ -238,7 +238,7 @@ Partial Class ScheduleBuilder
         Me.GroupBox1.Controls.Add(Me.lbRounds)
         Me.GroupBox1.Controls.Add(Me.tbRounds)
         Me.GroupBox1.Controls.Add(Me.cbPET)
-        Me.GroupBox1.Location = New System.Drawing.Point(468, 44)
+        Me.GroupBox1.Location = New System.Drawing.Point(408, 44)
         Me.GroupBox1.Margin = New System.Windows.Forms.Padding(2)
         Me.GroupBox1.Name = "GroupBox1"
         Me.GroupBox1.Padding = New System.Windows.Forms.Padding(2)

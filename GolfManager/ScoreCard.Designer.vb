@@ -158,6 +158,7 @@ Partial Class ScoreCard
         Me.DtCoursesBindingSource = New System.Windows.Forms.BindingSource(Me.components)
         Me.btnResetCTPs = New System.Windows.Forms.Button()
         Me.GroupBox3 = New System.Windows.Forms.GroupBox()
+        Me.btnReports = New System.Windows.Forms.Button()
         CType(Me.dgScores, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.DtScoresBindingSource, System.ComponentModel.ISupportInitialize).BeginInit()
         CType(Me.DsLeague, System.ComponentModel.ISupportInitialize).BeginInit()
@@ -361,7 +362,7 @@ Partial Class ScoreCard
         '
         Me.Hole10DataGridViewTextBoxColumn.DataPropertyName = "Hole10"
         Me.Hole10DataGridViewTextBoxColumn.HeaderText = "10"
-        Me.Hole10DataGridViewTextBoxColumn.MaxInputLength = 1
+        Me.Hole10DataGridViewTextBoxColumn.MaxInputLength = 9
         Me.Hole10DataGridViewTextBoxColumn.Name = "Hole10DataGridViewTextBoxColumn"
         '
         'Hole11DataGridViewTextBoxColumn
@@ -1385,11 +1386,23 @@ Partial Class ScoreCard
         Me.GroupBox3.TabStop = False
         Me.GroupBox3.Text = "Scoring Controls"
         '
+        'btnReports
+        '
+        Me.btnReports.Location = New System.Drawing.Point(989, 184)
+        Me.btnReports.Margin = New System.Windows.Forms.Padding(2)
+        Me.btnReports.Name = "btnReports"
+        Me.btnReports.Size = New System.Drawing.Size(81, 37)
+        Me.btnReports.TabIndex = 113
+        Me.btnReports.TabStop = False
+        Me.btnReports.Text = "Create Reports"
+        Me.btnReports.UseVisualStyleBackColor = True
+        '
         'ScoreCard
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.ClientSize = New System.Drawing.Size(1665, 846)
+        Me.Controls.Add(Me.btnReports)
         Me.Controls.Add(Me.GroupBox3)
         Me.Controls.Add(Me.btnResetCTPs)
         Me.Controls.Add(Me.dgHandicap)
@@ -1577,4 +1590,5 @@ Partial Class ScoreCard
     Friend WithEvents ClosestDataGridViewTextBoxColumn1 As DataGridViewTextBoxColumn
     Friend WithEvents SkinsDataGridViewTextBoxColumn2 As DataGridViewTextBoxColumn
     Friend WithEvents RoundDataGridViewTextBoxColumn As DataGridViewTextBoxColumn
+    Friend WithEvents btnReports As Button
 End Class

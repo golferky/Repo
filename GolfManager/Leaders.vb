@@ -1,5 +1,5 @@
 ﻿Imports System.IO
-Public Class Scores
+Public Class Leaders
     'Dim oHelper As New LeagueManager.Helper
     Dim oHelper As New Helper
     Dim rs As New Resizer
@@ -659,17 +659,16 @@ Public Class Scores
         End Try
     End Sub
 End Class
-Public Class rank
-    Public Hole As String
-    Public toPar As Decimal
+'Public Class rank
+'    Public Hole As String
+'    Public toPar As Decimal
 
-    Public Sub New(ByVal hole As String, ByVal toPar As Decimal)
-        Me.Hole = hole
-        Me.toPar = toPar
-    End Sub
+'    Public Sub New(ByVal hole As String, ByVal toPar As Decimal)
+'        Me.Hole = hole
+'        Me.toPar = toPar
+'    End Sub
 
-    Public Overrides Function ToString() As String
-        Return String.Format("{0}, {1}", Me.Hole, Me.toPar)
-    End Function
-
-End Class
+'    Public Overrides Function ToString() As String
+'        Return String.Format("{0}, {1}", Me.Hole, Me.toPar)
+'    End Function
+'End Class

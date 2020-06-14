@@ -50,6 +50,7 @@ Partial Class Main
         Me.lblProcessMsg = New System.Windows.Forms.Label()
         Me.gbControls = New System.Windows.Forms.GroupBox()
         Me.GroupBox6 = New System.Windows.Forms.GroupBox()
+        Me.Button2 = New System.Windows.Forms.Button()
         Me.btnStandingsSnapshot = New System.Windows.Forms.Button()
         Me.StatusStrip1 = New System.Windows.Forms.StatusStrip()
         Me.tspb = New System.Windows.Forms.ToolStripProgressBar()
@@ -67,6 +68,7 @@ Partial Class Main
         Me.MenuStrip2 = New System.Windows.Forms.MenuStrip()
         Me.MenuStrip3 = New System.Windows.Forms.MenuStrip()
         Me.AboutToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
+        Me.btnUpdPmts = New System.Windows.Forms.Button()
         Me.GroupBox1.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
         Me.GroupBox3.SuspendLayout()
@@ -147,7 +149,7 @@ Partial Class Main
         '
         'Button1
         '
-        Me.Button1.Location = New System.Drawing.Point(177, 23)
+        Me.Button1.Location = New System.Drawing.Point(179, 23)
         Me.Button1.Margin = New System.Windows.Forms.Padding(2)
         Me.Button1.Name = "Button1"
         Me.Button1.Size = New System.Drawing.Size(131, 24)
@@ -249,6 +251,7 @@ Partial Class Main
         '
         'GroupBox3
         '
+        Me.GroupBox3.Controls.Add(Me.btnUpdPmts)
         Me.GroupBox3.Controls.Add(Me.btnSetup)
         Me.GroupBox3.Controls.Add(Me.btnEmailAnnouncement)
         Me.GroupBox3.Controls.Add(Me.btnZip)
@@ -273,7 +276,7 @@ Partial Class Main
         '
         'btnEmailAnnouncement
         '
-        Me.btnEmailAnnouncement.Location = New System.Drawing.Point(14, 73)
+        Me.btnEmailAnnouncement.Location = New System.Drawing.Point(14, 65)
         Me.btnEmailAnnouncement.Margin = New System.Windows.Forms.Padding(2)
         Me.btnEmailAnnouncement.Name = "btnEmailAnnouncement"
         Me.btnEmailAnnouncement.Size = New System.Drawing.Size(131, 24)
@@ -283,7 +286,7 @@ Partial Class Main
         '
         'btnZip
         '
-        Me.btnZip.Location = New System.Drawing.Point(14, 133)
+        Me.btnZip.Location = New System.Drawing.Point(14, 106)
         Me.btnZip.Margin = New System.Windows.Forms.Padding(2)
         Me.btnZip.Name = "btnZip"
         Me.btnZip.Size = New System.Drawing.Size(131, 24)
@@ -344,6 +347,7 @@ Partial Class Main
         '
         'GroupBox6
         '
+        Me.GroupBox6.Controls.Add(Me.Button2)
         Me.GroupBox6.Controls.Add(Me.btnPayments)
         Me.GroupBox6.Controls.Add(Me.btnStandingsSnapshot)
         Me.GroupBox6.Controls.Add(Me.btnSkinsRpt)
@@ -359,6 +363,16 @@ Partial Class Main
         Me.GroupBox6.TabIndex = 9
         Me.GroupBox6.TabStop = False
         Me.GroupBox6.Text = "Finance and Reports"
+        '
+        'Button2
+        '
+        Me.Button2.Location = New System.Drawing.Point(179, 141)
+        Me.Button2.Margin = New System.Windows.Forms.Padding(2)
+        Me.Button2.Name = "Button2"
+        Me.Button2.Size = New System.Drawing.Size(131, 24)
+        Me.Button2.TabIndex = 14
+        Me.Button2.Text = "Stats Leaders"
+        Me.Button2.UseVisualStyleBackColor = True
         '
         'btnStandingsSnapshot
         '
@@ -518,6 +532,15 @@ Partial Class Main
         Me.AboutToolStripMenuItem.Size = New System.Drawing.Size(80, 20)
         Me.AboutToolStripMenuItem.Text = "ChangeLog"
         '
+        'btnUpdPmts
+        '
+        Me.btnUpdPmts.Location = New System.Drawing.Point(14, 147)
+        Me.btnUpdPmts.Name = "btnUpdPmts"
+        Me.btnUpdPmts.Size = New System.Drawing.Size(131, 23)
+        Me.btnUpdPmts.TabIndex = 11
+        Me.btnUpdPmts.Text = "Update Payments"
+        Me.btnUpdPmts.UseVisualStyleBackColor = True
+        '
         'Main
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
@@ -606,4 +629,6 @@ Partial Class Main
     Friend WithEvents MenuStrip2 As MenuStrip
     Friend WithEvents MenuStrip3 As MenuStrip
     Friend WithEvents AboutToolStripMenuItem As ToolStripMenuItem
+    Friend WithEvents Button2 As Button
+    Friend WithEvents btnUpdPmts As Button
 End Class

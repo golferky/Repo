@@ -66,8 +66,9 @@ Public Class Finance
 
         dtr.PrimaryKey = New DataColumn() {dtr.Columns("Player")}
         dtr.DefaultView.Sort = "Player Asc"
-        Dim dv As New DataView(oHelper.dsLeague.Tables("dtPayments"))
         Dim sdate = Main.cbLeagues.SelectedItem.ToString.Substring(Main.cbLeagues.SelectedItem.ToString.IndexOf("(") + 1, 4) & "0101"
+
+        Dim dv As New DataView(oHelper.dsLeague.Tables("dtPayments"))
         dv.RowFilter = String.Format("Date > {0} And Date < {1} ", sdate, sdate.Replace("0101", "1231"))
         For Each row As DataRowView In dv
             Dim xy = row(1).ToString
@@ -81,6 +82,38 @@ Public Class Finance
         dtr.Rows.Add("*** Totals ***", idue, iEarned, iSkins, iCTP, iSkinspaidout, iCTPpaidout, irspaidout, iccpaidout,
                      iesPaidOut1, iesPaidOut2, iecPaidOut1, iecPaidOut2)
 
+        Dim dvscores As New DataView(oHelper.dsLeague.Tables("dtScores"))
+        dvscores.RowFilter = String.Format("Date > {0} And Date < {1} and $Earn > 0", sdate, sdate.Replace("0101", "1231"))
+
+        'this loop will search the payments table to insure $$$ are included in the payments table
+        For Each row In dvscores
+            'dt.PrimaryKey = New DataColumn() {dt.Columns("Player")}
+            Dim sdesc As String = "", sDetail As String = ""
+            If row(Constants.closestamt) IsNot DBNull.Value Then
+                sdesc = Constants.CTP
+                sDetail = "#"
+                If oHelper.iHoleMarker > 0 Then
+                    If row(Constants.CTP1) IsNot DBNull.Value Then
+                        sDetail &= "10"
+                    Else
+                        sDetail &= "12"
+                    End If
+                Else
+                    If row(Constants.CTP1) IsNot DBNull.Value Then
+                        sDetail &= "4"
+                    Else
+                        sDetail &= "8"
+                    End If
+                End If
+
+            ElseIf row(Constants.skinamt) IsNot DBNull.Value Then
+                sdesc = Constants.skinpmt
+            End If
+            Dim sKeys() As Object = {row(Constants.Player), row("Date"), sdesc, sDetail}
+            Dim dr As DataRow = oHelper.dsLeague.Tables("dtPayments").Rows.Find(sKeys)
+            If dr Is Nothing Then row("Player") = "* " & row("Player")
+
+        Next
         tbDue.Text = idue
         tbRSCollected.Text = irscollected
         tbRSPaidOut.Text = irspaidout

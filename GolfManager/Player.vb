@@ -105,16 +105,16 @@ Public Class Player
                 BindingSource.DataSource = DsLeague.dtPlayers
                 DtPlayersDataGridView.DataSource = BindingSource
                 Dim aRow As DataRow
-                aRow = DsLeague.dtPlayers.NewRow
+                aRow = DsLeague.dtPlayers.FindByName("")
                 aRow("Name") = sgp.Split(":")(0) 'Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(sNameInfo)
-                DsLeague.dtPlayers.Rows.Add(aRow)
+                'DsLeague.dtPlayers.Rows.Add(aRow)
                 BindingSource.ResetBindings(False)
             End If
 
             If sov = sgp Then
                 dgc.Value = sOldCellValue
             Else
-                dgc.Value = sgp
+                dgc.Value = sgp.Split(":")(0)
             End If
         End If
 
