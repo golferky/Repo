@@ -20,13 +20,9 @@
         Dim sWH As String = ohelper.ScreenResize()
         If Me.Width >= sWH.Split(":")(0) Then
             Me.Width = sWH.Split(":")(0) - (sWH.Split(":")(0) * 0.1)
-            'Else
-            '    Me.Width = sWH.Split(":")(0)
         End If
         If Me.Height >= sWH.Split(":")(1) Then
             Me.Height = sWH.Split(":")(1) - (sWH.Split(":")(1) * 0.1)
-            'Else
-            '    Me.Height = sWH.Split(":")(1)
         End If
 
     End Sub
@@ -91,7 +87,6 @@
                     Else
                         aPlayer = row("APlayer")
                         iTeam = row("Team")
-                        'row.Delete()
                     End If
                 Next
                 .Width += 10
@@ -121,18 +116,21 @@
         'this changes the date back to mm/dd/yyyy
         ohelper.dDate = Date.ParseExact(cbDates.SelectedItem, "yyyyMMdd", System.Globalization.DateTimeFormatInfo.InvariantInfo)
 
-        iRnds = cbDates.Items.Count - cbDates.SelectedIndex
-        Dim ihalf = (cbDates.Items.Count / 2)
-        sFromDate = cbDates.Items(cbDates.Items.Count - 1)
+        Dim dvsch = New DataView(ohelper.dsLeague.Tables("dtSchedule"))
+        Dim ihalf = (dvsch.Count / 2) - 1
 
-        If iRnds > ihalf Then
+        sFromDate = cbDates.Items(cbDates.Items.Count - 1)
+        If cbDates.SelectedIndex = 0 Then iRnds = cbDates.Items.Count
+
+        If cbDates.Items.Count > ihalf And cbDates.SelectedIndex < ihalf Then
             gb2ndHalf.Visible = True
-            iRnds = ihalf
-            sToDate = cbDates.Items((cbDates.Items.Count - 1) - (ihalf - 1))
+            'todate for first half is computed by
+            'take all dates in schedule substract 2(league championship) divide by 2
+            sToDate = dvsch((iRnds - 2) / 2)(Constants.datecon)
             LoadDGV(dgTeams)
-            'iRnds = ihalf - cbDates.SelectedIndex
-            sFromDate = cbDates.Items(ihalf - 1)
-            sToDate = cbDates.Items(cbDates.SelectedIndex)
+            'todate for first half is computed by
+            sFromDate = dvsch(iRnds / 2)(Constants.datecon)
+            sToDate = cbDates.SelectedItem
             LoadDGV(dgTeams2)
         Else
             gb2ndHalf.Visible = False

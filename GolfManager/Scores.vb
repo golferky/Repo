@@ -64,9 +64,6 @@ Public Class Scores
             Dim xx = String.Format("Player = '{0}' and Method in ({1}) ", oHelper.sPlayer, "'Score','Gross','Net'")
 
             dvScores.RowFilter = String.Format("Player = '{0}' and Method in ({1}) ", oHelper.sPlayer, "'Score','Gross','Net'")
-
-            'dvScores.RowFilter = dvScores.RowFilter
-            'Me.Text = "Scores for Player-" & oHelper.sPlayer
             oHelper.iHoles = oHelper.dsLeague.Tables("dtLeagueParms").Rows(0).Item("Holes")
             oHelper.iHoleMarker = 1
             dvScores.Sort = "Date Desc"
@@ -122,7 +119,6 @@ Public Class Scores
 
                 If sParm = "Holes" Then
                     If sParm = "Holes" Then
-                        'sScoreCardforDGV = sScoreCardforDGV + oHelper.CreateHolesFromParm(sColFormat)
                         sScoreCardforDGV = sScoreCardforDGV + "PHdcp,"
                         sColFormat.Add("cPat40nt")
                         For i As Integer = 1 To 18 + oHelper.iHoleMarker - 1
@@ -149,10 +145,8 @@ Public Class Scores
                 sColFormat.Add(sPat)
             Next
             'remove trailing comma
-
             'replace spaces with underscores for csv column matchups
             sScoreCardforDGV = sScoreCardforDGV.Substring(0, Len(sScoreCardforDGV) - 1).Replace(" ", "_")
-
             dtScoreCard = dvScores.ToTable(False, sScoreCardforDGV.Split(",").ToArray)
 
             oHelper.CreateColumnsWithFormat("Rnds", dtScoreCard, sColFormat)
@@ -200,7 +194,6 @@ Public Class Scores
                 MsgBox("Error calculating Career Avg...contact programmer")
                 Exit Sub
             End If
-
 
             'process each year
             For Each row In foundRows
@@ -311,12 +304,6 @@ Public Class Scores
                     End If
                     '20181004 - override calcholemarker because of cc and league in same sch
                     oHelper.CalcHoleMarker(row.Cells("Date").Value)
-                    'If row.Cells("Hole1") IsNot DBNull.Value Then
-                    '    If IsNumeric(srow("Hole1")) Then oHelper.iHoleMarker = 1
-                    'ElseIf srow("Hole10") IsNot DBNull.Value Then
-                    '    If IsNumeric(srow("Hole10")) Then oHelper.iHoleMarker = 10
-                    'End If
-
                     If row.Cells("Method").Value = "Gross" Or row.Cells("Method").Value = "Net" Then
                         If row.Cells("Hole1").Value IsNot DBNull.Value Then
                             oHelper.iHoleMarker = 1
@@ -665,7 +652,6 @@ Public Class Scores
         Try
             '    rs.ResizeAllControls(Me)
             oHelper.LOGIT(String.Format("Form Height {0} Width {1}", Me.Height, Me.Width))
-            'Me.Text = String.Format("Scores for Player {4}-Screen {5}x{6} Form {0}x{1}-Grid {2}x{3} ", Me.Width, Me.Height, dgScores.Width, dgScores.Height, oHelper.sPlayer, Main.iScreenWidth, Main.iScreenHeight)
             Me.Text = String.Format("Player {8} - Form {7}-{0}, Resolution {1} x {2}, Menu {3} x {4}, Grid {5} x {6}", My.Computer.Name, Screen.PrimaryScreen.Bounds.Width, Screen.PrimaryScreen.Bounds.Width, Me.Width, Me.Height, dgScores.Width, dgScores.Height, Me.Name, oHelper.sPlayer)
 
         Catch ex As Exception

@@ -1,4 +1,5 @@
 ﻿Public Class Constants
+    Public Const CTP As String = "CTP"
     Public Const CTP1 As String = "CTP_1"
     Public Const CTP2 As String = "CTP_2"
     Public Const skinscol As String = "SkinsCollected"
@@ -25,6 +26,7 @@
     Public Const skinamt As String = "$Skins"
     Public Const skinnum As String = "#Skins"
     Public Const skin As String = "Skins"
+    Public Const skinpmt As String = "Skin"
     Public Const closest As String = "Closest"
     Public Const closestamt As String = "$Closest"
     Public Const points As String = "Points"
@@ -33,4 +35,8 @@
     Public Const Clear As String = "Clear"
     Public Const Hole1 As String = "Hole1"
     Public Const Hole10 As String = "Hole10"
+    Public Const Player As String = "Player"
+    Public Const Detail As String = "Detail"
+    Public Const Earnedcon As String = "Earned"
+    Public Const Name As String = "Name"
 End Class

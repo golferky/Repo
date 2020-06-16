@@ -4,7 +4,7 @@
 Imports Microsoft.Win32
 Imports GolfManager.Helper
 Public Class Main
-    Dim cVersion = "Version : 2020.02.09"
+    Dim cVersion = String.Format("Version : {0}", sChangeDate)
     Public oHelper As New Helper
     Private dsLeague As New dsLeague
     Dim bload As Boolean = True
@@ -18,9 +18,11 @@ Public Class Main
     Public sWorkingYear As String
     Dim toolTipHdcp As New ToolTip
     Dim schanges As String = ""
+    Dim sChangeDate As String = ""
 
     Private Sub Main_Load(sender As System.Object, e As System.EventArgs) Handles MyBase.Load
         Try
+
             Dim allScreens = Screen.AllScreens
             Dim Current_Screen As Screen = Screen.FromControl(Me)
             If Current_Screen.Primary Then
@@ -171,6 +173,9 @@ Public Class Main
 
             lblProcessMsg.Text = String.Format("Loading Changelog from {0},", oHelper.sFilePath)
             oHelper.status_Msg(lblProcessMsg, Me)
+            If IO.File.Exists(oHelper.sFilePath & "\Changelog.txt") Then
+                sChangeDate = IO.File.GetLastWriteTime(oHelper.sFilePath & "\Changelog.txt")
+            End If
             Using sr As New IO.StreamReader(oHelper.sFilePath & "\Changelog.txt", False)
                 schanges &= sr.ReadToEnd
             End Using
@@ -182,34 +187,14 @@ Public Class Main
             lblProcessMsg.Text = String.Format("Finished Loading Changelog from {0},", oHelper.sFilePath)
             oHelper.status_Msg(lblProcessMsg, Me)
 
-            Me.Text = Me.Text & " " & String.Format("{0}", cVersion)
+            Me.Text = Me.Text & " " & String.Format("{0}", sChangeDate)
 
             lbMonitor.Text = String.Format("{0}, Resolution {1} x {2}, Menu {3} x {4}", My.Computer.Name, iScreenWidth, iScreenHeight, Me.Width, Me.Height)
             oHelper.LOGIT(Me.Text)
 
             txtFolder.Text = oHelper.sFilePath
 
-            'build dropdown list of leagues
-            ' DsLeague = New dsLeague
-            'If Not oHelper.CSV2DataTable(dsLeague.Tables("dtLeagueParms"), oHelper.getLatestFile("*LeagueParms.csv")) Then
-            '    MsgBox(String.Format("File in use, close file and restart {0} {1}", vbCrLf, oHelper.getLatestFile("*LeagueParms.csv")))
-            '    End
-            'End If
-
-            Dim AccessDBAsValue As String = String.Empty
-            Dim rkACDBKey As RegistryKey = Registry.LocalMachine.OpenSubKey("SOFTWARE\Classes")
-            If rkACDBKey IsNot Nothing Then
-
-                For Each subKeyName As String In rkACDBKey.GetSubKeyNames()
-
-                    If subKeyName.Contains("Microsoft.ACE.OLEDB") Then
-                        If Not subKeyName.Contains("Errors") Then
-                            oHelper.sMACDBVersion = subKeyName
-                        End If
-                    End If
-                Next
-            End If
-            If oHelper.sMACDBVersion = "" Then
+            If oHelper.GetMACDBVersion = "" Then
                 MessageBox.Show(String.Format("no version of Microsoft Access DB found{0}Contact developer", vbCrLf))
                 End
             End If
@@ -304,8 +289,13 @@ Public Class Main
                 End If
             End If
 
-            For Each row In dvLeagues
+            For Each row As DataRowView In dvLeagues
                 '20181017  put in due to incomplete scores < 2018 and player lookup needs to change for those scores also
+                If row("StartDate") Is DBNull.Value Then
+                    MessageBox.Show(String.Format("League Setup({0}) has no Start Date, Defaulting to 20990101", row("Name")))
+                    row("StartDate") = "01-01-2099"
+                    row("EndDate") = "12-31-2099"
+                End If
                 If row("Startdate").year < "2018" Then Continue For
                 cbLeagues.Items.Add(row("Name") & " (" & row("StartDate").year & ")")
             Next
@@ -324,7 +314,6 @@ Public Class Main
             lblProcessMsg.Text = "Finished Loading League Tables"
             oHelper.status_Msg(lblProcessMsg, Me)
             'oHelper.bloghelper = False
-            oHelper.iHoles = oHelper.rLeagueParmrow("Holes")
             Me.Enabled = True
 
         Catch ex As InvalidCastException
@@ -427,7 +416,7 @@ Public Class Main
     End Sub
 
     Private Sub btnExit_Click(sender As Object, e As EventArgs) Handles btnExit.Click
-        '20180306-added checkbox for email backup option
+        '20180306-added checkbox for email backup optionCDate(row("EndDate")).ToString("yyyyMMdd")
         oHelper.DataTable2CSV(dsLeague.dtLeagueParms, oHelper.sFilePath & "\LeagueParms.csv")
         If cbMail.Checked Then
             Dim sfile = oHelper.sReportPath & "\" & Now.ToString("yyyyMMdd") & "_LeagueFiles.zip"
@@ -451,8 +440,10 @@ Public Class Main
                 MsgBox(oHelper.GGmail.ErrorText, MsgBoxStyle.Critical)
             End If
         End If
+
+        oHelper.dDate = Date.ParseExact(cbDates.SelectedItem, "yyyyMMdd", System.Globalization.DateTimeFormatInfo.InvariantInfo)
         oHelper.UpdateINI()
-        Close()
+        'Close()
         End
     End Sub
 
@@ -543,7 +534,7 @@ Public Class Main
             Dim TempdsLeague As New DataSet
             Dim sfile = "dt" & oHelper.getSubstring(oFile.Name, "_", ".xml")
             sfile = sfile.Replace(sLeagueName & "_", "")
-            'TempdsLeague.Tables.Add(sfile).ReadXml(oFile.FullName) ' oHelper.sFilePath & "\" & sfile)
+            'TempdsLeague.Tables.Add(sfile).
             TempdsLeague.ReadXml(oFile.FullName) ' oHelper.sFilePath & "\" & sfile)
             'Dim sfilename = "\" & oHelper.dsLeague.Tables(sfile).TableName.Substring(2) & ".csv"
             oHelper.DataTable2CSV(oHelper.dsLeague.Tables(sfile), oFile.FullName.Replace(".xml", ".csv"))
@@ -556,7 +547,9 @@ Public Class Main
         'GetXSDNameByFileName(oHelper.dsLeague.Tables("dtScores"),
         oHelper.dsLeague = dsLeague
         'setup email function
-        oHelper.GGmail = New GGSMTP_GMAIL(oHelper.rLeagueParmrow("Email"), oHelper.rLeagueParmrow("EmailPassword"))
+        If oHelper.rLeagueParmrow("EmailPassword") IsNot DBNull.Value Then
+            oHelper.GGmail = New GGSMTP_GMAIL(oHelper.rLeagueParmrow("Email"), oHelper.rLeagueParmrow("EmailPassword"))
+        End If
 
         Dim wkrow As DataRow
         If dsLeague.Tables.Contains("dtschedule") Then
@@ -568,6 +561,7 @@ Public Class Main
             End Try
         End If
 
+        oHelper.iHoles = oHelper.rLeagueParmrow("Holes")
         Dim dtschedule As New DataTable()
         'build a table of schedule with dates in rows instead of columns
         dtschedule = oHelper.buildSchedule()
@@ -587,21 +581,37 @@ Public Class Main
             row("Date") = CDate(row("Date")).ToString("yyyyMMdd")
         Next
         rebuildDates(dtschedule)
+        'find this years course
         For Each row In dsLeague.Tables("dtLeagueParms").Rows
             'Dim x = CDate(row("StartDate")).ToString("yyyyMMdd"), xx = CDate(row("EndDate")).ToString("yyyyMMdd")
-            If cbDates.SelectedItem >= CDate(row("StartDate")).ToString("yyyyMMdd") And cbDates.SelectedItem <= CDate(row("EndDate")).ToString("yyyyMMdd") Then
+            'If cbDates.SelectedItem >= CDate(row("StartDate")).ToString("yyyyMMdd") And cbDates.SelectedItem <= CDate(row("EndDate")).ToString("yyyyMMdd") Then
+            If cbDates.SelectedItem.ToString.Substring(0, 4) = CDate(row("StartDate")).ToString("yyyyMMdd").Substring(0, 4) Then
                 oHelper.thisCourse = oHelper.dsLeague.Tables("dtCourses").Rows.Find(row("Course"))
                 Exit For
             End If
         Next
         oHelper.newCalcLeftovers()
+        'oHelper.newCalcLeftovers()
     End Sub
     Sub rebuildDates(dtschedule As DataTable)
+
+        'this routine will load all dates up to today and 1 date after
         Dim dv As New DataView(dtschedule)
+        Dim scurrdt As String = Now.ToString("yyyyMMdd")
+        If cbLeagues.SelectedItem.ToString.Substring(cbLeagues.SelectedItem.ToString.IndexOf("(") + 1, 4) = scurrdt.Substring(0, 4) Then
+            For Each row In dv
+                If row("Date") > scurrdt Then
+                    scurrdt = row("Date")
+                    Exit For
+                End If
+            Next
+        End If
         dv.Sort = "Date desc"
         cbDates.Items.Clear()
         For Each row In dv
-            cbDates.Items.Add(row("Date"))
+            If row("Date") <= scurrdt Then
+                cbDates.Items.Add(row("Date"))
+            End If
         Next
 
         If oHelper.dDate.ToString("yyyyMMdd").Substring(0, 4) > cbDates.Items(0).ToString.Substring(0, 4) Then
@@ -609,9 +619,9 @@ Public Class Main
         End If
         'remove non-match dates from dates combobox
         'cdateToyyyyMMdd converts a string from 1/1/1900 to 19000101
-        Do While cbDates.Items(0) > oHelper.sDateLastScore
-            cbDates.Items.Remove(cbDates.Items(0))
-        Loop
+        'Do While cbDates.Items(0) > oHelper.sDateLastScore
+        '    cbDates.Items.Remove(cbDates.Items(0))
+        'Loop
 
         cbDates.SelectedIndex = 0
         cbDates.SelectedItem = oHelper.dDate.ToString("yyyyMMdd")
@@ -768,6 +778,22 @@ Public Class Main
 
     Private Sub AboutToolStripMenuItem_Click(sender As Object, e As EventArgs) Handles AboutToolStripMenuItem.Click
         MsgBox(schanges, MsgBoxStyle.Information, "Change Log")
+    End Sub
+
+    Private Sub Main_FormClosing(sender As Object, e As FormClosingEventArgs) Handles MyBase.FormClosing
+        btnExit_Click(sender, e)
+    End Sub
+
+    Private Sub Button2_Click(sender As Object, e As EventArgs) Handles Button2.Click
+
+    End Sub
+
+    Private Sub btnUpdPmts_Click(sender As Object, e As EventArgs) Handles btnUpdPmts.Click
+        oHelper.UpdatePmts()
+    End Sub
+
+    Private Sub btnLeaders_Click(sender As Object, e As EventArgs) Handles btnLeaders.Click
+        Leaders.Show()
     End Sub
 End Class
 Public Class Team
