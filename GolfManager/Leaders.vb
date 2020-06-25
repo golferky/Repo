@@ -11,6 +11,7 @@ Public Class Leaders
     Dim dtNewWklySkins
     Private Sub Scores_Load(sender As Object, e As EventArgs) Handles MyBase.Load
         oHelper = Main.oHelper
+        leaders()
         BldScoresDataGridFromFile()
         sWH = oHelper.ScreenResize()
         If Me.Width >= sWH.Split(":")(0) Then
@@ -77,14 +78,6 @@ Public Class Leaders
             '    End If
             'Next
 
-            'player column not needed, its in the heading 
-            If oHelper.bScoresbyPlayer Then
-                'sArray.Remove("Method-cPatMeth") 'cannot remove, used for other fields(avg,rank,topar)
-                sArray.Remove("Player(1)-cPat170")
-                sArray.Remove("Group(3)")
-                sArray.Remove("Team")
-
-            End If
             sArray.Remove("#Closests-cPat40nt")
             Dim dvScores As New DataView(oHelper.dsLeague.Tables("dtScores"))
             Dim sScoreCardforDGV = ""
@@ -108,21 +101,12 @@ Public Class Leaders
 
                 If sParm = "Holes" Then
                     If sParm = "Holes" Then
-                        sScoreCardforDGV = sScoreCardforDGV + "PHdcp,"
-                        'sColFormat.Add("cPat40nt")
                         For i As Integer = 1 To 18
                             sScoreCardforDGV = sScoreCardforDGV + "Hole" & i & ","
-                            'sColFormat.Add("cPatHole")
-                            'if its 18 holes
-                            'and were on hole 10
                             If i = 9 Then
                                 sScoreCardforDGV = sScoreCardforDGV + "Out Gross,Out Net,"
-                                'sColFormat.Add("cPat30")
-                                'sColFormat.Add("cPat30")
                             ElseIf i = 18 Then
                                 sScoreCardforDGV = sScoreCardforDGV + "In Gross,In Net,"
-                                'sColFormat.Add("cPat30")
-                                'sColFormat.Add("cPat30")
                             End If
                         Next
                         Continue For
@@ -131,22 +115,22 @@ Public Class Leaders
                     Continue For
                 End If
                 sScoreCardforDGV = sScoreCardforDGV + sParm + ","
-                'sColFormat.Add(sPat)
             Next
             'remove trailing comma
             'replace spaces with underscores for csv column matchups
             'need to rename ctp_1, _2 and have 4 columns for Ctp(one for each par 3)
-            oHelper.CreateColumn("#Closests", dtScoreCard)
             sScoreCardforDGV = sScoreCardforDGV.Substring(0, Len(sScoreCardforDGV) - 1).Replace(" ", "_")
             dtScoreCard = dvScores.ToTable(False, sScoreCardforDGV.Split(",").ToArray)
             dtScoreCard.Clear()
+            oHelper.CreateColumn("Period", dtScoreCard)
+            oHelper.CreateColumn("#Closests", dtScoreCard)
             oHelper.CreateColumn("Rnds", dtScoreCard)
             oHelper.CreateColumn("F9", dtScoreCard)
             oHelper.CreateColumn("B9", dtScoreCard)
 
             ''add col for each stat
             For Each fld As String In Helper.cStatsFields.Split(",")
-                oHelper.CreateColumn(fld, dtScoreCard)
+                oHelper.CreateColumn(fld.Split("-")(0), dtScoreCard)
             Next
 
             'add col for each Score only field
@@ -605,8 +589,8 @@ Public Class Leaders
                 newrow("$Skins") = 0
                 newrow("$Closest") = 0
                 newrow("#Skins") = 0
-                newrow("CTP_1") = 0
-                newrow("CTP_2") = 0
+                '                newrow("CTP_1") = 0
+                '                newrow("CTP_2") = 0
                 newrow("Points") = 0
                 newrow("Team_Points") = 0
                 newrow("Rnds") = 0
@@ -681,97 +665,64 @@ Public Class Leaders
         oHelper.LOGIT(String.Format("calculate stats for all players"))
 
         Try
-            If File.Exists("c:\temp\temp.txt") Then
-                File.Delete("c:\temp\temp.txt")
-            End If
+            If File.Exists("c:\temp\scores.txt") Then File.Delete("c:\temp\scores.txt")
+            If File.Exists("c:\temp\courses.txt") Then File.Delete("c:\temp\courses.txt")
 
             Dim sFrom = CDate(oHelper.rLeagueParmrow("StartDate")).ToString("yyyyMMdd")
             Dim sTo = CDate(oHelper.rLeagueParmrow("PostSeasonDt")).AddDays(7).ToString("yyyyMMdd")
-            oHelper.DataTable2CSV(oHelper.dsLeague.Tables("dtScores"), "c:\temp\temp.txt")
+            oHelper.DataTable2CSV(oHelper.dsLeague.Tables("dtScores"), "c:\temp\scores.txt")
+            oHelper.DataTable2CSV(oHelper.dsLeague.Tables("dtCourses"), "c:\temp\courses.txt")
             'Dim cn As New OleDbConnection("Provider=Microsoft.Jet.OLEDB.4.0;Data Source=C:\temp;Extended Properties='text;HDR=Yes;FMT=Delimited';")
             Dim cn As New OleDb.OleDbConnection(String.Format("Provider={0};Data Source=C:\temp;Extended Properties='text;HDR=Yes;FMT=Delimited';", oHelper.GetMACDBVersion))
             Dim sWhere = String.Format("Where date >= {0} and date < {1} Group By date", sFrom, sTo)
-            Dim x = oHelper.tallysumif(Constants.skin, "TRUE,True", "SkinPlayers")
-            Dim xx As String = String.Format("{0}", x)
             Debug.Print("")
             'https://stackoverflow.com/questions/22990229/count-iif-access-query
+            Dim sSkinIIf = "IIf(Ucase(Skins) = 'TRUE', 1, 0)"
             Dim strsql As String = String.Format _
-        ("SELECT Date
-            , COUNT(*) as Total
-            , SUM(IIF(Skins = 'TRUE' or Skins = 'True', 1, 0)) as SkinPlayers
-            , SUM(IIF(Closest = 'TRUE' or Closest = 'True', 1, 0)) as CTPPlayers
-            , IIF(SUM(Hole1) > 0,'Front','Back') as FrontBack 
+        ("SELECT IIF(SUM(Hole1) > 0,'Front','Back') as FrontBack 
+            , Player
+            , COUNT(*) as Rounds
+            , SUM({1}) as SkinRounds
+            , SUM({2}) as CTPRounds
+            , SUM([#Skins]) as NumSkins
+            , SUM([$Skins]) as SkinsAmount
+            , IIF(FrontBack = 'Front',SUM(CTP_1), 0) as CTP_4
+            , IIF(FrontBack = 'Front',SUM(CTP_2), 0) as CTP_8
+            , IIF(FrontBack = 'Back',SUM(CTP_1), 0) as CTP_10
+            , IIF(FrontBack = 'Back',SUM(CTP_2), 0) as CTP_12
 
-            , SUM([#Skins]) as wSkins
-            , SUM([$Skins]) as wskinsearned 
-            , IIF(wskinsearned > 0,wskinsearned,0) as skinsearned
-            , (IIF(Date < {0}, {1}, 7)) * SUM(IIF(Skins = 'TRUE' OR Skins = 'True', 1, 0)) - IIF(SUM([$Skins]) > 0, SUM([$Skins]),0) as wskinsextra
+            , SUM([Points]) as IndPoints
+            , SUM([Team_Points]) as TeamPoints
+            , SUM([Team_Points]) + SUM(Points) as TotalPoints 
+            , ROUND(TotalPoints / Rounds,2) as PointsPerRnd
 
-            , IIF(SUM(Hole1) > 0,(IIF(Date < {0}, 1, 3)) * SUM(IIF(Closest = 'TRUE' OR Closest = 'True', 1, 0)) / 2, 0) as ctpf1collected 
-            , IIF(SUM(Hole1) > 0,(IIF(Date < {0}, 1, 3)) * SUM(IIF(Closest = 'TRUE' OR Closest = 'True', 1, 0)) / 2, 0) as ctpf2collected 
-            , IIF(SUM(Hole10) > 0,(IIF(Date < {0}, 1, 3)) * SUM(IIF(Closest = 'TRUE' OR Closest = 'True', 1, 0)) / 2, 0) as ctpb1collected 
-            , IIF(SUM(Hole10) > 0,(IIF(Date < {0}, 1, 3)) * SUM(IIF(Closest = 'TRUE' OR Closest = 'True', 1, 0)) / 2, 0) as ctpb2collected 
+            , ROUND(AVG(Out_Gross),2) as AvgFront9 
+            , ROUND(AVG(In_Gross),2) as AvgBack9 
+            , ROUND((AVG(Out_Gross) + AVG(In_Gross)) / 2,2) as AvgScore
+            , MIN(Out_Gross) as LowF9Gr
+            , MIN(In_Gross) as LowB9Gr
+            , MAX(Out_Gross) as HiF9Gr
+            , MAX(In_Gross) as HiB9Gr
+            , MIN(Out_Net) as LowF9N
+            , MIN(In_Net) as LowB9N
+            , MAX(Out_Net) as HiF9N
+            , MAX(In_Net) as HiB9N
 
-            , IIF(SUM(Hole1) > 0,SUM([CTP_1]), 0) as wctpf1earned
-            , IIF(SUM(Hole1) > 0,SUM([CTP_2]), 0) as wctpf2earned
-            , IIF(SUM(Hole10) > 0,SUM([CTP_1]), 0) as wctpb1earned
-            , IIF(SUM(Hole10) > 0,SUM([CTP_2]), 0) as wctpb2earned
-
-            , IIF(wSkins > 0,wSkins,0) as Skins
-            , (IIF(Date < {0}, {1}, 7)) * SUM(IIF(Skins = 'TRUE' OR Skins = 'True', 1, 0)) as skinscollected
-            , IIF(wskinsextra > 0,wskinsextra,0) as skinsextra
-
-            , IIF(wctpf1earned > 0, wctpf1earned,0) as ctpf1earned
-            , ctpf1collected - ctpf1earned as ctpf1extra
-            , IIF(wctpf2earned > 0, wctpf2earned,0) as ctpf2earned
-            , ctpf2collected - ctpf2earned as ctpf2extra
-
-            , IIF(wctpb1earned > 0, wctpb1earned,0) as ctpb1earned
-            , ctpb1collected - ctpb1earned as ctpb1extra
-            , IIF(wctpb2earned > 0, wctpb2earned,0) as ctpb2earned
-            , ctpb2collected - ctpb2earned as ctpb2extra
-
-            FROM [temp.txt]",
-         CDate(oHelper.rLeagueParmrow("PostSeasonDt")).ToString("yyyyMMdd"), oHelper.rLeagueParmrow(Constants.skin)
+            FROM [Scores.txt] Scores
+            WHERE Date >= 20180101",
+         CDate(oHelper.rLeagueParmrow("PostSeasonDt")).ToString("yyyyMMdd"),
+         sSkinIIf,
+         sSkinIIf.Replace(Constants.skin, Constants.closest)
 )
+            'INNER JOIN [Courses.txt] Courses ON Scores.Course='Boone Links'
+            ', FORMAT(Date,'yyyymmdd') 
 
-            'strsql = String.Format _
-            '("SELECT Date
-            ', IIF(SUM([$Skins]) > 0,SUM([$Skins]),0) as SkinsExtra
-            'FROM [temp.txt]",
-            ' CDate(rLeagueParmrow("PostSeasonDt")).ToString("yyyyMMdd"), rLeagueParmrow(skin)
-            ')
+            strsql += vbCrLf & "GROUP BY Frontback,Player"
 
-            strsql += vbCrLf & String.Format("WHERE Date >= {0} And Date <= {1}", sFrom, sTo)
-            strsql += vbCrLf & "GROUP BY Player"
             dtNewWklySkins = New DataTable("Stats")
             Dim da As New OleDb.OleDbDataAdapter(strsql, cn)
             da.Fill(dtnewWklySkins)
             dtnewWklySkins.PrimaryKey = New DataColumn() {dtnewWklySkins.Columns("Date")}
-            Dim wkctpb1co As Decimal = 0
-            Dim wkctpb2co As Decimal = 0
-            Dim wkctpf1co As Decimal = 0
-            Dim wkctpf2co As Decimal = 0
-            For Each row In dtnewWklySkins.Rows
-                row(Constants.ctpb1extr) += wkctpb1co
-                wkctpb1co = row(Constants.ctpb1extr)
-                row(Constants.ctpb2extr) += wkctpb2co
-                wkctpb2co = row(Constants.ctpb2extr)
-                row(Constants.ctpf1extr) += wkctpf1co
-                wkctpf1co = row(Constants.ctpf1extr)
-                row(Constants.ctpf2extr) += wkctpf2co
-                wkctpf2co = row(Constants.ctpf2extr)
-            Next
-            Dim drow = dtNewWklySkins.Rows(dtNewWklySkins.Rows.Count - 1)
-            drow(Constants.ctpb1extr) += wkctpb1co
-            wkctpb1co = drow(Constants.ctpb1extr)
-            drow(Constants.ctpb2extr) += wkctpb2co
-            wkctpb2co = drow(Constants.ctpb2extr)
-            drow(Constants.ctpf1extr) += wkctpf1co
-            wkctpf1co = drow(Constants.ctpf1extr)
-            drow(Constants.ctpf2extr) += wkctpf2co
-            wkctpf2co = drow(Constants.ctpf2extr)
-
             Dim dt1 As New DataTable("Points")
             Dim strsql1 As String = String.Format _
         (

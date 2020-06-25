@@ -1231,6 +1231,7 @@ ByVal sepChar As String)
         Result = ex.GetType.ToString & "(0x" & hr.ToString("X8") & "): " & ex.Message & Environment.NewLine & ex.StackTrace & Environment.NewLine
         Dim st As StackTrace = New StackTrace(ex, True)
         For Each sf As StackFrame In st.GetFrames
+            Dim x = sf.GetFileLineNumber
             If sf.GetFileLineNumber() > 0 Then
                 Result &= "Line:" & sf.GetFileLineNumber() & " Filename: " & IO.Path.GetFileName(sf.GetFileName) & Environment.NewLine
             End If

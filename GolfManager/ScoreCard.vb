@@ -475,14 +475,14 @@ Public Class ScoreCard
         If oHelper.iHoleMarker = 10 Then sfld = sfld.Replace("Out", "In")
         If IsNumeric(R.Cells(sfld).Value) Then saScore = R.Cells(sfld).Value
         For Each row As DataGridViewRow In dgScores.Rows
-            If row.Cells("Player").Value = R.Cells("Opponent").Value Then
+            If row.Cells("Player").Value = R.Cells("Opponent").Value.ToString().Split(",")(0) Then
                 If IsNumeric(row.Cells(sfld).Value) Then shScore = row.Cells(sfld).Value
                 MatchResults = row.Index
                 Exit For
             End If
         Next
         If saScore <> 99 Or shScore <> 99 Then
-            R.Cells("Match").Value = String.Format("{1} vs {2}-{3}", R.Cells("Player").Value, saScore, R.Cells("Opponent").Value, shScore)
+            R.Cells("Match").Value = String.Format("{1} vs {2}-{3}", R.Cells("Player").Value, saScore, R.Cells("Opponent").Value.ToString.Split(",")(0), shScore)
         End If
     End Function
     Sub editTeam(R As DataGridViewRow, sCurrColName As String)
@@ -1145,10 +1145,13 @@ Public Class ScoreCard
                     End If
                 End If
                 If oHelper.RemoveNulls(foundrows(0)(skin)) = "Y" Then
-                    If row.Cells(skin) Is DBNull.Value Then row.Cells(skin).Value = True
+                    'Dim x = row.Cells(skin).Value
+                    row.Cells(skin).Value = True
+                    'If row.Cells(skin) Is DBNull.Value Then row.Cells(skin).Value = True
                 End If
                 If oHelper.RemoveNulls(foundrows(0)("CTP")) = "Y" Then
-                    If row.Cells(closest) Is DBNull.Value Then row.Cells(closest).Value = True
+                    row.Cells(closest).Value = True
+                    'If row.Cells(closest) Is DBNull.Value Then row.Cells(closest).Value = True
                 End If
                 'Dim sgross As Int16 = 0
                 If oHelper.iHoleMarker = 1 Then

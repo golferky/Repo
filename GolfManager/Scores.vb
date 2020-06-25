@@ -369,18 +369,18 @@ Public Class Scores
                         Dim iPar As Integer = oHelper.thisCourse("Hole" & i).ToString
                         Dim iScore As String = row.Cells("Hole" & i).Value
                         If Not row.Cells("Date").Value.ToString.Contains("ToPar") Then
-                            If cell.Value < iPar Then cell.Style.BackColor = Color.Red
+                            If cell.Value < iPar Then
+                                cell.Style.BackColor = Color.Red
+                            End If
                         End If
                     Else
                         If row.Cells("Date").Value.ToString.Contains("ToPar") Then
-                            If row.Cells("Hole" & i).Value < 0 Then
-                                cell.Value = cell.Value * -1
+                            If row.Cells("Hole" & i).Value.ToString.Contains("-.") Then
                                 cell.Style.BackColor = Color.Red
                             End If
                         Else
                             row.Cells("Hole" & i).Value = ""
                         End If
-
                     End If
                 End If
             Next
@@ -475,7 +475,7 @@ Public Class Scores
             row("Hole" & i) = d2dec.ToString("#.0")
             d2dec -= oHelper.thisCourse("Hole" & i).ToString
             'this updates the ytd topar
-            drToPar("Hole" & i) = d2dec.ToString("#.0")
+            drToPar("Hole" & i) = d2dec.ToString("#.0;-#.0;#.0")
         Catch ex As Exception
             MsgBox(oHelper.GetExceptionInfo(ex))
         End Try

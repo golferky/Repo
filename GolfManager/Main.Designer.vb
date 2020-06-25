@@ -24,6 +24,7 @@ Partial Class Main
     Private Sub InitializeComponent()
         Me.btnExit = New System.Windows.Forms.Button()
         Me.GroupBox1 = New System.Windows.Forms.GroupBox()
+        Me.btnLeaders = New System.Windows.Forms.Button()
         Me.btnMatches = New System.Windows.Forms.Button()
         Me.btnScoreCard = New System.Windows.Forms.Button()
         Me.btnPayments = New System.Windows.Forms.Button()
@@ -65,11 +66,9 @@ Partial Class Main
         Me.TabPage3 = New System.Windows.Forms.TabPage()
         Me.TabPage4 = New System.Windows.Forms.TabPage()
         Me.TabPage5 = New System.Windows.Forms.TabPage()
-        Me.MenuStrip1 = New System.Windows.Forms.MenuStrip()
         Me.MenuStrip2 = New System.Windows.Forms.MenuStrip()
         Me.MenuStrip3 = New System.Windows.Forms.MenuStrip()
         Me.AboutToolStripMenuItem = New System.Windows.Forms.ToolStripMenuItem()
-        Me.btnLeaders = New System.Windows.Forms.Button()
         Me.GroupBox1.SuspendLayout()
         Me.GroupBox2.SuspendLayout()
         Me.GroupBox3.SuspendLayout()
@@ -108,6 +107,15 @@ Partial Class Main
         Me.GroupBox1.TabIndex = 9
         Me.GroupBox1.TabStop = False
         Me.GroupBox1.Text = "Scoring and Games"
+        '
+        'btnLeaders
+        '
+        Me.btnLeaders.Location = New System.Drawing.Point(128, 67)
+        Me.btnLeaders.Name = "btnLeaders"
+        Me.btnLeaders.Size = New System.Drawing.Size(75, 23)
+        Me.btnLeaders.TabIndex = 9
+        Me.btnLeaders.Text = "Leaders"
+        Me.btnLeaders.UseVisualStyleBackColor = True
         '
         'btnMatches
         '
@@ -214,7 +222,7 @@ Partial Class Main
         'cbLogging
         '
         Me.cbLogging.AutoSize = True
-        Me.cbLogging.Location = New System.Drawing.Point(174, 75)
+        Me.cbLogging.Location = New System.Drawing.Point(174, 76)
         Me.cbLogging.Name = "cbLogging"
         Me.cbLogging.Size = New System.Drawing.Size(64, 17)
         Me.cbLogging.TabIndex = 13
@@ -224,7 +232,7 @@ Partial Class Main
         'cbMail
         '
         Me.cbMail.AutoSize = True
-        Me.cbMail.Location = New System.Drawing.Point(244, 75)
+        Me.cbMail.Location = New System.Drawing.Point(244, 76)
         Me.cbMail.Name = "cbMail"
         Me.cbMail.Size = New System.Drawing.Size(96, 17)
         Me.cbMail.TabIndex = 20
@@ -308,9 +316,9 @@ Partial Class Main
         'cbLeagues
         '
         Me.cbLeagues.FormattingEnabled = True
-        Me.cbLeagues.Location = New System.Drawing.Point(37, 72)
+        Me.cbLeagues.Location = New System.Drawing.Point(37, 144)
         Me.cbLeagues.Name = "cbLeagues"
-        Me.cbLeagues.Size = New System.Drawing.Size(131, 21)
+        Me.cbLeagues.Size = New System.Drawing.Size(262, 21)
         Me.cbLeagues.TabIndex = 15
         '
         'lbScoresFile
@@ -335,7 +343,7 @@ Partial Class Main
         'lblProcessMsg
         '
         Me.lblProcessMsg.AutoSize = True
-        Me.lblProcessMsg.Location = New System.Drawing.Point(34, 102)
+        Me.lblProcessMsg.Location = New System.Drawing.Point(38, 96)
         Me.lblProcessMsg.Name = "lblProcessMsg"
         Me.lblProcessMsg.Size = New System.Drawing.Size(91, 13)
         Me.lblProcessMsg.TabIndex = 16
@@ -399,29 +407,29 @@ Partial Class Main
         '
         Me.StatusStrip1.ImageScalingSize = New System.Drawing.Size(32, 32)
         Me.StatusStrip1.Items.AddRange(New System.Windows.Forms.ToolStripItem() {Me.tspb, Me.tssl})
-        Me.StatusStrip1.Location = New System.Drawing.Point(0, 405)
+        Me.StatusStrip1.Location = New System.Drawing.Point(0, 468)
         Me.StatusStrip1.Name = "StatusStrip1"
         Me.StatusStrip1.Padding = New System.Windows.Forms.Padding(0, 0, 7, 0)
-        Me.StatusStrip1.Size = New System.Drawing.Size(488, 26)
+        Me.StatusStrip1.Size = New System.Drawing.Size(488, 22)
         Me.StatusStrip1.TabIndex = 25
         Me.StatusStrip1.Text = "StatusStrip1"
         '
         'tspb
         '
         Me.tspb.Name = "tspb"
-        Me.tspb.Size = New System.Drawing.Size(200, 20)
+        Me.tspb.Size = New System.Drawing.Size(200, 16)
         Me.tspb.Style = System.Windows.Forms.ProgressBarStyle.Continuous
         '
         'tssl
         '
         Me.tssl.Name = "tssl"
-        Me.tssl.Size = New System.Drawing.Size(119, 21)
+        Me.tssl.Size = New System.Drawing.Size(119, 17)
         Me.tssl.Text = "ToolStripStatusLabel1"
         '
         'lbMonitor
         '
         Me.lbMonitor.AutoSize = True
-        Me.lbMonitor.Location = New System.Drawing.Point(34, 46)
+        Me.lbMonitor.Location = New System.Drawing.Point(38, 128)
         Me.lbMonitor.Name = "lbMonitor"
         Me.lbMonitor.Size = New System.Drawing.Size(63, 13)
         Me.lbMonitor.TabIndex = 26
@@ -430,7 +438,7 @@ Partial Class Main
         'Label2
         '
         Me.Label2.AutoSize = True
-        Me.Label2.Location = New System.Drawing.Point(352, 46)
+        Me.Label2.Location = New System.Drawing.Point(339, 128)
         Me.Label2.Name = "Label2"
         Me.Label2.Size = New System.Drawing.Size(61, 13)
         Me.Label2.TabIndex = 28
@@ -439,9 +447,9 @@ Partial Class Main
         'cbDates
         '
         Me.cbDates.FormattingEnabled = True
-        Me.cbDates.Location = New System.Drawing.Point(355, 75)
+        Me.cbDates.Location = New System.Drawing.Point(342, 144)
         Me.cbDates.Name = "cbDates"
-        Me.cbDates.Size = New System.Drawing.Size(81, 21)
+        Me.cbDates.Size = New System.Drawing.Size(96, 21)
         Me.cbDates.TabIndex = 29
         '
         'TabControl1
@@ -451,10 +459,10 @@ Partial Class Main
         Me.TabControl1.Controls.Add(Me.TabPage3)
         Me.TabControl1.Controls.Add(Me.TabPage4)
         Me.TabControl1.Controls.Add(Me.TabPage5)
-        Me.TabControl1.Location = New System.Drawing.Point(37, 145)
+        Me.TabControl1.Location = New System.Drawing.Point(37, 186)
         Me.TabControl1.Name = "TabControl1"
         Me.TabControl1.SelectedIndex = 0
-        Me.TabControl1.Size = New System.Drawing.Size(399, 236)
+        Me.TabControl1.Size = New System.Drawing.Size(401, 237)
         Me.TabControl1.TabIndex = 31
         '
         'TabPage1
@@ -463,7 +471,7 @@ Partial Class Main
         Me.TabPage1.Location = New System.Drawing.Point(4, 22)
         Me.TabPage1.Name = "TabPage1"
         Me.TabPage1.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabPage1.Size = New System.Drawing.Size(391, 210)
+        Me.TabPage1.Size = New System.Drawing.Size(393, 211)
         Me.TabPage1.TabIndex = 0
         Me.TabPage1.Text = "Scoring and Games"
         Me.TabPage1.UseVisualStyleBackColor = True
@@ -474,7 +482,7 @@ Partial Class Main
         Me.TabPage2.Location = New System.Drawing.Point(4, 22)
         Me.TabPage2.Name = "TabPage2"
         Me.TabPage2.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabPage2.Size = New System.Drawing.Size(391, 210)
+        Me.TabPage2.Size = New System.Drawing.Size(393, 211)
         Me.TabPage2.TabIndex = 1
         Me.TabPage2.Text = "Finance and Reports"
         Me.TabPage2.UseVisualStyleBackColor = True
@@ -485,7 +493,7 @@ Partial Class Main
         Me.TabPage3.Location = New System.Drawing.Point(4, 22)
         Me.TabPage3.Name = "TabPage3"
         Me.TabPage3.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabPage3.Size = New System.Drawing.Size(391, 210)
+        Me.TabPage3.Size = New System.Drawing.Size(393, 211)
         Me.TabPage3.TabIndex = 2
         Me.TabPage3.Text = "Utilities"
         Me.TabPage3.UseVisualStyleBackColor = True
@@ -496,7 +504,7 @@ Partial Class Main
         Me.TabPage4.Location = New System.Drawing.Point(4, 22)
         Me.TabPage4.Name = "TabPage4"
         Me.TabPage4.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabPage4.Size = New System.Drawing.Size(391, 210)
+        Me.TabPage4.Size = New System.Drawing.Size(393, 211)
         Me.TabPage4.TabIndex = 3
         Me.TabPage4.Text = "Controls"
         Me.TabPage4.UseVisualStyleBackColor = True
@@ -507,18 +515,10 @@ Partial Class Main
         Me.TabPage5.Location = New System.Drawing.Point(4, 22)
         Me.TabPage5.Name = "TabPage5"
         Me.TabPage5.Padding = New System.Windows.Forms.Padding(3)
-        Me.TabPage5.Size = New System.Drawing.Size(391, 210)
+        Me.TabPage5.Size = New System.Drawing.Size(393, 211)
         Me.TabPage5.TabIndex = 4
         Me.TabPage5.Text = "Cleanup"
         Me.TabPage5.UseVisualStyleBackColor = True
-        '
-        'MenuStrip1
-        '
-        Me.MenuStrip1.Location = New System.Drawing.Point(0, 48)
-        Me.MenuStrip1.Name = "MenuStrip1"
-        Me.MenuStrip1.Size = New System.Drawing.Size(488, 24)
-        Me.MenuStrip1.TabIndex = 32
-        Me.MenuStrip1.Text = "MenuStrip1"
         '
         'MenuStrip2
         '
@@ -543,21 +543,12 @@ Partial Class Main
         Me.AboutToolStripMenuItem.Size = New System.Drawing.Size(80, 20)
         Me.AboutToolStripMenuItem.Text = "ChangeLog"
         '
-        'btnLeaders
-        '
-        Me.btnLeaders.Location = New System.Drawing.Point(128, 67)
-        Me.btnLeaders.Name = "btnLeaders"
-        Me.btnLeaders.Size = New System.Drawing.Size(75, 23)
-        Me.btnLeaders.TabIndex = 9
-        Me.btnLeaders.Text = "Leaders"
-        Me.btnLeaders.UseVisualStyleBackColor = True
-        '
         'Main
         '
         Me.AutoScaleDimensions = New System.Drawing.SizeF(6.0!, 13.0!)
         Me.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font
         Me.AutoScroll = True
-        Me.ClientSize = New System.Drawing.Size(488, 431)
+        Me.ClientSize = New System.Drawing.Size(488, 490)
         Me.Controls.Add(Me.TabControl1)
         Me.Controls.Add(Me.cbLogging)
         Me.Controls.Add(Me.cbMail)
@@ -565,13 +556,11 @@ Partial Class Main
         Me.Controls.Add(Me.Label2)
         Me.Controls.Add(Me.lbMonitor)
         Me.Controls.Add(Me.StatusStrip1)
-        Me.Controls.Add(Me.MenuStrip1)
         Me.Controls.Add(Me.MenuStrip2)
         Me.Controls.Add(Me.MenuStrip3)
         Me.Controls.Add(Me.lblProcessMsg)
         Me.Controls.Add(Me.cbLeagues)
         Me.Controls.Add(Me.Label1)
-        Me.MainMenuStrip = Me.MenuStrip1
         Me.Margin = New System.Windows.Forms.Padding(2)
         Me.Name = "Main"
         Me.Text = "League Manager"
@@ -636,7 +625,6 @@ Partial Class Main
     Friend WithEvents TabPage3 As TabPage
     Friend WithEvents TabPage4 As TabPage
     Friend WithEvents TabPage5 As TabPage
-    Friend WithEvents MenuStrip1 As MenuStrip
     Friend WithEvents MenuStrip2 As MenuStrip
     Friend WithEvents MenuStrip3 As MenuStrip
     Friend WithEvents AboutToolStripMenuItem As ToolStripMenuItem
