@@ -1301,6 +1301,8 @@ Partial Public Class dsLeague
         
         Private columnCTP As Global.System.Data.DataColumn
         
+        Private columnEOY As Global.System.Data.DataColumn
+        
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")>  _
         Public Sub New()
@@ -1465,6 +1467,14 @@ Partial Public Class dsLeague
         End Property
         
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")>  _
+        Public ReadOnly Property EOYColumn() As Global.System.Data.DataColumn
+            Get
+                Return Me.columnEOY
+            End Get
+        End Property
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0"),  _
          Global.System.ComponentModel.Browsable(false)>  _
         Public ReadOnly Property Count() As Integer
@@ -1517,9 +1527,10 @@ Partial Public Class dsLeague
                     ByVal TextStats As String,  _
                     ByVal EmailStats As String,  _
                     ByVal Skins As String,  _
-                    ByVal CTP As String) As dtPlayersRow
+                    ByVal CTP As String,  _
+                    ByVal EOY As String) As dtPlayersRow
             Dim rowdtPlayersRow As dtPlayersRow = CType(Me.NewRow,dtPlayersRow)
-            Dim columnValuesArray() As Object = New Object() {Name, Team, Grade, Paid, Email, Phone, NickName, DateLeft, DateJoined, HomePhone, CellCarrier, CommPref, TextStats, EmailStats, Skins, CTP}
+            Dim columnValuesArray() As Object = New Object() {Name, Team, Grade, Paid, Email, Phone, NickName, DateLeft, DateJoined, HomePhone, CellCarrier, CommPref, TextStats, EmailStats, Skins, CTP, EOY}
             rowdtPlayersRow.ItemArray = columnValuesArray
             Me.Rows.Add(rowdtPlayersRow)
             Return rowdtPlayersRow
@@ -1564,6 +1575,7 @@ Partial Public Class dsLeague
             Me.columnEmailStats = MyBase.Columns("EmailStats")
             Me.columnSkins = MyBase.Columns("Skins")
             Me.columnCTP = MyBase.Columns("CTP")
+            Me.columnEOY = MyBase.Columns("EOY")
         End Sub
         
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
@@ -1601,6 +1613,8 @@ Partial Public Class dsLeague
             MyBase.Columns.Add(Me.columnSkins)
             Me.columnCTP = New Global.System.Data.DataColumn("CTP", GetType(String), Nothing, Global.System.Data.MappingType.Element)
             MyBase.Columns.Add(Me.columnCTP)
+            Me.columnEOY = New Global.System.Data.DataColumn("EOY", GetType(String), Nothing, Global.System.Data.MappingType.Element)
+            MyBase.Columns.Add(Me.columnEOY)
             Me.Constraints.Add(New Global.System.Data.UniqueConstraint("Constraint1", New Global.System.Data.DataColumn() {Me.columnName}, true))
             Me.columnName.AllowDBNull = false
             Me.columnName.Unique = true
@@ -5038,6 +5052,21 @@ Partial Public Class dsLeague
         
         <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")>  _
+        Public Property EOY() As String
+            Get
+                Try 
+                    Return CType(Me(Me.tabledtPlayers.EOYColumn),String)
+                Catch e As Global.System.InvalidCastException
+                    Throw New Global.System.Data.StrongTypingException("The value for column 'EOY' in table 'dtPlayers' is DBNull.", e)
+                End Try
+            End Get
+            Set
+                Me(Me.tabledtPlayers.EOYColumn) = value
+            End Set
+        End Property
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")>  _
         Public Function IsTeamNull() As Boolean
             Return Me.IsNull(Me.tabledtPlayers.TeamColumn)
         End Function
@@ -5214,6 +5243,18 @@ Partial Public Class dsLeague
          Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")>  _
         Public Sub SetCTPNull()
             Me(Me.tabledtPlayers.CTPColumn) = Global.System.Convert.DBNull
+        End Sub
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")>  _
+        Public Function IsEOYNull() As Boolean
+            Return Me.IsNull(Me.tabledtPlayers.EOYColumn)
+        End Function
+        
+        <Global.System.Diagnostics.DebuggerNonUserCodeAttribute(),  _
+         Global.System.CodeDom.Compiler.GeneratedCodeAttribute("System.Data.Design.TypedDataSetGenerator", "16.0.0.0")>  _
+        Public Sub SetEOYNull()
+            Me(Me.tabledtPlayers.EOYColumn) = Global.System.Convert.DBNull
         End Sub
     End Class
     

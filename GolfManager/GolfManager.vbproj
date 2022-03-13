@@ -90,6 +90,9 @@
       <DesignTime>True</DesignTime>
       <DependentUpon>dsLeague.xsd</DependentUpon>
     </Compile>
+    <Compile Include="dsLeague.vb">
+      <DependentUpon>dsLeague.xsd</DependentUpon>
+    </Compile>
     <Compile Include="EmailMessage.Designer.vb">
       <DependentUpon>EmailMessage.vb</DependentUpon>
     </Compile>

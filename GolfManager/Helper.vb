@@ -328,29 +328,50 @@ Public Class Helper
                 '2019-07-26 this causes issues on schedule because first week could be a rainout like 2018
                 'If sAry(0).ToString = "" Then Continue Do
                 'if this is the first line, it is a header so save each column header and mark the numeric ones 
-
+                If Debugger.IsAttached Then
+                    LOGIT($"table {dt.TableName} has {sAry.Count - 1} columns")
+                End If
                 If dlinecnt = 1 Then
-                    If dt.Columns.Count = 0 Then
-                        For i = 0 To sAry.Count - 1
-                            Dim dc = New DataColumn(sAry(i))
-                            If sAry(i) = "Team" Or sAry(i).Contains("#") Or sAry(i).Contains("$") Then
-                                dc.DataType = System.Type.GetType("System.Int16")
-                            Else
-                                dc.DataType = System.Type.GetType("System.String")
-                            End If
-                            dt.Columns.Add(dc)
-                        Next
-                    End If
+                    Try
+                        'if dt has 0 columns there is no xsd created
+                        If dt.Columns.Count = 0 Then
+                            For i = 0 To sAry.Count - 1
+                                'LOGIT($"column {sAry(i)}")
+                                Dim dc = New DataColumn(sAry(i))
+                                If sAry(i) = "Team" Or sAry(i).Contains("#") Or sAry(i).Contains("$") Then
+                                    dc.DataType = System.Type.GetType("System.Int16")
+                                Else
+                                    dc.DataType = System.Type.GetType("System.String")
+                                End If
+                                dt.Columns.Add(dc)
+                            Next
+                        End If
+
+                    Catch ex As Exception
+
+                    End Try
+                    For Each scol In sAry
+                        If Not dt.Columns.Contains(scol) Then
+                            LOGIT($"sxd for table {dt.TableName} missing col {scol} ")
+                        End If
+                    Next
                     Continue Do
                 End If
 
-                aRow = dt.NewRow
-                For i = 0 To sAry.Count - 1
-                    If sAry(i).Trim <> "" Then
-                        aRow(i) = sAry(i)
-                    End If
-                Next
-                dt.Rows.Add(aRow)
+                Try
+                    aRow = dt.NewRow
+                    For i = 0 To sAry.Count - 1
+                        If sAry(i).Trim <> "" Then
+                            aRow(i) = sAry(i)
+                        End If
+                    Next
+                    dt.Rows.Add(aRow)
+
+                Catch ex As Exception
+                    LOGIT($"Record {dlinecnt} Dropped {line} table has {dt.Columns.Count} columns error {ex.Message}")
+                    Continue Do
+                End Try
+
 
                 'Try
                 '    dt.Rows.Add(aRow)
@@ -2318,62 +2339,68 @@ ByVal sepChar As String)
 
     Function WaitForFile(dt As DataTable, sFile As String, lbstatus As Label, frm As Form) As Boolean
         LOGIT("Entering " & Reflection.MethodBase.GetCurrentMethod.Name)
-        WaitForFile = False
-        If CSV2DataTable(dt, sFile) Then
-            WaitForFile = True
-            'If sFile.Contains("LeagueParm") Then
-            '    If dDate.ToString("MM/dd/yyyy") < "20190101" Then
-            '        If Not dt.Columns.Contains("PostSeasonDt") Then
-            '            dt.Columns("PostSeason").ColumnName = "PostSeasonDt"
-            '            For Each col In dt.Rows
-            '                col("PostSeasonDt") = "09/18/2018"
-            '            Next
-            '        End If
-            '    End If
-            'End If
-        Else
-            Dim processes As Process() = Process.GetProcesses
-            Dim i As Integer
-            Dim xxdsds = processes.GetUpperBound(0) - 1
-            For i = 0 To processes.GetUpperBound(0) - 1
-                myProcess = processes(i)
-                'if module contains an asterisk in notepadm, its been updated
-                Debug.Print(myProcess.ProcessName & "-" & myProcess.Id & "-" & myProcess.MainWindowTitle)
-                Dim yxyxy = sFile.Substring(sFile.LastIndexOf("\") + 1)
-                If myProcess.MainWindowTitle.Contains(sFile.Substring(sFile.LastIndexOf("\") + 1)) Then
-                    Debug.Print(String.Format(myProcess.MainWindowTitle))
-                    For ii = 0 To 6
-                        If CSV2DataTable(dt, sFile) Then
-                            WaitForFile = True
-                            Exit Function
-                        End If
+        Try
 
-                        lbstatus.Text = String.Format("Waiting for {1} seconds for file {0}", sFile, ii)
-                        status_Msg(lbstatus, frm)
-                        Threading.Thread.Sleep(1000)
-                        'MsgBox(String.Format("File {0} is in use, will wait up for {1} seconds to free up", sFile, i))
-                        If ii = 0 Then
-                            sMessage = String.Format("File {0} is in use, will wait up for {1} seconds to free up", sFile, 30)
-                        Else
-                            sMessage = String.Format("File {0} is in use, will wait up for {1} more seconds to free up", sFile, 30 - (ii * 5))
+            WaitForFile = False
+            If CSV2DataTable(dt, sFile) Then
+                WaitForFile = True
+                'If sFile.Contains("LeagueParm") Then
+                '    If dDate.ToString("MM/dd/yyyy") < "20190101" Then
+                '        If Not dt.Columns.Contains("PostSeasonDt") Then
+                '            dt.Columns("PostSeason").ColumnName = "PostSeasonDt"
+                '            For Each col In dt.Rows
+                '                col("PostSeasonDt") = "09/18/2018"
+                '            Next
+                '        End If
+                '    End If
+                'End If
+            Else
+                Dim processes As Process() = Process.GetProcesses
+                Dim i As Integer
+                Dim xxdsds = processes.GetUpperBound(0) - 1
+                For i = 0 To processes.GetUpperBound(0) - 1
+                    myProcess = processes(i)
+                    'if module contains an asterisk in notepadm, its been updated
+                    Debug.Print(myProcess.ProcessName & "-" & myProcess.Id & "-" & myProcess.MainWindowTitle)
+                    Dim yxyxy = sFile.Substring(sFile.LastIndexOf("\") + 1)
+                    If myProcess.MainWindowTitle.Contains(sFile.Substring(sFile.LastIndexOf("\") + 1)) Then
+                        Debug.Print(String.Format(myProcess.MainWindowTitle))
+                        For ii = 0 To 6
+                            If CSV2DataTable(dt, sFile) Then
+                                WaitForFile = True
+                                Exit Function
+                            End If
+
+                            lbstatus.Text = String.Format("Waiting for {1} seconds for file {0}", sFile, ii)
+                            status_Msg(lbstatus, frm)
+                            Threading.Thread.Sleep(1000)
+                            'MsgBox(String.Format("File {0} is in use, will wait up for {1} seconds to free up", sFile, i))
+                            If ii = 0 Then
+                                sMessage = String.Format("File {0} is in use, will wait up for {1} seconds to free up", sFile, 30)
+                            Else
+                                sMessage = String.Format("File {0} is in use, will wait up for {1} more seconds to free up", sFile, 30 - (ii * 5))
+                            End If
+                            Popup.Text = "File in Use"
+                            'CreateObject("WScript.Shell").Popup(sMsg, 5, "File in Use")
+                            If ii < 6 Then Popup.ShowDialog()
+                        Next ii
+                        Dim mbr = MessageBox.Show(String.Format("File {1} In use by {2}{0}Do you want to keep waiting while you close? Press <Yes> Or to Cancel this session, Press <No>", vbCrLf, sFile & ".csv", myProcess.MainWindowTitle.Split("-")(1)), "File In Use", MessageBoxButtons.YesNo)
+                        If mbr = DialogResult.No Then
+                            End
                         End If
-                        Popup.Text = "File in Use"
-                        'CreateObject("WScript.Shell").Popup(sMsg, 5, "File in Use")
-                        If ii < 6 Then Popup.ShowDialog()
-                    Next ii
-                    Dim mbr = MessageBox.Show(String.Format("File {1} In use by {2}{0}Do you want to keep waiting while you close? Press <Yes> Or to Cancel this session, Press <No>", vbCrLf, sFile & ".csv", myProcess.MainWindowTitle.Split("-")(1)), "File In Use", MessageBoxButtons.YesNo)
-                    If mbr = DialogResult.No Then
-                        End
+                    Else
+                        Continue For
                     End If
-                Else
-                    Continue For
-                End If
-            Next i
+                Next i
 
-            lbstatus.Text = String.Format("Finished Waiting for file {0}", sFile)
-            status_Msg(lbstatus, frm)
-            Exit Function
-        End If
+                lbstatus.Text = String.Format("Finished Waiting for file {0}", sFile)
+                status_Msg(lbstatus, frm)
+                Exit Function
+            End If
+
+        Catch ex As Exception
+
+        End Try
     End Function
 
     Private Function getFileProcesses(ByVal strFile As String) As ArrayList
