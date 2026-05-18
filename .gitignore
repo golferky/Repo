@@ -262,3 +262,12 @@ __pycache__/
 /PGAOneAndDone
 /LeagueManager/20190327_LeagueManager_Backup
 /LeagueManager/LeagueManager - Copy
+
+# HughsGolf installer outputs (do not commit binaries)
+*.msi
+setup.exe
+
+# Live SQLite DB (app uses C:\HughsGolf\Files\ — keep out of git)
+*.db
+*.db-shm
+*.db-wal
