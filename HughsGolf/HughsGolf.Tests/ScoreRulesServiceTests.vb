@@ -39,6 +39,16 @@ Namespace HughsGolf.Tests
         End Sub
 
         <TestMethod>
+        Sub CtpCarryoverDetail_KeepsFrontAndBackBucketsSeparate()
+            Dim frontResult = ScoreRulesService.CtpCarryoverDetail(1, "Front")
+            Dim backResult = ScoreRulesService.CtpCarryoverDetail(1, "Back")
+
+            Assert.AreEqual("Carryover1-Front", frontResult)
+            Assert.AreEqual("Carryover1-Back", backResult)
+            Assert.AreNotEqual(frontResult, backResult)
+        End Sub
+
+        <TestMethod>
         Sub CapScore_Par3AboveMax_ReturnsPar3Max()
             Dim result = ScoreRulesService.CapScore(8, 3, 6, 8, 10)
 

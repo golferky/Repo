@@ -1262,10 +1262,15 @@ Public Class ScoreCard
             Dim tp = tc.TabPages("PrizeMoney")
             Dim dgv = DirectCast(tp.Controls("dgPrizeMoney"), DataGridView)
 
-            ' Build categories (Skins + CTPs based on sPar3s from Scores)
+            ctx.SetDate(ctx.ActiveDate)
+            sPar3s = ctx.lPar3s
+            Dim activeFrontBack As String = LeagueDateService.GetFrontBack(ctx.ActiveDate, ctx.rLeagueParmrow("Start9").ToString())
+            Dim activePar3s As List(Of String) = ctx.lPar3s
+
+            ' Build categories (Skins + CTPs based on current date par 3s)
             Dim lCategorys As New List(Of String) From {"Skin"}
-            If sPar3s IsNot Nothing Then
-                For i = 1 To sPar3s.Count
+            If activePar3s IsNot Nothing Then
+                For i = 1 To activePar3s.Count
                     lCategorys.Add($"CTP{i}")
                 Next
             End If
@@ -1286,41 +1291,75 @@ Public Class ScoreCard
             If ctx.Conn.State <> ConnectionState.Open Then ctx.Conn.Open()
 
             Dim skinCarry As Decimal = 0
-            Dim skinSql As String = $"
-            SELECT IFNULL(SUM(Earned), 0)
-            FROM Payments
-            WHERE League = '{ctx.SafeLeagueName}'
-              AND Player = 'Kitty'
-              AND Desc = 'Skin'
-              AND Detail = 'Carryover'
-              AND Date < {ctx.ActiveDate}"
+            Dim skinSql As String = "
+            SELECT IFNULL((
+                SELECT Earned
+                FROM Payments
+                WHERE League = @League
+                  AND Player = 'Kitty'
+                  AND Desc = 'Skin'
+                  AND Detail = 'Carryover'
+                  AND Date < @Date
+                ORDER BY Date DESC
+                LIMIT 1
+            ), 0)"
             Using cmd As New SQLiteCommand(skinSql, ctx.Conn)
+                cmd.Parameters.AddWithValue("@League", ctx.sLeagueName)
+                cmd.Parameters.AddWithValue("@Date", ctx.ActiveDate)
                 skinCarry = CDec(cmd.ExecuteScalar())
             End Using
-            Dim skinRow = dtPM.Rows.Find("Skin")
-            If skinRow IsNot Nothing Then skinRow("Prior") = skinCarry
+            SetPrizeMoneyValue("Skin", "Prior", skinCarry)
 
             ' ─────────────────────────────────────────────────────────────────────────────
             ' SCORECARD.VB — LoadPrizeMoneyTab (CTP carryover section only — rest unchanged)
             ' ─────────────────────────────────────────────────────────────────────────────
-            If sPar3s IsNot Nothing Then
-                For i = 1 To sPar3s.Count
+            If activePar3s IsNot Nothing Then
+                For i = 1 To activePar3s.Count
                     Dim ctpCarry As Decimal = 0
-                    Dim ctpSql As String = $"
-            SELECT IFNULL(SUM(Earned), 0)
-            FROM Payments
-            WHERE League = '{ctx.SafeLeagueName}'
-              AND Player = 'Kitty'
-              AND Desc = 'CTP'
-              AND Detail = 'Carryover{i}-{ctx.sFrontBack}'
-              AND Date < {ctx.ActiveDate}"
+                    Dim carryoverDetail As String = ScoreRulesService.CtpCarryoverDetail(i, activeFrontBack)
+                    Dim ctpSql As String = "
+            SELECT IFNULL((
+                SELECT Earned
+                FROM Payments
+                WHERE League = @League
+                  AND Player = 'Kitty'
+                  AND Desc = 'CTP'
+                  AND Detail = @Detail
+                  AND Date < @Date
+                ORDER BY Date DESC
+                LIMIT 1
+            ), 0)"
                     Using cmd As New SQLiteCommand(ctpSql, ctx.Conn)
+                        cmd.Parameters.AddWithValue("@League", ctx.sLeagueName)
+                        cmd.Parameters.AddWithValue("@Detail", carryoverDetail)
+                        cmd.Parameters.AddWithValue("@Date", ctx.ActiveDate)
                         ctpCarry = CDec(cmd.ExecuteScalar())
                     End Using
-                    Dim ctpRow = dtPM.Rows.Find($"CTP{i}")
-                    If ctpRow IsNot Nothing Then ctpRow("Prior") = ctpCarry
+                    LOGIT($"LoadPrizeMoneyTab CTP{i}: ActiveDate={ctx.ActiveDate} FrontBack={activeFrontBack} Detail={carryoverDetail} Prior={ctpCarry}", True)
+                    SetPrizeMoneyValue($"CTP{i}", "Prior", ctpCarry)
                 Next
             End If
+
+            Dim paymentSql As String = "
+            SELECT Player, Desc, Detail, Earned
+            FROM Payments
+            WHERE League = @League
+              AND Date = @Date"
+            Using cmd As New SQLiteCommand(paymentSql, ctx.Conn)
+                cmd.Parameters.AddWithValue("@League", ctx.sLeagueName)
+                cmd.Parameters.AddWithValue("@Date", ctx.ActiveDate)
+                Using rdr As SQLiteDataReader = cmd.ExecuteReader()
+                    While rdr.Read()
+                        ApplyPrizeMoneyPaymentRow(
+                            rdr("Player").ToString(),
+                            rdr("Desc").ToString(),
+                            rdr("Detail").ToString(),
+                            If(IsDBNull(rdr("Earned")), 0D, CDec(rdr("Earned"))),
+                            activePar3s)
+                    End While
+                End Using
+            End Using
+            RecalculatePrizeMoneyTotals()
 
             ' --- BIND DATA ---
             dgv.DataSource = dtPM
@@ -1388,6 +1427,68 @@ Public Class ScoreCard
             LOGIT("LoadPrizeMoneyTab Error: " & ex.Message)
         End Try
     End Sub
+
+    Private Sub ApplyPrizeMoneyPaymentRow(player As String, desc As String, detail As String, earned As Decimal, par3s As List(Of String))
+        If String.Equals(desc, "CTP", StringComparison.OrdinalIgnoreCase) Then
+            If detail.StartsWith("#") Then
+                Dim hole As String = detail.Replace("#", "")
+                For i = 1 To par3s.Count
+                    If par3s(i - 1) = hole Then
+                        AddPrizeMoneyValue($"CTP{i}", "Current", earned)
+                        AddPrizeMoneyValue($"CTP{i}", "TotalNum", 1D)
+                        Exit For
+                    End If
+                Next
+            ElseIf Not String.Equals(player, "Kitty", StringComparison.OrdinalIgnoreCase) Then
+                Dim share As Decimal = If(par3s.Count > 0, earned / par3s.Count, earned)
+                For i = 1 To par3s.Count
+                    AddPrizeMoneyValue($"CTP{i}", "Collected", share)
+                Next
+            End If
+        ElseIf String.Equals(desc, "Skin", StringComparison.OrdinalIgnoreCase) Then
+            If detail.StartsWith("#") Then
+                AddPrizeMoneyValue("Skin", "Current", earned)
+                AddPrizeMoneyValue("Skin", "TotalNum", 1D)
+            ElseIf Not String.Equals(player, "Kitty", StringComparison.OrdinalIgnoreCase) Then
+                AddPrizeMoneyValue("Skin", "Collected", earned)
+            End If
+        End If
+    End Sub
+
+    Private Sub SetPrizeMoneyValue(category As String, fieldName As String, value As Decimal)
+        If dtPM Is Nothing OrElse Not dtPM.Columns.Contains(fieldName) Then Exit Sub
+
+        For Each row As DataRow In dtPM.Rows
+            If String.Equals(row("Category").ToString(), category, StringComparison.OrdinalIgnoreCase) Then
+                row(fieldName) = value
+                Exit Sub
+            End If
+        Next
+    End Sub
+
+    Private Sub AddPrizeMoneyValue(category As String, fieldName As String, value As Decimal)
+        If dtPM Is Nothing OrElse Not dtPM.Columns.Contains(fieldName) Then Exit Sub
+
+        For Each row As DataRow In dtPM.Rows
+            If String.Equals(row("Category").ToString(), category, StringComparison.OrdinalIgnoreCase) Then
+                row(fieldName) = CDec(row(fieldName)) + value
+                Exit Sub
+            End If
+        Next
+    End Sub
+
+    Private Sub RecalculatePrizeMoneyTotals()
+        If dtPM Is Nothing Then Exit Sub
+
+        For Each row As DataRow In dtPM.Rows
+            Dim prior As Decimal = CDec(row("Prior"))
+            Dim current As Decimal = CDec(row("Current"))
+            Dim collected As Decimal = CDec(row("Collected"))
+            row("TotalAmount") = prior + current
+            row("Leftover") = prior + collected - current
+        Next
+    End Sub
+
     Private Sub dgPrizeMoney_CellFormatting(sender As Object, e As DataGridViewCellFormattingEventArgs)
         Try
             Dim dgv = DirectCast(sender, DataGridView)
@@ -5188,7 +5289,8 @@ LEFT JOIN (
                 RefreshStablefordTab()
                 Exit Sub
             Case "PrizeMoney"
-                EditScoresEngine.UpdatePrizeMoney(suppressDuesPrompt:=True)
+                LoadPrizeMoneyTab(tabControl)
+                Exit Sub
             Case "Schedule"
                 LoadScheduleTab(tabControl)
                 Exit Sub
