@@ -431,7 +431,7 @@ Public Class ScoreCard
         Dim row = dg.Rows(e.RowIndex)
         Dim colName As String = dg.Columns(e.ColumnIndex).Name
 
-        ' 🔥 skip system updates
+        ' skip system updates
         If row.Cells(e.ColumnIndex).Tag?.ToString() = "SYS" Then
             row.Cells(e.ColumnIndex).Tag = Nothing
             Exit Sub
@@ -500,7 +500,7 @@ Public Class ScoreCard
         ' In ScoreCard_Load after other controls:
         Dim btnPDF As New Button()
         btnPDF.Name = "btnGeneratePDF"
-        btnPDF.Text = "📄 PDF"
+        btnPDF.Text = "PDF"
         btnPDF.Font = New Font("Segoe UI", 9, FontStyle.Bold)
         btnPDF.Size = New Size(70, 25)
         btnPDF.Location = New Point(cbDates.Right + 20, cbDates.Top + 3)
@@ -533,12 +533,11 @@ Public Class ScoreCard
                                      End If
 
                                      Dim tabName As String = activeTab.Name
-                                     Dim path As String = System.IO.Path.Combine(
-                                         $"{ctx.ReportPath}\{ctx.SeasonYear}\{ctx.ActiveDate.Substring(4, 4)}\", $"{tabName}.pdf")
+                                     Dim path As String = GetReportPdfPath($"{tabName}_{ctx.ActiveDate}.pdf")
 
                                      GeneratePDF(dgv, $"{tabName} Report", path)
                                  End Sub
-        ctx.ShowLegacyTabs = False  ' ← set before creating checkbox
+        ctx.ShowLegacyTabs = False  ' set before creating checkbox
 
         ' Create legacy checkbox
         Dim chkLegacy As New CheckBox()
@@ -665,9 +664,10 @@ Public Class ScoreCard
             tabControl.DrawMode = TabDrawMode.OwnerDrawFixed
             AddHandler tabControl.DrawItem, AddressOf TabControl_DrawItem
 
-            ' ── Active tabs — always load ──────────────────────────────
+            ' -- Active tabs - always load ------------------------------
             LoadScoresTab(tabControl)
             LoadStablefordTab(tabControl)
+            LoadStablefordStandingsTab(tabControl)
             CheckAndPromptGallusImport()
 
             If Not ctx.IsPostSeason Then
@@ -678,7 +678,7 @@ Public Class ScoreCard
             LoadPaymentsTab(tabControl)
             LoadCTPTab(tabControl)
 
-            ' ── Secondary tabs ─────────────────────────────────────────
+            ' -- Secondary tabs -----------------------------------------
             LoadLast5Tab(tabControl)
             LoadPrizeMoneyTab(tabControl)
             LoadPMRecapTab(tabControl)
@@ -686,7 +686,7 @@ Public Class ScoreCard
             LoadExpensesTab(tabControl)
             LoadLeadersTab(tabControl)
             LoadGallusImportTab(tabControl)
-            ' ── Legacy tabs — only load if checkbox checked ────────────
+            ' -- Legacy tabs - only load if checkbox checked ------------
             If ctx.ShowLegacyTabs Then
                 LoadSkinsCTPsTab(tabControl)
                 LoadKittyTab(tabControl)
@@ -736,7 +736,7 @@ Public Class ScoreCard
     }
         Dim newTabs As New List(Of String) From {"Payments", "Expenses"}
 
-        Dim tabs As String() = {"Scores", "Stableford", "Last5", "Matches", "Schedule", "Standings", "PrizeMoney", "PMRecap", "StrokeHoles", "CTPs", "SkinsCTPs", "Kitty", "WeeklyPayments", "Payments", "Expenses", "LeagueDues", "Leaders", "GallusImport"}
+        Dim tabs As String() = {"Scores", "Stableford", "StablefordStandings", "Last5", "Matches", "Schedule", "Standings", "PrizeMoney", "PMRecap", "StrokeHoles", "CTPs", "SkinsCTPs", "Kitty", "WeeklyPayments", "Payments", "Expenses", "LeagueDues", "Leaders", "GallusImport"}
         For Each tabName As String In tabs
             If ctx.IsPostSeason AndAlso (tabName = "Matches" OrElse tabName = "Standings") Then Continue For
             ' Skip legacy tabs if checkbox unchecked
@@ -746,7 +746,7 @@ Public Class ScoreCard
 
             Dim tabPage As New TabPage()
             tabPage.Name = tabName
-            tabPage.Text = If(tabName = "SkinsCTPs", "Skins/CTPs", tabName)
+            tabPage.Text = If(tabName = "SkinsCTPs", "Skins/CTPs", If(tabName = "StablefordStandings", "SF Stdg", tabName))
 
             Dim dgv As New DataGridView()
             dgv.Name = $"dg{tabName}"
@@ -1226,9 +1226,9 @@ Public Class ScoreCard
         End Try
     End Sub
 
-    ' ─────────────────────────────────────────────────────────────────────────────
-    ' CellFormatting — styles subtotal and grand total rows
-    ' ─────────────────────────────────────────────────────────────────────────────
+    ' -----------------------------------------------------------------------------
+    ' CellFormatting - styles subtotal and grand total rows
+    ' -----------------------------------------------------------------------------
     Private Sub dgPMRecap_CellFormatting(sender As Object, e As DataGridViewCellFormattingEventArgs)
         Dim dgv = DirectCast(sender, DataGridView)
         If e.RowIndex < 0 OrElse e.RowIndex >= dgv.Rows.Count Then Return
@@ -1310,9 +1310,9 @@ Public Class ScoreCard
             End Using
             SetPrizeMoneyValue("Skin", "Prior", skinCarry)
 
-            ' ─────────────────────────────────────────────────────────────────────────────
-            ' SCORECARD.VB — LoadPrizeMoneyTab (CTP carryover section only — rest unchanged)
-            ' ─────────────────────────────────────────────────────────────────────────────
+            ' -----------------------------------------------------------------------------
+            ' SCORECARD.VB - LoadPrizeMoneyTab (CTP carryover section only - rest unchanged)
+            ' -----------------------------------------------------------------------------
             If activePar3s IsNot Nothing Then
                 For i = 1 To activePar3s.Count
                     Dim ctpCarry As Decimal = 0
@@ -1670,7 +1670,7 @@ Public Class ScoreCard
             Next
             dgv.Columns.Insert(1, playerCol)
 
-            ' Load par 3 holes — one row each
+            ' Load par 3 holes - one row each
             Dim bPostSeason As Boolean = ctx.ActiveDate >= ctx.sPSDate
             Dim ctpAmount As Decimal = If(bPostSeason,
             CDec(ctx.rLeagueParmrow("ClosestPS")),
@@ -1682,7 +1682,7 @@ Public Class ScoreCard
 
                 Dim existing = GetExistingCTPWinner(hole)
                 If existing <> "" Then
-                    ' Already awarded — show Reset
+                    ' Already awarded - show Reset
                     Dim playerCombo = DirectCast(dgv.Columns("Player"), DataGridViewComboBoxColumn)
                     If Not playerCombo.Items.Contains(existing) Then
                         playerCombo.Items.Add(existing)
@@ -1693,7 +1693,7 @@ Public Class ScoreCard
                     dgv.Rows(r).Cells("Award").Style.ForeColor = Color.DarkRed
                     dgv.Rows(r).DefaultCellStyle.BackColor = Color.LightGreen
                 Else
-                    ' Not awarded — show Award
+                    ' Not awarded - show Award
                     dgv.Rows(r).Cells("Award").Value = "Award"
                     dgv.Rows(r).Cells("Award").Style.ForeColor = Color.DarkGreen
                 End If
@@ -1744,9 +1744,9 @@ Public Class ScoreCard
 
             Dim buttonVal As String = dgv.Rows(e.RowIndex).Cells("Award").Value?.ToString()
 
-            ' ─────────────────────────────────────────────────────────────────────────────
-            ' SCORECARD.VB — Reset block in dgCTPs_CellContentClick
-            ' ─────────────────────────────────────────────────────────────────────────────
+            ' -----------------------------------------------------------------------------
+            ' SCORECARD.VB - Reset block in dgCTPs_CellContentClick
+            ' -----------------------------------------------------------------------------
             If buttonVal = "Reset" Then
                 If MessageBox.Show($"Remove CTP award for hole {hole}?",
                        "Reset CTP Winner",
@@ -1761,7 +1761,7 @@ Public Class ScoreCard
           AND Desc = 'CTP'
           AND Detail = '#{hole}'")
 
-                ' Delete Kitty carryover for this slot — frontback aware
+                ' Delete Kitty carryover for this slot - frontback aware
                 Dim ctpSlot As Integer = 0
                 For i = 1 To ctx.lPar3s.Count
                     If ctx.lPar3s(i - 1) = hole Then
@@ -1793,7 +1793,7 @@ Public Class ScoreCard
                 LOGIT($"CTP reset: hole {hole} award removed")
                 Exit Sub
             End If
-            ' ── AWARD ────────────────────────────────────────────────────────────
+            ' -- AWARD ------------------------------------------------------------
             Dim player As String = dgv.Rows(e.RowIndex).Cells("Player").Value?.ToString()
 
             If String.IsNullOrEmpty(player) Then
@@ -1811,7 +1811,7 @@ Public Class ScoreCard
                 End If
             Next
 
-            ' Calculate actual payout from pot — not entry fee from LeagueParms
+            ' Calculate actual payout from pot - not entry fee from LeagueParms
             Dim par3Count As Integer = If(ctx.lPar3s IsNot Nothing AndAlso ctx.lPar3s.Count > 0, ctx.lPar3s.Count, 1)
             Dim ctpAmount As Decimal = Math.Floor(EditScoresEngine.GetCTPCollected() / par3Count) +
                                    EditScoresEngine.GetCTPCarryover(slot)
@@ -1843,7 +1843,7 @@ Public Class ScoreCard
 
             ' Refresh prize money
             UpdatePrizeMoney(suppressDuesPrompt:=True)
-            LOGIT($"CTP awarded: Hole {hole} → {player} ${ctpAmount:F2}")
+            LOGIT($"CTP awarded: Hole {hole} ? {player} ${ctpAmount:F2}")
 
         Catch ex As Exception
             LOGIT("dgCTPs_CellContentClick Error: " & ex.Message)
@@ -2116,6 +2116,8 @@ ORDER BY COALESCE(P.LastName, L.Player), COALESCE(P.FirstName, '')"
             End Using
 
             If freshData Is Nothing OrElse freshData.Rows.Count = 0 Then Exit Sub
+            RecalculateMatchPoints(freshData)
+
             ' --- Bind directly ---
             dgv.AutoGenerateColumns = True
             dgv.DataSource = freshData
@@ -2174,6 +2176,94 @@ ORDER BY COALESCE(P.LastName, L.Player), COALESCE(P.FirstName, '')"
             LOGIT("LoadMatchesTab Error: " & ex.Message)
         End Try
     End Sub
+
+    Private Sub RecalculateMatchPoints(matches As DataTable)
+        If matches Is Nothing OrElse matches.Rows.Count = 0 Then Exit Sub
+
+        If ctx.Conn.State <> ConnectionState.Open Then ctx.Conn.Open()
+        Using tran = ctx.Conn.BeginTransaction()
+            Using cmd As New SQLiteCommand("
+                UPDATE Matches
+                SET Points = @Points,
+                    Team_Points = @TeamPoints,
+                    Team_Net = @TeamNet
+                WHERE League = @League
+                  AND Date = @Date
+                  AND Player = @Player", ctx.Conn, tran)
+
+                cmd.Parameters.AddWithValue("@League", ctx.sLeagueName)
+                cmd.Parameters.AddWithValue("@Date", ctx.ActiveDate)
+                cmd.Parameters.Add("@Player", DbType.String)
+                cmd.Parameters.Add("@Points", DbType.Decimal)
+                cmd.Parameters.Add("@TeamPoints", DbType.Decimal)
+                cmd.Parameters.Add("@TeamNet", DbType.Object)
+
+                For matchStart As Integer = 0 To matches.Rows.Count - 1 Step 4
+                    If matchStart + 3 >= matches.Rows.Count Then Exit For
+
+                    Dim team1 = New DataRow() {matches.Rows(matchStart), matches.Rows(matchStart + 1)}
+                    Dim team2 = New DataRow() {matches.Rows(matchStart + 2), matches.Rows(matchStart + 3)}
+                    Dim team1Net As Decimal = MatchTeamNet(team1)
+                    Dim team2Net As Decimal = MatchTeamNet(team2)
+
+                    For i As Integer = 0 To 3
+                        Dim row = matches.Rows(matchStart + i)
+                        Dim isTeam1 As Boolean = i < 2
+                        Dim isAPlayer As Boolean = i = 0 OrElse i = 2
+                        Dim myNet As Decimal = MatchPlayerNet(row)
+                        Dim oppNet As Decimal = MatchPlayerNet(matches.Rows(matchStart + If(isTeam1, i + 2, i - 2)))
+                        Dim points As Decimal = MatchPoints(myNet, oppNet)
+                        Dim teamPoints As Decimal = 0D
+                        Dim teamNetValue As Object = DBNull.Value
+
+                        If isAPlayer Then
+                            Dim myTeamNet As Decimal = If(isTeam1, team1Net, team2Net)
+                            Dim oppTeamNet As Decimal = If(isTeam1, team2Net, team1Net)
+                            teamPoints = MatchPoints(myTeamNet, oppTeamNet)
+                            teamNetValue = If(myTeamNet >= 999D, CObj(999D), CObj(myTeamNet))
+                        End If
+
+                        row("Points") = points
+                        row("Team_Points") = teamPoints
+                        row("Team_Net") = teamNetValue
+
+                        cmd.Parameters("@Player").Value = row("Player").ToString()
+                        cmd.Parameters("@Points").Value = points
+                        cmd.Parameters("@TeamPoints").Value = teamPoints
+                        cmd.Parameters("@TeamNet").Value = teamNetValue
+                        cmd.ExecuteNonQuery()
+                    Next
+                Next
+            End Using
+            tran.Commit()
+        End Using
+    End Sub
+
+    Private Function MatchPlayerNet(row As DataRow) As Decimal
+        If row Is Nothing Then Return 999D
+        If IsDBNull(row("Gross")) OrElse Not IsNumeric(row("Gross")) OrElse CDec(row("Gross")) <= 0 Then Return 999D
+        If IsDBNull(row("Net")) OrElse Not IsNumeric(row("Net")) Then Return 999D
+        Return CDec(row("Net"))
+    End Function
+
+    Private Function MatchTeamNet(rows As IEnumerable(Of DataRow)) As Decimal
+        Dim rowList = rows.ToList()
+        If rowList.Count = 0 OrElse MatchPlayerNet(rowList(0)) >= 999D Then Return 999D
+        Return rowList.Sum(Function(r)
+                               Dim net = MatchPlayerNet(r)
+                               Return If(net >= 999D, 0D, net)
+                           End Function)
+    End Function
+
+    Private Function MatchPoints(myNet As Decimal, oppNet As Decimal) As Decimal
+        If myNet >= 999D AndAlso oppNet >= 999D Then Return 0.5D
+        If myNet >= 999D Then Return 0D
+        If oppNet >= 999D Then Return 1D
+        If myNet < oppNet Then Return 1D
+        If myNet > oppNet Then Return 0D
+        Return 0.5D
+    End Function
+
     Private Sub dgvMatches_CellFormatting(sender As Object, e As DataGridViewCellFormattingEventArgs)
         Try
             Dim dgv = DirectCast(sender, DataGridView)
@@ -2181,7 +2271,7 @@ ORDER BY COALESCE(P.LastName, L.Player), COALESCE(P.FirstName, '')"
             Dim row = dgv.Rows(e.RowIndex)
             Dim colName As String = dgv.Columns(e.ColumnIndex).Name
 
-            ' ⛳ 1. THE 4-ROW BLUE GROUPING
+            ' 1. THE 4-ROW BLUE GROUPING
             Dim matchBlue = Color.FromArgb(210, 230, 255)
             If (e.RowIndex \ 4) Mod 2 = 0 Then
                 e.CellStyle.BackColor = matchBlue
@@ -2189,14 +2279,14 @@ ORDER BY COALESCE(P.LastName, L.Player), COALESCE(P.FirstName, '')"
                 e.CellStyle.BackColor = Color.White
             End If
 
-            ' ⛳ 2. PINK STATUS (Player & Opponent Name Only)
+            ' 2. PINK STATUS (Player & Opponent Name Only)
             Dim netVal = row.Cells("Net").Value
             Dim hasScore As Boolean = (netVal IsNot DBNull.Value AndAlso Not String.IsNullOrWhiteSpace(netVal.ToString()))
             If Not hasScore AndAlso (colName = "Player" OrElse colName = "Opponent") Then
                 e.CellStyle.BackColor = Color.Pink
             End If
 
-            ' ⛳ 3. SHOW 999 AS BLANK for Team_Net and Net
+            ' 3. SHOW 999 AS BLANK for Team_Net and Net
             If colName = "Team_Net" OrElse colName = "Net" Then
                 If e.Value IsNot Nothing AndAlso IsNumeric(e.Value) AndAlso CInt(e.Value) = 999 Then
                     e.Value = ""
@@ -2207,7 +2297,7 @@ ORDER BY COALESCE(P.LastName, L.Player), COALESCE(P.FirstName, '')"
                 End If
             End If
 
-            ' ⛳ 4. POINTS HIGHLIGHTS
+            ' 4. POINTS HIGHLIGHTS
             If colName = "Points" OrElse colName = "Team_Points" Then
                 If e.Value IsNot Nothing AndAlso IsNumeric(e.Value) Then
                     Dim val As Double = Convert.ToDouble(e.Value)
@@ -2295,7 +2385,7 @@ ORDER BY COALESCE(P.LastName, L.Player), COALESCE(P.FirstName, '')"
                                                                     Return $"{fn} {ln.Substring(0, 1)}"
                                                                 End If
                                                             End If
-                                                            ' Fallback — split on space
+                                                            ' Fallback - split on space
                                                             Dim parts = fullName.Trim().Split(" "c)
                                                             If parts.Length >= 2 Then
                                                                 Return $"{parts(0)} {parts(parts.Length - 1).Substring(0, 1)}"
@@ -2384,17 +2474,13 @@ ORDER BY COALESCE(P.LastName, L.Player), COALESCE(P.FirstName, '')"
                     Dim teamA As Integer = CInt(parts(0).Trim())
                     Dim teamB As Integer = CInt(parts(1).Trim())
 
-                    ' Find rows for each team and set opponent
+                    ' Find rows for each team and set opponent team number
                     For Each teamRow As DataRow In targetDt.Rows
                         Dim rowTeam As Integer = CInt(teamRow("Team"))
-                        If rowTeam = teamA AndAlso teamPlayers.ContainsKey(teamB) Then
-                            Dim oppA = formatName(teamPlayers(teamB).A)
-                            Dim oppB = formatName(teamPlayers(teamB).B)
-                            teamRow(dateStr) = $"{oppA} / {oppB}"
-                        ElseIf rowTeam = teamB AndAlso teamPlayers.ContainsKey(teamA) Then
-                            Dim oppA = formatName(teamPlayers(teamA).A)
-                            Dim oppB = formatName(teamPlayers(teamA).B)
-                            teamRow(dateStr) = $"{oppA} / {oppB}"
+                        If rowTeam = teamA Then
+                            teamRow(dateStr) = teamB.ToString()
+                        ElseIf rowTeam = teamB Then
+                            teamRow(dateStr) = teamA.ToString()
                         End If
                     Next
                 Next
@@ -2485,7 +2571,7 @@ ORDER BY COALESCE(P.LastName, L.Player), COALESCE(P.FirstName, '')"
                 col.Width = 90
                 col.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleLeft
             Else
-                col.Width = 105
+                col.Width = 55
                 col.DefaultCellStyle.Alignment = DataGridViewContentAlignment.MiddleCenter
                 col.HeaderCell.Style.Alignment = DataGridViewContentAlignment.MiddleCenter
                 ' Highlight current week
@@ -2714,7 +2800,7 @@ ORDER BY COALESCE(P.LastName, L.Player), COALESCE(P.FirstName, '')"
         sb.AppendLine("      AND COALESCE(S.Team, T.Team) IS NOT NULL")
         sb.AppendLine(")")
 
-        ' Build the SELECT — used for both halves
+        ' Build the SELECT - used for both halves
         Dim selectClause As String = "
     SELECT
         @Half AS Half,
@@ -2828,9 +2914,9 @@ ORDER BY COALESCE(P.LastName, L.Player), COALESCE(P.FirstName, '')"
     End Sub
     Private Sub ColorTopThree(dgv As DataGridView)
         Dim colors() As Color = {
-            Color.FromArgb(255, 215, 0),    ' Gold   — 1st
-            Color.FromArgb(192, 192, 192),  ' Silver — 2nd
-            Color.FromArgb(205, 127, 50)    ' Bronze — 3rd
+            Color.FromArgb(255, 215, 0),    ' Gold   - 1st
+            Color.FromArgb(192, 192, 192),  ' Silver - 2nd
+            Color.FromArgb(205, 127, 50)    ' Bronze - 3rd
         }
         For i As Integer = 0 To Math.Min(2, dgv.Rows.Count - 1)
             dgv.Rows(i).DefaultCellStyle.BackColor = colors(i)
@@ -2872,7 +2958,7 @@ ORDER BY COALESCE(P.LastName, L.Player), COALESCE(P.FirstName, '')"
 
             ' --- LABEL ---
             Dim lbl As New Label()
-            lbl.Text = $"Skins & CTP Winnings — {DateTime.ParseExact(ctx.ActiveDate.ToString(), "yyyyMMdd", Nothing).ToString("MM/dd/yyyy")}"
+            lbl.Text = $"Skins & CTP Winnings - {DateTime.ParseExact(ctx.ActiveDate.ToString(), "yyyyMMdd", Nothing).ToString("MM/dd/yyyy")}"
             lbl.Font = New Font("Segoe UI", 10, FontStyle.Bold)
             lbl.Location = New Point(10, 10)
             lbl.AutoSize = True
@@ -2990,7 +3076,7 @@ ORDER BY COALESCE(P.LastName, L.Player), COALESCE(P.FirstName, '')"
 
             ' --- LABEL ---
             Dim lbl As New Label()
-            lbl.Text = $"Kitty / Carryover Balance — Total: {totalKitty:C2}"
+            lbl.Text = $"Kitty / Carryover Balance - Total: {totalKitty:C2}"
             lbl.Font = New Font("Segoe UI", 10, FontStyle.Bold)
             lbl.Location = New Point(10, 10)
             lbl.AutoSize = True
@@ -3283,13 +3369,13 @@ ORDER BY COALESCE(P.LastName, L.Player), COALESCE(P.FirstName, '')"
         Dim isSub As Boolean = row.Cells("IsSub").Value.ToString() = "Y"
         Dim gross As Integer = CInt(If(row.Cells("Gross").Value Is Nothing, 0, row.Cells("Gross").Value))
 
-        ' No show — pink
+        ' No show - pink
         If gross = 0 Then
             e.CellStyle.BackColor = Color.LightPink
             Return
         End If
 
-        ' Sub — player cell aqua
+        ' Sub - player cell aqua
         If isSub AndAlso colName = "Player" Then
             e.CellStyle.BackColor = Color.Aqua
             e.Paint(e.ClipBounds, DataGridViewPaintParts.All)
@@ -3297,7 +3383,7 @@ ORDER BY COALESCE(P.LastName, L.Player), COALESCE(P.FirstName, '')"
             Return
         End If
 
-        ' Skins Out / CTP Out — green if has value, plain if empty
+        ' Skins Out / CTP Out - green if has value, plain if empty
         If colName = "Skins Out" OrElse colName = "CTP Out" Then
             Dim cellVal As String = If(e.Value IsNot Nothing, e.Value.ToString(), "")
             If cellVal <> "" Then
@@ -3322,7 +3408,7 @@ ORDER BY COALESCE(P.LastName, L.Player), COALESCE(P.FirstName, '')"
             Case ""
                 e.Paint(e.ClipBounds, DataGridViewPaintParts.All)
             Case Else
-                ' Paid — green cell
+                ' Paid - green cell
                 e.CellStyle.BackColor = Color.LightGreen
                 e.Paint(e.ClipBounds, DataGridViewPaintParts.All)
         End Select
@@ -3362,7 +3448,7 @@ ORDER BY COALESCE(P.LastName, L.Player), COALESCE(P.FirstName, '')"
                 End Using
 
             Case Else
-                ' Undo — only for In columns
+                ' Undo - only for In columns
                 If cellVal <> "" Then
                     Dim desc As String = If(colName = "Skins In", "Skin", "CTP")
                     UndoPayment(playerName, desc, "= 'Payment'")
@@ -3609,7 +3695,7 @@ ORDER BY COALESCE(P.LastName, L.Player), COALESCE(P.FirstName, '')"
         Dim row = dgv.Rows(e.RowIndex)
         Dim isSub As Boolean = row.Cells("IsSub").Value.ToString() = "Y"
 
-        ' Sub — player cell aqua
+        ' Sub - player cell aqua
         If isSub AndAlso colName = "Player" Then
             e.CellStyle.BackColor = Color.Aqua
             e.Paint(e.ClipBounds, DataGridViewPaintParts.All)
@@ -3617,7 +3703,7 @@ ORDER BY COALESCE(P.LastName, L.Player), COALESCE(P.FirstName, '')"
             Return
         End If
 
-        ' Out cols — display only, green if value
+        ' Out cols - display only, green if value
         If outCols.Contains(colName) Then
             Dim cellVal As String = If(e.Value IsNot Nothing, e.Value.ToString(), "")
             If cellVal <> "" Then
@@ -3643,7 +3729,7 @@ ORDER BY COALESCE(P.LastName, L.Player), COALESCE(P.FirstName, '')"
             Case val = ""
                 e.Paint(e.ClipBounds, DataGridViewPaintParts.All)
             Case Else
-                ' Paid — green
+                ' Paid - green
                 e.CellStyle.BackColor = Color.LightGreen
                 e.Paint(e.ClipBounds, DataGridViewPaintParts.All)
         End Select
@@ -3713,7 +3799,7 @@ ORDER BY COALESCE(P.LastName, L.Player), COALESCE(P.FirstName, '')"
         Dim colName As String = dgv.Columns(e.ColumnIndex).Name
         Dim isTotalsRow As Boolean = (e.RowIndex = dgv.Rows.Count - 1)
 
-        ' Totals row — bold no color
+        ' Totals row - bold no color
         If isTotalsRow Then
             e.CellStyle.Font = New Font("Segoe UI", 9.0!, FontStyle.Bold)
             Return
@@ -3739,7 +3825,7 @@ ORDER BY COALESCE(P.LastName, L.Player), COALESCE(P.FirstName, '')"
             End If
         End If
 
-        ' Sub — player cell aqua
+        ' Sub - player cell aqua
         Dim isSub As Boolean = dgv.Rows(e.RowIndex).Cells("IsSub").Value.ToString() = "Y"
         If isSub AndAlso colName = "Player" Then
             e.CellStyle.BackColor = Color.Aqua
@@ -3904,7 +3990,7 @@ ORDER BY P.LastName, P.FirstName"
 
             ' --- LABEL ---
             Dim lbl As New Label()
-            lbl.Text = $"Payments — {season} Season"
+            lbl.Text = $"Payments - {season} Season"
             lbl.Font = New Font("Segoe UI", 10, FontStyle.Bold)
             lbl.Location = New Point(10, 10)
             lbl.AutoSize = True
@@ -4216,8 +4302,8 @@ ORDER BY P.LastName, P.FirstName"
                                             Dim hasCTPPayment As Boolean = hasPayment(playerKey, "CTP")
 
                                             Dim msg As String = $"Refund payments for {playerKey} on {ctx.ActiveDate}?"
-                                            If hasSkinsPayment Then msg &= vbCrLf & "• Delete Skins payment"
-                                            If hasCTPPayment Then msg &= vbCrLf & "• Delete CTP payment"
+                                            If hasSkinsPayment Then msg &= vbCrLf & "- Delete Skins payment"
+                                            If hasCTPPayment Then msg &= vbCrLf & "- Delete CTP payment"
 
                                             Dim mbr = MessageBox.Show(msg, "Confirm Refund", MessageBoxButtons.YesNo, MessageBoxIcon.Question)
                                             If mbr <> DialogResult.Yes Then Exit Sub
@@ -4326,7 +4412,7 @@ ORDER BY P.LastName, P.FirstName"
 
             ' --- LABEL ---
             Dim lbl As New Label()
-            lbl.Text = $"Balance Sheet — {season} Season"
+            lbl.Text = $"Balance Sheet - {season} Season"
             lbl.Font = New Font("Segoe UI", 10, FontStyle.Bold)
             lbl.Location = New Point(10, 10)
             lbl.AutoSize = True
@@ -4399,7 +4485,7 @@ ORDER BY P.LastName, P.FirstName"
             dt.Rows.Add(ldRow)
 
             Dim subTot1 = dt.NewRow()
-            subTot1("Category") = "── League Dues Total ──"
+            subTot1("Category") = "-- League Dues Total --"
             subTot1("Due") = ldDue
             subTot1("Collected") = ldCollected
             subTot1("PaidOut") = 0
@@ -4565,7 +4651,7 @@ ORDER BY P.LastName, P.FirstName"
             dt.Rows.Add(drinksRow)
 
             Dim subTot2 = dt.NewRow()
-            subTot2("Category") = "── Food/Drinks Total ──"
+            subTot2("Category") = "-- Food/Drinks Total --"
             subTot2("Due") = 0
             subTot2("Collected") = foodCollected + drinksCollected
             subTot2("PaidOut") = foodCharge + drinksCharge
@@ -4619,7 +4705,7 @@ ORDER BY P.LastName, P.FirstName"
             totalRow("Balance") = 0D
             dt.Rows.Add(totalRow)
             For Each row As DataRow In dt.Rows
-                If row("Category").ToString().StartsWith("──") Then Continue For  ' ← skip subtotals
+                If row("Category").ToString().StartsWith("--") Then Continue For  ' skip subtotals
                 If row("Category").ToString() = "TOTALS" Then Continue For
                 totalRow("Due") = CDec(totalRow("Due")) + CDec(row("Due"))
                 totalRow("Collected") = CDec(totalRow("Collected")) + CDec(row("Collected"))
@@ -4699,7 +4785,7 @@ ORDER BY P.LastName, P.FirstName"
                         dgv.Rows(i).Cells("Balance").Style.Font = New Font("Segoe UI", 9, FontStyle.Bold)
                     End If
                 End If
-                If cat.StartsWith("──") Then
+                If cat.StartsWith("--") Then
                     dgv.Rows(i).DefaultCellStyle.BackColor = Color.FromArgb(220, 220, 220)
                     dgv.Rows(i).DefaultCellStyle.Font = New Font("Segoe UI", 9, FontStyle.Bold)
                     Continue For
@@ -4721,7 +4807,7 @@ ORDER BY P.LastName, P.FirstName"
 
             ' --- LABEL ---
             Dim lbl As New Label()
-            lbl.Text = $"Leaders — {ctx.SeasonYear} Season"
+            lbl.Text = $"Leaders - {ctx.SeasonYear} Season"
             lbl.Font = New Font("Segoe UI", 10, FontStyle.Bold)
             lbl.Location = New Point(10, 10)
             lbl.AutoSize = True
@@ -4773,7 +4859,7 @@ ORDER BY P.LastName, P.FirstName"
             tp.Controls.Add(chkReg)
 
             ' --- SCROLL PANEL ---
-            ' AutoScroll handles BOTH directions — no manual scrollbars needed
+            ' AutoScroll handles BOTH directions - no manual scrollbars needed
             Dim scrollPanel As New Panel()
             scrollPanel.Name = "pnlLeaders"
             scrollPanel.Location = New Point(0, 40)
@@ -5110,7 +5196,7 @@ LEFT JOIN (
             dgv.Location = New Point(10, 45)
             dgv.Size = New Size(tp.Width - 20, tp.Height - 60)
             dgv.Anchor = AnchorStyles.Top Or AnchorStyles.Left Or AnchorStyles.Right Or AnchorStyles.Bottom
-            dgv.ScrollBars = ScrollBars.Both  ' ← change from None to Both
+            dgv.ScrollBars = ScrollBars.Both  ' change from None to Both
             dgv.AutoSizeColumnsMode = DataGridViewAutoSizeColumnsMode.None
             dgv.RowHeadersVisible = False
             dgv.AllowUserToAddRows = False
@@ -5321,7 +5407,7 @@ LEFT JOIN (
                 grid.Refresh()
             End If
         Catch ex As Exception
-            ' Tab may not have a matching grid — safe to ignore
+            ' Tab may not have a matching grid - safe to ignore
         End Try
     End Sub
     Private Sub dgv_CurrentCellDirtyStateChanged(sender As Object, e As EventArgs) 'Handles dgv.CurrentCellDirtyStateChanged
@@ -5473,7 +5559,7 @@ LEFT JOIN (
             EditScoresEngine.scoreCache.TryGetValue(playerKey, rowInfo)
 
             ' ---------------------------------------------------------
-            ' 2.5 PLAYER CELL — paint aqua for subs
+            ' 2.5 PLAYER CELL - paint aqua for subs
             ' ---------------------------------------------------------
             If colNameCell = "Player" Then
                 If rowInfo IsNot Nothing AndAlso rowInfo.IsSub Then
@@ -5492,7 +5578,7 @@ LEFT JOIN (
             End If
 
             ' ---------------------------------------------------------
-            ' 3. CACHED CELL LOGIC — hole columns only
+            ' 3. CACHED CELL LOGIC - hole columns only
             ' ---------------------------------------------------------
             Dim holeCell As Integer
             Dim isOtherWeekCell As Boolean = False
@@ -5612,10 +5698,14 @@ LEFT JOIN (
         End Try
     End Sub
     Private Sub btnPrintScores_Click(sender As Object, e As EventArgs) Handles btnPrintScores.Click
-        Dim path As String = System.IO.Path.Combine(
-        System.IO.Path.GetTempPath(),
-        $"Scores_{ctx.ActiveDate}.pdf")
-        path = System.IO.Path.Combine(ctx.ReportPath, $"Scores_{ctx.ActiveDate}.pdf")
+        Dim path As String = GetReportPdfPath($"Scores_{ctx.ActiveDate}.pdf")
+        If dgScores IsNot Nothing Then
+            If Not EditScoresEngine.IsReady() Then
+                EditScoresEngine.Initialize(dgScores, Me.ohelper)
+            End If
+            EditScoresEngine.BuildScoreCache()
+            dgScores.Refresh()
+        End If
         GeneratePDF(dgScores, "Scores Report", path)
     End Sub
     Private Sub btnPrintMatches_Click(sender As Object, e As EventArgs) Handles btnPrintMatches.Click
@@ -5623,9 +5713,7 @@ LEFT JOIN (
         If tp Is Nothing Then Exit Sub
         Dim dgv = DirectCast(tp.Controls("dgMatches"), DataGridView)
         If dgv Is Nothing Then Exit Sub
-        Dim path As String = System.IO.Path.Combine(
-        ctx.ReportPath,
-        $"Matches_{ctx.ActiveDate}.pdf")
+        Dim path As String = GetReportPdfPath($"Matches_{ctx.ActiveDate}.pdf")
         GeneratePDF(dgv, "Matches Report", path)
     End Sub
     Private Sub btnPrintStandings_Click(sender As Object, e As EventArgs) Handles btnPrintStandings.Click
@@ -5639,26 +5727,34 @@ LEFT JOIN (
             Dim dgv1 = DirectCast(tp.Controls("dgStandings1"), DataGridView)
             Dim dgv2 = DirectCast(tp.Controls("dgStandings2"), DataGridView)
             If dgv1 IsNot Nothing Then
-                Dim path1 As String = System.IO.Path.Combine(
-                ctx.ReportPath,
-                $"Standings1st_{ctx.ActiveDate}.pdf")
+                Dim path1 As String = GetReportPdfPath($"Standings1st_{ctx.ActiveDate}.pdf")
                 GeneratePDF(dgv1, "1st Half Standings", path1)
             End If
             If dgv2 IsNot Nothing Then
-                Dim path2 As String = System.IO.Path.Combine(
-                ctx.ReportPath,
-                $"Standings2nd_{ctx.ActiveDate}.pdf")
+                Dim path2 As String = GetReportPdfPath($"Standings2nd_{ctx.ActiveDate}.pdf")
                 GeneratePDF(dgv2, "2nd Half Standings", path2)
             End If
         Else
             Dim dgv = DirectCast(tp.Controls("dgStandings"), DataGridView)
             If dgv Is Nothing Then Exit Sub
-            Dim path As String = System.IO.Path.Combine(
-            System.IO.Path.GetTempPath(),
-            $"Standings_{ctx.ActiveDate}.pdf")
+            Dim path As String = GetReportPdfPath($"Standings_{ctx.ActiveDate}.pdf")
             GeneratePDF(dgv, "Season Standings", path)
         End If
     End Sub
+
+    Private Function GetReportPdfPath(fileName As String) As String
+        Dim reportFileName As String = fileName
+        Dim activeDateSuffix As String = "_" & ctx.ActiveDate
+        Dim fileStem As String = System.IO.Path.GetFileNameWithoutExtension(fileName)
+        Dim extension As String = System.IO.Path.GetExtension(fileName)
+
+        If fileStem.EndsWith(activeDateSuffix, StringComparison.OrdinalIgnoreCase) Then
+            reportFileName = fileStem.Substring(0, fileStem.Length - activeDateSuffix.Length) & extension
+        End If
+
+        Return System.IO.Path.Combine(ctx.ReportPath, ctx.SeasonYear, ctx.ActiveDate.Substring(4, 4), reportFileName)
+    End Function
+
     Private Sub Form1_Shown(sender As Object, e As EventArgs) Handles MyBase.Shown
         ' Set focus to the TextBox control
         tbPlayer.Focus()
@@ -5718,7 +5814,7 @@ LEFT JOIN (
                                          End Sub
         AddHandler dgv.SelectionChanged, Sub(s As Object, ev As EventArgs)
 
-                                             If _suppressEvents Then Exit Sub   ' 🔥 THIS IS THE FIX
+                                             If _suppressEvents Then Exit Sub   ' THIS IS THE FIX
 
                                              Dim btn = TryCast(gb.Controls("btnClearScores"), Button)
                                              If btn Is Nothing Then Exit Sub
@@ -5932,6 +6028,15 @@ LEFT JOIN (
             Next
         Next
     End Sub
+    Private Function IsMatchesPdfGrid(dgv As DataGridView) As Boolean
+        If dgv Is Nothing Then Return False
+        If String.Equals(dgv.Name, "dgMatches", StringComparison.OrdinalIgnoreCase) Then Return True
+        If dgv.Parent IsNot Nothing AndAlso String.Equals(dgv.Parent.Name, "Matches", StringComparison.OrdinalIgnoreCase) Then Return True
+
+        Return dgv.Columns.Contains("Points") AndAlso
+               dgv.Columns.Contains("Team_Points") AndAlso
+               Not dgv.Columns.Contains("1")
+    End Function
     Public Sub GeneratePDF(dgv As DataGridView, title As String, filePath As String)
         Try
             PdfSharp.Fonts.GlobalFontSettings.FontResolver = New WindowsFontResolver()
@@ -5983,7 +6088,7 @@ LEFT JOIN (
                     XColor.FromArgb(184, 134, 11))
                     Dim third As Double = rowHeight / 3
 
-                    ' Top — hole number
+                    ' Top - hole number
                     Dim topRect As New XRect(x, y, colWidth, third)
                     gfx.DrawRectangle(New XSolidBrush(headerColor), topRect)
                     Dim sf As New XStringFormat()
@@ -5991,7 +6096,7 @@ LEFT JOIN (
                     sf.LineAlignment = XLineAlignment.Center
                     gfx.DrawString(displayHole.ToString(), headerFont, XBrushes.White, topRect, sf)
 
-                    ' Middle — par
+                    ' Middle - par
                     Dim par As String = "?"
                     Try
                         par = ctx.thiscourse($"Hole{displayHole}").ToString()
@@ -6004,7 +6109,7 @@ LEFT JOIN (
                     gfx.DrawRectangle(New XSolidBrush(midColor), midRect)
                     gfx.DrawString(par, headerFont, XBrushes.White, midRect, sf)
 
-                    ' Bottom — stroke index
+                    ' Bottom - stroke index
                     Dim strokeIndex As String = "?"
                     Try
                         Dim colKey As String = "H" & displayHole
@@ -6041,7 +6146,7 @@ LEFT JOIN (
                 Dim row = dgv.Rows(rowIdx)
                 x = marginLeft
 
-                ' ── Totals detection: check Player cell value, not row index ──
+                ' -- Totals detection: check Player cell value, not row index --
                 Dim isTotals As Boolean = False
                 If dgv.Columns.Contains("Player") Then
                     Dim playerVal As String = If(row.Cells("Player").Value IsNot Nothing,
@@ -6066,17 +6171,17 @@ LEFT JOIN (
                     sf.Alignment = XStringAlignment.Center
                     sf.LineAlignment = XLineAlignment.Center
 
-                    ' ── Determine background color ──
-                    Dim bgColor As XColor = XColor.FromArgb(255, 255, 255)
+                    ' -- Determine background color --
+                    Dim bgColor As XColor = DataGridViewCellBackColor(row, col, rowIdx)
 
                     If isTotals Then
                         bgColor = XColor.FromArgb(211, 211, 211)
 
                     ElseIf col.Name = "Player" AndAlso rowInfo IsNot Nothing AndAlso rowInfo.IsSub Then
-                        bgColor = XColor.FromArgb(0, 255, 255) ' Aqua — sub player
+                        bgColor = XColor.FromArgb(0, 255, 255) ' Aqua - sub player
 
-                    ElseIf dgv.Columns.Contains("Points") Then
-                        ' ── Matches grid ──
+                    ElseIf IsMatchesPdfGrid(dgv) Then
+                        ' -- Matches grid --
 
                         ' 1. 4-row blue grouping (base)
                         If (rowIdx \ 4) Mod 2 = 0 Then
@@ -6109,7 +6214,7 @@ LEFT JOIN (
                         End If
 
                     Else
-                        ' ── Scores grid ──
+                        ' -- Scores grid --
                         Dim holeNum As Integer
                         If Integer.TryParse(col.Name, holeNum) AndAlso rowInfo IsNot Nothing Then
                             Dim info As EditScoresEngine.HoleInfo = Nothing
@@ -6122,12 +6227,8 @@ LEFT JOIN (
                                     bgColor = XColor.FromArgb(176, 196, 222)
                                 ElseIf info.IsLowest Then
                                     bgColor = XColor.FromArgb(200, 220, 255, 200)
-                                ElseIf rowIdx Mod 2 <> 0 Then
-                                    bgColor = XColor.FromArgb(240, 248, 255)
                                 End If
                             End If
-                        ElseIf rowIdx Mod 2 <> 0 Then
-                            bgColor = XColor.FromArgb(240, 248, 255)
                         End If
                     End If
 
@@ -6135,13 +6236,13 @@ LEFT JOIN (
                     gfx.DrawRectangle(New XSolidBrush(bgColor), rect)
                     gfx.DrawRectangle(XPens.LightGray, rect)
 
-                    ' ── Blank out 999 in Net / Team_Net ──
+                    ' -- Blank out 999 in Net / Team_Net --
                     If (col.Name = "Net" OrElse col.Name = "Team_Net") AndAlso
                    IsNumeric(cellVal) AndAlso CInt(cellVal) = 999 Then
                         cellVal = ""
                     End If
 
-                    ' ── Draw cell content ──
+                    ' -- Draw cell content --
                     Dim holeNum2 As Integer
                     If Integer.TryParse(col.Name, holeNum2) AndAlso rowInfo IsNot Nothing Then
                         Dim info As EditScoresEngine.HoleInfo = Nothing
@@ -6201,6 +6302,21 @@ LEFT JOIN (
             MsgBox($"PDF generation failed: {ex.Message}", MsgBoxStyle.Critical)
         End Try
     End Sub
+
+    Private Function DataGridViewCellBackColor(row As DataGridViewRow,
+                                               col As DataGridViewColumn,
+                                               rowIdx As Integer) As XColor
+        Dim color As Color = row.Cells(col.Name).Style.BackColor
+
+        If color.IsEmpty Then color = row.DefaultCellStyle.BackColor
+        If color.IsEmpty AndAlso rowIdx Mod 2 <> 0 Then color = row.DataGridView.AlternatingRowsDefaultCellStyle.BackColor
+        If color.IsEmpty Then color = row.DataGridView.RowsDefaultCellStyle.BackColor
+        If color.IsEmpty Then color = row.DataGridView.DefaultCellStyle.BackColor
+        If color.IsEmpty Then color = Color.White
+
+        Return XColor.FromArgb(color.R, color.G, color.B)
+    End Function
+
     Public Class WindowsFontResolver
         Implements PdfSharp.Fonts.IFontResolver
 
@@ -6264,7 +6380,7 @@ LEFT JOIN (
 
                 Dim val = row.Cells("Player").Value?.ToString()
 
-                ' 🔥 UPDATED LINE (partial + case-insensitive)
+                ' UPDATED LINE (partial + case-insensitive)
                 If Not String.IsNullOrEmpty(val) AndAlso
                val.IndexOf(playerName, StringComparison.OrdinalIgnoreCase) >= 0 Then
 
@@ -6288,7 +6404,7 @@ LEFT JOIN (
         Dim tp = tc.SelectedTab
         If tp Is Nothing Then Exit Sub
 
-        ' 🔥 check ALL grids on active tab
+        ' check ALL grids on active tab
         For Each dgv As DataGridView In tp.Controls.OfType(Of DataGridView)()
 
             If Not dgv.Columns.Contains("Player") Then Continue For
@@ -6352,3 +6468,4 @@ Public Class TeamMatch
     End Function
 End Class
 #End Region
+

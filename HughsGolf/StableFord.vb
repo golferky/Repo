@@ -389,4 +389,279 @@
         e.Cancel = True
     End Sub
 
+
+#Region "Stableford Standings"
+    Friend Sub LoadStablefordStandingsTab(tc As TabControl)
+        Try
+            Dim tp = tc.TabPages("StablefordStandings")
+            If tp Is Nothing Then Exit Sub
+
+            tp.Controls.Clear()
+            tp.AutoScroll = True
+
+            Dim lbl As New Label()
+            lbl.Text = "Stableford YTD Standings"
+            lbl.Font = New Font("Segoe UI", 10, FontStyle.Bold)
+            lbl.Location = New Point(10, 10)
+            lbl.AutoSize = True
+            tp.Controls.Add(lbl)
+
+            Dim dgv As New DataGridView()
+            dgv.AutoGenerateColumns = True
+            dgv.Name = "dgStablefordStandings"
+            dgv.Location = New Point(10, 35)
+            Dim sfStandingsTable As DataTable = BuildStablefordStandingsTable()
+            dgv.DataSource = sfStandingsTable
+            lbl.Text = $"Stableford YTD Standings ({sfStandingsTable.Rows.Count} teams)"
+            tp.Controls.Add(dgv)
+
+            StyleStablefordStandingsGrid(dgv)
+            ColorTopThree(dgv)
+
+            Dim availableHeight As Integer = If(tc IsNot Nothing, tc.Height - 100, 500)
+            Dim h As Integer = (dgv.Rows.Count * dgv.RowTemplate.Height) + dgv.ColumnHeadersHeight + 2
+            Dim w As Integer = dgv.Columns.GetColumnsWidth(DataGridViewElementStates.Visible) + 3
+            dgv.Size = New Size(Math.Min(Math.Max(w, 760), Math.Max(tp.Width - 35, 760)), Math.Min(Math.Max(h, 80), availableHeight))
+            dgv.ScrollBars = If(h > availableHeight OrElse w > dgv.Width, ScrollBars.Both, ScrollBars.None)
+        Catch ex As Exception
+            LOGIT("LoadStablefordStandingsTab Error: " & ex.Message)
+        End Try
+    End Sub
+
+    Private Function BuildStablefordStandingsTable() As DataTable
+        Dim season As Integer = CInt(ctx.rLeagueParmrow("Season"))
+        Dim startDate As Integer = CInt(CDate(ctx.rLeagueParmrow("StartDate")).ToString("yyyyMMdd"))
+        Dim endDate As Integer = Math.Min(CInt(CDate(ctx.rLeagueParmrow("EndDate")).ToString("yyyyMMdd")), CInt(ctx.ActiveDate))
+
+        Dim teams As New DataTable()
+        Using cmd As New System.Data.SQLite.SQLiteCommand("
+            SELECT Team, Grade, Player
+            FROM Teams
+            WHERE Year = @Year
+            ORDER BY Team, Grade", ctx.Conn)
+            cmd.Parameters.AddWithValue("@Year", season)
+            If ctx.Conn.State <> ConnectionState.Open Then ctx.Conn.Open()
+            Using da As New System.Data.SQLite.SQLiteDataAdapter(cmd)
+                da.Fill(teams)
+            End Using
+        End Using
+
+        Dim scores As New DataTable()
+        Using cmd As New System.Data.SQLite.SQLiteCommand("
+            SELECT
+                S.Player,
+                S.Date,
+                S.FrontBack,
+                S.[1], S.[2], S.[3], S.[4], S.[5], S.[6], S.[7], S.[8], S.[9],
+                COALESCE(Su.Team, T.Team, 0) AS Team,
+                COALESCE(Su.Grade, T.Grade, '') AS Grade,
+                COALESCE(H.Hdcp, 0) AS PHdcp
+            FROM Scores S
+            LEFT JOIN Teams T
+              ON T.Player = S.Player
+             AND T.Year = @Year
+            LEFT JOIN Subs Su
+              ON Su.League = S.League
+             AND Su.Date = S.Date
+             AND Su.Player = S.Player
+            LEFT JOIN Handicaps H ON H.League = S.League
+                AND H.Player = S.Player
+                AND H.Date = (
+                    SELECT MAX(H2.Date) FROM Handicaps H2
+                    WHERE H2.League = S.League
+                      AND H2.Player = S.Player
+                      AND H2.Date < S.Date
+                      AND H2.Hdcp <> ''
+                )
+            WHERE S.Date BETWEEN @StartDate AND @EndDate
+              AND S.FrontBack IN ('Front', 'Back')
+              AND S.Gross IS NOT NULL
+              AND COALESCE(Su.Team, T.Team, 0) <> 0
+            ORDER BY S.Date, COALESCE(Su.Team, T.Team), COALESCE(Su.Grade, T.Grade)", ctx.Conn)
+            cmd.Parameters.AddWithValue("@Year", season)
+            cmd.Parameters.AddWithValue("@StartDate", startDate)
+            cmd.Parameters.AddWithValue("@EndDate", endDate)
+            If ctx.Conn.State <> ConnectionState.Open Then ctx.Conn.Open()
+            Using da As New System.Data.SQLite.SQLiteDataAdapter(cmd)
+                da.Fill(scores)
+            End Using
+        End Using
+        Dim weekDates = scores.AsEnumerable().
+            Select(Function(r) r("Date").ToString()).
+            Distinct().
+            OrderBy(Function(d) d).
+            ToList()
+
+        Dim standings As New DataTable("StablefordStandings")
+        standings.Columns.Add("Team", GetType(Integer))
+        standings.Columns.Add("APlayer", GetType(String))
+        standings.Columns.Add("BPlayer", GetType(String))
+        standings.Columns.Add("ATotal", GetType(Decimal))
+        standings.Columns.Add("BTotal", GetType(Decimal))
+        standings.Columns.Add("TeamTotal", GetType(Decimal))
+        For Each dateKey In weekDates
+            standings.Columns.Add(FormatStablefordWeekColumn(dateKey), GetType(Decimal))
+        Next
+        standings.Columns.Add("GrandTotal", GetType(Decimal))
+        standings.Columns.Add("PointsBack", GetType(Decimal))
+
+        Dim teamWeekPoints As New Dictionary(Of Integer, Dictionary(Of String, Decimal))()
+        Dim teamGradeTotals As New Dictionary(Of Integer, Dictionary(Of String, Decimal))()
+        For Each scoreRow As DataRow In scores.Rows
+            Dim team As Integer = CInt(scoreRow("Team"))
+            If team = 0 Then Continue For
+            Dim grade As String = scoreRow("Grade").ToString()
+            Dim dateKey As String = scoreRow("Date").ToString()
+            Dim pts As Decimal = CalculateStablefordPointsForScoreRow(scoreRow)
+
+            If Not teamWeekPoints.ContainsKey(team) Then teamWeekPoints(team) = New Dictionary(Of String, Decimal)()
+            If Not teamWeekPoints(team).ContainsKey(dateKey) Then teamWeekPoints(team)(dateKey) = 0D
+            teamWeekPoints(team)(dateKey) += pts
+
+            If Not teamGradeTotals.ContainsKey(team) Then teamGradeTotals(team) = New Dictionary(Of String, Decimal)()
+            If Not teamGradeTotals(team).ContainsKey(grade) Then teamGradeTotals(team)(grade) = 0D
+            teamGradeTotals(team)(grade) += pts
+        Next
+
+        Dim configuredTeams As Integer = If(teams.Rows.Count = 0, CInt(ctx.rLeagueParmrow("Teams")), teams.AsEnumerable().Max(Function(r) CInt(r("Team"))))
+        For teamNum As Integer = 1 To configuredTeams
+            Dim currentTeam As Integer = teamNum
+            Dim teamRows = teams.AsEnumerable().Where(Function(r) CInt(r("Team")) = currentTeam).ToList()
+            Dim row = standings.NewRow()
+            row("Team") = teamNum
+            row("APlayer") = teamRows.Where(Function(r) r("Grade").ToString() = "A").Select(Function(r) r("Player").ToString()).FirstOrDefault()
+            row("BPlayer") = teamRows.Where(Function(r) r("Grade").ToString() = "B").Select(Function(r) r("Player").ToString()).FirstOrDefault()
+
+            Dim aTotal As Decimal = If(teamGradeTotals.ContainsKey(teamNum) AndAlso teamGradeTotals(teamNum).ContainsKey("A"), teamGradeTotals(teamNum)("A"), 0D)
+            Dim bTotal As Decimal = If(teamGradeTotals.ContainsKey(teamNum) AndAlso teamGradeTotals(teamNum).ContainsKey("B"), teamGradeTotals(teamNum)("B"), 0D)
+            Dim total As Decimal = aTotal + bTotal
+            row("ATotal") = aTotal
+            row("BTotal") = bTotal
+            row("TeamTotal") = total
+
+            For Each dateKey In weekDates
+                Dim colName As String = FormatStablefordWeekColumn(dateKey)
+                Dim weekPts As Decimal = 0D
+                If teamWeekPoints.ContainsKey(teamNum) AndAlso teamWeekPoints(teamNum).ContainsKey(dateKey) Then
+                    weekPts = teamWeekPoints(teamNum)(dateKey)
+                End If
+                row(colName) = weekPts
+            Next
+            row("GrandTotal") = total
+            standings.Rows.Add(row)
+        Next
+
+        Dim view As New DataView(standings)
+        view.Sort = "GrandTotal DESC, Team ASC"
+        Dim sorted = view.ToTable()
+
+        If sorted.Rows.Count > 0 Then
+            Dim leader As Decimal = CDec(sorted.Rows(0)("GrandTotal"))
+            For Each row As DataRow In sorted.Rows
+                row("PointsBack") = leader - CDec(row("GrandTotal"))
+            Next
+        End If
+
+        Return sorted
+    End Function
+
+    Private Function CalculateStablefordPointsForScoreRow(scoreRow As DataRow) As Decimal
+        Dim totalPts As Decimal = 0D
+        Dim phdcp As Integer = If(scoreRow.IsNull("PHdcp"), 0, CInt(scoreRow("PHdcp")))
+        Dim frontBack As String = scoreRow("FrontBack").ToString()
+        Dim startHole As Integer = If(frontBack = "Back", 10, 1)
+        Dim spoints As String() = "0,1,2,3,4,8".Split(","c)
+
+        For i As Integer = 1 To 9
+            If scoreRow.IsNull(i.ToString()) Then Continue For
+            Dim rawScore As String = scoreRow(i.ToString()).ToString()
+            If rawScore = "" OrElse rawScore = "0" OrElse Not IsNumeric(rawScore) Then Continue For
+
+            Dim gross As Integer = CInt(rawScore)
+            Dim actualHole As Integer = startHole + i - 1
+            Dim strokes As Integer = StablefordStrokesForHole(actualHole, phdcp)
+            Dim par As Integer = CInt(ctx.thiscourse($"Hole{actualHole}"))
+            Dim net As Integer = gross - strokes
+            Dim diff As Integer = par - net
+            Dim idx As Integer = Math.Max(0, Math.Min(diff + 2, spoints.Length - 1))
+            totalPts += CDec(spoints(idx))
+        Next
+
+        Return totalPts
+    End Function
+
+    Private Function StablefordStrokesForHole(actualHole As Integer, phdcp As Integer) As Integer
+        Dim si As Integer = CInt(ctx.thiscourse($"H{actualHole}"))
+        Dim strokes As Integer = 0
+        If phdcp >= si Then strokes += 1
+        If phdcp - 9 >= si Then strokes += 1
+        Return strokes
+    End Function
+
+    Private Function FormatStablefordWeekColumn(dateKey As String) As String
+        If dateKey.Length = 8 Then
+            Return dateKey.Substring(4, 2) & "/" & dateKey.Substring(6, 2)
+        End If
+        Return dateKey
+    End Function
+
+    Private Sub StyleStablefordStandingsGrid(dgv As DataGridView)
+        Dim source = TryCast(dgv.DataSource, DataTable)
+        If source Is Nothing Then Exit Sub
+
+        dgv.DataSource = Nothing
+        dgv.Columns.Clear()
+        dgv.AutoGenerateColumns = False
+
+        AddSfStandingsColumn(dgv, "Team", "Team", 38, "", DataGridViewContentAlignment.MiddleCenter)
+        AddSfStandingsColumn(dgv, "APlayer", "A Player", 96, "", DataGridViewContentAlignment.MiddleLeft)
+        AddSfStandingsColumn(dgv, "BPlayer", "B Player", 96, "", DataGridViewContentAlignment.MiddleLeft)
+        AddSfStandingsColumn(dgv, "ATotal", "A Pts", 42, "N0", DataGridViewContentAlignment.MiddleRight)
+        AddSfStandingsColumn(dgv, "BTotal", "B Pts", 42, "N0", DataGridViewContentAlignment.MiddleRight)
+        AddSfStandingsColumn(dgv, "TeamTotal", "Total", 46, "N0", DataGridViewContentAlignment.MiddleRight)
+
+        For Each col As DataColumn In source.Columns
+            If System.Text.RegularExpressions.Regex.IsMatch(col.ColumnName, "^\d{2}/\d{2}$") Then
+                AddSfStandingsColumn(dgv, col.ColumnName, col.ColumnName, 38, "N0", DataGridViewContentAlignment.MiddleRight)
+            End If
+        Next
+
+        AddSfStandingsColumn(dgv, "PointsBack", "GB", 42, "N0", DataGridViewContentAlignment.MiddleRight)
+
+        dgv.DataSource = source
+        dgv.DefaultCellStyle.Font = New Font("Segoe UI", 9.0!)
+        dgv.ColumnHeadersDefaultCellStyle.Font = New Font("Segoe UI", 9.0!, FontStyle.Bold)
+        dgv.RowTemplate.Height = 24
+        dgv.ColumnHeadersHeight = 28
+        dgv.RowHeadersVisible = False
+        dgv.AllowUserToAddRows = False
+        dgv.AllowUserToDeleteRows = False
+        dgv.AllowUserToResizeRows = False
+        dgv.ReadOnly = True
+        dgv.BorderStyle = BorderStyle.None
+        dgv.CellBorderStyle = DataGridViewCellBorderStyle.SingleHorizontal
+        dgv.GridColor = Color.LightGray
+        dgv.BackgroundColor = Color.White
+        dgv.AlternatingRowsDefaultCellStyle.BackColor = Color.FromArgb(245, 245, 245)
+
+        If dgv.Columns.Contains("TeamTotal") Then
+            dgv.Columns("TeamTotal").DefaultCellStyle.Font = New Font(dgv.Font, FontStyle.Bold)
+        End If
+    End Sub
+
+    Private Sub AddSfStandingsColumn(dgv As DataGridView, dataProperty As String, header As String, width As Integer, fmt As String, align As DataGridViewContentAlignment)
+        Dim col As New DataGridViewTextBoxColumn()
+        col.Name = dataProperty
+        col.DataPropertyName = dataProperty
+        col.HeaderText = header
+        col.Width = width
+        col.DefaultCellStyle.Alignment = align
+        col.HeaderCell.Style.Alignment = align
+        If fmt <> "" Then col.DefaultCellStyle.Format = fmt
+        dgv.Columns.Add(col)
+    End Sub
+#End Region
+
 End Class
+
+

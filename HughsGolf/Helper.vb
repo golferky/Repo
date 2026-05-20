@@ -307,7 +307,7 @@ ByVal sepChar As String)
                 'Dim strFile As String = "c:\windows\system32\msi.dll"
                 Dim a As ArrayList = getFilesInUse(strFileName)
 
-                'For Each p As Process In‼ a
+                'For Each p As Process Inâ€¼ a
                 '    If p.ProcessName.Contains("wps") Or p.ProcessName.Contains("excel") Or p.ProcessName.Contains("notepad") Then
                 '        LOGIT(p.ProcessName)
                 '    End If
@@ -1085,7 +1085,7 @@ Date = {ctx.ActiveDate}
                 If pHdcp = "" Then pHdcp = IHdcp
 
             Else
-                ' First time player — use this score only
+                ' First time player â€” use this score only
                 If pHdcp = "" Then
                     If ctx.sFrontBack = "Front" Then
                         wk = "Out"
@@ -1205,9 +1205,9 @@ SELECT
     ROUND(CareerAvg, 1) AS CareerAvg,
     TotalRounds,
     CASE 
-        WHEN RecentAvg < CareerAvg - 0.5 THEN '↓' 
-        WHEN RecentAvg > CareerAvg + 0.5 THEN '↑' 
-        ELSE '→' 
+        WHEN RecentAvg < CareerAvg - 0.5 THEN 'Down' 
+        WHEN RecentAvg > CareerAvg + 0.5 THEN 'Up' 
+        ELSE 'Flat' 
     END AS Trend
 FROM FinalStats
 LIMIT 1;
@@ -1744,8 +1744,8 @@ AND Detail = 'Payment'
 
 #End Region
     'The trick is to declare the new Random class outside of the function that retrieves the next random number. 
-    'This way you generate the seed only once and are getting the “randomizer” formula to cycle through its formula and ensure the next chosen number is truly random.
-    'Here’s my code. 
+    'This way you generate the seed only once and are getting the â€œrandomizerâ€ formula to cycle through its formula and ensure the next chosen number is truly random.
+    'Hereâ€™s my code. 
     'Note that you no longer have to declare new objects (such as objRandom, here) at the top of your class or module; 
     'you can do it just above the function, to aid clarity of code:
     Dim objRandom As New System.Random(
@@ -3125,7 +3125,7 @@ END;"
     ''' <param name="connection">SQLiteConnection (will open if closed, close if it was closed)</param>
     ''' <param name="sql">The SQL query (should return ONE column, e.g. SELECT DISTINCT Something ...)</param>
     ''' <param name="targetCombo">The ComboBox to populate</param>
-    ''' <param name="parameters">Optional Dictionary of parameter name → value</param>
+    ''' <param name="parameters">Optional Dictionary of parameter name â†’ value</param>
     ''' <param name="noDataText">Text to show when no results</param>
     ''' <param name="trimAndValidate">Optional lambda to clean/validate each value before adding</param>
     Public Sub SQLiteFillComboFromQuery(
@@ -3440,19 +3440,19 @@ END;"
                    Optional trans As SQLiteTransaction = Nothing) As Integer
 
         Try
-            ' ✅ Ensure connection is open
+            ' âœ… Ensure connection is open
             If ctx.Conn.State <> ConnectionState.Open Then
                 ctx.Conn.Open()
             End If
 
             Using cmd As New SQLiteCommand(sql, ctx.Conn)
 
-                ' ✅ Attach transaction if provided
+                ' âœ… Attach transaction if provided
                 If trans IsNot Nothing Then
                     cmd.Transaction = trans
                 End If
 
-                ' ✅ Add parameters
+                ' âœ… Add parameters
                 If params IsNot Nothing Then
                     For Each kvp In params
                         cmd.Parameters.AddWithValue(kvp.Key, kvp.Value)
@@ -3461,7 +3461,7 @@ END;"
 
                 Dim rowsAffected = cmd.ExecuteNonQuery()
 
-                ' 🔍 Debug (optional)
+                ' ðŸ” Debug (optional)
                 ' LOGIT($"Rows affected: {rowsAffected}")
 
                 Return rowsAffected
@@ -4319,7 +4319,7 @@ ORDER by Date Desc")
     Public Shared Property LeagueParms As LeagueParms
 
     ' ============================================================
-    '   ENTRY POINT — called from your existing Init()
+    '   ENTRY POINT â€” called from your existing Init()
     ' ============================================================
     Public Sub InitLeagueParmsFromFiles(configFolder As String, season As Integer, dp As Action(Of String))
 
@@ -4624,16 +4624,7 @@ ORDER by Date Desc")
         Dim results As New List(Of Dictionary(Of String, Object))
         Try
             ' Fetch HTML
-            Dim html As String = ""
-            Dim request As System.Net.HttpWebRequest = System.Net.WebRequest.Create(url)
-            request.Method = "GET"
-            request.UserAgent = "Mozilla/5.0"
-            request.Timeout = 10000
-            Using response As System.Net.HttpWebResponse = request.GetResponse()
-                Using sr As New System.IO.StreamReader(response.GetResponseStream())
-                    html = sr.ReadToEnd()
-                End Using
-            End Using
+            Dim html As String = FetchGallusScorecardHtml(url)
 
             LOGIT($"ParseGallus: fetched {html.Length} chars")
 
@@ -4644,7 +4635,7 @@ ORDER by Date Desc")
 
             LOGIT($"ParseGallus: found {allRows.Count} table rows")
 
-            ' Parse cells helper — always add every cell to preserve column alignment
+            ' Parse cells helper â€” always add every cell to preserve column alignment
             Dim parseCells As Func(Of String, List(Of String)) = Function(rowHtml As String)
                                                                      Dim cells As New List(Of String)
                                                                      Dim cellMatches = System.Text.RegularExpressions.Regex.Matches(
@@ -4654,7 +4645,7 @@ ORDER by Date Desc")
                                                                      For Each cm As System.Text.RegularExpressions.Match In cellMatches
                                                                          Dim val = System.Text.RegularExpressions.Regex.Replace(cm.Groups(1).Value, "<.*?>", "").Trim()
                                                                          val = System.Text.RegularExpressions.Regex.Replace(val, "\s+", " ").Trim()
-                                                                         cells.Add(val)  ' Always add — even empty — to keep column positions intact
+                                                                         cells.Add(val)  ' Always add â€” even empty â€” to keep column positions intact
                                                                      Next
                                                                      Return cells
                                                                  End Function
@@ -4722,14 +4713,14 @@ ORDER by Date Desc")
                 Dim scoreCells = parseCells(playerRow)
                 If scoreCells.Count = 0 Then Continue For
 
-                Dim playerName As String = scoreCells(0).Trim()
+                Dim playerName As String = NormalizeGallusPlayerName(scoreCells(0).Trim())
                 LOGIT($"ParseGallus: processing player={playerName} cells={scoreCells.Count}")
 
                 ' 0-based: hole 1/10 = index 0, hole 9/18 = index 8
                 Dim front9Scores(8) As Integer
                 Dim back9Scores(8) As Integer
 
-                ' Front 9 — cells 1-9, stored at 0-8
+                ' Front 9 â€” cells 1-9, stored at 0-8
                 For i As Integer = 1 To 9
                     If i < scoreCells.Count Then
                         Dim val As Integer
@@ -4738,7 +4729,7 @@ ORDER by Date Desc")
                     End If
                 Next
 
-                ' Back 9 — cells 11-19 (skip Out at index 10), stored at 0-8
+                ' Back 9 â€” cells 11-19 (skip Out at index 10), stored at 0-8
                 For i As Integer = 1 To 9
                     Dim idx = i + 10
                     If idx < scoreCells.Count Then
@@ -4774,6 +4765,81 @@ ORDER by Date Desc")
         Return results
     End Function
 
+    Private Function FetchGallusScorecardHtml(url As String) As String
+        Try
+            Return FetchGallusScorecardHtml(url, False)
+        Catch ex As System.Net.WebException When TryCast(ex.Response, System.Net.HttpWebResponse)?.StatusCode = System.Net.HttpStatusCode.Forbidden
+            LOGIT("ParseGallus: basic request returned 403; retrying with browser headers")
+            Return FetchGallusScorecardHtml(url, True)
+        End Try
+    End Function
+
+    Private Function NormalizeGallusScorecardUrl(rawUrl As String) As String
+        Dim cleaned As String = If(rawUrl, "").Trim()
+        cleaned = cleaned.Trim("<"c, ">"c, " "c, ControlChars.Tab, ControlChars.Cr, ControlChars.Lf)
+
+        If cleaned = "" Then Throw New UriFormatException("Gallus URL is blank.")
+
+        Dim roundIdPattern As String = "[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}"
+        Dim roundIdMatch = System.Text.RegularExpressions.Regex.Match(cleaned, roundIdPattern)
+
+        If Not cleaned.Contains("://") Then
+            If System.Text.RegularExpressions.Regex.IsMatch(cleaned, "^manager\.gallusgolf\.com/", System.Text.RegularExpressions.RegexOptions.IgnoreCase) Then
+                cleaned = "https://" & cleaned
+            ElseIf roundIdMatch.Success Then
+                cleaned = "https://manager.gallusgolf.com/Share/Round/" & roundIdMatch.Value
+            Else
+                cleaned = "https://" & cleaned
+            End If
+        End If
+
+        Dim uri As Uri = Nothing
+        If Not Uri.TryCreate(cleaned, UriKind.Absolute, uri) OrElse (uri.Scheme <> Uri.UriSchemeHttp AndAlso uri.Scheme <> Uri.UriSchemeHttps) Then
+            Throw New UriFormatException("Invalid Gallus URL: " & cleaned)
+        End If
+
+        Return uri.AbsoluteUri
+    End Function
+    Private Function FetchGallusScorecardHtml(url As String, useBrowserHeaders As Boolean) As String
+        url = NormalizeGallusScorecardUrl(url)
+        Dim request As System.Net.HttpWebRequest = CType(System.Net.WebRequest.Create(url), System.Net.HttpWebRequest)
+        request.Method = "GET"
+        request.UserAgent = If(useBrowserHeaders,
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36",
+            "Mozilla/5.0")
+        request.Timeout = If(useBrowserHeaders, 15000, 10000)
+
+        If useBrowserHeaders Then
+            request.Accept = "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8"
+            request.Headers(System.Net.HttpRequestHeader.AcceptLanguage) = "en-US,en;q=0.9"
+            request.Headers(System.Net.HttpRequestHeader.CacheControl) = "no-cache"
+            request.Referer = "https://manager.gallusgolf.com/"
+            request.AutomaticDecompression = System.Net.DecompressionMethods.GZip Or System.Net.DecompressionMethods.Deflate
+        End If
+
+        Using response As System.Net.HttpWebResponse = CType(request.GetResponse(), System.Net.HttpWebResponse)
+            Using sr As New System.IO.StreamReader(response.GetResponseStream())
+                Return sr.ReadToEnd()
+            End Using
+        End Using
+    End Function
+    Private Function NormalizeGallusPlayerName(rawName As String) As String
+        If String.IsNullOrWhiteSpace(rawName) Then Return ""
+
+        Dim cleaned As String = System.Net.WebUtility.HtmlDecode(rawName).Trim()
+        cleaned = System.Text.RegularExpressions.Regex.Replace(cleaned, "\s+", " ").Trim()
+
+        If cleaned.Contains(",") Then
+            Dim parts = cleaned.Split({","c}, 2)
+            Dim lastName As String = parts(0).Trim()
+            Dim firstName As String = parts(1).Trim()
+            If firstName <> "" AndAlso lastName <> "" Then
+                cleaned = firstName & " " & lastName
+            End If
+        End If
+
+        Return System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(cleaned.ToLower())
+    End Function
     Public Function ParseScorecardViaOCR(imagePath As String) As List(Of Dictionary(Of String, Object))
         Dim results As New List(Of Dictionary(Of String, Object))
         Try
@@ -5011,7 +5077,7 @@ ORDER by Date Desc")
                     Function(r) r.ToLower() = p.ToLower())).ToList()
 
             If candidates.Count = 1 Then
-                LOGIT($"Group intelligence: {claudeName} → suggested {candidates(0)}")
+                LOGIT($"Group intelligence: {claudeName} â†’ suggested {candidates(0)}")
                 Return candidates(0)
             End If
 
@@ -5027,3 +5093,5 @@ ORDER by Date Desc")
         Return ""
     End Function
 End Class
+
+

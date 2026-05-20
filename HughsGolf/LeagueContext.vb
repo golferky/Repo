@@ -1,4 +1,4 @@
-﻿Imports System.Data.SQLite
+Imports System.Data.SQLite
 Imports System.Globalization
 
 Public Class LeagueContext
@@ -18,7 +18,7 @@ Public Class LeagueContext
     ' --- Pathing & Environment ---
     ' Reminder: You can update these when you move to the Mac mini 4TB drive
     Public Property csvFilePath As String = "C:\HughsGolf\Files\" '"C:\Users\Gary\OneDrive\Documents\Hugh's League\"
-    Public Property ReportPath As String = "C:\HughsGolf\Reports\" '"C:\Users\Gary\OneDrive\Documents\Hugh's League\"
+    Public Property ReportPath As String = "\\GarysNas\My Stuff\HughsGolf\Reports\" '"C:\HughsGolf\Reports\"
 
     'Public Property oHelper.sFilePath = "C:\Logs"
     'csvFilePath = "C:\HughsGolf\Files\"

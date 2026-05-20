@@ -1,4 +1,4 @@
-﻿Imports System.Data.SQLite
+Imports System.Data.SQLite
 Partial Class ScoreCard
 
     Private Sub btnGallus_Click(sender As Object, e As EventArgs)
@@ -1328,20 +1328,40 @@ Partial Class ScoreCard
             LOGIT($"CheckAndPromptGallusImport Error: {ex.Message}")
         End Try
     End Sub
+    Private Function NormalizeImportedPlayerName(rawName As String) As String
+        If String.IsNullOrWhiteSpace(rawName) Then Return ""
+
+        Dim cleaned As String = System.Net.WebUtility.HtmlDecode(rawName).Trim()
+        cleaned = System.Text.RegularExpressions.Regex.Replace(cleaned, "\s+", " ").Trim()
+
+        If cleaned.Contains(",") Then
+            Dim parts = cleaned.Split({","c}, 2)
+            Dim lastName As String = parts(0).Trim()
+            Dim firstName As String = parts(1).Trim()
+            If firstName <> "" AndAlso lastName <> "" Then
+                cleaned = firstName & " " & lastName
+            End If
+        End If
+
+        Return System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(cleaned.ToLower())
+    End Function
+
     Private Function ResolveProperPlayerName(gallusName As String) As String
+        Dim normalizedName As String = NormalizeImportedPlayerName(gallusName)
+
         ' Try to find exact match in Players table
         Using cmd As New SQLiteCommand("
         SELECT Player FROM Players 
         WHERE LOWER(Player) = LOWER(@Name)
         LIMIT 1", ctx.Conn)
-            cmd.Parameters.AddWithValue("@Name", gallusName.Trim())
+            cmd.Parameters.AddWithValue("@Name", normalizedName)
             If ctx.Conn.State <> ConnectionState.Open Then ctx.Conn.Open()
             Dim result = cmd.ExecuteScalar()
             If result IsNot Nothing Then Return result.ToString()
         End Using
 
         ' Try last name match
-        Dim lastName As String = gallusName.Trim().Split(" "c).Last()
+        Dim lastName As String = normalizedName.Trim().Split(" "c).Last()
         Using cmd As New SQLiteCommand("
         SELECT Player FROM Players 
         WHERE LOWER(Player) LIKE LOWER(@Name)
@@ -1352,8 +1372,7 @@ Partial Class ScoreCard
             If result IsNot Nothing Then Return result.ToString()
         End Using
 
-        ' Fallback to TitleCase
-        Return System.Globalization.CultureInfo.CurrentCulture.TextInfo.ToTitleCase(gallusName.Trim().ToLower())
+        Return normalizedName
     End Function
     Friend Sub ImportGallusData(tp As TabPage)
         Dim btnGallus As New Button()

@@ -195,6 +195,7 @@ Module EditScoresEngine
             enteredHoleScores.Add(h(i))
         Next
         Dim gross As Integer = ScoreRulesService.CalculateGross(enteredHoleScores)
+        Dim handicap As Integer = GetRowPreviousHandicap(row)
         Dim sql As String = "
     INSERT OR IGNORE INTO Scores (League, Player, Date, FrontBack)
     VALUES (@League, @Player, @Date, @FrontBack);
@@ -202,11 +203,7 @@ Module EditScoresEngine
         [1]=@H1,[2]=@H2,[3]=@H3,[4]=@H4,[5]=@H5,
         [6]=@H6,[7]=@H7,[8]=@H8,[9]=@H9,
         Gross = CASE WHEN @Gross = 0 THEN NULL ELSE @Gross END,
-        Net = CASE WHEN @Gross = 0 THEN NULL ELSE @Gross -
-            IFNULL((SELECT PHdcp FROM Handicaps 
-                     WHERE League=@League AND Player=@Player 
-                       AND Date = @Date), 0)
-            END
+        Net = CASE WHEN @Gross = 0 THEN NULL ELSE @Gross - @Handicap END
     WHERE League=@League AND Player=@Player AND Date=@Date"
 
         Using cmd As New SQLiteCommand(sql, ctx.Conn)
@@ -216,12 +213,30 @@ Module EditScoresEngine
             cmd.Parameters.AddWithValue("@Date", sDate)
             cmd.Parameters.AddWithValue("@FrontBack", ctx.sFrontBack)
             cmd.Parameters.AddWithValue("@Gross", gross)
+            cmd.Parameters.AddWithValue("@Handicap", handicap)
             For i As Integer = 1 To 9
                 cmd.Parameters.AddWithValue($"@H{i}", h(i))
             Next
             cmd.ExecuteNonQuery()
         End Using
     End Sub
+
+    Private Function GetRowPreviousHandicap(row As DataGridViewRow) As Integer
+        If row Is Nothing Then Return 0
+
+        Dim hdcpValue As Object = Nothing
+        If row.DataGridView IsNot Nothing AndAlso row.DataGridView.Columns.Contains("PHdcp") Then
+            hdcpValue = row.Cells("PHdcp").Value
+        ElseIf row.DataGridView IsNot Nothing AndAlso row.DataGridView.Columns.Contains("phdcp") Then
+            hdcpValue = row.Cells("phdcp").Value
+        End If
+
+        If hdcpValue IsNot Nothing AndAlso Not IsDBNull(hdcpValue) AndAlso IsNumeric(hdcpValue) Then
+            Return CInt(hdcpValue)
+        End If
+
+        Return 0
+    End Function
 
     ' ================= MEMORY UPDATE =================
     Private Sub UpdateDtScores(row As DataGridViewRow, colName As String, score As Object, dgv As DataGridView)
@@ -2307,7 +2322,7 @@ Module EditScoresEngine
             Dim scores As New List(Of String)
             Dim startIdx As Integer = Math.Max(0, i - 4)
             For j As Integer = i To startIdx Step -1
-            scores.Add(dt.Rows(j)("Gross").ToString())
+                scores.Add(dt.Rows(j)("Gross").ToString())
             Next
             Dim last5 As String = String.Join("-", scores)
             Dim lastDate As String = dt.Rows(i)("Date").ToString()
